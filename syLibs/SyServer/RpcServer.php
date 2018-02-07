@@ -236,10 +236,7 @@ class RpcServer extends BaseServer {
         $rspData = $this->_receivePack->packData();
         $this->_receivePack->init();
 
-        $sendRes = $server->send($fd, $rspData);
-        if(!$sendRes){
-            Log::error('rpc send response error, error_code:' . $server->getLastError());
-        }
+        $server->send($fd, $rspData);
         self::$_reqId = '';
     }
 }

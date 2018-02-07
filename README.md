@@ -94,70 +94,25 @@
         server_ip: string 服务IP
         server_port: int 服务端口
         server_status: int 服务状态 0:关闭 1:开启
-## Mongodb文档
-    https://docs.mongodb.com/php-library/
-    
-## API文档（使用apidoc生成）
-### 参考链接
-    https://github.com/apidoc/apidoc
-### 安装nodejs和apidoc
-```
-    tar -xvf node-v6.10.2-linux-x64.tar
-    mkdir /usr/local/nodejs
-    mv node-v6.10.2-linux-x64/ /usr/local/nodejs
-    vim /etc/profile
-        export NODE_HOME=/usr/local/nodejs/node-v6.10.2-linux-x64
-        export $PATH=$NODE_HOME/bin
-    source /etc/profile
-    npm config set registry "http://registry.npm.taobao.org"
-    sudo npm install apidoc -g
-```
-### 添加配置
-在项目根目录下添加名称为apidoc.json的文件，文件内容：
-```
-    {
-        "name": "SyApi",
-        "version": "1.0.0",
-        "description": "API文档",
-        "title": "API文档",
-        "url" : "http://localhost:8080/Index"
-    }
-```
-### 生成文档
-```
-    apidoc -i 项目根目录 -o 文档存放目录
-    //如果出现错误 SyntaxError: Use of const in strict mode
-    npm cache clean -f
-    npm install -g n
-    n stable
-```
-## XDebug代码分析
-- 默认关闭了自动堆栈追踪和自动性能分析
-- 开启堆栈追踪,如果是GET请求,必须在url上附带XDEBUG_TRACE参数,如果是POST请求,必须在请求体上附带XDEBUG_TRACE参数
-- 开启性能分析,如果是GET请求,必须在url上附带XDEBUG_PROFILE参数,如果是POST请求,必须在请求体上附带XDEBUG_PROFILE参数
-### 参考链接
-    http://blog.csdn.net/why_2012_gogo/article/details/51170609
-### 可视化工具
-- KCacheGrind(Linux)
-- QCacheGrind(Windows)
-
-## XHPROF性能分析
-### 使用样例
-参考demo_xhprof.php文件
-
-## 代码解耦
-善用观察者模式来实现业务代码解耦,具体可参考邮件发送模块
-
-## 接口签名
-请求地址带上签名参数,统一只在api模块做签名校验,签名参数如下:
-- _sign: 签名值,由数字,字母组成的48位字符串
-
+        
 ## 定时任务
-- 详情参见分支task
-
-## 数据库连接池
-- https://github.com/swoole/php-cp //连接池扩展
-- https://github.com/swoole/swoole-src/blob/master/examples/mysql_proxy_server.php //swoole版
-
-## 图片处理
-- https://github.com/kosinix/grafika //参考地址
+1. 定时任务处理都是通过发送HTTP GET请求的方式进行,在执行定时任务之前,必须确保请求接口可正常访问
+2. 目前支持的定时任务有三种: 
+- 一次性定时任务,必须指定任务的执行时间戳
+- 间隔定时任务,必须指定任务的间隔时间,单位为秒
+- cron定时任务,必须指定任务的cron计划时间
+### 命令
+```
+    //添加脚本执行权限
+    chmod a+x /home/jw/phpspace/swooleyaf/startTaskCron.sh
+    chmod a+x /home/jw/phpspace/swooleyaf/startTaskInterval.sh
+    chmod a+x /home/jw/phpspace/swooleyaf/startTaskSingle.sh
+    //启动定时任务
+    nohup sh /home/jw/phpspace/swooleyaf/startTaskCron.sh 2>&1 >/dev/null &
+    nohup sh /home/jw/phpspace/swooleyaf/startTaskInterval.sh 2>&1 >/dev/null &
+    nohup sh /home/jw/phpspace/swooleyaf/startTaskSingle.sh 2>&1 >/dev/null &
+    //关闭定时任务
+    ps -ef | grep startTaskCron.sh |kill -9
+    ps -ef | grep startTaskInterval.sh |kill -9
+    ps -ef | grep startTaskSingle.sh |kill -9
+```

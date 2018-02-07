@@ -654,21 +654,16 @@ class CronTool {
     }
 
     /**
-     * @param string $cron
+     * @param string $cron 计划时间字符串,格式: 30 * * * * * -每30秒执行一次
      * @return \Tool\Cron\CronData
      * @throws \Exception\Cron\CronException
      */
     public static function analyseCron(string $cron){
-        $cronStr = preg_replace('/\s+/', '=', trim($cron));
-        if(preg_match('/^(\=(\*|\d+(\,\d+)*|\d+\-\d+(\,\d+\-\d+)*)(\/\d+){0,1}){6}$/', '=' . $cronStr) == 0){
-            throw new CronException('cron格式不合法', ErrorCode::CRON_FORMAT_ERROR);
-        }
-
-        $cronArr = explode('=', $cronStr);
+        $cronArr = explode(' ', $cron);
         $handleRes = self::handleCron($cronArr);
 
         $cronData = new CronData();
-        $cronData->setCron(preg_replace('/\=/', ' ', $cronStr));
+        $cronData->setCron($cron);
         $cronData->setSeconds(self::analyseCronSecond($handleRes['second']));
         $cronData->setMinutes(self::analyseCronMinute($handleRes['minute']));
         $cronData->setHours(self::analyseCronHour($handleRes['hour']));

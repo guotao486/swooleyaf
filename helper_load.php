@@ -7,4 +7,4 @@ date_default_timezone_set('PRC');
 define('SY_VERSION', '3.1');
 define('SY_ROOT', __DIR__);
 define('SY_ENV', 'dev');
-define('SY_PROJECT', 'a01');
+define('SY_PROJECT', 'a1');

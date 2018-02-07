@@ -6,12 +6,11 @@
  * Time: 下午8:34
  */
 class CommonController extends \SyFrame\BaseController {
-    public $signStatus = true;
+    public $signStatus = false;
 
     public function init() {
         parent::init();
-        $this->signStatus = true;
-        $view = $this->initView();
+        $this->signStatus = false;
 
         $token = \Tool\SySession::getSessionId();
         $_COOKIE[\Constant\Server::SERVER_DATA_KEY_TOKEN] = $token;

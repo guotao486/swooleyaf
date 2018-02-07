@@ -32,43 +32,10 @@ $projects = [
     'sy_api' => [
         'git_branch' => 'master',
         'type' => 'module',
-        'module_name' => 'a01api',
+        'module_name' => 'a1api',
         'listens' => [
             0 => [
                 'port' => 7100,
-                'weight' => 1,
-            ],
-        ],
-    ],
-    'sy_order' => [
-        'git_branch' => 'master',
-        'type' => 'module',
-        'module_name' => 'a01order',
-        'listens' => [
-            0 => [
-                'port' => 7120,
-                'weight' => 1,
-            ],
-        ],
-    ],
-    'sy_user' => [
-        'git_branch' => 'master',
-        'type' => 'module',
-        'module_name' => 'a01user',
-        'listens' => [
-            0 => [
-                'port' => 7140,
-                'weight' => 1,
-            ],
-        ],
-    ],
-    'sy_services' => [
-        'git_branch' => 'master',
-        'type' => 'module',
-        'module_name' => 'a01services',
-        'listens' => [
-            0 => [
-                'port' => 7160,
                 'weight' => 1,
             ],
         ],

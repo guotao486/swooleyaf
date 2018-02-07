@@ -14,7 +14,7 @@ if ($registryList === false) {
 $syPack = new \Tool\SyPack();
 foreach ($registryList['data'] as $eRegistry) {
     $serverData = \Tool\Tool::jsonDecode($eRegistry['value']);
-    if(substr($serverData['module'], 0, 3) == SY_PROJECT){
+    if(substr($serverData['module'], 0, 2) == SY_PROJECT){
         if ($serverData['module'] == \Constant\Server::MODULE_NAME_API) {
             $url = 'http://' . $serverData['host'] . ':' . $serverData['port'];
             $syPack->setCommandAndData(\Tool\SyPack::COMMAND_TYPE_SOCKET_CLIENT_SEND_TASK_REQ, [

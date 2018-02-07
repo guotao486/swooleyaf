@@ -187,14 +187,9 @@ class CronData {
 
     /**
      * @param string $cron
-     * @throws \Exception\Cron\CronException
      */
     public function setCron(string $cron) {
-        if(preg_match('/^(\s{1}(\*|\d+(\,\d+)*|\d+\-\d+(\,\d+\-\d+)*)(\/\d+){0,1}){6}$/', ' ' . $cron) == 0){
-            throw new CronException('cron格式不合法', ErrorCode::CRON_FORMAT_ERROR);
-        }
-
-        $this->cron = preg_replace('/\s+/', ' ', $cron);
+        $this->cron = $cron;
     }
 
     /**
@@ -262,31 +257,39 @@ class CronData {
 
     /**
      * 校验时间戳是否满足cron计划
-     * @param int $timestamp
+     * @param array $timeArr 时间数组
+     *   格式如下：
+     *   [
+     *     'second' => 1,
+     *     'minute' => 1,
+     *     'hour' => 1,
+     *     'day' => 1,
+     *     'month' => 1,
+     *     'week' => 1,
+     *   ]
      * @return bool
      */
-    public function checkTime(int $timestamp) : bool {
-        if (preg_match('/^[1-4]\d{9}$/', $timestamp) == 0) {
+    public function checkTime(array $timeArr) : bool {
+        if (empty($timeArr)) {
             return false;
         }
 
-        $timeArr = explode('-', date('s-i-G-j-n-w', $timestamp));
-        if (!$this->checkSecond((int)$timeArr[0])) {
+        if (!$this->checkSecond($timeArr['second'])) {
             return false;
         }
-        if (!$this->checkMinute((int)$timeArr[1])) {
+        if (!$this->checkMinute($timeArr['minute'])) {
             return false;
         }
-        if (!$this->checkHour((int)$timeArr[2])) {
+        if (!$this->checkHour($timeArr['hour'])) {
             return false;
         }
-        if (!$this->checkDay((int)$timeArr[3])) {
+        if (!$this->checkDay($timeArr['day'])) {
             return false;
         }
-        if (!$this->checkMonth((int)$timeArr[4])) {
+        if (!$this->checkMonth($timeArr['month'])) {
             return false;
         }
-        if (!$this->checkWeek((int)$timeArr[5])) {
+        if (!$this->checkWeek($timeArr['week'])) {
             return false;
         }
 
