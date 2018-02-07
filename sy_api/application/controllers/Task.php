@@ -121,9 +121,9 @@ class TaskController extends CommonController {
      * @apiGroup Task
      */
     public function handleSingleTaskAction() {
-        $this->sendRsp([
-            'code' => 0,
-        ]);
+        $handleRes = \Dao\TaskDao::handleSingleTask([]);
+        $this->SyResult->setData($handleRes);
+        $this->sendRsp();
     }
 
     /**
@@ -133,9 +133,9 @@ class TaskController extends CommonController {
      * @apiGroup Task
      */
     public function handlePersistIntervalTaskAction() {
-        $this->sendRsp([
-            'code' => 0,
-        ]);
+        $handleRes = \Dao\TaskDao::handlePersistIntervalTask([]);
+        $this->SyResult->setData($handleRes);
+        $this->sendRsp();
     }
 
     /**
@@ -145,8 +145,8 @@ class TaskController extends CommonController {
      * @apiGroup Task
      */
     public function handlePersistCronTaskAction() {
-        $this->sendRsp([
-            'code' => 0,
-        ]);
+        $handleRes = \Dao\TaskDao::handlePersistCronTask([]);
+        $this->SyResult->setData($handleRes);
+        $this->sendRsp();
     }
 }
