@@ -47,6 +47,12 @@ function swoole_event_write($fd, $data){}
 function swoole_event_defer($callback){}
 
 /**
+ * @param $callback[required]
+ * @return mixed
+ */
+function swoole_event_cycle($callback){}
+
+/**
  * @param $ms[required]
  * @param $callback[required]
  * @param $param[optional]
@@ -150,9 +156,10 @@ function swoole_get_local_mac(){}
 
 /**
  * @param $errno[required]
+ * @param $error_type[optional]
  * @return mixed
  */
-function swoole_strerror($errno){}
+function swoole_strerror($errno, $error_type=null){}
 
 function swoole_errno(){}
 

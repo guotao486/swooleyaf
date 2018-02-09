@@ -125,6 +125,16 @@ class swoole_channel extends Swoole\Channel
 
 }
 
+class swoole_http2_client extends Swoole\Http2\Client
+{
+
+}
+
+class swoole_http2_response extends Swoole\Http2\Response
+{
+
+}
+
 class swoole_serialize extends Swoole\Serialize
 {
 

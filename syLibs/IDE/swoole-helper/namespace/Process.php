@@ -2,11 +2,15 @@
 namespace Swoole;
 
 /**
- * @since 1.9.21
+ * @since 1.10.1
  */
 class Process
 {
     const IPC_NOWAIT = 256;
+    const PIPE_MASTER = 1;
+    const PIPE_WORKER = 2;
+    const PIPE_READ = 3;
+    const PIPE_WRITE = 4;
 
 
     /**

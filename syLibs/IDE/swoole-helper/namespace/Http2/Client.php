@@ -1,10 +1,10 @@
 <?php
-namespace Swoole;
+namespace Swoole\Http2;
 
 /**
  * @since 1.10.1
  */
-class Client
+class Client extends \swoole_client
 {
     const MSG_OOB = 1;
     const MSG_PEEK = 2;
@@ -16,16 +16,69 @@ class Client
 
 
     /**
-     * @param $type[required]
-     * @param $async[optional]
      * @return mixed
      */
-    public function __construct($type, $async=null){}
+    public function __construct(){}
 
     /**
      * @return mixed
      */
     public function __destruct(){}
+
+    /**
+     * @return mixed
+     */
+    public function setHeaders(){}
+
+    /**
+     * @return mixed
+     */
+    public function setCookies(){}
+
+    /**
+     * @return mixed
+     */
+    public function get(){}
+
+    /**
+     * @return mixed
+     */
+    public function post(){}
+
+    /**
+     * @return mixed
+     */
+    public function onConnect(){}
+
+    /**
+     * @return mixed
+     */
+    public function onError(){}
+
+    /**
+     * @return mixed
+     */
+    public function onReceive(){}
+
+    /**
+     * @return mixed
+     */
+    public function onClose(){}
+
+    /**
+     * @return mixed
+     */
+    public function openStream(){}
+
+    /**
+     * @return mixed
+     */
+    public function push(){}
+
+    /**
+     * @return mixed
+     */
+    public function closeStream(){}
 
     /**
      * @param $settings[required]

@@ -2,7 +2,7 @@
 namespace Swoole\Websocket;
 
 /**
- * @since 1.9.21
+ * @since 1.10.1
  */
 class Server extends \swoole_http_server
 {
@@ -29,6 +29,12 @@ class Server extends \swoole_http_server
      * @return mixed
      */
     public function exist($fd){}
+
+    /**
+     * @param $fd[required]
+     * @return mixed
+     */
+    public function isEstablished($fd){}
 
     /**
      * @param $data[required]
