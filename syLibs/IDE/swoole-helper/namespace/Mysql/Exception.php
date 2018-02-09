@@ -2,7 +2,7 @@
 namespace Swoole\Mysql;
 
 /**
- * @since 1.9.21
+ * @since 1.10.1
  */
 class Exception extends \Exception
 {

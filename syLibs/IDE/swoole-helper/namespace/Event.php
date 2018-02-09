@@ -2,7 +2,7 @@
 namespace Swoole;
 
 /**
- * @since 1.9.21
+ * @since 1.10.1
  */
 class Event
 {
@@ -54,6 +54,12 @@ class Event
      * @return mixed
      */
     public static function defer($callback){}
+
+    /**
+     * @param $callback[required]
+     * @return mixed
+     */
+    public static function cycle($callback){}
 
 
 }

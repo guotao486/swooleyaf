@@ -2,7 +2,7 @@
 namespace Swoole;
 
 /**
- * @since 1.9.21
+ * @since 1.10.1
  */
 class Async
 {
@@ -54,6 +54,13 @@ class Async
      * @return mixed
      */
     public static function set($settings){}
+
+    /**
+     * @param $command[required]
+     * @param $callback[required]
+     * @return mixed
+     */
+    public static function exec($command, $callback){}
 
 
 }

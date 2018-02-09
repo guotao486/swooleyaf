@@ -2,7 +2,7 @@
 namespace Swoole\Http;
 
 /**
- * @since 1.9.21
+ * @since 1.10.1
  */
 class Response
 {
@@ -56,6 +56,14 @@ class Response
      * @return mixed
      */
     public function header($key, $value, $ucwords=null){}
+
+    /**
+     * @param $key[required]
+     * @param $value[required]
+     * @param $ucwords[optional]
+     * @return mixed
+     */
+    public function trailer($key, $value, $ucwords=null){}
 
     /**
      * @param $content[required]
