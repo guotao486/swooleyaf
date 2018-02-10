@@ -8,3 +8,4 @@ define('SY_VERSION', '3.1');
 define('SY_ROOT', __DIR__);
 define('SY_ENV', 'dev');
 define('SY_PROJECT', 'a01');
+define('SY_LOG_PATH', ini_get('seaslog.default_basepath') . 'sy' . SY_PROJECT . '/');
