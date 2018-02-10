@@ -43,7 +43,7 @@ class Etcd3Singleton {
     private $prefixModules = '';
 
     private function __construct() {
-        Log::setPath(Tool::getConfig('project.' . SY_ENV . SY_PROJECT . '.dir.store.log'));
+        Log::setPath(SY_LOG_PATH);
         $this->init();
     }
 

@@ -70,7 +70,7 @@ class KafkaConsumer {
         $this->kafkaConsumer = new \RdKafka\KafkaConsumer($conf);
         $this->managerKey = Server::REDIS_PREFIX_MESSAGE_QUEUE . 'manager_kafka';
         $this->initTopics();
-        Log::setPath(Tool::getConfig('project.' . SY_ENV . SY_PROJECT . '.dir.store.log'));
+        Log::setPath(SY_LOG_PATH);
     }
 
     private function __clone() {

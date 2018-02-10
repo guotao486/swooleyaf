@@ -195,7 +195,7 @@ abstract class BaseServer {
         define('SY_SID_LENGTH', strlen(self::$_serverToken));
 
         //设置日志目录
-        Log::setPath(Tool::getConfig('project.' . SY_ENV . SY_PROJECT . '.dir.store.log'));
+        Log::setPath(SY_LOG_PATH);
     }
 
     private function __clone() {

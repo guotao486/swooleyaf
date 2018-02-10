@@ -45,7 +45,7 @@ class RedisConsumer {
 
     public function __construct() {
         $this->managerKey = Server::REDIS_PREFIX_MESSAGE_QUEUE . 'manager_redis';
-        Log::setPath(Tool::getConfig('project.' . SY_ENV . SY_PROJECT . '.dir.store.log'));
+        Log::setPath(SY_LOG_PATH);
         $this->init();
     }
 
