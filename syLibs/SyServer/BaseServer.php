@@ -9,10 +9,8 @@ namespace SyServer;
 
 use Constant\ErrorCode;
 use Constant\Server;
-use DesignPatterns\Singletons\Etcd3Singleton;
 use DesignPatterns\Singletons\MysqlSingleton;
 use DesignPatterns\Singletons\RedisSingleton;
-use Exception\Etcd\EtcdException;
 use Log\Log;
 use MessageQueue\Producer\RedisProducer;
 use Response\Result;
@@ -418,48 +416,6 @@ abstract class BaseServer {
     }
 
     /**
-     * 刷新注册的服务列表
-     * @throws \Exception\Etcd\EtcdException
-     */
-    protected function refreshRegisterServices() {
-        $modulePrefix = Etcd3Singleton::getInstance()->getPrefixModules();
-        $registryList = Etcd3Singleton::getInstance()->getList($modulePrefix);
-        if($registryList === false){
-            throw new EtcdException('拉取注册服务信息失败', ErrorCode::ETCD_GET_DATA_ERROR);
-        }
-
-        $this->clearRegisterServices();
-
-        $groupServices = [];
-        foreach ($registryList['data'] as $eRegistry) {
-            $serverData = Tool::jsonDecode($eRegistry['value']);
-            if($serverData['status'] != Server::SERVER_STATUS_OPEN){
-                continue;
-            }
-
-            self::$_syServices->set($serverData['token'], $serverData);
-            if(!isset($groupServices[$serverData['module']])){
-                $groupServices[$serverData['module']] = [
-                    'weight' => 0,
-                    'tokens' => [],
-                ];
-            }
-            for ($i = 0;$i < $serverData['weight'];$i++) {
-                $groupServices[$serverData['module']]['tokens'][] = $serverData['token'];
-            }
-            $groupServices[$serverData['module']]['weight'] += $serverData['weight'];
-        }
-
-        foreach ($groupServices as $module => $moduleData) {
-            self::$_syModules->set($module, [
-                'module' => $module,
-                'weight' => $moduleData['weight'],
-                'tokens' => ',' . implode(',', $moduleData['tokens']),
-            ]);
-        }
-    }
-
-    /**
      * 添加本地用户信息
      * @param string $sessionId 会话ID
      * @param array $userData
@@ -543,6 +499,37 @@ abstract class BaseServer {
         }
     }
 
+    /**
+     * 刷新项目模块信息
+     * @param array $modules 模块信息列表
+     */
+    protected function refreshProjectModules(array $modules) {
+        $this->clearRegisterServices();
+
+        $groupServices = [];
+        foreach ($modules as $serverToken => $serverData) {
+            self::$_syServices->set($serverToken, $serverData);
+            if (!isset($groupServices[$serverData['module']])) {
+                $groupServices[$serverData['module']] = [
+                    'weight' => 0,
+                    'tokens' => [],
+                ];
+            }
+            for ($i = 0;$i < $serverData['weight'];$i++) {
+                $groupServices[$serverData['module']]['tokens'][] = $serverToken;
+            }
+            $groupServices[$serverData['module']]['weight'] += $serverData['weight'];
+        }
+
+        foreach ($groupServices as $moduleTag => $moduleData) {
+            self::$_syModules->set($moduleTag, [
+                'module' => $moduleTag,
+                'weight' => $moduleData['weight'],
+                'tokens' => ',' . implode(',', $moduleData['tokens']),
+            ]);
+        }
+    }
+
     protected function basicWorkStart(\swoole_server $server, $workerId){
         //设置错误和异常处理
         set_exception_handler('\SyError\ErrorHandler::handleException');
@@ -562,15 +549,15 @@ abstract class BaseServer {
 
         if($workerId == 0){ //保证每一个服务只执行一次定时任务
             $weight = (int)Tool::getArrayVal($this->_configs['server'], 'weight', 1);
-            $moduleKey = Etcd3Singleton::getInstance()->getPrefixModules() . self::$_serverToken;
-            Etcd3Singleton::getInstance()->set($moduleKey, Tool::jsonEncode([
+            Tool::setProjectModules(SY_PROJECT, self::$_serverToken, [
                 'token' => self::$_serverToken,
                 'module' => SY_MODULE,
+                'type' => SY_API ? Server::SERVER_TYPE_API : Server::SERVER_TYPE_RPC,
                 'host' => $this->_host,
                 'port' => (string)$this->_port,
                 'weight' => $weight > 0 ? $weight : 1,
                 'status' => Server::SERVER_STATUS_OPEN,
-            ], JSON_UNESCAPED_UNICODE));
+            ]);
         }
     }
 
@@ -629,8 +616,8 @@ abstract class BaseServer {
      * @param \swoole_server $server
      */
     public function onShutdown(\swoole_server $server){
-        $moduleKey = Etcd3Singleton::getInstance()->getPrefixModules() . self::$_serverToken;
-        Etcd3Singleton::getInstance()->del($moduleKey);
+        $activeModules = Tool::getProjectModulesByServer(SY_PROJECT, self::$_serverToken, []);
+        Tool::updateProjectModules($activeModules);
     }
 
     /**

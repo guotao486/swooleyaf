@@ -93,9 +93,6 @@ class RpcServer extends BaseServer {
         $result = true;
         $taskCommand = Tool::getArrayVal($data, 'task_command', '');
         switch ($taskCommand) {
-            case Server::TASK_TYPE_REFRESH_SERVER_REGISTRY:
-                $this->refreshRegisterServices();
-                break;
             case Server::TASK_TYPE_CLEAR_LOCAL_USER_CACHE:
                 $this->clearLocalUsers();
                 break;
@@ -125,6 +122,23 @@ class RpcServer extends BaseServer {
                             'msg' => '设置成功',
                         ]);
                     }
+                    break;
+                case '/refreshservices':
+                    $result = new Result();
+                    if(!(isset($_POST['_services']) && is_string($_POST['_services']))){
+                        $result->setCodeMsg(ErrorCode::COMMON_PARAM_ERROR, '服务模块信息必须设置');
+                    } else {
+                        $services = Tool::jsonDecode($_POST['_services']);
+                        if (is_array($services) && !empty($services)) {
+                            $this->refreshProjectModules($services);
+                            $result->setData([
+                                'msg' => '刷新服务模块信息成功',
+                            ]);
+                        } else {
+                            $result->setCodeMsg(ErrorCode::COMMON_PARAM_ERROR, '服务模块信息不合法');
+                        }
+                    }
+
                     break;
                 default:
                     $result = $this->_app->bootstrap()->getDispatcher()->dispatch(new Http($data['api_uri']))->getBody();

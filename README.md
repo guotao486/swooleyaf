@@ -59,12 +59,11 @@
 ```
     //前置命令,必须在开启服务之前运行
     nohup etcd --listen-client-urls http://10.27.166.170:2379 --advertise-client-urls http://10.27.166.170:2379 >/dev/null & --启动etcd服务
-    nohup etcdctl watch sydev/modules/ sydev/modules0 >/usr/local/inotify/symodules/change_service.txt --endpoints=[10.27.166.170:2379] 2>&1 & --启动etcd监听服务
-    chmod a+x /home/jw/phpspace/swooleyaf/symodules_inotify.sh
-    nohup sh /home/jw/phpspace/swooleyaf/symodules_inotify.sh >/dev/null 2>&1 & --启动inotify实时更新
-    //服务命令
-    /usr/local/php7/bin/php helper_service_manager.php -s start-all --启动服务
-    /usr/local/php7/bin/php helper_service_manager.php -s stop-all --关闭服务
+    //服务命令-启动服务
+    /usr/local/php7/bin/php helper_service_manager.php -s start-all
+    /usr/local/php7/bin/php helper_command.php -action refreshserver
+    //服务命令-关闭服务
+    /usr/local/php7/bin/php helper_service_manager.php -s stop-all
     //微信更新access token和js ticket缓存
     //1:必须将helper_sytask.php文件加入到linux系统cron执行任务中
     //2:强制刷新缓存: /usr/local/php7/bin/php helper_sytask.php -refreshwx 1

@@ -37,10 +37,10 @@ class Etcd3Singleton {
      */
     private $prefixBase = '';
     /**
-     * 模块前缀
+     * 项目前缀
      * @var string
      */
-    private $prefixModules = '';
+    private $prefixProjects = '';
 
     private function __construct() {
         Log::setPath(SY_LOG_PATH);
@@ -80,7 +80,7 @@ class Etcd3Singleton {
         }
         $this->baseDomain = $configs['domain'];
         $this->prefixBase = $configs['prefix']['base'];
-        $this->prefixModules = $configs['prefix']['modules'];
+        $this->prefixProjects = $configs['prefix']['projects'];
     }
 
     /**
@@ -100,8 +100,8 @@ class Etcd3Singleton {
     /**
      * @return string
      */
-    public function getPrefixModules() : string {
-        return $this->prefixModules;
+    public function getPrefixProjects() : string {
+        return $this->prefixProjects;
     }
 
     /**
