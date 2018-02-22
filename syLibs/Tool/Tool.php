@@ -10,6 +10,7 @@ namespace Tool;
 use Constant\ErrorCode;
 use Constant\Server;
 use DesignPatterns\Factories\CacheSimpleFactory;
+use DesignPatterns\Singletons\Etcd3Singleton;
 use Exception\Common\CheckException;
 use Traits\SimpleTrait;
 use Yaf\Registry;
@@ -524,5 +525,131 @@ class Tool {
         $client->close();
 
         return $res;
+    }
+
+    /**
+     * 设置项目模块信息
+     * @param string $projectTag 项目标识
+     * @param string $serverToken 服务标识
+     * @param array $serverData 服务数据
+     */
+    public static function setProjectModules(string $projectTag,string $serverToken,array $serverData) {
+        $redisKey = Server::REDIS_PREFIX_PROJECT_MODULES . $projectTag;
+        if (empty($serverData)) {
+            CacheSimpleFactory::getRedisInstance()->hMset($redisKey, [
+                $serverToken => '',
+                'project_tag' => $projectTag,
+            ]);
+        } else {
+            CacheSimpleFactory::getRedisInstance()->hMset($redisKey, [
+                $serverToken => Tool::jsonEncode($serverData, JSON_UNESCAPED_UNICODE),
+                'project_tag' => $projectTag,
+            ]);
+        }
+    }
+
+    /**
+     * 通过redis缓存获取项目模块信息
+     * @param string $projectTag 项目标识
+     * @return array
+     */
+    public static  function getProjectModulesByRedis(string $projectTag) {
+        $redisKey = Server::REDIS_PREFIX_PROJECT_MODULES . $projectTag;
+        $projectModules = CacheSimpleFactory::getRedisInstance()->hGetAll($redisKey);
+        CacheSimpleFactory::getRedisInstance()->del($redisKey);
+        if (is_array($projectModules) && isset($projectModules['project_tag']) && ($projectModules['project_tag'] == $projectTag)) {
+            $projectKey = Etcd3Singleton::getInstance()->getPrefixProjects() . $projectTag;
+            $existModules = Etcd3Singleton::getInstance()->get($projectKey);
+            $nowModules = is_string($existModules) ? Tool::jsonDecode($existModules) : [];
+            unset($projectModules['project_tag']);
+
+            $activeModules = [];
+            foreach ($projectModules as $serverToken => $moduleStr) {
+                if (strlen($moduleStr) > 0) {
+                    $moduleData = Tool::jsonDecode($moduleStr);
+                    $nowModules[$serverToken] = $moduleData;
+                    if ($moduleData['status'] == Server::SERVER_STATUS_OPEN) {
+                        $activeModules[$serverToken] = $moduleData;
+                    }
+                } else {
+                    unset($nowModules[$serverToken]);
+                }
+            }
+
+            Etcd3Singleton::getInstance()->set($projectKey, Tool::jsonEncode($nowModules, JSON_UNESCAPED_UNICODE));
+
+            return $activeModules;
+        } else {
+            return [];
+        }
+    }
+
+    /**
+     * 服务端获取项目模块信息
+     * @param string $projectTag 项目标识
+     * @param string $serverToken 模块标识
+     * @param array $serverData 模块数据
+     * @return array
+     */
+    public static  function getProjectModulesByServer(string $projectTag,string $serverToken,array $serverData) {
+        $projectKey = Etcd3Singleton::getInstance()->getPrefixProjects() . $projectTag;
+        $existModules = Etcd3Singleton::getInstance()->get($projectKey);
+        $nowModules = is_string($existModules) ? Tool::jsonDecode($existModules) : [];
+        if (empty($serverData)) {
+            unset($nowModules[$serverToken]);
+        } else {
+            $saveData = isset($nowModules[$serverToken]) ? array_merge($nowModules[$serverToken], $serverData) : $serverData;
+            $nowModules[$serverToken] = $saveData;
+        }
+
+        $activeModules = [];
+        foreach ($nowModules as $tag => $eData) {
+            if ($eData['status'] == Server::SERVER_STATUS_OPEN) {
+                $activeModules[$tag] = $eData;
+            }
+        }
+
+        Etcd3Singleton::getInstance()->set($projectKey, Tool::jsonEncode($nowModules, JSON_UNESCAPED_UNICODE));
+
+        return $activeModules;
+    }
+
+    /**
+     * 更新项目模块信息
+     * @param array $modules
+     */
+    public static  function updateProjectModules(array $modules) {
+        $syPack = new SyPack();
+
+        $params = [
+            '_services' => Tool::jsonEncode($modules, JSON_UNESCAPED_UNICODE),
+        ];
+        $syPack->setCommandAndData(SyPack::COMMAND_TYPE_RPC_CLIENT_SEND_API_REQ, [
+            'api_module' => Server::MODULE_NAME_API,
+            'api_uri' => '/refreshservices',
+            'api_method' => 'POST',
+            'api_params' => $params,
+        ]);
+        $servicesStr1 = $syPack->packData();
+        $servicesStr2 = http_build_query($params);
+
+        foreach ($modules as $eModule) {
+            if ($eModule['type'] == Server::SERVER_TYPE_API) {
+                $url = 'http://' . $eModule['host'] . ':' . $eModule['port'] . '/refreshservices';
+                $ch = curl_init();
+                curl_setopt($ch, CURLOPT_URL, $url);
+                curl_setopt($ch, CURLOPT_POST, true);
+                curl_setopt($ch, CURLOPT_POSTFIELDS, $servicesStr2);
+                curl_setopt($ch, CURLOPT_TIMEOUT_MS, 2000);
+                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+                curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+                curl_setopt($ch, CURLOPT_HEADER, false);
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                curl_exec($ch);
+                curl_close($ch);
+            } else {
+                self::sendSyRpcReq($eModule['host'], $eModule['port'], $servicesStr1);
+            }
+        }
     }
 }

@@ -390,19 +390,27 @@ class HttpServer extends BaseServer {
                     $resArr['code'] = ErrorCode::COMMON_PARAM_ERROR;
                     $resArr['msg'] = '服务状态必须设置';
                 } else {
-                    $moduleKey = Etcd3Singleton::getInstance()->getPrefixModules() . hash('crc32b', $_GET['server_ip'] . ':' . $_GET['server_port']);
-                    $configStr = Etcd3Singleton::getInstance()->get($moduleKey);
-                    if($configStr === false){
+                    $projectKey = Etcd3Singleton::getInstance()->getPrefixProjects() . SY_PROJECT;
+                    $projectStr = Etcd3Singleton::getInstance()->get($projectKey);
+                    if ($projectStr === false) {
                         $resArr['code'] = ErrorCode::COMMON_PARAM_ERROR;
-                        $resArr['msg'] = '服务不存在';
+                        $resArr['msg'] = '项目不存在';
                     } else {
-                        $configArr = Tool::jsonDecode($configStr);
-                        $configArr['status'] = $_GET['server_status'];
-                        Etcd3Singleton::getInstance()->set($moduleKey, Tool::jsonEncode($configArr, JSON_UNESCAPED_UNICODE));
+                        $projectData = Tool::jsonDecode($projectStr);
+                        $serverToken = hash('crc32b', $_GET['server_ip'] . ':' . $_GET['server_port']);
+                        if (isset($projectData[$serverToken])) {
+                            $activeModules = Tool::getProjectModulesByServer(SY_PROJECT, $serverToken, [
+                                'status' => $_GET['server_status'],
+                            ]);
+                            Tool::updateProjectModules($activeModules);
 
-                        $resArr['data'] = [
-                            'update_num' => 1,
-                        ];
+                            $resArr['data'] = [
+                                'update_num' => 1,
+                            ];
+                        } else {
+                            $resArr['code'] = ErrorCode::COMMON_PARAM_ERROR;
+                            $resArr['msg'] = '服务不存在';
+                        }
                     }
                 }
 
@@ -425,6 +433,30 @@ class HttpServer extends BaseServer {
                     $resArr['data'] = [
                         'msg' => '设置成功',
                     ];
+                }
+                $result = Tool::jsonEncode($resArr, JSON_UNESCAPED_UNICODE);
+
+                break;
+            case '/refreshservices':
+                $resArr = [
+                    'code' => 0,
+                ];
+
+                $_POST = $request->post ?? [];
+                if(!(isset($_POST['_services']) && is_string($_POST['_services']))){
+                    $resArr['code'] = ErrorCode::COMMON_PARAM_ERROR;
+                    $resArr['msg'] = '服务模块信息必须设置';
+                } else {
+                    $services = Tool::jsonDecode($_POST['_services']);
+                    if (is_array($services) && !empty($services)) {
+                        $this->refreshProjectModules($services);
+                        $resArr['data'] = [
+                            'msg' => '刷新服务模块信息成功',
+                        ];
+                    } else {
+                        $resArr['code'] = ErrorCode::COMMON_PARAM_ERROR;
+                        $resArr['msg'] = '服务模块信息不合法';
+                    }
                 }
                 $result = Tool::jsonEncode($resArr, JSON_UNESCAPED_UNICODE);
 
@@ -476,9 +508,6 @@ class HttpServer extends BaseServer {
 
         $taskCommand = Tool::getArrayVal($data, 'task_command', '');
         switch ($taskCommand) {
-            case Server::TASK_TYPE_REFRESH_SERVER_REGISTRY:
-                $this->refreshRegisterServices();
-                break;
             case Server::TASK_TYPE_CLEAR_API_SIGN_CACHE:
                 $this->clearApiSign();
                 break;
