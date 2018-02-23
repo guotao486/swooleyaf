@@ -632,6 +632,7 @@ class Tool {
         ]);
         $servicesStr1 = $syPack->packData();
         $servicesStr2 = http_build_query($params);
+        unset($syPack);
 
         foreach ($modules as $eModule) {
             if ($eModule['type'] == Server::SERVER_TYPE_API) {
