@@ -183,41 +183,32 @@ final class WxUtil {
 
         $timeout = (int)Tool::getArrayVal($configs, 'timeout', 2000);
 
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        //post提交方式
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $dataStr);
-        //设置超时
-        curl_setopt($ch, CURLOPT_TIMEOUT_MS, $timeout);
-
+        $curlConfigs = [
+            CURLOPT_URL => $url,
+            CURLOPT_POST => true,
+            CURLOPT_POSTFIELDS => $dataStr,
+            CURLOPT_TIMEOUT_MS => $timeout,
+            CURLOPT_HEADER => Tool::getArrayVal($configs, 'headers', false),
+            CURLOPT_RETURNTRANSFER => true,
+        ];
         if (Tool::getArrayVal($configs, 'ssl_verify', true)) { //是否需要ssl认证，默认需要
-            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
-            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);//严格校验
+            $curlConfigs[CURLOPT_SSL_VERIFYPEER] = true;
+            $curlConfigs[CURLOPT_SSL_VERIFYHOST] = 2; //严格校验
         } else {
-            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+            $curlConfigs[CURLOPT_SSL_VERIFYPEER] = false;
+            $curlConfigs[CURLOPT_SSL_VERIFYHOST] = false;
         }
-
-        //设置header
-        curl_setopt($ch, CURLOPT_HEADER, Tool::getArrayVal($configs, 'headers', false));
-        //要求结果为字符串且输出到屏幕上
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         if (Tool::getArrayVal($configs, 'use_cert', false)) { //是否需要证书，默认不需要
-            curl_setopt($ch, CURLOPT_SSLCERTTYPE, 'PEM');
-            curl_setopt($ch, CURLOPT_SSLCERT, Tool::getArrayVal($configs, 'sslcert_path', ''));
-            curl_setopt($ch, CURLOPT_SSLKEYTYPE, 'PEM');
-            curl_setopt($ch, CURLOPT_SSLKEY, Tool::getArrayVal($configs, 'sslkey_path', ''));
+            $curlConfigs[CURLOPT_SSLCERTTYPE] = 'PEM';
+            $curlConfigs[CURLOPT_SSLCERT] = Tool::getArrayVal($configs, 'sslcert_path', '');
+            $curlConfigs[CURLOPT_SSLKEYTYPE] = 'PEM';
+            $curlConfigs[CURLOPT_SSLKEY] = Tool::getArrayVal($configs, 'sslkey_path', '');
         }
-
-        $resData = curl_exec($ch);
-        $errorNo = curl_errno($ch);
-        $extends['head'] = curl_getinfo($ch);
-        curl_close($ch);
-        if ($errorNo == 0) {
-            return $resData;
+        $sendRes = Tool::sendCurlReq($curlConfigs);
+        if ($sendRes['res_no'] == 0) {
+            return $sendRes['res_content'];
         } else {
-            throw new WxException('curl出错，错误码=' . $errorNo, ErrorCode::WX_POST_ERROR);
+            throw new WxException('curl出错，错误码=' . $sendRes['res_no'], ErrorCode::WX_POST_ERROR);
         }
     }
 
@@ -230,21 +221,18 @@ final class WxUtil {
      * @throws \Exception\Wx\WxException
      */
     private static function sendGetReq(string $url,int $timeout=2000,array &$extends=[]) {
-        $ch = curl_init();
-        curl_setopt($ch,CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_TIMEOUT_MS, $timeout);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-        curl_setopt($ch, CURLOPT_HEADER, false);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        $data = curl_exec($ch);
-        $errorNo = curl_errno($ch);
-        $extends['head'] = curl_getinfo($ch);
-        curl_close($ch);
-        if ($errorNo == 0) {
-            return $data;
+        $sendRes = Tool::sendCurlReq([
+            CURLOPT_URL => $url,
+            CURLOPT_TIMEOUT_MS => $timeout,
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYHOST => false,
+            CURLOPT_HEADER => false,
+            CURLOPT_RETURNTRANSFER => true,
+        ]);
+        if ($sendRes['res_no'] == 0) {
+            return $sendRes['res_content'];
         } else {
-            throw new WxException('curl出错，错误码=' . $errorNo, ErrorCode::WX_GET_ERROR);
+            throw new WxException('curl出错，错误码=' . $sendRes['res_no'], ErrorCode::WX_GET_ERROR);
         }
     }
 

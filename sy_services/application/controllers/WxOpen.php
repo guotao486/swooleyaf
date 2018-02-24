@@ -30,7 +30,7 @@ class WxOpenController extends CommonController {
         $allParams = \Request\SyRequest::getParams();
         $incomeData = \Wx\WxOpenUtil::xmlToArray($allParams['wx_xml']);
         if (isset($incomeData['Encrypt']) && isset($incomeData['AppId'])) {
-            $decryptRes = \Wx\WxOpenUtil::decryptMsg($incomeData['Encrypt'], \Wx\WxConfig::getOpenCommonConfigs('appid'), $allParams['msg_signature'], $allParams['nonce'], $allParams['timestamp']);
+            $decryptRes = \Wx\WxOpenUtil::decryptMsg($incomeData['Encrypt'], \DesignPatterns\Singletons\WxConfigSingleton::getInstance()->getOpenCommonConfig(), $allParams['msg_signature'], $allParams['nonce'], $allParams['timestamp']);
             $msgData = \Wx\WxOpenUtil::xmlToArray($decryptRes['content']);
             if($msgData['InfoType'] == 'component_verify_ticket') { //微信服务器定时监听
                 \Wx\WxOpenUtil::getComponentAccessToken('timer', $msgData['ComponentVerifyTicket'] . '');
@@ -100,7 +100,7 @@ class WxOpenController extends CommonController {
         $allParams = \Request\SyRequest::getParams();
         $incomeData = \Wx\WxOpenUtil::xmlToArray($allParams['wx_xml']);
         if (isset($incomeData['Encrypt']) && isset($incomeData['AppId'])) {
-            $decryptRes = \Wx\WxOpenUtil::decryptMsg($incomeData['Encrypt'], \Wx\WxConfig::getOpenCommonConfigs('appid'), $allParams['msg_signature'], $allParams['nonce'], $allParams['timestamp']);
+            $decryptRes = \Wx\WxOpenUtil::decryptMsg($incomeData['Encrypt'], \DesignPatterns\Singletons\WxConfigSingleton::getInstance()->getOpenCommonConfig(), $allParams['msg_signature'], $allParams['nonce'], $allParams['timestamp']);
             $msgData = \Wx\WxOpenUtil::xmlToArray($decryptRes['content']);
             if(isset($msgData['MsgType'])){
                 $saveArr = [];
@@ -136,24 +136,23 @@ class WxOpenController extends CommonController {
                         $authInfo = \Wx\WxOpenUtil::getAuthorizerAuth($authCode);
                         //调用发送客服消息api回复文本消息
                         $url = 'https://api.weixin.qq.com/cgi-bin/message/custom/send?access_token=' . $authInfo['data']['authorization_info']['authorizer_access_token'];
-                        $ch = curl_init();
-                        curl_setopt($ch, CURLOPT_POST, 1);
-                        curl_setopt($ch, CURLOPT_URL, $url);
-                        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
-                            'touser' => $msgData['FromUserName'],
-                            'msgtype' => 'text',
-                            'text' => [
-                                'content' => $authCode . '_from_api',
+                        \Tool\Tool::sendCurlReq([
+                            CURLOPT_URL => $url,
+                            CURLOPT_POST => true,
+                            CURLOPT_POSTFIELDS => \Tool\Tool::jsonEncode([
+                                'touser' => $msgData['FromUserName'],
+                                'msgtype' => 'text',
+                                'text' => [
+                                    'content' => $authCode . '_from_api',
+                                ],
+                            ], JSON_UNESCAPED_UNICODE),
+                            CURLOPT_RETURNTRANSFER => true,
+                            CURLOPT_SSL_VERIFYPEER => false,
+                            CURLOPT_SSL_VERIFYHOST => false,
+                            CURLOPT_HTTPHEADER => [
+                                'Expect:',
                             ],
-                        ], JSON_UNESCAPED_UNICODE));
-                        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-                        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-                        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-                        curl_setopt($ch, CURLOPT_HTTPHEADER, [
-                            'Expect:',
                         ]);
-                        curl_exec($ch);
-                        curl_close($ch);
                     } else {
                         $saveArr = [
                             'ToUserName' => $msgData['FromUserName'],
@@ -166,7 +165,7 @@ class WxOpenController extends CommonController {
                 }
                 if(!empty($saveArr)){
                     $replyXml = \Wx\WxOpenUtil::arrayToXml($saveArr);
-                    $returnStr = \Wx\WxOpenUtil::encryptMsg($replyXml, \Wx\WxConfig::getOpenCommonConfigs('appid'), $decryptRes['aes_key']);
+                    $returnStr = \Wx\WxOpenUtil::encryptMsg($replyXml, \DesignPatterns\Singletons\WxConfigSingleton::getInstance()->getOpenCommonConfig(), $decryptRes['aes_key']);
                 }
             }
         }

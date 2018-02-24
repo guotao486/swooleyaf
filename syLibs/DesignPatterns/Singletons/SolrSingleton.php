@@ -231,31 +231,28 @@ class SolrSingleton {
         $dataStr = Tool::jsonEncode($data, JSON_UNESCAPED_UNICODE);
         $url = $this->server . $this->core . $method;
 
-        $ch = curl_init($url);
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");  // 更新需要post提交
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $dataStr);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            'Content-Type: application/json',
-            'Content-Length: ' . strlen($dataStr),
-            'Expect:',
+        $sendRes = Tool::sendCurlReq([
+            CURLOPT_URL => $url,
+            CURLOPT_CUSTOMREQUEST => "POST",
+            CURLOPT_POSTFIELDS => $dataStr,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HTTPHEADER => [
+                'Content-Type: application/json',
+                'Content-Length: ' . strlen($dataStr),
+                'Expect:',
+            ],
         ]);
-        $execRes = curl_exec($ch);
-        $errorNo = curl_errno($ch);
-        $errorMsg = curl_error($ch);
-        curl_close($ch);
-
-        if($errorNo == 0){
-            $resData = Tool::jsonDecode($execRes);
+        if($sendRes['res_no'] == 0){
+            $resData = Tool::jsonDecode($sendRes['res_content']);
             if(is_array($resData)){
                 return $resData;
             } else {
-                Log::error('解析POST响应失败,响应数据=' . $execRes, ErrorCode::SOLR_POST_ERROR);
+                Log::error('解析POST响应失败,响应数据=' . $sendRes['res_content'], ErrorCode::SOLR_POST_ERROR);
 
                 throw new SolrException('解析POST响应失败', ErrorCode::SOLR_POST_ERROR);
             }
         } else {
-            Log::error('curl发送solr post请求出错,错误码=' . $errorNo . ',错误信息=' . $errorMsg, ErrorCode::SOLR_POST_ERROR);
+            Log::error('curl发送solr post请求出错,错误码=' . $sendRes['res_no'] . ',错误信息=' . $sendRes['res_msg'], ErrorCode::SOLR_POST_ERROR);
 
             throw new SolrException('POST请求出错', ErrorCode::SOLR_POST_ERROR);
         }
@@ -282,26 +279,22 @@ class SolrSingleton {
             }
         }
 
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HEADER, 0);
-        $execRes = curl_exec($ch);
-        $errorNo = curl_errno($ch);
-        $errorMsg = curl_error($ch);
-        curl_close($ch);
-
-        if($errorNo == 0){
-            $resData = Tool::jsonDecode($execRes);
+        $sendRes = Tool::sendCurlReq([
+            CURLOPT_URL => $url,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HEADER => false,
+        ]);
+        if($sendRes['res_no'] == 0){
+            $resData = Tool::jsonDecode($sendRes['res_content']);
             if(is_array($resData)){
                 return $resData;
             } else {
-                Log::error('解析GET响应失败,响应数据=' . $execRes, ErrorCode::SOLR_GET_ERROR);
+                Log::error('解析GET响应失败,响应数据=' . $sendRes['res_content'], ErrorCode::SOLR_GET_ERROR);
 
                 throw new SolrException('解析GET响应失败', ErrorCode::SOLR_GET_ERROR);
             }
         } else {
-            Log::error('curl发送solr get请求出错,错误码=' . $errorNo . ',错误信息=' . $errorMsg, ErrorCode::SOLR_GET_ERROR);
+            Log::error('curl发送solr get请求出错,错误码=' . $sendRes['res_no'] . ',错误信息=' . $sendRes['res_msg'], ErrorCode::SOLR_GET_ERROR);
 
             throw new SolrException('GET请求出错', ErrorCode::SOLR_GET_ERROR);
         }

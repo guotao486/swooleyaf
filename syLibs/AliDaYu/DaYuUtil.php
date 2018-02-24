@@ -95,26 +95,23 @@ final class DaYuUtil {
      */
     private static function sendPostReq(string $url,array $data,array $configs=[]){
         $timeout = isset($configs['timeout']) && is_numeric($configs['timeout']) ? (int)$configs['timeout'] : 1000;
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_NOSIGNAL, true);
-        curl_setopt($ch, CURLOPT_TIMEOUT_MS, $timeout);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-        curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            'Expect:',
+        $sendRes = Tool::sendCurlReq([
+            CURLOPT_URL => $url,
+            CURLOPT_NOSIGNAL => true,
+            CURLOPT_TIMEOUT_MS => $timeout,
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYHOST => false,
+            CURLOPT_POST => true,
+            CURLOPT_POSTFIELDS => http_build_query($data),
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HTTPHEADER => [
+                'Expect:',
+            ],
         ]);
-        $res = curl_exec($ch);
-        $errorNo = curl_errno($ch);
-        curl_close($ch);
-
-        if($errorNo > 0){
-            Log::error('短信请求失败,curl错误码为' . $errorNo, ErrorCode::ALIDAYU_POST_ERROR);
+        if($sendRes['res_no'] > 0){
+            Log::error('短信请求失败,curl错误码为' . $sendRes['res_no'], ErrorCode::ALIDAYU_POST_ERROR);
         }
 
-        return $res;
+        return $sendRes['res_content'];
     }
 }

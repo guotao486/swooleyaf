@@ -105,85 +105,61 @@ class Etcd3Singleton {
     }
 
     /**
-     * @param resource $ch
-     * @param array $extends
-     * @throws \Exception\Etcd\EtcdException
-     */
-    private function setCurlOpts(&$ch, array $extends=[]) {
-        $timeout = (int)Tool::getArrayVal($extends, 'timeout', 2000);
-        if ($timeout <= 0) {
-            throw new EtcdException('超时时间必须大于0', ErrorCode::ETCD_PARAM_ERROR);
-        }
-
-        curl_setopt($ch, CURLOPT_TIMEOUT_MS, $timeout);
-        curl_setopt($ch, CURLOPT_HEADER, false);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
-        $headers = Tool::getArrayVal($extends, 'headers', false);
-        if (is_array($headers)) {
-            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        }
-    }
-
-    /**
      * 发送请求
      * @param string $url 请求地址
      * @param array $data 请求参数数组
      * @param array $extends 扩展参数数组
      * @return string
      * @throws \Exception\Etcd\EtcdException
-     * @throws \Exception
      */
     private function sendReq(string $url,array $data,array $extends=[]) {
         $method = strtoupper(Tool::getArrayVal($extends, 'method', self::METHOD_GET));
         if (!in_array($method, $this->methods)) {
             throw new EtcdException('请求方式不支持', ErrorCode::ETCD_PARAM_ERROR);
         }
+        $timeout = (int)Tool::getArrayVal($extends, 'timeout', 2000);
+        if ($timeout <= 0) {
+            throw new EtcdException('超时时间必须大于0', ErrorCode::ETCD_PARAM_ERROR);
+        }
+        $headers = Tool::getArrayVal($extends, 'headers', false);
 
-        $res = '';
-        $ch = curl_init();
-        $this->setCurlOpts($ch, $extends);
-
-        try {
-            switch ($method) {
-                case self::METHOD_GET:
-                    $trueUrl = empty($data) ? $url : $url . '?' . http_build_query($data);
-                    curl_setopt($ch, CURLOPT_URL, $trueUrl);
-                    break;
-                case self::METHOD_POST:
-                    curl_setopt($ch, CURLOPT_URL, $url);
-                    curl_setopt($ch, CURLOPT_POST, true);
-                    curl_setopt($ch, CURLOPT_POSTFIELDS, Tool::jsonEncode($data));
-                    break;
-                case self::METHOD_PUT:
-                    curl_setopt($ch, CURLOPT_URL, $url);
-                    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, self::METHOD_PUT);
-                    curl_setopt($ch, CURLOPT_POSTFIELDS, Tool::jsonEncode($data));
-                    break;
-                case self::METHOD_DELETE:
-                    $trueUrl = empty($data) ? $url : $url . '?' . http_build_query($data);
-                    curl_setopt($ch, CURLOPT_URL, $trueUrl);
-                    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, self::METHOD_DELETE);
-                    break;
-                default:
-                    break;
-            }
-
-            $res = curl_exec($ch);
-            $errorNo = curl_errno($ch);
-            if ($errorNo != 0) {
-                throw new EtcdException('curl出错，错误码=' . $errorNo, ErrorCode::ETCD_SEND_REQ_ERROR);
-            }
-        } catch (\Exception $e) {
-            $res = false;
-            throw $e;
-        } finally {
-            curl_close($ch);
-            if ($res !== false) {
-                return $res;
-            }
+        $curlConfigs = [
+            CURLOPT_TIMEOUT_MS => $timeout,
+            CURLOPT_HEADER => false,
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYHOST => false,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HTTPHEADER => $headers,
+        ];
+        switch ($method) {
+            case self::METHOD_GET:
+                $trueUrl = empty($data) ? $url : $url . '?' . http_build_query($data);
+                $curlConfigs[CURLOPT_URL] = $trueUrl;
+                break;
+            case self::METHOD_POST:
+                $curlConfigs[CURLOPT_URL] = $url;
+                $curlConfigs[CURLOPT_POST] = true;
+                $curlConfigs[CURLOPT_POSTFIELDS] = Tool::jsonEncode($data);
+                break;
+            case self::METHOD_PUT:
+                $curlConfigs[CURLOPT_URL] = $url;
+                $curlConfigs[CURLOPT_CUSTOMREQUEST] = self::METHOD_PUT;
+                $curlConfigs[CURLOPT_POSTFIELDS] = Tool::jsonEncode($data);
+                break;
+            case self::METHOD_DELETE:
+                $trueUrl = empty($data) ? $url : $url . '?' . http_build_query($data);
+                $curlConfigs[CURLOPT_URL] = $trueUrl;
+                $curlConfigs[CURLOPT_CUSTOMREQUEST] = self::METHOD_DELETE;
+                break;
+            default:
+                break;
+        }
+        $sendRes = Tool::sendCurlReq($curlConfigs);
+        if ($sendRes['res_no'] == 0) {
+            return $sendRes['res_content'];
+        } else {
+            Log::error('curl出错，错误码=' . $sendRes['res_no']);
+            return false;
         }
     }
 

@@ -94,26 +94,18 @@ final class WxOpenUtil {
         $timeout = (int)Tool::getArrayVal($configs, 'timeout', 2000);
         $headers = Tool::getArrayVal($configs, 'headers', false);
 
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        //post提交方式
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $dataStr);
-        //设置超时
-        curl_setopt($ch, CURLOPT_TIMEOUT_MS, $timeout);
-
-        //设置header
-        curl_setopt($ch, CURLOPT_HEADER, $headers);
-        //要求结果为字符串且输出到屏幕上
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
-        $resData = curl_exec($ch);
-        $errorNo = curl_errno($ch);
-        curl_close($ch);
-        if ($errorNo == 0) {
-            return $resData;
+        $sendRes = Tool::sendCurlReq([
+            CURLOPT_URL => $url,
+            CURLOPT_POST => true,
+            CURLOPT_POSTFIELDS => $dataStr,
+            CURLOPT_TIMEOUT_MS => $timeout,
+            CURLOPT_HEADER => $headers,
+            CURLOPT_RETURNTRANSFER => true,
+        ]);
+        if ($sendRes['res_no'] == 0) {
+            return $sendRes['res_content'];
         } else {
-            throw new WxOpenException('curl出错，错误码=' . $errorNo, ErrorCode::WXOPEN_POST_ERROR);
+            throw new WxOpenException('curl出错，错误码=' . $sendRes['res_no'], ErrorCode::WXOPEN_POST_ERROR);
         }
     }
 
@@ -125,20 +117,18 @@ final class WxOpenUtil {
      * @throws WxOpenException
      */
     private static function sendGetReq(string $url,int $timeout=2000) {
-        $ch = curl_init();
-        curl_setopt($ch,CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_TIMEOUT_MS, $timeout);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-        curl_setopt($ch, CURLOPT_HEADER, false);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        $data = curl_exec($ch);
-        $errorNo = curl_errno($ch);
-        curl_close($ch);
-        if ($errorNo == 0) {
-            return $data;
+        $sendRes = Tool::sendCurlReq([
+            CURLOPT_URL => $url,
+            CURLOPT_TIMEOUT_MS => $timeout,
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYHOST => false,
+            CURLOPT_HEADER => false,
+            CURLOPT_RETURNTRANSFER => true,
+        ]);
+        if ($sendRes['res_no'] == 0) {
+            return $sendRes['res_content'];
         } else {
-            throw new WxOpenException('curl出错，错误码=' . $errorNo, ErrorCode::WXOPEN_GET_ERROR);
+            throw new WxOpenException('curl出错，错误码=' . $sendRes['res_no'], ErrorCode::WXOPEN_GET_ERROR);
         }
     }
 

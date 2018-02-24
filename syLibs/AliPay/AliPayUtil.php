@@ -382,34 +382,24 @@ final class AliPayUtil {
      * @throws \Exception\Ali\AliPayException
      */
     private static function sendPostReq(string $url,array $data,array $configs=[]) {
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_FAILONERROR, false);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
-
         $timeout = (int)Tool::getArrayVal($configs, 'timeout', 2000);
-        curl_setopt($ch, CURLOPT_TIMEOUT_MS, $timeout);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            'Content-Type: application/x-www-form-urlencoded;charset=utf-8',
-            'Expect:',
+        $sendRes = Tool::sendCurlReq([
+            CURLOPT_URL => $url,
+            CURLOPT_FAILONERROR => false,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_POST => true,
+            CURLOPT_POSTFIELDS => http_build_query($data),
+            CURLOPT_TIMEOUT_MS => $timeout,
+            CURLOPT_HTTPHEADER => [
+                'Content-Type: application/x-www-form-urlencoded;charset=utf-8',
+                'Expect:',
+            ],
         ]);
-
-        $resData = curl_exec($ch);
-        $errorNo = curl_errno($ch);
-        if ($errorNo == 0) {
-            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-            curl_close($ch);
-            if (200 !== $httpCode) {
-                throw new AliPayException($resData, ErrorCode::ALIPAY_POST_ERROR);
-            }
+        if ($sendRes['res_no'] == 0) {
+            return $sendRes['res_content'];
         } else {
-            curl_close($ch);
-            throw new AliPayException('curl出错，错误码=' . $errorNo, ErrorCode::ALIPAY_POST_ERROR);
+            throw new AliPayException('curl出错，错误码=' . $sendRes['res_no'], ErrorCode::ALIPAY_POST_ERROR);
         }
-
-        return $resData;
     }
 }

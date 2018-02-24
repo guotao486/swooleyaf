@@ -29,27 +29,26 @@ abstract class SyModuleTaskBase {
     }
 
     public function sendSyHttpReq(string $url,array $params,$method='GET') {
-        $ch = curl_init();
         $sendUrl = $url;
         if(($method == 'GET') && !empty($params)){
             $sendUrl .= '?' . http_build_query($params);
         }
 
-        curl_setopt($ch, CURLOPT_URL, $sendUrl);
+        $curlConfigs = [
+            CURLOPT_URL => $sendUrl,
+            CURLOPT_TIMEOUT_MS => 2000,
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYHOST => false,
+            CURLOPT_HEADER => false,
+            CURLOPT_RETURNTRANSFER => true,
+        ];
         if($method == 'POST'){
-            curl_setopt($ch, CURLOPT_POST, true);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($params));
+            $curlConfigs[CURLOPT_POST] = true;
+            $curlConfigs[CURLOPT_POSTFIELDS] = http_build_query($params);
         }
-        curl_setopt($ch, CURLOPT_TIMEOUT_MS, 2000);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-        curl_setopt($ch, CURLOPT_HEADER, false);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        $res = curl_exec($ch);
-        $errNo = curl_errno($ch);
-        curl_close($ch);
+        $sendRes = Tool::sendCurlReq($curlConfigs);
 
-        return $errNo == 0 ? $res : false;
+        return $sendRes['res_no'] == 0 ? $sendRes['res_content'] : false;
     }
 
     public function sendSyTaskReq(string $host,int $port,string $taskStr,string $protocol) {

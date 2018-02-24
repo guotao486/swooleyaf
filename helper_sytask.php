@@ -2,15 +2,14 @@
 require_once __DIR__ . '/helper_load.php';
 
 function sendSyGetReq(string $url) {
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, $url);
-    curl_setopt($ch, CURLOPT_TIMEOUT_MS, 2000);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-    curl_setopt($ch, CURLOPT_HEADER, false);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_exec($ch);
-    curl_close($ch);
+    \Tool\Tool::sendCurlReq([
+        CURLOPT_URL => $url,
+        CURLOPT_TIMEOUT_MS => 2000,
+        CURLOPT_SSL_VERIFYPEER => false,
+        CURLOPT_SSL_VERIFYHOST => false,
+        CURLOPT_HEADER => false,
+        CURLOPT_RETURNTRANSFER => true,
+    ]);
 }
 
 $container = new \SyTask\SyModuleTaskContainer();
