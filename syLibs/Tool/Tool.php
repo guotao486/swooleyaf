@@ -479,20 +479,18 @@ class Tool {
      * @return bool|mixed
      */
     public static function sendSyHttpTaskReq(string $url,string $content) {
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, Server::SERVER_DATA_KEY_TASK . '=' . urlencode($content));
-        curl_setopt($ch, CURLOPT_TIMEOUT_MS, 2000);
-        curl_setopt($ch, CURLOPT_HEADER, false);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        $res = curl_exec($ch);
-        $errorNo = curl_errno($ch);
-        curl_close($ch);
+        $sendRes = self::sendCurlReq([
+            CURLOPT_URL => $url,
+            CURLOPT_POST => true,
+            CURLOPT_POSTFIELDS => Server::SERVER_DATA_KEY_TASK . '=' . urlencode($content),
+            CURLOPT_TIMEOUT_MS => 2000,
+            CURLOPT_HEADER => false,
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYHOST => false,
+            CURLOPT_RETURNTRANSFER => true,
+        ]);
 
-        return $errorNo == 0 ? $res : false;
+        return $sendRes['res_no'] == 0 ? $sendRes['res_content'] : false;
     }
 
     /**
@@ -636,21 +634,46 @@ class Tool {
 
         foreach ($modules as $eModule) {
             if ($eModule['type'] == Server::SERVER_TYPE_API) {
-                $url = 'http://' . $eModule['host'] . ':' . $eModule['port'] . '/refreshservices';
-                $ch = curl_init();
-                curl_setopt($ch, CURLOPT_URL, $url);
-                curl_setopt($ch, CURLOPT_POST, true);
-                curl_setopt($ch, CURLOPT_POSTFIELDS, $servicesStr2);
-                curl_setopt($ch, CURLOPT_TIMEOUT_MS, 2000);
-                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-                curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-                curl_setopt($ch, CURLOPT_HEADER, false);
-                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-                curl_exec($ch);
-                curl_close($ch);
+                self::sendCurlReq([
+                    CURLOPT_URL => 'http://' . $eModule['host'] . ':' . $eModule['port'] . '/refreshservices',
+                    CURLOPT_POST => true,
+                    CURLOPT_POSTFIELDS => $servicesStr2,
+                    CURLOPT_TIMEOUT_MS => 2000,
+                    CURLOPT_SSL_VERIFYPEER => false,
+                    CURLOPT_SSL_VERIFYHOST => false,
+                    CURLOPT_HEADER => false,
+                    CURLOPT_RETURNTRANSFER => true,
+                ]);
             } else {
                 self::sendSyRpcReq($eModule['host'], $eModule['port'], $servicesStr1);
             }
+        }
+    }
+
+    /**
+     * 发送curl请求
+     * @param array $configs 配置数组
+     * @return array
+     * @throws \Exception\Common\CheckException
+     */
+    public static function sendCurlReq(array $configs) {
+        if (isset($configs[CURLOPT_URL]) && is_string($configs[CURLOPT_URL])) {
+            $ch = curl_init();
+            foreach ($configs as $configKey => $configVal) {
+                curl_setopt($ch, $configKey, $configVal);
+            }
+            $resContent = curl_exec($ch);
+            $resNo = curl_errno($ch);
+            $resMsg = curl_error($ch);
+            curl_close($ch);
+
+            return [
+                'res_no' => $resNo,
+                'res_msg' => $resMsg,
+                'res_content' => $resContent,
+            ];
+        } else {
+            throw new CheckException('请求地址不能为空', ErrorCode::COMMON_PARAM_ERROR);
         }
     }
 }

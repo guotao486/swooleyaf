@@ -90,31 +90,29 @@ class MapTencentSingleton {
             ];
         }
 
-        $ch = curl_init($url);
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
-        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_TIMEOUT_MS, $timeout);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $nowHeaders);
+        $curlConfigs = [
+            CURLOPT_URL => $url,
+            CURLOPT_CUSTOMREQUEST => "POST",
+            CURLOPT_POSTFIELDS => http_build_query($data),
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_TIMEOUT_MS => $timeout,
+            CURLOPT_HTTPHEADER => $nowHeaders,
+        ];
         if(strlen($referer) > 0){
-            curl_setopt($ch, CURLOPT_REFERER, $referer);
+            $curlConfigs[CURLOPT_REFERER] = $referer;
         }
-        $execRes = curl_exec($ch);
-        $errorNo = curl_errno($ch);
-        $errorMsg = curl_error($ch);
-        curl_close($ch);
-
-        if($errorNo == 0){
-            $resData = Tool::jsonDecode($execRes);
+        $sendRes = Tool::sendCurlReq($curlConfigs);
+        if($sendRes['res_no'] == 0){
+            $resData = Tool::jsonDecode($sendRes['res_content']);
             if(is_array($resData)){
                 return $resData;
             } else {
-                Log::error('解析POST响应失败,响应数据=' . $execRes, ErrorCode::MAP_TENCENT_POST_ERROR);
+                Log::error('解析POST响应失败,响应数据=' . $sendRes['res_content'], ErrorCode::MAP_TENCENT_POST_ERROR);
 
                 throw new TencentMapException('解析POST响应失败', ErrorCode::MAP_TENCENT_POST_ERROR);
             }
         } else {
-            Log::error('curl发送腾讯地图post请求出错,错误码=' . $errorNo . ',错误信息=' . $errorMsg, ErrorCode::MAP_TENCENT_POST_ERROR);
+            Log::error('curl发送腾讯地图post请求出错,错误码=' . $sendRes['res_no'] . ',错误信息=' . $sendRes['res_msg'], ErrorCode::MAP_TENCENT_POST_ERROR);
 
             throw new TencentMapException('POST请求出错', ErrorCode::MAP_TENCENT_POST_ERROR);
         }
@@ -134,29 +132,27 @@ class MapTencentSingleton {
         $referer = Tool::getArrayVal($configs, 'referer', '');
         $headers = Tool::getArrayVal($configs, 'headers', []);
 
-        $ch = curl_init($nowUrl);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_TIMEOUT_MS, $timeout);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        $curlConfigs = [
+            CURLOPT_URL => $nowUrl,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_TIMEOUT_MS => $timeout,
+            CURLOPT_HTTPHEADER => $headers,
+        ];
         if(strlen($referer) > 0){
-            curl_setopt($ch, CURLOPT_REFERER, $referer);
+            $curlConfigs[CURLOPT_REFERER] = $referer;
         }
-        $execRes = curl_exec($ch);
-        $errorNo = curl_errno($ch);
-        $errorMsg = curl_error($ch);
-        curl_close($ch);
-
-        if($errorNo == 0){
-            $resData = Tool::jsonDecode($execRes);
+        $sendRes = Tool::sendCurlReq($curlConfigs);
+        if($sendRes['res_no'] == 0){
+            $resData = Tool::jsonDecode($sendRes['res_content']);
             if(is_array($resData)){
                 return $resData;
             } else {
-                Log::error('解析GET响应失败,响应数据=' . $execRes, ErrorCode::MAP_TENCENT_GET_ERROR);
+                Log::error('解析GET响应失败,响应数据=' . $sendRes['res_content'], ErrorCode::MAP_TENCENT_GET_ERROR);
 
                 throw new TencentMapException('解析GET响应失败', ErrorCode::MAP_TENCENT_GET_ERROR);
             }
         } else {
-            Log::error('curl发送腾讯地图get请求出错,错误码=' . $errorNo . ',错误信息=' . $errorMsg, ErrorCode::MAP_TENCENT_GET_ERROR);
+            Log::error('curl发送腾讯地图get请求出错,错误码=' . $sendRes['res_no'] . ',错误信息=' . $sendRes['res_msg'], ErrorCode::MAP_TENCENT_GET_ERROR);
 
             throw new TencentMapException('GET请求出错', ErrorCode::MAP_TENCENT_GET_ERROR);
         }

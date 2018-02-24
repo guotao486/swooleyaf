@@ -9,6 +9,7 @@ namespace SyTask;
 
 use Constant\Project;
 use Tool\Cron\CronTool;
+use Tool\Tool;
 
 class SyTaskUrl {
     /**
@@ -118,20 +119,18 @@ class SyTaskUrl {
     }
 
     public function sendUrl() {
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $this->exec_obj);
-        curl_setopt($ch, CURLOPT_TIMEOUT_MS, 3000);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-        curl_setopt($ch, CURLOPT_HEADER, false);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        $res = curl_exec($ch);
-        $errorNo = curl_errno($ch);
-        curl_close($ch);
-        if ($errorNo == 0) {
-            return $res;
+        $sendRes = Tool::sendCurlReq([
+            CURLOPT_URL => $this->exec_obj,
+            CURLOPT_TIMEOUT_MS => 3000,
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYHOST => false,
+            CURLOPT_HEADER => false,
+            CURLOPT_RETURNTRANSFER => true,
+        ]);
+        if ($sendRes['res_no'] == 0) {
+            return $sendRes['res_content'];
         } else {
-            return '{"code":' . $errorNo . ',"msg":"处理url请求失败"}';
+            return '{"code":' . $sendRes['res_no'] . ',"msg":"处理url请求失败"}';
         }
     }
 }
