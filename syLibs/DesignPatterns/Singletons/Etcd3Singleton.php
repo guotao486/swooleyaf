@@ -129,8 +129,10 @@ class Etcd3Singleton {
             CURLOPT_SSL_VERIFYPEER => false,
             CURLOPT_SSL_VERIFYHOST => false,
             CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_HTTPHEADER => $headers,
         ];
+        if (is_array($headers)) {
+            $curlConfigs[CURLOPT_HTTPHEADER] = $headers;
+        }
         switch ($method) {
             case self::METHOD_GET:
                 $trueUrl = empty($data) ? $url : $url . '?' . http_build_query($data);
