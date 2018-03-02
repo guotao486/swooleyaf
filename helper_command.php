@@ -6,7 +6,10 @@ switch ($action) {
     case 'refreshserver':
         $activeModules = \Tool\Tool::getProjectModulesByRedis(SY_PROJECT);
         if (!empty($activeModules)) {
-            \Tool\Tool::updateProjectModules($activeModules);
+            $results = \Tool\Tool::updateProjectModules($activeModules);
+            foreach ($results as $eResult) {
+                echo $eResult . PHP_EOL;
+            }
         }
 
         break;

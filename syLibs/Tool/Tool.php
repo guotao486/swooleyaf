@@ -615,8 +615,11 @@ class Tool {
     /**
      * 更新项目模块信息
      * @param array $modules
+     * @return array
      */
     public static  function updateProjectModules(array $modules) {
+        $resArr = [];
+
         $syPack = new SyPack();
 
         $params = [
@@ -630,11 +633,11 @@ class Tool {
         ]);
         $servicesStr1 = $syPack->packData();
         $servicesStr2 = http_build_query($params);
-        unset($syPack);
 
         foreach ($modules as $eModule) {
+            $msg = 'send req to ' . $eModule['host'] . ':' . $eModule['port'] . ',result:';
             if ($eModule['type'] == Server::SERVER_TYPE_API) {
-                self::sendCurlReq([
+                $res = self::sendCurlReq([
                     CURLOPT_URL => 'http://' . $eModule['host'] . ':' . $eModule['port'] . '/refreshservices',
                     CURLOPT_POST => true,
                     CURLOPT_POSTFIELDS => $servicesStr2,
@@ -644,10 +647,22 @@ class Tool {
                     CURLOPT_HEADER => false,
                     CURLOPT_RETURNTRANSFER => true,
                 ]);
+                $msg .= print_r($res, true);
             } else {
-                self::sendSyRpcReq($eModule['host'], $eModule['port'], $servicesStr1);
+                $resStr = self::sendSyRpcReq($eModule['host'], $eModule['port'], $servicesStr1);
+                if ($resStr === false) {
+                    $msg .= '失败';
+                } else if ($syPack->unpackData($resStr)) {
+                    $msg .= print_r($syPack->getData(), true);
+                } else {
+                    $msg .= '解析响应数据失败';
+                }
             }
+
+            $resArr[] = $msg;
         }
+
+        return $resArr;
     }
 
     /**
