@@ -64,8 +64,6 @@ installDicts = {
     }
 }
 
-# 所有系统环境均为CentOS7
-
 # 初始化系统环境配置
 def __initSystemEnv(envList):
     for eEnv in iter(envList):
@@ -73,7 +71,7 @@ def __initSystemEnv(envList):
     run('source /etc/profile')
 
 # 配置基础环境
-def installBase():
+def __installBase():
     run('yum -y install vim zip nss gcc gcc-c++ net-tools wget htop lsof unzip bzip2 curl-devel zlib-devel epel-release perl-ExtUtils-MakeMaker expat-devel gettext-devel openssl-devel iproute.x86_64 autoconf')
     run('wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo')
     run('mkdir %s' % installDicts['common']['remotePackagePath'])
@@ -97,7 +95,7 @@ def installBase():
     run('yum -y update')
 
 # 配置nginx环境
-def installNginx():
+def __installNginx():
     run('mkdir /home/logs/nginx')
     run('mkdir /home/configs/nginx')
     run('mkdir /home/configs/nginx/certs')
@@ -225,7 +223,7 @@ def installNginx():
     run('systemctl enable nginx')
 
 # 配置PHP7环境
-def installPhp7():
+def __installPhp7():
     run('yum -y install gdb php-mcrypt libmcrypt libmcrypt-devel libxslt libxml2 libxml2-devel openssl openssl-devel curl-devel libcurl-devel libpng.x86_64 freetype.x86_64 libjpeg-turbo.x86_64 libjpeg-turbo-devel.x86_64 libjpeg-turbo-utils.x86_64 libpng-devel.x86_64 freetype-devel.x86_64 libjpeg-turbo-devel libmcrypt-devel mysql-devel openldap openldap-devel libtool-ltdl-devel.x86_64 gmp-devel')
 
     jpegLocal = ''.join([installDicts['common']['localPackagePath'], '/php7/jpegsrc.v9.tar.gz'])
@@ -409,7 +407,7 @@ def installPhp7():
         run('rm -rf swoole-1.10.1.tgz')
 
 # 配置java环境
-def installJava():
+def __installJava():
     jdkLocal = ''.join([installDicts['common']['localPackagePath'], '/java/jdk-8u131-linux-x64.tar.gz'])
     jdkRemote = ''.join([installDicts['common']['remotePackagePath'], '/jdk-8u131-linux-x64.tar.gz'])
     put(jdkLocal, jdkRemote)
@@ -420,7 +418,7 @@ def installJava():
         run('rm -rf jdk-8u131-linux-x64.tar.gz')
 
 # 配置inotify环境
-def installInotify():
+def __installInotify():
     inotifyLocal = ''.join([installDicts['common']['localPackagePath'], '/linux/inotify-tools-3.14.tar.gz'])
     inotifyRemote = ''.join([installDicts['common']['remotePackagePath'], '/inotify-tools-3.14.tar.gz'])
     put(inotifyLocal, inotifyRemote)
@@ -433,7 +431,7 @@ def installInotify():
         run('touch /usr/local/inotify/symodules/change_service.txt')
 
 # 配置etcd环境
-def installEtcd():
+def __installEtcd():
     etcdLocal = ''.join([installDicts['common']['localPackagePath'], '/linux/etcd-v3.2.7-linux-amd64.tar.gz'])
     etcdRemote = ''.join([installDicts['common']['remotePackagePath'], '/etcd-v3.2.7-linux-amd64.tar.gz'])
     put(etcdLocal, etcdRemote)
@@ -444,7 +442,7 @@ def installEtcd():
         run('rm -rf etcd-v3.2.7-linux-amd64.tar.gz')
 
 # 配置redis环境
-def installRedis():
+def __installRedis():
     redisLocal = ''.join([installDicts['common']['localPackagePath'], '/redis/redis-3.2.11.tar.gz'])
     redisRemote = ''.join([installDicts['common']['remotePackagePath'], '/redis-3.2.11.tar.gz'])
     put(redisLocal, redisRemote)
@@ -468,38 +466,38 @@ def installRedis():
 @roles('front')
 def installFront():
     __initSystemEnv(installDicts['front']['envProfile'])
-    installBase()
+    __installBase()
     run('firewall-cmd --zone=public --add-port=21/tcp --permanent')
     run('firewall-cmd --zone=public --add-port=22/tcp --permanent')
     run('firewall-cmd --zone=public --add-port=80/tcp --permanent')
     run('firewall-cmd --zone=public --add-port=8983/tcp --permanent')
     run('firewall-cmd --reload')
-    installNginx()
-    installPhp7()
-    installJava()
+    __installNginx()
+    __installPhp7()
+    __installJava()
 
 @roles('backend')
 def installBackend():
     __initSystemEnv(installDicts['backend']['envProfile'])
-    installBase()
+    __installBase()
     run('firewall-cmd --zone=public --add-port=21/tcp --permanent')
     run('firewall-cmd --zone=public --add-port=22/tcp --permanent')
     run('firewall-cmd --zone=public --add-port=80/tcp --permanent')
     run('firewall-cmd --zone=public --add-port=2379/tcp --permanent')
     run('firewall-cmd --zone=public --add-port=6379/tcp --permanent')
     run('firewall-cmd --reload')
-    installNginx()
-    installPhp7()
-    installRedis()
-    installInotify()
-    installEtcd()
+    __installNginx()
+    __installPhp7()
+    __installRedis()
+    __installInotify()
+    __installEtcd()
 
 # 配置mysql环境
 # 配置之前先用命令rpm -qa | grep mariadb找出已经安装的数据库,然后用命令rpm -e --nodeps xxx删除已经安装的软件(xxx为前一步命令找到的软件名)
 @roles('mysql')
 def installMysql():
     __initSystemEnv(installDicts['mysql']['envProfile'])
-    installBase()
+    __installBase()
     run('firewall-cmd --zone=public --add-port=21/tcp --permanent')
     run('firewall-cmd --zone=public --add-port=22/tcp --permanent')
     run('firewall-cmd --zone=public --add-port=80/tcp --permanent')
@@ -538,7 +536,7 @@ def installMysql():
 @roles('mongodb')
 def installMongodb():
     __initSystemEnv(installDicts['mongodb']['envProfile'])
-    installBase()
+    __installBase()
     run('firewall-cmd --zone=public --add-port=21/tcp --permanent')
     run('firewall-cmd --zone=public --add-port=22/tcp --permanent')
     run('firewall-cmd --zone=public --add-port=80/tcp --permanent')
