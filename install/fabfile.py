@@ -267,8 +267,8 @@ def __installPhp7():
         run('rm -rf freetype-2.6.5/')
         run('rm -rf freetype-2.6.5.tar.bz2')
 
-    php7Local = ''.join([installDicts['common']['localPackagePath'], '/php7/php-7.1.14.tar.gz'])
-    php7Remote = ''.join([installDicts['common']['remotePackagePath'], '/php-7.1.14.tar.gz'])
+    php7Local = ''.join([installDicts['common']['localPackagePath'], '/php7/php-7.1.15.tar.gz'])
+    php7Remote = ''.join([installDicts['common']['remotePackagePath'], '/php-7.1.15.tar.gz'])
     put(php7Local, php7Remote)
     with cd(installDicts['common']['remotePackagePath']):
         run('mkdir /tmp/swoolyaf')
@@ -278,8 +278,8 @@ def __installPhp7():
         run('mkdir /home/logs/seaslog-fpm')
         run('mkdir /usr/local/mysql')
         run('mkdir /usr/local/php7')
-        run('tar -zxvf php-7.1.14.tar.gz')
-        run('cd php-7.1.14/ && ./configure --prefix=/usr/local/php7 --exec-prefix=/usr/local/php7 --bindir=/usr/local/php7/bin --sbindir=/usr/local/php7/sbin --includedir=/usr/local/php7/include --libdir=/usr/local/php7/lib/php --mandir=/usr/local/php7/php/man --with-config-file-path=/usr/local/php7/etc --with-mysql-sock=/usr/local/mysql/mysql.sock --with-zlib=/usr/local/zlib --with-mhash --with-openssl --with-mysqli=shared,mysqlnd --with-pdo-mysql=shared,mysqlnd --with-iconv --enable-zip --enable-inline-optimization --disable-debug --disable-rpath --enable-shared --enable-xml --enable-pcntl --enable-bcmath --enable-mysqlnd --enable-sysvsem --with-mysqli --enable-embedded-mysqli  --with-pdo-mysql --enable-shmop --enable-mbregex --enable-mbstring --enable-ftp --enable-sockets --with-xmlrpc --enable-soap --without-pear --with-gettext --enable-session --with-curl --enable-opcache --enable-fpm --without-gdbm --enable-fileinfo --with-gmp && make && make install')
+        run('tar -zxvf php-7.1.15.tar.gz')
+        run('cd php-7.1.15/ && ./configure --prefix=/usr/local/php7 --exec-prefix=/usr/local/php7 --bindir=/usr/local/php7/bin --sbindir=/usr/local/php7/sbin --includedir=/usr/local/php7/include --libdir=/usr/local/php7/lib/php --mandir=/usr/local/php7/php/man --with-config-file-path=/usr/local/php7/etc --with-mysql-sock=/usr/local/mysql/mysql.sock --with-zlib=/usr/local/zlib --with-mhash --with-openssl --with-mysqli=shared,mysqlnd --with-pdo-mysql=shared,mysqlnd --with-iconv --enable-zip --enable-inline-optimization --disable-debug --disable-rpath --enable-shared --enable-xml --enable-pcntl --enable-bcmath --enable-mysqlnd --enable-sysvsem --with-mysqli --enable-embedded-mysqli  --with-pdo-mysql --enable-shmop --enable-mbregex --enable-mbstring --enable-ftp --enable-sockets --with-xmlrpc --enable-soap --without-pear --with-gettext --enable-session --with-curl --enable-opcache --enable-fpm --without-gdbm --enable-fileinfo --with-gmp && make && make install')
 
     php7CliIniLocal = ''.join([installDicts['common']['localPackagePath'], '/php7/php-cli.ini'])
     php7CliIniRemote = '/usr/local/php7/etc/php-cli.ini'
@@ -296,7 +296,7 @@ def __installPhp7():
     run('chmod 754 /lib/systemd/system/php7-fpm.service')
     run('systemctl enable php7-fpm.service')
 
-    php7DirRemote = ''.join([installDicts['common']['remotePackagePath'], '/php-7.1.14'])
+    php7DirRemote = ''.join([installDicts['common']['remotePackagePath'], '/php-7.1.15'])
     with cd(php7DirRemote):
         run('groupadd www')
         run('useradd -g www www -s /sbin/nologin')
