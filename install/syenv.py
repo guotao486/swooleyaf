@@ -4,7 +4,9 @@ from config import installDicts
 from fabric.api import *
 
 
-class SyEnvBase(metaclass=ABCMeta):
+class SyEnvBase(object):
+    __metaclass__ = ABCMeta
+
     _profileConfigs = []
 
     def __init__(self):
