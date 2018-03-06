@@ -10,10 +10,10 @@ env.passwords = {
 }
 
 env.roledefs = {
-    'mysql': ['root@192.168.1.3:22',],
-    'mongodb': ['root@192.168.1.4:22',],
-    'front': ['root@192.168.1.1:22',],
-    'backend': ['root@192.168.1.2:22',],
+    'mysql': ['root@192.168.1.1:22',],
+    'mongodb': ['root@192.168.1.2:22',],
+    'front': ['root@192.168.1.3:22',],
+    'backend': ['root@192.168.1.4:22',],
     'mixfb': ['root@192.168.1.5:22',]
 }
 
