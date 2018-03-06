@@ -2,22 +2,45 @@
 from fabric.api import *
 
 env.passwords = {
-    'root@10.66.94.239:22': '32985200Xsh',
+    'root@192.168.1.1:22': 'password1',
+    'root@192.168.1.2:22': 'password2',
+    'root@192.168.1.3:22': 'password3',
+    'root@192.168.1.4:22': 'password4',
+    'root@192.168.1.5:22': 'password5',
 }
 
 env.roledefs = {
-    'front': ['root@10.66.94.239:22',],
-    'backend': ['root@10.66.94.239:22',],
-    'mysql': ['root@10.66.94.239:22',],
-    'mongodb': ['root@10.66.94.239:22',]
+    'mysql': ['root@192.168.1.3:22',],
+    'mongodb': ['root@192.168.1.4:22',],
+    'front': ['root@192.168.1.1:22',],
+    'backend': ['root@192.168.1.2:22',],
+    'mixfb': ['root@192.168.1.5:22',]
 }
 
 installDicts = {
     'common': {
-        'localPackagePath': '/home/download/initenv',
+        'localPackagePath': '/home/jw/download',
         'remotePackagePath': '/home/download',
         'gitUserName': 'jiangwei',
         'gitUserEmail': 'jiangwei07061625@163.com'
+    },
+    'mysql': {
+        'envProfile': [
+            '',
+            'export PATH=\$PATH:/usr/local/git/bin',
+        ]
+    },
+    'mongodb': {
+        'envProfile': [
+            '',
+            'ulimit -f unlimited',
+            'ulimit -t unlimited',
+            'ulimit -v unlimited',
+            'ulimit -n 64000',
+            'ulimit -m unlimited',
+            'ulimit -u 64000',
+            'export PATH=\$PATH:/usr/local/git/bin',
+        ]
     },
     'front': {
         'envProfile': [
@@ -44,22 +67,18 @@ installDicts = {
             'export PATH=\$PATH:/usr/local/git/bin:/usr/local/bin',
         ]
     },
-    'mysql': {
+    'mixfb': {
         'envProfile': [
             '',
-            'export PATH=\$PATH:/usr/local/git/bin',
-        ]
-    },
-    'mongodb': {
-        'envProfile': [
-            '',
-            'ulimit -f unlimited',
-            'ulimit -t unlimited',
-            'ulimit -v unlimited',
-            'ulimit -n 64000',
-            'ulimit -m unlimited',
-            'ulimit -u 64000',
-            'export PATH=\$PATH:/usr/local/git/bin',
+            'export LUAJIT_LIB=/usr/local/luajit/lib',
+            'export LUAJIT_INC=/usr/local/luajit/include/luajit-2.0',
+            "export CPPFLAGS='-I/usr/local/libjpeg/include -I/usr/local/freetype/include'",
+            "export LDFLAGS='-L/usr/local/libjpeg/lib -L/usr/local/freetype/lib'",
+            'export LD_LIBRARY_PATH=\$LD_LIBRARY_PATH:/usr/local/lib',
+            'export ETCDCTL_API=3',
+            'export JAVA_HOME=/usr/java/jdk1.8.0',
+            'export CLASSPATH=.:\$JAVA_HOME/jre/lib/rt.jar:\$JAVA_HOME/lib/dt.jar:\$JAVA_HOME/lib/tools.jar',
+            'export PATH=\$PATH:/usr/local/git/bin:/usr/local/bin:\$JAVA_HOME/bin:\$JAVA_HOME/jre/bin',
         ]
     }
 }
@@ -463,35 +482,6 @@ def __installRedis():
         run('systemctl daemon-reload')
         run('chkconfig redis on')
 
-@roles('front')
-def installFront():
-    __initSystemEnv(installDicts['front']['envProfile'])
-    __installBase()
-    run('firewall-cmd --zone=public --add-port=21/tcp --permanent')
-    run('firewall-cmd --zone=public --add-port=22/tcp --permanent')
-    run('firewall-cmd --zone=public --add-port=80/tcp --permanent')
-    run('firewall-cmd --zone=public --add-port=8983/tcp --permanent')
-    run('firewall-cmd --reload')
-    __installNginx()
-    __installPhp7()
-    __installJava()
-
-@roles('backend')
-def installBackend():
-    __initSystemEnv(installDicts['backend']['envProfile'])
-    __installBase()
-    run('firewall-cmd --zone=public --add-port=21/tcp --permanent')
-    run('firewall-cmd --zone=public --add-port=22/tcp --permanent')
-    run('firewall-cmd --zone=public --add-port=80/tcp --permanent')
-    run('firewall-cmd --zone=public --add-port=2379/tcp --permanent')
-    run('firewall-cmd --zone=public --add-port=6379/tcp --permanent')
-    run('firewall-cmd --reload')
-    __installNginx()
-    __installPhp7()
-    __installRedis()
-    __installInotify()
-    __installEtcd()
-
 # 配置mysql环境
 # 配置之前先用命令rpm -qa | grep mariadb找出已经安装的数据库,然后用命令rpm -e --nodeps xxx删除已经安装的软件(xxx为前一步命令找到的软件名)
 @roles('mysql')
@@ -563,3 +553,50 @@ def installMongodb():
     put(mongoCronLocal, mongoCronRemote)
     run('crontab %s' % mongoCronRemote)
     run('rm -rf %s' % mongoCronRemote)
+
+@roles('front')
+def installFront():
+    __initSystemEnv(installDicts['front']['envProfile'])
+    __installBase()
+    run('firewall-cmd --zone=public --add-port=21/tcp --permanent')
+    run('firewall-cmd --zone=public --add-port=22/tcp --permanent')
+    run('firewall-cmd --zone=public --add-port=80/tcp --permanent')
+    run('firewall-cmd --zone=public --add-port=8983/tcp --permanent')
+    run('firewall-cmd --reload')
+    __installNginx()
+    __installPhp7()
+    __installJava()
+
+@roles('backend')
+def installBackend():
+    __initSystemEnv(installDicts['backend']['envProfile'])
+    __installBase()
+    run('firewall-cmd --zone=public --add-port=21/tcp --permanent')
+    run('firewall-cmd --zone=public --add-port=22/tcp --permanent')
+    run('firewall-cmd --zone=public --add-port=80/tcp --permanent')
+    run('firewall-cmd --zone=public --add-port=2379/tcp --permanent')
+    run('firewall-cmd --zone=public --add-port=6379/tcp --permanent')
+    run('firewall-cmd --reload')
+    __installNginx()
+    __installPhp7()
+    __installRedis()
+    __installInotify()
+    __installEtcd()
+
+@roles('mixfb')
+def installFrontAndBackend():
+    __initSystemEnv(installDicts['mixfb']['envProfile'])
+    __installBase()
+    run('firewall-cmd --zone=public --add-port=21/tcp --permanent')
+    run('firewall-cmd --zone=public --add-port=22/tcp --permanent')
+    run('firewall-cmd --zone=public --add-port=80/tcp --permanent')
+    run('firewall-cmd --zone=public --add-port=2379/tcp --permanent')
+    run('firewall-cmd --zone=public --add-port=6379/tcp --permanent')
+    run('firewall-cmd --zone=public --add-port=8983/tcp --permanent')
+    run('firewall-cmd --reload')
+    __installNginx()
+    __installPhp7()
+    __installJava()
+    __installRedis()
+    __installInotify()
+    __installEtcd()
