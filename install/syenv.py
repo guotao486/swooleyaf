@@ -374,6 +374,7 @@ class SyEnvBase(metaclass=ABCMeta):
             run('mkdir /usr/local/inotify')
             run('tar -zxvf inotify-tools-3.14.tar.gz')
             run('cd inotify-tools-3.14/ && ./configure --prefix=/usr/local/inotify && make && make install')
+            run('rm -rf inotify-tools-3.14/')
             run('rm -rf inotify-tools-3.14.tar.gz')
             run('mkdir /usr/local/inotify/symodules')
             run('touch /usr/local/inotify/symodules/change_service.txt')
@@ -407,6 +408,7 @@ class SyEnvBase(metaclass=ABCMeta):
             redisConfLocal = ''.join([installDicts['path.package.local'], '/redis/6379.conf'])
             redisConfRemote = '/etc/redis/6379.conf'
             put(redisConfLocal, redisConfRemote)
+            run('echo "bind 127.0.0.1 %s" >> %s' % (env.host, redisConfRemote), False)
             run('rm -rf redis-3.2.11.tar.gz')
             run('systemctl daemon-reload')
             run('chkconfig redis on')
