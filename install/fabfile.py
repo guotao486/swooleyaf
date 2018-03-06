@@ -400,7 +400,7 @@ def __installPhp7():
         run('rm -rf yaf-3.0.6/')
         run('rm -rf yaf-3.0.6.tgz')
 
-    # 扩展swoole-1.10.1.tgz
+    # 扩展swoole
     extSwooleJemallocLocal = ''.join([installDicts['common']['localPackagePath'], '/php7/jemalloc-4.5.0.tar.bz2'])
     extSwooleJemallocRemote = ''.join([installDicts['common']['remotePackagePath'], '/jemalloc-4.5.0.tar.bz2'])
     put(extSwooleJemallocLocal, extSwooleJemallocRemote)
