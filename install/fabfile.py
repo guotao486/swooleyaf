@@ -300,6 +300,8 @@ def __installPhp7():
     with cd(php7DirRemote):
         run('groupadd www')
         run('useradd -g www www -s /sbin/nologin')
+        run('chown -R www /home/logs/seaslog-fpm')
+        run('chgrp -R www /home/logs/seaslog-fpm')
         run('cp sapi/fpm/init.d.php-fpm /etc/init.d/php7-fpm')
         run('chmod +x /etc/init.d/php7-fpm')
         run('cp /usr/local/php7/etc/php-fpm.conf.default /usr/local/php7/etc/php-fpm.conf')
