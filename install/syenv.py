@@ -390,7 +390,6 @@ class SyEnvBase(metaclass=ABCMeta):
             run('rm -rf etcd-v3.2.7-linux-amd64.tar.gz')
 
     # 配置redis环境
-    # 安装完成后需要修改/etc/redis/6379.conf,在bind配置后添加当前服务器的内网IP
     def _installRedis(self):
         redisLocal = ''.join([installDicts['path.package.local'], '/redis/redis-3.2.11.tar.gz'])
         redisRemote = ''.join([installDicts['path.package.remote'], '/redis-3.2.11.tar.gz'])
