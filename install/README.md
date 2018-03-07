@@ -13,13 +13,11 @@
 
 # 命令
     //所有系统环境均为CentOS7
-    //安装服务器环境-mysql
-    /usr/local/python3/bin/fab -f fabfile.py installMysql
-    //安装服务器环境-mongodb
-    /usr/local/python3/bin/fab -f fabfile.py installMongodb
-    //安装服务器环境-前端
-    /usr/local/python3/bin/fab -f fabfile.py installFront
-    //安装服务器环境-后端
-    /usr/local/python3/bin/fab -f fabfile.py installBackend
-    //安装服务器环境-前后端混合
-    /usr/local/python3/bin/fab -f fabfile.py installFrontAndBackend
+    //安装服务器环境
+    /usr/local/python3/bin/fab -f fabfile.py installEnv:tag=xxx
+    xxx为环境类型,支持的类型如下:
+        syMysql: swooleyaf的mysql环境
+        syMongodb: swooleyaf的mongodb环境
+        syFront: swooleyaf的前端环境
+        syBackend: swooleyaf的后端环境
+        syFrontBackend: swooleyaf的前后端混合环境
