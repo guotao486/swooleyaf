@@ -12,7 +12,7 @@ class LoginController extends CommonController {
 
     /**
      * 用户登录
-     * @api {post} /Login/login 用户登录
+     * @api {post} /Index/Login/login 用户登录
      * @apiDescription 用户登录
      * @apiGroup UserLogin
      * @apiParam {string} login_type 登录类型,4位长度字符串

@@ -8,25 +8,56 @@
 class ImageController extends CommonController {
     public $signStatus = false;
 
-    private $acceptTypes = [
-        'image/gif' => 'gif',
-        'image/png' => 'png',
-        'image/jpg' => 'jpg',
-        'image/jpeg' => 'jpg',
-    ];
-
     public function init() {
         parent::init();
         $this->signStatus = false;
     }
 
+    /**
+     * 获取百度编辑器配置
+     * @api {get} /Index/Image/index 获取百度编辑器配置
+     * @apiDescription 获取百度编辑器配置
+     * @apiGroup File
+     * @apiParam {string} action 动作名称 config:获取配置 uploadimage:上传图片
+     * @apiParam {string} callback 回调函数名
+     * @SyFilter-{"field": "action","explain": "动作名称","type": "string","rules": {"min": 1,"required":1}}
+     * @SyFilter-{"field": "callback","explain": "回调函数名","type": "string","rules": {"min": 0}}
+     */
     public function indexAction() {
-        $res = \SyModule\SyModuleService::getInstance()->sendApiReq('/Index/Image/index', $_GET);
-        $resArr = \Tool\Tool::jsonDecode($res);
-        if ($resArr['code'] > 0) {
-            $this->sendRsp($res);
+        $action = (string)\Request\SyRequest::getParams('action');
+        if($action == 'uploadimage'){
+            $handleRes = \Dao\ApiImageDao::uploadImageHandle(1);
+            $uploadRes = \SyModule\SyModuleService::getInstance()->sendApiReq('/Index/Image/uploadImage', $handleRes);
+            $uploadData = \Tool\Tool::jsonDecode($uploadRes);
+            if(!is_array($uploadData)){
+                $this->sendRsp(\Tool\Tool::jsonEncode([
+                    'rid' => 0,
+                    'message' => '上传图片出错',
+                ]));
+            } else if($uploadData['code'] > 0){
+                $this->sendRsp(\Tool\Tool::jsonEncode([
+                    'rid' => 0,
+                    'message' => $uploadData['msg'],
+                ]));
+            } else {
+                $editorRes = $uploadData['data'];
+                $editorRes['state'] = 'SUCCESS';
+                $editorRes['url'] = $uploadData['data']['image_url'];
+                unset($editorRes['image_url']);
+                $this->sendRsp(\Tool\Tool::jsonEncode($editorRes));
+            }
+        } else if($action == 'config'){
+            $callback = trim(\Request\SyRequest::getParams('callback', ''));
+            if(strlen($callback) > 0){
+                $jsonpStr = $callback . '(' . \Tool\Tool::jsonEncode(\Tool\Tool::getConfig('ueditor.' . SY_ENV . SY_PROJECT)) . ')';
+                $this->sendRsp($jsonpStr);
+            } else {
+                $this->SyResult->setCodeMsg(\Constant\ErrorCode::COMMON_PARAM_ERROR, '回调函数名不能为空');
+                $this->sendRsp();
+            }
         } else {
-            $this->sendRsp($resArr['data']);
+            $this->SyResult->setCodeMsg(\Constant\ErrorCode::COMMON_PARAM_ERROR, '动作不支持');
+            $this->sendRsp();
         }
     }
 

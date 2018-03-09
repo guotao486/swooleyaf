@@ -11,25 +11,8 @@ class ImageController extends CommonController {
     }
 
     /**
-     * 获取百度编辑器配置
-     * @api {get} /Image/index 获取百度编辑器配置
-     * @apiDescription 获取百度编辑器配置
-     * @apiGroup ServiceImage
-     * @apiParam {string{1..32}} callback 回调函数名称
-     * @apiSuccess {string} Body jsonp字符串
-     * @apiUse CommonFail
-     * @SyFilter-{"field": "callback","explain": "回调函数","type": "string","rules": {"required": 1,"min": 1,"max": 150}}
-     */
-    public function indexAction() {
-        $jsonpStr = \Request\SyRequest::getParams('callback', '') . '(' . \Tool\Tool::jsonEncode(\Tool\Tool::getConfig('ueditor.' . SY_ENV . SY_PROJECT)) . ')';
-        $this->SyResult->setData($jsonpStr);
-
-        $this->sendRsp();
-    }
-
-    /**
      * 生成二维码图片
-     * @api {get} /Image/createQrImage 生成二维码图片
+     * @api {get} /Index/Image/createQrImage 生成二维码图片
      * @apiDescription 生成二维码图片
      * @apiGroup ServiceImage
      * @apiParam {string{1..255}} url 链接地址
@@ -63,7 +46,7 @@ class ImageController extends CommonController {
 
     /**
      * 生成验证码图片
-     * @api {get} /Image/createCodeImage 生成验证码图片
+     * @api {get} /Index/Image/createCodeImage 生成验证码图片
      * @apiDescription 生成验证码图片
      * @apiGroup ServiceImage
      * @apiParam {string{1..64}} _sytoken 令牌标识
@@ -123,7 +106,7 @@ class ImageController extends CommonController {
 
     /**
      * 图片上传
-     * @api {post} /Image/uploadImage 图片上传
+     * @api {post} /Index/Image/uploadImage 图片上传
      * @apiDescription 图片上传
      * @apiGroup ServiceImage
      * @apiParam {string} upload_type 上传类型,4位长度字符串

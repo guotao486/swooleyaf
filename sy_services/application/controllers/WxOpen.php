@@ -6,7 +6,7 @@ class WxOpenController extends CommonController {
 
     /**
      * 处理微信服务器消息通知
-     * @api {post} /WxOpen/handleWxNotify 处理微信服务器消息通知
+     * @api {post} /Index/WxOpen/handleWxNotify 处理微信服务器消息通知
      * @apiDescription 处理微信服务器消息通知
      * @apiGroup ServiceWxOpen
      * @apiParam {string} wx_xml 微信xml消息
@@ -71,7 +71,7 @@ class WxOpenController extends CommonController {
 
     /**
      * 处理授权者公众号消息
-     * @api {post} /WxOpen/handleAuthorizerNotify 处理授权者公众号消息
+     * @api {post} /Index/WxOpen/handleAuthorizerNotify 处理授权者公众号消息
      * @apiDescription 处理授权者公众号消息
      * @apiGroup ServiceWxOpen
      * @apiParam {string} wx_xml 微信xml消息
@@ -176,7 +176,7 @@ class WxOpenController extends CommonController {
 
     /**
      * 获取开放平台授权地址
-     * @api {get} /WxOpen/getComponentAuthUrl 获取开放平台授权地址
+     * @api {get} /Index/WxOpen/getComponentAuthUrl 获取开放平台授权地址
      * @apiDescription 获取开放平台授权地址
      * @apiGroup ServiceWxOpen
      * @apiUse CommonSuccess
