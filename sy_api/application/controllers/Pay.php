@@ -21,18 +21,6 @@ class PayController extends CommonController {
     }
 
     /**
-     * 处理微信支付通知
-     */
-    public function handleWxPayNotifyAction() {
-        $handleRes = \SyModule\SyModuleOrder::getInstance()->sendApiReq('/Index/Pay/handleWxPayNotify', [
-            'wx_xml' => \Tool\Tool::getArrayVal($GLOBALS, 'HTTP_RAW_POST_DATA', ''),
-        ]);
-        $resData = \Tool\Tool::jsonDecode($handleRes);
-
-        $this->sendRsp($resData['data']);
-    }
-
-    /**
      * 处理微信扫码预支付通知
      */
     public function handleWxPrePayNotifyAction() {
