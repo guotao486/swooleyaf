@@ -15,7 +15,7 @@ class PayController extends CommonController {
      */
     public function applyPayAction() {
         $allParams = \Request\SyRequest::getParams();
-        $allParams['_sytoken'] = \Tool\SySession::getSessionId();
+        $allParams['session_id'] = \Tool\SySession::getSessionId();
         $applyRes = \SyModule\SyModuleOrder::getInstance()->sendApiReq('/Index/Pay/applyPay', $allParams);
         $this->sendRsp($applyRes);
     }

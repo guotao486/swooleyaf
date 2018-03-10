@@ -53,11 +53,14 @@ class PayNotifyController extends CommonController {
         if (\Wx\WxUtil::checkSign($xmlData, $xmlData['appid'])) {
             $handleRes = \SyModule\SyModuleOrder::getInstance()->sendApiReq('/Index/Pay/handleWxPrePayNotify', $xmlData);
             $resData = \Tool\Tool::jsonDecode($handleRes);
+            if (is_array($resData) && isset($resData['code']) && ($resData['code'] == \Constant\ErrorCode::COMMON_SUCCESS)) {
+                $this->sendRsp($resData['data']['result']);
+            } else {
+                $this->sendRsp('');
+            }
         } else {
             $this->sendRsp('');
         }
-
-        $this->sendRsp($resData['data']);
     }
 
     /**
@@ -66,7 +69,6 @@ class PayNotifyController extends CommonController {
      * @apiDescription 处理支付宝网页支付同步回跳地址
      * @apiGroup OrderPay
      * @apiParam {string} url 同步回跳URL地址
-     * @apiParam {string} _sytoken 令牌标识
      * @apiSuccess HandleSuccess 处理成功
      * @apiSuccessExample success:
      *     HTTP/1.1 302
@@ -77,13 +79,13 @@ class PayNotifyController extends CommonController {
      * @apiSuccessExample fail:
      *     跳转地址不正确
      * @SyFilter-{"field": "url","explain": "同步回跳URL地址","type": "string","rules": {"required": 1,"url": 1}}
-     * @SyFilter-{"field": "_sytoken","explain": "令牌标识","type": "string","rules": {"required": 1,"min": 1}}
      */
     public function handleAliWebRedirectAction() {
         $expireTime = time() + 604800;
-        $allParams = \Request\SyRequest::getParams();
-        \Response\SyResponseHttp::cookie('token', $allParams['_sytoken'], $expireTime, '/', \SyServer\HttpServer::getServerConfig('cookiedomain_base', ''));
-        \Response\SyResponseHttp::redirect($allParams['url']);
+        $sessionId = \Tool\SySession::getSessionId();
+        $redirectUrl = \Request\SyRequest::getParams('url');
+        \Response\SyResponseHttp::cookie(\Constant\Server::SERVER_DATA_KEY_TOKEN, $sessionId, $expireTime, '/', \SyServer\HttpServer::getServerConfig('cookiedomain_base', ''));
+        \Response\SyResponseHttp::redirect($redirectUrl);
 
         $this->sendRsp();
     }
