@@ -80,7 +80,8 @@ class PayController extends CommonController {
      * @apiSuccess HandleFail 处理失败
      */
     public function handleWxPrePayNotifyAction() {
-        $returnObj = new \Wx\NativeReturn();
+        $appId = (string)\Request\SyRequest::getParams('appid');
+        $returnObj = new \Wx\NativeReturn($appId);
         $redis = \DesignPatterns\Factories\CacheSimpleFactory::getRedisInstance();
         $redisKey = \Constant\Server::REDIS_PREFIX_WX_NATIVE_PRE . \Request\SyRequest::getParams('product_id', '');
         if ($redis->exists($redisKey)) {
@@ -88,7 +89,7 @@ class PayController extends CommonController {
             //TODO: 生成一条新的单号记录
             $orderSn = '111';
             //统一下单
-            $order = new \Wx\UnifiedOrder(\Wx\UnifiedOrder::TRADE_TYPE_NATIVE);
+            $order = new \Wx\UnifiedOrder(\Wx\UnifiedOrder::TRADE_TYPE_NATIVE, $appId);
             $order->setBody($saveArr['pay_name']);
             $order->setOutTradeNo($orderSn);
             $order->setTotalFee($saveArr['pay_money']);
@@ -106,7 +107,9 @@ class PayController extends CommonController {
 
         //返回结果
         $resData = $returnObj->getDetail();
-        $this->SyResult->setData(\Wx\WxUtil::arrayToXml($resData));
+        $this->SyResult->setData([
+            'result' => \Wx\WxUtil::arrayToXml($resData),
+        ]);
 
         $this->sendRsp();
     }

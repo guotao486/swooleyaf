@@ -49,12 +49,12 @@ class ImageController extends CommonController {
      * @api {get} /Index/Image/createCodeImage 生成验证码图片
      * @apiDescription 生成验证码图片
      * @apiGroup ServiceImage
-     * @apiParam {string{1..64}} _sytoken 令牌标识
+     * @apiParam {string{1..64}} session_id 令牌标识
      * @apiParam {number{50-150}} image_width 图片宽度
      * @apiParam {number{20-80}} image_height 图片高度
      * @apiSuccess {string} Body 图片字节流
      * @apiUse CommonFail
-     * @SyFilter-{"field": "_sytoken","explain": "令牌标识","type": "string","rules": {"required": 1,"min": 1,"max": 150}}
+     * @SyFilter-{"field": "session_id","explain": "令牌标识","type": "string","rules": {"required": 1,"min": 1,"max": 150}}
      * @SyFilter-{"field": "image_width","explain": "图片宽度","type": "int","rules": {"required": 1,"min": 50,"max": 150}}
      * @SyFilter-{"field": "image_height","explain": "图片高度","type": "int","rules": {"required": 1,"min": 20,"max": 80}}
      */
@@ -94,7 +94,7 @@ class ImageController extends CommonController {
 
         //随机字符串放入redis
         $redis = \DesignPatterns\Factories\CacheSimpleFactory::getRedisInstance();
-        $redisKey = \Constant\Server::REDIS_PREFIX_CODE_IMAGE . \Request\SyRequest::getParams('_sytoken');
+        $redisKey = \Constant\Server::REDIS_PREFIX_CODE_IMAGE . \Request\SyRequest::getParams('session_id');
         $redis->set($redisKey, $code, 190);
 
         $this->SyResult->setData([
