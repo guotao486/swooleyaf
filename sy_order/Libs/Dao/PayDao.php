@@ -14,8 +14,8 @@ use Constant\ErrorCode;
 use Constant\Project;
 use Constant\Server;
 use DesignPatterns\Factories\CacheSimpleFactory;
-use DesignPatterns\Singletons\MysqlSingleton;
 use Exception\Common\CheckException;
+use Factories\SyBaseMysqlFactory;
 use Interfaces\Containers\PayContainer;
 use Log\Log;
 use Request\SyRequest;
@@ -51,12 +51,6 @@ class PayDao {
      * @var \Interfaces\Containers\PayContainer
      */
     private static $payContainer = null;
-
-    private static function initPay() {
-        if (is_null(self::$payContainer)) {
-            self::$payContainer = new PayContainer();
-        }
-    }
 
     /**
      * @param string $payContent
@@ -110,6 +104,7 @@ class PayDao {
         $order->setAttach($data['content_result']['pay_attach']);
         $order->setOpenid($data['a00_openid']);
         $applyRes = WxUtil::applyJsPay($order, 'shop');
+        unset($order);
         if($applyRes['code'] > 0){
             throw new CheckException($applyRes['message'], ErrorCode::COMMON_PARAM_ERROR);
         }
@@ -127,6 +122,7 @@ class PayDao {
         $order->setOutTradeNo($data['content_result']['pay_sn']);
         $order->setAttach($data['content_result']['pay_attach']);
         $applyRes = WxUtil::applyNativePay($order);
+        unset($order);
         if($applyRes['code'] > 0){
             throw new CheckException($applyRes['message'], ErrorCode::COMMON_PARAM_ERROR);
         }
@@ -140,14 +136,17 @@ class PayDao {
         $prePay = new PayNativePre($data['a00_appid']);
         $prePay->setProductId($data['content_result']['pay_sn']);
         $applyRes = WxUtil::applyPreNativePay($prePay);
+        unset($prePay);
 
         $redisKey = Server::REDIS_PREFIX_WX_NATIVE_PRE . $data['content_result']['pay_sn'];
-        CacheSimpleFactory::getRedisInstance()->set($redisKey, Tool::jsonEncode([
+        CacheSimpleFactory::getRedisInstance()->hMset($redisKey, [
             'pay_name' => $data['content_result']['pay_name'],
             'pay_money' => $data['content_result']['pay_money'],
             'pay_attach' => $data['content_result']['pay_attach'],
             'pay_sn' => $data['content_result']['pay_sn'],
-        ], JSON_UNESCAPED_UNICODE), 7200);
+            'cache_key' => $redisKey,
+        ]);
+        CacheSimpleFactory::getRedisInstance()->expire($redisKey, 7200);
 
         return [
             'code_url' => $applyRes
@@ -162,6 +161,7 @@ class PayDao {
         $pay->setTimeoutExpress($data['a01_timeout']);
         $pay->setOutTradeNo($data['content_result']['pay_sn']);
         $payRes = AliPayUtil::applyQrCodePay($pay);
+        unset($pay);
         if ($payRes['code'] > 0) {
             throw new CheckException($payRes['message'], ErrorCode::COMMON_PARAM_ERROR);
         }
@@ -179,19 +179,21 @@ class PayDao {
         $pay->setAttach($data['content_result']['pay_attach']);
         $pay->setTimeoutExpress($data['a01_timeout']);
         $pay->setOutTradeNo($data['content_result']['pay_sn']);
+        $html = AliPayUtil::createWapPayHtml($pay);
+        unset($pay);
 
         return [
-            'html' => AliPayUtil::createWapPayHtml($pay),
+            'html' => $html,
         ];
     }
 
-    private static function payContentCheckGoodsOrder(array &$data) {
+    private static function payContentCheckGoodsOrder(array $data) {
         $orderSn = trim(SyRequest::getParams('goods_ordersn', ''));
         if(strlen($orderSn) == 0){
             throw new CheckException('订单单号不能为空', ErrorCode::COMMON_PARAM_ERROR);
         }
 
-        $data['content_params'] = [
+        return [
             'order_sn' => $orderSn,
         ];
     }
@@ -207,21 +209,39 @@ class PayDao {
         if (is_null($contentCheckFunc)) {
             throw new CheckException('支付内容不支持', ErrorCode::COMMON_PARAM_ERROR);
         }
-        self::$contentCheckFunc($data);
+        $contentParams = self::$contentCheckFunc($data);
 
         $payService = self::getPayService($data['pay_content']);
         if (is_null($payService)) {
             throw new CheckException('支付内容未实现', ErrorCode::COMMON_PARAM_ERROR);
         }
-        $data['content_result'] = $payService->getPayInfo($data['content_params']);
-        unset($data['content_params']);
+        $data['content_result'] = $payService->getPayInfo($contentParams);
 
         $typeHandleFunc = Tool::getArrayVal(self::$payTypeHandleMap, $data['pay_type'], null);
         return self::$typeHandleFunc($data);
     }
 
     public static function completePay(array $data){
-        $payContent = substr($data['pay_sn'], 0, 4);
+        //添加支付原始记录
+        $payHistory = SyBaseMysqlFactory::PayHistoryEntity();
+        $payHistory->type = $data['pay_type'];
+        $payHistory->trade_sn = $data['pay_tradesn'];
+        $payHistory->seller_sn = $data['pay_sellersn'];
+        $payHistory->app_id = $data['pay_appid'];
+        $payHistory->buyer_id = $data['pay_buyerid'];
+        $payHistory->money = $data['pay_money'];
+        $payHistory->attach = $data['pay_attach'];
+        $payHistory->content = Tool::jsonEncode($data['pay_data'], JSON_UNESCAPED_UNICODE);
+        $payHistory->status = $data['pay_status'];
+        $payHistory->created = time();
+        $ormResult1 = $payHistory->getContainer()->getModel()->getOrmDbTable();
+        $ormResult1->where('`seller_sn`=?', [$data['pay_sellersn']]);
+        $historyInfo = $payHistory->getContainer()->getModel()->findOne($ormResult1);
+        if (empty($historyInfo)) {
+            $payHistory->getContainer()->getModel()->insert($payHistory->getEntityDataArray());
+        }
+
+        $payContent = substr($data['pay_sellersn'], 0, 4);
         $payService = self::getPayService($payContent);
         if(is_null($payService)){
             throw new CheckException('支付内容不支持', ErrorCode::COMMON_PARAM_ERROR);
@@ -229,15 +249,16 @@ class PayDao {
 
         $successRes = [];
         try {
-            MysqlSingleton::getInstance()->getConn()->beginTransaction();
+            $payHistory->getContainer()->getModel()->openTransaction();
             $successRes = $payService->handlePaySuccess($data);
-            MysqlSingleton::getInstance()->getConn()->commit();
+            $payHistory->getContainer()->getModel()->commitTransaction();
         } catch (\Exception $e) {
-            MysqlSingleton::getInstance()->getConn()->rollBack();
+            $payHistory->getContainer()->getModel()->rollbackTransaction();
             Log::error($e->getMessage(), $e->getCode(), $e->getTraceAsString());
 
             throw new CheckException('支付处理失败', ErrorCode::COMMON_SERVER_ERROR);
         } finally {
+            unset($ormResult1, $payHistory);
             if(!empty($successRes)){
                 $payService->handlePaySuccessAttach($successRes);
             }

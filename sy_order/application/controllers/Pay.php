@@ -6,14 +6,8 @@
  * Time: 下午1:26
  */
 class PayController extends CommonController {
-    private static $alipaySuccessStatus = [];
-
     public function init() {
         parent::init();
-        self::$alipaySuccessStatus = [
-            'TRADE_SUCCESS',
-            'TRADE_FINISHED',
-        ];
     }
 
     /**
@@ -49,32 +43,30 @@ class PayController extends CommonController {
 
     /**
      * 处理微信支付通知
-     * @api {post} /Index/Pay/handleWxPayNotify 处理微信支付通知
-     * @apiDescription 处理微信支付通知
-     * @apiGroup Pay
-     * @apiSuccess HandleSuccess 处理成功
-     * @apiSuccess HandleFail 处理失败
      */
     public function handleWxPayNotifyAction() {
-        $wxResultCode = (string)\Request\SyRequest::getParams('result_code', '');
-        $wxReturnCode = (string)\Request\SyRequest::getParams('return_code', '');
+        $allParams = \Request\SyRequest::getParams();
+        $wxResultCode = (string)\Tool\Tool::getArrayVal($allParams, 'result_code', '');
+        $wxReturnCode = (string)\Tool\Tool::getArrayVal($allParams, 'return_code', '');
         if (($wxResultCode == 'SUCCESS') && ($wxReturnCode == 'SUCCESS')) { //支付成功
-            //TODO: 添加支付原始记录
-
             \Dao\PayDao::completePay([
-                'pay_sn' => $xmlData['out_trade_no'] . '',
                 'pay_type' => \Constant\Project::PAY_TYPE_WX,
-                'pay_money' => $xmlData['total_fee'],
-                'pay_attach' => \Tool\Tool::getArrayVal($xmlData, 'attach', ''),
-                'trade_status' => '',
+                'pay_tradesn' => $allParams['transaction_id'],
+                'pay_sellersn' => $allParams['out_trade_no'],
+                'pay_appid' => $allParams['appid'],
+                'pay_buyerid' => $allParams['openid'],
+                'pay_money' => (int)$allParams['total_fee'],
+                'pay_attach' => \Tool\Tool::getArrayVal($allParams, 'attach', ''),
+                'pay_status' => $wxReturnCode,
+                'pay_data' => $allParams,
             ]);
             $this->SyResult->setData([
                 'msg' => '支付成功',
             ]);
         } else if($wxResultCode == 'SUCCESS') { //业务出错
-            $this->SyResult->setCodeMsg(\Constant\ErrorCode::COMMON_SERVER_ERROR, $xmlData['err_code_des']);
+            $this->SyResult->setCodeMsg(\Constant\ErrorCode::COMMON_SERVER_ERROR, $allParams['err_code_des']);
         } else { //通信出错
-            $this->SyResult->setCodeMsg(\Constant\ErrorCode::COMMON_SERVER_ERROR, $xmlData['return_msg']);
+            $this->SyResult->setCodeMsg(\Constant\ErrorCode::COMMON_SERVER_ERROR, $allParams['return_msg']);
         }
 
         $this->sendRsp();
@@ -82,30 +74,26 @@ class PayController extends CommonController {
 
     /**
      * 处理微信扫码预支付通知
-     * @api {post} /Index/Pay/handleWxPrePayNotify 处理微信扫码预支付通知
-     * @apiDescription 处理微信扫码预支付通知
-     * @apiGroup Pay
-     * @apiSuccess HandleSuccess 处理成功
-     * @apiSuccess HandleFail 处理失败
      */
     public function handleWxPrePayNotifyAction() {
         $appId = (string)\Request\SyRequest::getParams('appid');
+        $productId = (string)\Request\SyRequest::getParams('product_id', '');
         $returnObj = new \Wx\NativeReturn($appId);
-        $redis = \DesignPatterns\Factories\CacheSimpleFactory::getRedisInstance();
-        $redisKey = \Constant\Server::REDIS_PREFIX_WX_NATIVE_PRE . \Request\SyRequest::getParams('product_id', '');
-        if ($redis->exists($redisKey)) {
-            $saveArr = \Tool\Tool::jsonDecode($redis->get($redisKey));
-            //TODO: 生成一条新的单号记录
-            $orderSn = '111';
+        $redisKey = \Constant\Server::REDIS_PREFIX_WX_NATIVE_PRE . $productId;
+        $cacheData = \DesignPatterns\Factories\CacheSimpleFactory::getRedisInstance()->hGetAll($redisKey);
+        if (is_array($cacheData) && isset($cacheData['cache_key']) && ($cacheData['cache_key'] == $redisKey)) {
+            $nonceStr = (string)\Request\SyRequest::getParams('nonce_str');
+            //生成一条新的单号记录
+            $orderSn = substr($productId, 0, 4) . \Tool\Tool::createUniqueSn();
             //统一下单
             $order = new \Wx\UnifiedOrder(\Wx\UnifiedOrder::TRADE_TYPE_NATIVE, $appId);
-            $order->setBody($saveArr['pay_name']);
+            $order->setBody($cacheData['pay_name']);
             $order->setOutTradeNo($orderSn);
-            $order->setTotalFee($saveArr['pay_money']);
-            $order->setAttach($saveArr['pay_attach']);
+            $order->setTotalFee($cacheData['pay_money']);
+            $order->setAttach($cacheData['pay_attach']);
             $applyRes = \Wx\WxUtil::applyNativePay($order);
             if($applyRes['code'] == 0){
-                $returnObj->setNonceStr($xmlData['nonce_str']);
+                $returnObj->setNonceStr($nonceStr);
                 $returnObj->setPrepayId($applyRes['data']['prepay_id']);
             } else {
                 $returnObj->setErrorMsg($applyRes['message'], $applyRes['message']);
@@ -119,101 +107,80 @@ class PayController extends CommonController {
         $this->SyResult->setData([
             'result' => \Wx\WxUtil::arrayToXml($resData),
         ]);
+        unset($returnObj);
 
         $this->sendRsp();
     }
 
     /**
      * 处理支付宝退款异步通知消息
-     * @api {post} /Index/Pay/handleAliRefundNotify 处理支付宝退款异步通知消息
-     * @apiDescription 处理支付宝退款异步通知消息
-     * @apiGroup Pay
-     * @apiSuccess HandleSuccess 处理成功
-     * @apiSuccessExample success:
-     *     success
-     * @apiSuccess HandleFail 处理失败
-     * @apiSuccessExample fail:
-     *     fail
      */
     public function handleAliRefundNotifyAction() {
         $allParams = \Request\SyRequest::getParams();
-        if(\AliPay\AliPayUtil::verifyData($allParams, '2', 'RSA2')){
-            if($allParams['notify_type'] == 'batch_refund_notify'){ //即时到账批量退款
-                $needData = [
-                    'refund_sn' => $allParams['batch_no'],
-                    'list' => []
+        if($allParams['notify_type'] == 'batch_refund_notify'){ //即时到账批量退款
+            $needData = [
+                'refund_sn' => $allParams['batch_no'],
+                'list' => []
+            ];
+            $dataArr = explode('#', $allParams['result_details']);
+            foreach($dataArr as $eData) {
+                $eData1 = explode('$', $eData);
+                $eData2 = explode('^', $eData1[0]);
+                $needData['list'][] = [
+                    'order_sn' => $eData2[0] . '',
+                    'refund_money' => number_format($eData2[1], 2, '.', '') . '',
+                    'refund_status' => $eData2[2]
                 ];
-                $dataArr = explode('#', $allParams['result_details']);
-                foreach($dataArr as $eData) {
-                    $eData1 = explode('$', $eData);
-                    $eData2 = explode('^', $eData1[0]);
-                    $needData['list'][] = [
-                        'order_sn' => $eData2[0] . '',
-                        'refund_money' => number_format($eData2[1], 2, '.', '') . '',
-                        'refund_status' => $eData2[2]
-                    ];
-                }
-
-                //TODO: 处理退款数据
             }
 
-            $this->SyResult->setData('success');
-        } else {
-            $error = '支付宝退款数据校验失败,数据:' . \Tool\Tool::jsonEncode($allParams, JSON_UNESCAPED_UNICODE);
-            \Log\Log::error($error, \Constant\ErrorCode::ALIPAY_PARAM_ERROR);
-
-            $this->SyResult->setData('fail');
+            //TODO: 处理退款数据
         }
+
+        $this->SyResult->setData([
+            'msg' => '退款处理成功',
+        ]);
 
         $this->sendRsp();
     }
 
     /**
      * 处理支付宝付款异步通知消息
-     * @api {post} /Index/Pay/handleAliPayNotify 处理支付宝付款异步通知消息
-     * @apiDescription 处理支付宝付款异步通知消息
-     * @apiGroup Pay
-     * @apiSuccess HandleSuccess 处理成功
-     * @apiSuccessExample success:
-     *     success
-     * @apiSuccess HandleFail 处理失败
-     * @apiSuccessExample fail:
-     *     fail
      */
     public function handleAliPayNotifyAction() {
         $allParams = \Request\SyRequest::getParams();
-        if(\AliPay\AliPayUtil::verifyData($allParams, '2', 'RSA2')){
-            if(($allParams['notify_type'] == 'trade_status_sync') && (in_array($allParams['trade_status'], self::$alipaySuccessStatus))) {
-                //TODO: 添加支付原始记录
-
-                if(isset($allParams['payment_type'])) { //网页支付
-                    $payMoney = isset($allParams['total_fee']) && is_numeric($allParams['total_fee']) ? (int)($allParams['total_fee'] * 1000 / 10) : 0;
-                } else { //二维码支付
-                    if(isset($allParams['buyer_pay_amount']) && is_numeric($allParams['buyer_pay_amount'])) {
-                        $payMoney = (int)($allParams['buyer_pay_amount'] * 1000 / 10);
-                    } else if(isset($allParams['total_amount']) && is_numeric($allParams['total_amount'])) {
-                        $payMoney = (int)($allParams['total_amount'] * 1000 / 10);
-                    } else {
-                        $payMoney = 0;
-                    }
+        if(($allParams['notify_type'] == 'trade_status_sync')
+            && in_array($allParams['trade_status'], [
+                'TRADE_SUCCESS',
+                'TRADE_FINISHED',
+            ])) {
+            if(isset($allParams['payment_type'])) { //网页支付
+                $payMoney = isset($allParams['total_fee']) && is_numeric($allParams['total_fee']) ? (int)($allParams['total_fee'] * 1000 / 10) : 0;
+            } else { //二维码支付
+                if(isset($allParams['buyer_pay_amount']) && is_numeric($allParams['buyer_pay_amount'])) {
+                    $payMoney = (int)($allParams['buyer_pay_amount'] * 1000 / 10);
+                } else if(isset($allParams['total_amount']) && is_numeric($allParams['total_amount'])) {
+                    $payMoney = (int)($allParams['total_amount'] * 1000 / 10);
+                } else {
+                    $payMoney = 0;
                 }
-
-                \Dao\PayDao::completePay([
-                    'pay_sn' => $allParams['out_trade_no'] . '',
-                    'pay_type' => \Constant\Project::PAY_TYPE_ALI,
-                    'pay_money' => $payMoney,
-                    'pay_attach' => isset($allParams['body']) && is_string($allParams['body']) ? $allParams['body'] . '' : '',
-                    'trade_status' => $allParams['trade_status'],
-                ]);
             }
 
-            $this->SyResult->setData('success');
-        } else {
-            $error = '支付宝付款数据校验失败,数据:' . \Tool\Tool::jsonEncode($allParams, JSON_UNESCAPED_UNICODE);
-            \Log\Log::error($error, \Constant\ErrorCode::ALIPAY_PARAM_ERROR);
-
-            $this->SyResult->setData('fail');
+            \Dao\PayDao::completePay([
+                'pay_type' => \Constant\Project::PAY_TYPE_ALI,
+                'pay_tradesn' => $allParams['trade_no'],
+                'pay_sellersn' => $allParams['out_trade_no'],
+                'pay_appid' => $allParams['app_id'],
+                'pay_buyerid' => $allParams['buyer_id'],
+                'pay_money' => $payMoney,
+                'pay_attach' => isset($allParams['body']) && is_string($allParams['body']) ? (string)$allParams['body'] : '',
+                'pay_status' => $allParams['trade_status'],
+                'pay_data' => $allParams,
+            ]);
         }
+
+        $this->SyResult->setData([
+            'msg' => '支付处理成功',
+        ]);
 
         $this->sendRsp();
     }

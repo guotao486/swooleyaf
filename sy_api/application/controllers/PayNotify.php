@@ -15,6 +15,9 @@ class PayNotifyController extends CommonController {
 
     /**
      * 处理微信支付通知
+     * @api {post} /Index/PayNotify/handleWxPayNotify 处理微信支付通知
+     * @apiDescription 处理微信支付通知
+     * @apiGroup PayNotify
      */
     public function handleWxPayNotifyAction() {
         $wxMsg = \Tool\Tool::getArrayVal($GLOBALS, 'HTTP_RAW_POST_DATA', '');
@@ -45,6 +48,9 @@ class PayNotifyController extends CommonController {
 
     /**
      * 处理微信扫码预支付通知
+     * @api {post} /Index/PayNotify/handleWxPrePayNotify 处理微信扫码预支付通知
+     * @apiDescription 处理微信扫码预支付通知
+     * @apiGroup PayNotify
      */
     public function handleWxPrePayNotifyAction() {
         $wxMsg = \Tool\Tool::getArrayVal($GLOBALS, 'HTTP_RAW_POST_DATA', '');
@@ -64,10 +70,37 @@ class PayNotifyController extends CommonController {
     }
 
     /**
+     * 处理支付宝付款异步通知消息
+     * @api {post} /Index/PayNotify/handleAliPayNotify 处理支付宝付款异步通知消息
+     * @apiDescription 处理支付宝付款异步通知消息
+     * @apiGroup PayNotify
+     * @apiSuccess HandleSuccess 处理成功
+     * @apiSuccessExample success:
+     *     success
+     * @apiSuccess HandleFail 处理失败
+     * @apiSuccessExample fail:
+     *     fail
+     */
+    public function handleAliPayNotifyAction() {
+        $resultMsg = 'fail';
+        $allParams = \Request\SyRequest::getParams();
+        \Log\Log::log('ali pay data:' . \Tool\Tool::jsonEncode($allParams, JSON_UNESCAPED_UNICODE));
+        if(\AliPay\AliPayUtil::verifyData($allParams, '2', 'RSA2')){
+            $handleRes = \SyModule\SyModuleOrder::getInstance()->sendApiReq('/Index/Pay/handleAliPayNotify', $allParams);
+            $handleData = \Tool\Tool::jsonDecode($handleRes);
+            if(is_array($handleData) && isset($handleData['code']) && ($handleData['code'] == 0)){
+                $resultMsg = 'success';
+            }
+        }
+
+        $this->sendRsp($resultMsg);
+    }
+
+    /**
      * 处理支付宝网页支付同步回跳地址
-     * @api {get} /Index/Pay/handleAliWebRedirect 处理支付宝网页支付同步回跳地址
+     * @api {get} /Index/PayNotify/handleAliWebRedirect 处理支付宝网页支付同步回跳地址
      * @apiDescription 处理支付宝网页支付同步回跳地址
-     * @apiGroup OrderPay
+     * @apiGroup PayNotify
      * @apiParam {string} url 同步回跳URL地址
      * @apiSuccess HandleSuccess 处理成功
      * @apiSuccessExample success:
@@ -88,5 +121,32 @@ class PayNotifyController extends CommonController {
         \Response\SyResponseHttp::redirect($redirectUrl);
 
         $this->sendRsp();
+    }
+
+    /**
+     * 处理支付宝退款异步通知消息
+     * @api {post} /Index/PayNotify/handleAliRefundNotify 处理支付宝退款异步通知消息
+     * @apiDescription 处理支付宝退款异步通知消息
+     * @apiGroup PayNotify
+     * @apiSuccess HandleSuccess 处理成功
+     * @apiSuccessExample success:
+     *     success
+     * @apiSuccess HandleFail 处理失败
+     * @apiSuccessExample fail:
+     *     fail
+     */
+    public function handleAliRefundNotifyAction() {
+        $resultMsg = 'fail';
+        $allParams = \Request\SyRequest::getParams();
+        \Log\Log::log('ali refund data:' . \Tool\Tool::jsonEncode($allParams, JSON_UNESCAPED_UNICODE));
+        if(\AliPay\AliPayUtil::verifyData($allParams, '2', 'RSA2')){
+            $handleRes = \SyModule\SyModuleOrder::getInstance()->sendApiReq('/Index/Pay/handleAliRefundNotify', $allParams);
+            $handleData = \Tool\Tool::jsonDecode($handleRes);
+            if(is_array($handleData) && isset($handleData['code']) && ($handleData['code'] == 0)){
+                $resultMsg = 'success';
+            }
+        }
+
+        $this->sendRsp($resultMsg);
     }
 }
