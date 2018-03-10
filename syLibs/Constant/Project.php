@@ -17,9 +17,9 @@ final class Project {
     const COMMON_LIMIT_DEFAULT = 10; //默认分页限制
     const COMMON_DBNAME_DEFAULT = 'sytrain'; //默认数据库名
 
-    //订单常量,处理类型常量格式 前4位为产品类型，中间3位为操作者类型，后3位为操作行为
-    const ORDER_PAY_TYPE_GOODS = '0001'; //支付类型-商品
-    const ORDER_REFUND_TYPE_GOODS = '5001'; //退款类型-商品
+    //订单常量
+    const ORDER_PAY_TYPE_GOODS = '1000'; //支付类型-商品
+    const ORDER_REFUND_TYPE_GOODS = '5000'; //退款类型-商品
 
     //支付常量
     const PAY_TYPE_WX = 1; //类型-微信支付

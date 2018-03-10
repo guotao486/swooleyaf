@@ -11,12 +11,16 @@ use Constant\Project;
 use Interfaces\Base\PayBase;
 use Interfaces\PayService;
 
-class Goods extends PayBase implements PayService {
+class OrderGoods extends PayBase implements PayService {
     public function __construct() {
         $this->payType = Project::ORDER_PAY_TYPE_GOODS;
     }
 
     private function __clone() {
+    }
+
+    public function getPayInfo(array $data) : array {
+        // TODO: Implement getPayInfo() method.
     }
 
     public function handlePaySuccess(array $data) : array {

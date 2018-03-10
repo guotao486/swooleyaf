@@ -8,7 +8,7 @@
 namespace Interfaces\Containers;
 
 use Constant\Project;
-use Interfaces\Impl\Pay\Goods;
+use Interfaces\Impl\Pay\OrderGoods;
 use Tool\BaseContainer;
 
 class PayContainer extends BaseContainer {
@@ -18,7 +18,7 @@ class PayContainer extends BaseContainer {
         ];
 
         $this->bind(Project::ORDER_PAY_TYPE_GOODS, function () {
-            return new Goods();
+            return new OrderGoods();
         });
     }
 }

@@ -20,19 +20,28 @@ class PayController extends CommonController {
      * 申请支付
      * @api {post} /Index/Pay/applyPay 申请支付
      * @apiDescription 申请支付
-     * @apiGroup OrderPay
-     * @apiParam {string} apply_type 申请类型,7位长度字符串
-     * @apiUse OrderPayModelWxJs
-     * @apiUse OrderPayModelAliWeb
-     * @apiUse OrderPayModelAliCode
-     * @apiUse OrderPayContentGoods
+     * @apiGroup Pay
+     * @apiParam {string} session_id 会话ID
+     * @apiParam {string} pay_type 支付类型 a000:微信JS a001:微信动态二维码 a002:微信静态二维码 a100:支付宝二维码 a101:支付宝网页
+     * @apiParam {string} pay_content 支付内容 1000:商品订单
+     * @apiParam {string} [a01_timeout] 支付宝订单过期时间
+     * @apiParam {string} [a01_returnurl] 支付宝同步通知链接
+     * @apiParam {string} [goods_ordersn] 商品订单单号
+     * @SyFilter-{"field": "session_id","explain": "会话ID","type": "string","rules": {"required": 1,"min": 1}}
+     * @SyFilter-{"field": "pay_type","explain": "支付类型","type": "string","rules": {"required": 1,"min": 4,"max": 4}}
+     * @SyFilter-{"field": "pay_content","explain": "支付内容","type": "string","rules": {"required": 1,"min": 4,"max": 4}}
+     * @SyFilter-{"field": "a01_timeout","explain": "订单过期时间","type": "string","rules": {"min": 0,"max": 20}}
+     * @SyFilter-{"field": "a01_returnurl","explain": "同步通知链接","type": "string","rules": {"url": 1}}
+     * @SyFilter-{"field": "goods_ordersn","explain": "订单单号","type": "string","rules": {"min": 10,"max": 32}}
      * @apiUse CommonSuccess
      * @apiUse CommonFail
-     * @SyFilter-{"field": "apply_type","explain": "申请类型","type": "string","rules": {"required": 1,"regex": "/^[0-9a-z]{7}$/"}}
      */
     public function applyPayAction() {
-        $applyType = (string)\Request\SyRequest::getParams('apply_type');
-        $applyRes = \Dao\OrderDao::applyPay($applyType);
+        $needParams = [
+            'pay_type' => trim(\Request\SyRequest::getParams('pay_type')),
+            'pay_content' => trim(\Request\SyRequest::getParams('pay_content')),
+        ];
+        $applyRes = \Dao\PayDao::applyPay($needParams);
         $this->SyResult->setData($applyRes);
 
         $this->sendRsp();
@@ -42,7 +51,7 @@ class PayController extends CommonController {
      * 处理微信支付通知
      * @api {post} /Index/Pay/handleWxPayNotify 处理微信支付通知
      * @apiDescription 处理微信支付通知
-     * @apiGroup OrderPay
+     * @apiGroup Pay
      * @apiSuccess HandleSuccess 处理成功
      * @apiSuccess HandleFail 处理失败
      */
@@ -52,7 +61,7 @@ class PayController extends CommonController {
         if (($wxResultCode == 'SUCCESS') && ($wxReturnCode == 'SUCCESS')) { //支付成功
             //TODO: 添加支付原始记录
 
-            \Dao\OrderDao::completePay([
+            \Dao\PayDao::completePay([
                 'pay_sn' => $xmlData['out_trade_no'] . '',
                 'pay_type' => \Constant\Project::PAY_TYPE_WX,
                 'pay_money' => $xmlData['total_fee'],
@@ -75,7 +84,7 @@ class PayController extends CommonController {
      * 处理微信扫码预支付通知
      * @api {post} /Index/Pay/handleWxPrePayNotify 处理微信扫码预支付通知
      * @apiDescription 处理微信扫码预支付通知
-     * @apiGroup OrderPay
+     * @apiGroup Pay
      * @apiSuccess HandleSuccess 处理成功
      * @apiSuccess HandleFail 处理失败
      */
@@ -118,7 +127,7 @@ class PayController extends CommonController {
      * 处理支付宝退款异步通知消息
      * @api {post} /Index/Pay/handleAliRefundNotify 处理支付宝退款异步通知消息
      * @apiDescription 处理支付宝退款异步通知消息
-     * @apiGroup OrderPay
+     * @apiGroup Pay
      * @apiSuccess HandleSuccess 处理成功
      * @apiSuccessExample success:
      *     success
@@ -163,7 +172,7 @@ class PayController extends CommonController {
      * 处理支付宝付款异步通知消息
      * @api {post} /Index/Pay/handleAliPayNotify 处理支付宝付款异步通知消息
      * @apiDescription 处理支付宝付款异步通知消息
-     * @apiGroup OrderPay
+     * @apiGroup Pay
      * @apiSuccess HandleSuccess 处理成功
      * @apiSuccessExample success:
      *     success
@@ -189,7 +198,7 @@ class PayController extends CommonController {
                     }
                 }
 
-                \Dao\OrderDao::completePay([
+                \Dao\PayDao::completePay([
                     'pay_sn' => $allParams['out_trade_no'] . '',
                     'pay_type' => \Constant\Project::PAY_TYPE_ALI,
                     'pay_money' => $payMoney,
