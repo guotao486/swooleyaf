@@ -26,7 +26,7 @@ class PayNotifyController extends CommonController {
         if (\Wx\WxUtil::checkSign($xmlData, $xmlData['appid'])) {
             $handleRes = \SyModule\SyModuleOrder::getInstance()->sendApiReq('/Index/Pay/handleWxPayNotify', $xmlData);
             $handleData = \Tool\Tool::jsonDecode($handleRes);
-            if(is_array($handleData) && isset($handleData['code']) && ($handleData['code'] == 0)){
+            if(is_array($handleData) && isset($handleData['code']) && ($handleData['code'] == \Constant\ErrorCode::COMMON_SUCCESS)){
                 $error = '';
             } else {
                 $error = '处理失败';
@@ -88,7 +88,7 @@ class PayNotifyController extends CommonController {
         if(\AliPay\AliPayUtil::verifyData($allParams, '2', 'RSA2')){
             $handleRes = \SyModule\SyModuleOrder::getInstance()->sendApiReq('/Index/Pay/handleAliPayNotify', $allParams);
             $handleData = \Tool\Tool::jsonDecode($handleRes);
-            if(is_array($handleData) && isset($handleData['code']) && ($handleData['code'] == 0)){
+            if(is_array($handleData) && isset($handleData['code']) && ($handleData['code'] == \Constant\ErrorCode::COMMON_SUCCESS)){
                 $resultMsg = 'success';
             }
         }
@@ -142,7 +142,7 @@ class PayNotifyController extends CommonController {
         if(\AliPay\AliPayUtil::verifyData($allParams, '2', 'RSA2')){
             $handleRes = \SyModule\SyModuleOrder::getInstance()->sendApiReq('/Index/Pay/handleAliRefundNotify', $allParams);
             $handleData = \Tool\Tool::jsonDecode($handleRes);
-            if(is_array($handleData) && isset($handleData['code']) && ($handleData['code'] == 0)){
+            if(is_array($handleData) && isset($handleData['code']) && ($handleData['code'] == \Constant\ErrorCode::COMMON_SUCCESS)){
                 $resultMsg = 'success';
             }
         }
