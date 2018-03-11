@@ -7,9 +7,12 @@
  */
 namespace Interfaces\Impl\Pay;
 
+use Constant\ErrorCode;
 use Constant\Project;
+use Exception\Common\CheckException;
 use Interfaces\Base\PayBase;
 use Interfaces\PayService;
+use Request\SyRequest;
 
 class OrderGoods extends PayBase implements PayService {
     public function __construct() {
@@ -17,6 +20,17 @@ class OrderGoods extends PayBase implements PayService {
     }
 
     private function __clone() {
+    }
+
+    public function checkPayParams() : array {
+        $orderSn = trim(SyRequest::getParams('goods_ordersn', ''));
+        if(strlen($orderSn) == 0){
+            throw new CheckException('订单单号不能为空', ErrorCode::COMMON_PARAM_ERROR);
+        }
+
+        return [
+            'order_sn' => $orderSn,
+        ];
     }
 
     public function getPayInfo(array $data) : array {

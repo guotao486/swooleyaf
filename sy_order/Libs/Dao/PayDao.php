@@ -187,17 +187,6 @@ class PayDao {
         ];
     }
 
-    private static function payContentCheckGoodsOrder(array $data) {
-        $orderSn = trim(SyRequest::getParams('goods_ordersn', ''));
-        if(strlen($orderSn) == 0){
-            throw new CheckException('订单单号不能为空', ErrorCode::COMMON_PARAM_ERROR);
-        }
-
-        return [
-            'order_sn' => $orderSn,
-        ];
-    }
-
     public static function applyPay(array $data) {
         $typeCheckFunc = Tool::getArrayVal(self::$payTypeCheckMap, $data['pay_type'], null);
         if (is_null($typeCheckFunc)) {
@@ -205,16 +194,11 @@ class PayDao {
         }
         self::$typeCheckFunc($data);
 
-        $contentCheckFunc = Tool::getArrayVal(self::$payContentCheckMap, $data['pay_content'], null);
-        if (is_null($contentCheckFunc)) {
-            throw new CheckException('支付内容不支持', ErrorCode::COMMON_PARAM_ERROR);
-        }
-        $contentParams = self::$contentCheckFunc($data);
-
         $payService = self::getPayService($data['pay_content']);
         if (is_null($payService)) {
-            throw new CheckException('支付内容未实现', ErrorCode::COMMON_PARAM_ERROR);
+            throw new CheckException('支付内容不支持', ErrorCode::COMMON_PARAM_ERROR);
         }
+        $contentParams = $payService->checkPayParams();
         $data['content_result'] = $payService->getPayInfo($contentParams);
 
         $typeHandleFunc = Tool::getArrayVal(self::$payTypeHandleMap, $data['pay_type'], null);

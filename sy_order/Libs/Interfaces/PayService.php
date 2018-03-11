@@ -9,6 +9,12 @@ namespace Interfaces;
 
 interface PayService {
     /**
+     * 校验支付参数
+     * @return array
+     */
+    public function checkPayParams() : array;
+
+    /**
      * 获取支付信息
      * @param array $data
      * @return array
