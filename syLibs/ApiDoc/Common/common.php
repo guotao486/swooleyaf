@@ -30,6 +30,6 @@
  * @apiSuccessExample fail:
  *     {
  *       "code": 10000,
- *       "message": "id必须为整数"
+ *       "msg": "id必须为整数"
  *     }
  */

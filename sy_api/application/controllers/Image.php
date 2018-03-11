@@ -19,7 +19,7 @@ class ImageController extends CommonController {
      * @apiDescription 获取百度编辑器配置
      * @apiGroup File
      * @apiParam {string} action 动作名称 config:获取配置 uploadimage:上传图片
-     * @apiParam {string} callback 回调函数名
+     * @apiParam {string} [callback] 回调函数名
      * @SyFilter-{"field": "action","explain": "动作名称","type": "string","rules": {"min": 1,"required":1}}
      * @SyFilter-{"field": "callback","explain": "回调函数名","type": "string","rules": {"min": 0}}
      */

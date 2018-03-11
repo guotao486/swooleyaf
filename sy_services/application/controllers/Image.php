@@ -16,9 +16,9 @@ class ImageController extends CommonController {
      * @apiDescription 生成二维码图片
      * @apiGroup ServiceImage
      * @apiParam {string{1..255}} url 链接地址
-     * @apiParam {string} error_level 容错级别，取值为H L M Q，越在前级别越低
-     * @apiParam {number{1-10}} image_size 图片大小
-     * @apiParam {number{0-200}} margin_size 外边框间隙，单位为px
+     * @apiParam {string} [error_level=L] 容错级别，取值为H L M Q，越在前级别越低
+     * @apiParam {number{1-10}} [image_size=5] 图片大小
+     * @apiParam {number{0-200}} [margin_size=2] 外边框间隙，单位为px
      * @apiSuccess {string} Body 图片字节流
      * @apiUse CommonFail
      * @SyFilter-{"field": "url","explain": "链接地址","type": "string","rules": {"required": 1,"url": 1}}
@@ -50,13 +50,13 @@ class ImageController extends CommonController {
      * @apiDescription 生成验证码图片
      * @apiGroup ServiceImage
      * @apiParam {string{1..64}} session_id 令牌标识
-     * @apiParam {number{50-150}} image_width 图片宽度
-     * @apiParam {number{20-80}} image_height 图片高度
-     * @apiSuccess {string} Body 图片字节流
-     * @apiUse CommonFail
+     * @apiParam {number{50-150}} [image_width=130] 图片宽度
+     * @apiParam {number{20-80}} [image_height=45] 图片高度
      * @SyFilter-{"field": "session_id","explain": "令牌标识","type": "string","rules": {"required": 1,"min": 1,"max": 150}}
      * @SyFilter-{"field": "image_width","explain": "图片宽度","type": "int","rules": {"required": 1,"min": 50,"max": 150}}
      * @SyFilter-{"field": "image_height","explain": "图片高度","type": "int","rules": {"required": 1,"min": 20,"max": 80}}
+     * @apiSuccess {string} Body 图片字节流
+     * @apiUse CommonFail
      */
     public function createCodeImageAction() {
         $fontPath = \SyServer\HttpServer::getServerConfig('storepath_resources') . '/consolas.ttf';
@@ -110,15 +110,16 @@ class ImageController extends CommonController {
      * @apiDescription 图片上传
      * @apiGroup ServiceImage
      * @apiParam {string} upload_type 上传类型,4位长度字符串
-     * @apiUse ServiceImageUploadTypeBase64
-     * @apiUse ServiceImageUploadTypeUrl
-     * @apiUse ServiceImageUploadContentNormal
-     * @apiUse ServiceImageUploadContentPuzzle
-     * @apiUse CommonSuccess
-     * @apiUse CommonFail
+     * @apiParam {string} [image_base64] 图片base64编码
+     * @apiParam {string} [image_url] 图片链接
+     * @apiParam {string} [image_wxmedia] 微信媒体ID
+     * @apiParam {number{1-5000}} image_width 图片限定宽度
+     * @apiParam {number{1-5000}} image_height 图片限定高度
      * @SyFilter-{"field": "upload_type","explain": "上传类型","type": "int","rules": {"required": 1,"min": 1}}
      * @SyFilter-{"field": "image_width","explain": "图片限制宽度","type": "int","rules": {"required": 1,"min": 1,"max": 5000}}
      * @SyFilter-{"field": "image_height","explain": "图片限制高度","type": "int","rules": {"required": 1,"min": 1,"max": 5000}}
+     * @apiUse CommonSuccess
+     * @apiUse CommonFail
      */
     public function uploadImageAction() {
         $cacheKey = \Constant\Server::REDIS_PREFIX_IMAGE_DATA . \Request\SyRequest::getParams('_syfile_tag', '');
