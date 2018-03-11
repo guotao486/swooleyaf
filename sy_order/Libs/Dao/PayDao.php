@@ -11,7 +11,6 @@ use AliPay\AliPayUtil;
 use AliPay\PayQrCode;
 use AliPay\PayWap;
 use Constant\ErrorCode;
-use Constant\Project;
 use Constant\Server;
 use DesignPatterns\Factories\CacheSimpleFactory;
 use Exception\Common\CheckException;
@@ -42,9 +41,6 @@ class PayDao {
         'a002' => 'payTypeHandleWxNativeStatic',
         'a100' => 'payTypeHandleAliCode',
         'a101' => 'payTypeHandleAliWeb',
-    ];
-    private static $payContentCheckMap = [
-        Project::ORDER_PAY_TYPE_GOODS => 'payContentCheckGoodsOrder',
     ];
 
     /**
