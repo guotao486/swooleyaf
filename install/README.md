@@ -11,7 +11,18 @@
     Setting->Project->Project Interpreter->Add Local
     设置Base interpreter并勾选上Inherit global site-packages
 
+# 贝叶斯分类
+    https://www.jianshu.com/p/f6a3f3200689
+
+# 配置
+## swooleyaf环境安装
+    详情参见文件: initcentos7/swooleyaf/helper_swooleyaf.md
+
+## sywaf防火墙
+    详情参见文件: resources/nginx/lualib/helper_sywaf.md
+
 # 命令
+## swooleyaf环境安装
     //所有系统环境均为CentOS7
     //安装服务器环境
     /usr/local/python3/bin/fab -f fabfile.py installEnv:tag=xxx

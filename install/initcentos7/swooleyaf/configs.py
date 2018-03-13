@@ -9,6 +9,7 @@ env.hosts = [
     '192.168.1.5',
 ]
 
+# 建议账号用root,避免权限问题
 env.passwords = {
     'root@192.168.1.1:22': 'password1',
     'root@192.168.1.2:22': 'password2',

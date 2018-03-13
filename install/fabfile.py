@@ -1,6 +1,7 @@
 # -*- coding:utf-8 -*-
 from initcentos7.swooleyaf.syinstall import *
 
+
 def installEnv(tag):
     tagMap = {
         'syMysql': installSyMysql,

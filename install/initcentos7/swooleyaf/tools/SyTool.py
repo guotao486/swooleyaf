@@ -16,26 +16,32 @@ class SyTool():
     def initSystem():
         run('yum -y install vim zip nss gcc gcc-c++ net-tools wget htop lsof unzip bzip2 curl-devel zlib-devel epel-release perl-ExtUtils-MakeMaker expat-devel gettext-devel openssl-devel iproute.x86_64 autoconf')
         run('wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo')
-        run('mkdir %s' % syDicts['path.package.remote'])
-        run('mkdir /home/configs')
-        run('mkdir /home/logs')
-        run('mkdir /usr/local/mysql')
+        run('yum -y update')
         run('systemctl enable firewalld')
         run('systemctl start firewalld')
         run('systemctl enable crond')
         run('systemctl start crond')
-        run('mkdir /usr/local/git')
+        with settings(warn_only=True):
+            run('mkdir /home/configs')
+            run('mkdir /home/logs')
+            run('mkdir /usr/local/mysql')
+            run('mkdir %s' % syDicts['path.package.remote'])
+
+    # 配置git环境
+    @staticmethod
+    def installGit():
         run('yum -y remove git')
+        with settings(warn_only=True):
+            run('mkdir /usr/local/git')
 
         gitLocal = ''.join([syDicts['path.package.local'], '/resources/linux/git-2.10.2.tar.gz'])
         gitRemote = ''.join([syDicts['path.package.remote'], '/git-2.10.2.tar.gz'])
         put(gitLocal, gitRemote)
         with cd(syDicts['path.package.remote']):
             run('tar -xzf git-2.10.2.tar.gz')
-            run('cd git-2.10.2 && make prefix=/usr/local/git all && make prefix=/usr/local/git install && cd ../ && rm -rf git-2.10.2 && rm -rf git-2.10.2.tar.gz')
+            run('cd git-2.10.2 && make prefix=/usr/local/git all && make prefix=/usr/local/git install && cd ../ && rm -rf git-2.10.2/ && rm -rf git-2.10.2.tar.gz')
             run('git config --global user.name "%s"' % syDicts['git.user.name'])
             run('git config --global user.email "%s"' % syDicts['git.user.email'])
-        run('yum -y update')
 
     # 配置nginx环境
     @staticmethod
@@ -125,13 +131,13 @@ class SyTool():
             run('mv lua-nginx-module-0.10.11/ /home/configs/nginx/modules/lua-nginx-module')
             run('rm -rf lua-nginx-module-0.10.11.tar.gz')
 
-        ngxwafLocal = ''.join([syDicts['path.package.local'], '/resources/nginx/ngx_lua_waf.tar.gz'])
-        ngxwafRemote = ''.join([syDicts['path.package.remote'], '/ngx_lua_waf.tar.gz'])
-        put(ngxwafLocal, ngxwafRemote)
+        ngxLualibLocal = ''.join([syDicts['path.package.local'], '/resources/nginx/lualib.tar.gz'])
+        ngxLualibRemote = ''.join([syDicts['path.package.remote'], '/lualib.tar.gz'])
+        put(ngxLualibLocal, ngxLualibRemote)
         with cd(syDicts['path.package.remote']):
-            run('tar -zxvf ngx_lua_waf.tar.gz')
-            run('mv ngx_lua_waf/ /home/configs/nginx/waf')
-            run('rm -rf ngx_lua_waf.tar.gz')
+            run('tar -zxvf lualib.tar.gz')
+            run('mv lualib/ /home/configs/nginx/lualib')
+            run('rm -rf lualib.tar.gz')
 
         nginxLocal = ''.join([syDicts['path.package.local'], '/resources/nginx/nginx-1.12.1.tar.gz'])
         nginxRemote = ''.join([syDicts['path.package.remote'], '/nginx-1.12.1.tar.gz'])
@@ -159,6 +165,14 @@ class SyTool():
         nginxConfRemote = '/usr/local/nginx/conf/nginx.conf'
         run('rm -rf %s' % nginxConfRemote)
         put(nginxConfLocal, nginxConfRemote)
+
+        nginxApiConfLocal = ''.join([syDicts['path.package.local'], '/configs/swooleyaf/nginx/demoapi.conf'])
+        nginxApiConfRemote = '/home/configs/nginx/servers/demoapi.conf'
+        put(nginxApiConfLocal, nginxApiConfRemote)
+
+        nginxFrontConfLocal = ''.join([syDicts['path.package.local'], '/configs/swooleyaf/nginx/demofront.conf'])
+        nginxFrontConfRemote = '/home/configs/nginx/servers/demofront.conf'
+        put(nginxFrontConfLocal, nginxFrontConfRemote)
 
         nginxServiceLocal = ''.join([syDicts['path.package.local'], '/configs/swooleyaf/nginx/nginx.service'])
         nginxServiceRemote = '/lib/systemd/system/nginx.service'
@@ -414,3 +428,25 @@ class SyTool():
             run('rm -rf redis-3.2.11.tar.gz')
             run('systemctl daemon-reload')
             run('chkconfig redis on')
+
+    @staticmethod
+    def installFtp():
+        run('yum -y install pam pam-devel db4 de4-devel db4-uitls db4-tcl vsftpd')
+        run('useradd vsftpd -s /sbin/nologin')
+        ftpUserLocal = ''.join([syDicts['path.package.local'], '/configs/swooleyaf/ftp/vftpuser.txt'])
+        ftpUserRemote = '/etc/vsftpd/vftpuser.txt'
+        put(ftpUserLocal, ftpUserRemote)
+        run('db_load -T -t hash -f %s /etc/vsftpd/vftpuser.db' % ftpUserRemote)
+        ftpdLocal = ''.join([syDicts['path.package.local'], '/configs/swooleyaf/ftp/vsftpd'])
+        ftpdRemote = '/etc/pam.d/vsftpd'
+        run('mv %s /etc/pam.d/vsftpd.back' % ftpdRemote)
+        put(ftpdLocal, ftpdRemote)
+        run('touch /etc/vsftpd/chroot_list')
+        run('mkdir /etc/vsftpd/vsftpd_user_conf')
+        run('echo "local_root=/home/jw" > /etc/vsftpd/vsftpd_user_conf/jw')
+        ftpConfLocal = ''.join([syDicts['path.package.local'], '/configs/swooleyaf/ftp/vsftpd.conf'])
+        ftpConfRemote = '/etc/vsftpd/vsftpd.conf'
+        run('mv %s /etc/vsftpd/vsftpd.conf.back' % ftpConfRemote)
+        put(ftpConfLocal, ftpConfRemote)
+        run('systemctl enable vsftpd')
+        run('systemctl restart vsftpd')

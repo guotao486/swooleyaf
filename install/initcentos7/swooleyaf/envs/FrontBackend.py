@@ -22,6 +22,7 @@ class FrontBackend(SyBase):
     def install(self):
         SyTool.initSystemEnv(self._profileEnv)
         SyTool.initSystem()
+        SyTool.installGit()
         run('firewall-cmd --zone=public --add-port=21/tcp --permanent')
         run('firewall-cmd --zone=public --add-port=22/tcp --permanent')
         run('firewall-cmd --zone=public --add-port=80/tcp --permanent')
