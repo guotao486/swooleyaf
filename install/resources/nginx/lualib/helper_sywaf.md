@@ -45,8 +45,8 @@
     /home/configs/nginx/lualib/sywafconfigs.lua
 
 ## 配置详解
-- PathRules: 过滤规则存放目录,以/结尾
-- LogDir: 日志存储目录,以/结尾
+- DirRules: 过滤规则存放目录,以/结尾
+- DirLog: 日志存储目录,以/结尾
 - SwitchLogAttack: 攻击日志记录开关 on:开启 off:关闭
 - SwitchUrlDeny: url拦截开关 on:开启 off:关闭
 - SwitchUrlRedirect: 拦截重定向开关 on:开启 off:关闭

@@ -18,12 +18,12 @@ local OpenUrlDeny = sywaftool.isOpen(configs.SwitchUrlDeny)
 local OpenCookie = sywaftool.isOpen(configs.SwitchCookie)
 local OpenCCDeny = sywaftool.isOpen(configs.SwitchCCDeny)
 local OpenPost = sywaftool.isOpen(configs.SwitchPost)
-local WhiteUrls = sywaftool.readRule(configs.PathRules .. 'whiteurl')
-local BlackArgs = sywaftool.readRule(configs.PathRules .. 'args')
-local BlackUrls = sywaftool.readRule(configs.PathRules .. 'url')
-local BlackUserAgents = sywaftool.readRule(configs.PathRules .. 'user-agent')
-local BlackCookies = sywaftool.readRule(configs.PathRules .. 'cookie')
-local BlackPosts = sywaftool.readRule(configs.PathRules .. 'post')
+local WhiteUrls = sywaftool.readRule(configs.DirRules .. 'whiteurl')
+local BlackArgs = sywaftool.readRule(configs.DirRules .. 'args')
+local BlackUrls = sywaftool.readRule(configs.DirRules .. 'url')
+local BlackUserAgents = sywaftool.readRule(configs.DirRules .. 'user-agent')
+local BlackCookies = sywaftool.readRule(configs.DirRules .. 'cookie')
+local BlackPosts = sywaftool.readRule(configs.DirRules .. 'post')
 
 local function logWaf(method, url, data, rule)
     if OpenLogAttack then
@@ -37,7 +37,7 @@ local function logWaf(method, url, data, rule)
         else
             msg = realIp .. " [" .. time .. "] \"" .. method .. " " .. serverName .. url .. "\" \"" .. data .. "\" - \"" .. rule .. "\"\n"
         end
-        local filename = configs.LogDir .. serverName .. "_" .. ngx.today() .. "_attack.log"
+        local filename = configs.DirLog .. serverName .. "_" .. ngx.today() .. "_attack.log"
         sytool.log(filename, msg)
     end
 end
