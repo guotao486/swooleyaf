@@ -273,7 +273,7 @@ local function checkPost()
 end
 
 local module = {}
-module.tokenSecret = 'jb6YNPKe'
+module.tokenSecret = 'jb6hNP'
 
 function module.checkWaf()
     if checkWhiteIp() then
@@ -297,7 +297,7 @@ end
 
 function module.checkCookieToken()
     local nowToken = ngx.var.cookie_sywaftoken
-    local newToken = ngx.md5(module.tokenSecret .. ngx.var.remote_addr)
+    local newToken = module.tokenSecret .. ngx.crc32_short(ngx.var.remote_addr)
     if nowToken ~= nil then
         if nowToken == newToken then
             return
