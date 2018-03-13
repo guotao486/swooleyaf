@@ -297,7 +297,7 @@ end
 
 function module.checkCookieToken()
     local nowToken = ngx.var.cookie_sywaftoken
-    local newToken = module.tokenSecret .. ngx.crc32_short(ngx.var.remote_addr)
+    local newToken = ngx.crc32_short(module.tokenSecret .. ngx.var.remote_addr)
     if nowToken ~= nil then
         if nowToken == newToken then
             return
