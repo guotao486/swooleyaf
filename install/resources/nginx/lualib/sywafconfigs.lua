@@ -7,8 +7,8 @@
 --
 
 local configs = {}
-configs['PathRules'] = '/home/configs/nginx/lualib/wafconf/'
-configs['LogDir'] = '/home/logs/nginx/'
+configs['DirRules'] = '/home/configs/nginx/lualib/wafconf/'
+configs['DirLog'] = '/home/logs/nginx/'
 configs['SwitchLogAttack'] = 'on'
 configs['SwitchUrlDeny'] = 'on'
 configs['SwitchUrlRedirect'] = 'on'
