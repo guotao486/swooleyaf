@@ -47,28 +47,28 @@
 ## 配置详解
 - DirRules: 过滤规则存放目录,以/结尾
 - DirLog: 日志存储目录,以/结尾
-- SwitchLogAttack: 攻击日志记录开关 on:开启 off:关闭
-- SwitchUrlDeny: url拦截开关 on:开启 off:关闭
-- SwitchUrlRedirect: 拦截重定向开关 on:开启 off:关闭
+- SwitchCCDeny: cc攻击拦截开关 on:开启 off:关闭
+- SwitchWhiteUri: uri白名单过滤开关 on:开启 off:关闭
+- SwitchBlackUri: uri黑名单过滤开关 on:开启 off:关闭
 - SwitchCookie: cookie过滤开关 on:开启 off:关闭
 - SwitchPost: post过滤开关 on:开启 off:关闭
-- SwitchWhiteUrl: url白名单过滤开关 on:开启 off:关闭
-- SwitchCCDeny: cc攻击拦截开关 on:开启 off:关闭
 - BlackFileExts: 文件后缀黑名单列表
-- BlackIps: ip黑名单列表
 - WhiteIps: ip白名单列表
+- BlackIps: ip黑名单列表
 - CCCount: CC攻击次数限制
 - CCSeconds: CC攻击频率时间限制,单位为秒
-- HtmlError: 攻击返回提示内容,必须用```[[```和```]]```包容
+- ErrRspContentHtml: html格式错误响应内容,必须用```[[```和```]]```包容
+- ErrRspContentJson: json格式错误响应内容,必须用```[[```和```]]```包容
 
 ## 过滤规则介绍
     攻击日志格式:虚拟主机名_日期_attack.log
 
-- args: 过滤get参数
-- url: 过滤get请求url
-- post: 过滤post请求
-- whitelist: url白名单
-- user-agent: 过滤user-agent
+- white-uris: uri白名单
+- black-uris: uri黑名单
+- black-useragents: user-agent黑名单
+- black-getargs: get参数黑名单
+- black-cookies: cookie黑名单
+- black-postargs: post参数黑名单
 
 # 鸣谢
 - 此WAF扩展基于loveshell的ngx_lua_waf开发

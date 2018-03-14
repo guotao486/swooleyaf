@@ -161,3 +161,6 @@
 
 ## 图片处理
 - https://github.com/kosinix/grafika //参考地址
+
+## nginx防火墙
+- 详情参见文件: install/resources/nginx/helper_sywaf.md

@@ -11,200 +11,194 @@ local sytool = require("sytool")
 local sywaftool = require("sywaftool")
 local ngxMatch = ngx.re.find
 local ngxUnescapeUri = ngx.unescape_uri
-local OpenLogAttack = sywaftool.isOpen(configs.SwitchLogAttack)
-local OpenUrlRedirect = sywaftool.isOpen(configs.SwitchUrlRedirect)
-local OpenWhiteUrl = sywaftool.isOpen(configs.SwitchWhiteUrl)
-local OpenUrlDeny = sywaftool.isOpen(configs.SwitchUrlDeny)
-local OpenCookie = sywaftool.isOpen(configs.SwitchCookie)
 local OpenCCDeny = sywaftool.isOpen(configs.SwitchCCDeny)
+local OpenWhiteUri = sywaftool.isOpen(configs.SwitchWhiteUri)
+local OpenBlackUri = sywaftool.isOpen(configs.SwitchBlackUri)
+local OpenCookie = sywaftool.isOpen(configs.SwitchCookie)
 local OpenPost = sywaftool.isOpen(configs.SwitchPost)
-local WhiteUrls = sywaftool.readRule(configs.DirRules .. 'whiteurl')
-local BlackArgs = sywaftool.readRule(configs.DirRules .. 'args')
-local BlackUrls = sywaftool.readRule(configs.DirRules .. 'url')
-local BlackUserAgents = sywaftool.readRule(configs.DirRules .. 'user-agent')
-local BlackCookies = sywaftool.readRule(configs.DirRules .. 'cookie')
-local BlackPosts = sywaftool.readRule(configs.DirRules .. 'post')
+local WhiteUris = sywaftool.readRule(configs.DirRules .. 'white-uris')
+local BlackUris = sywaftool.readRule(configs.DirRules .. 'black-uris')
+local BlackUserAgents = sywaftool.readRule(configs.DirRules .. 'black-useragents')
+local BlackGetArgs = sywaftool.readRule(configs.DirRules .. 'black-getargs')
+local BlackCookies = sywaftool.readRule(configs.DirRules .. 'black-cookies')
+local BlackPostArgs = sywaftool.readRule(configs.DirRules .. 'black-postargs')
 
 local function logWaf(method, url, data, rule)
-    if OpenLogAttack then
-        local realIp = sytool.getClientIp()
-        local ua = ngx.var.http_user_agent
-        local serverName = ngx.var.server_name
-        local time = ngx.localtime()
-        local msg = ''
-        if ua then
-            msg = realIp .. " [" .. time .. "] \"" .. method .. " " .. serverName .. url .. "\" \"" .. data .. "\"  \"" .. ua .. "\" \"" .. rule .. "\"\n"
-        else
-            msg = realIp .. " [" .. time .. "] \"" .. method .. " " .. serverName .. url .. "\" \"" .. data .. "\" - \"" .. rule .. "\"\n"
-        end
-        local filename = configs.DirLog .. serverName .. "_" .. ngx.today() .. "_attack.log"
-        sytool.log(filename, msg)
+    local msgs = {}
+    local serverName = ngx.var.server_name
+    table.insert(msgs, sytool.getClientIp())
+    table.insert(msgs, " [")
+    table.insert(msgs, ngx.localtime())
+    table.insert(msgs, '] "')
+    table.insert(msgs, method)
+    table.insert(msgs, " ")
+    table.insert(msgs, serverName)
+    table.insert(msgs, url)
+    table.insert(msgs, '" "')
+    table.insert(msgs, data)
+
+    local ua = ngx.var.http_user_agent
+    if ua then
+        table.insert(msgs, '" "')
+        table.insert(msgs, ua)
+        table.insert(msgs, '" "')
+    else
+        table.insert(msgs, '" - "')
     end
+    table.insert(msgs, rule)
+    table.insert(msgs, '"\n')
+    local filename = configs.DirLog .. serverName .. "_" .. ngx.today() .. "_attack.log"
+    sytool.log(filename, table.concat(msgs, ''))
 end
 
-local function sayHtml()
-    if OpenUrlRedirect then
+local function sendErrorRsp(status, msgType)
+    ngx.status = status
+    if msgType == 'json' then
+        ngx.header.content_type = "application/json;charset=UTF-8"
+        ngx.say(configs.ErrRspContentJson)
+    else
         ngx.header.content_type = "text/html;charset=UTF-8"
-        ngx.status = ngx.HTTP_FORBIDDEN
-        ngx.say(configs.HtmlError)
-        ngx.exit(ngx.status)
-    end
-end
-
-local function checkWhiteUrl()
-    if OpenWhiteUrl then
-        if #WhiteUrls > 0 then
-            for _, rule in pairs(WhiteUrls) do
-                if ngxMatch(ngx.var.uri, rule, "isjo") then
-                    return true
-                end
-            end
-        end
+        ngx.say(configs.ErrRspContentHtml)
     end
 
-    return false
+    ngx.exit(ngx.status)
 end
 
 local function checkFileExt(ext)
     local extStr = string.lower(ext)
-    if configs.BlackFileExts[extStr] == nil then
-        return true
-    else
-        logWaf('POST', ngx.var.request_uri, "-", "file attack with ext " .. ext)
-        sayHtml()
-        return false
+    if configs.BlackFileExts[extStr] ~= nil then
+        logWaf('File-Ext', ngx.var.request_uri, "-", "file attack with ext " .. ext)
+        sendErrorRsp(ngx.HTTP_FORBIDDEN, 'html')
     end
 end
 
-local function checkArgs()
-    local nowTable = {}
-    local nowArgs = ngx.req.get_uri_args()
-    for key, val in pairs(nowArgs) do
-        local valStr = ''
-        if type(val) == 'table' then
-            local et = {}
-            for k, v in pairs(val) do
-                if v == true then
-                    table.insert(et, "")
-                else
-                    table.insert(et, v)
-                end
-            end
-            valStr = table.concat(et, " ")
-        else
-            valStr = val
-        end
-        table.insert(nowTable, valStr)
-    end
-
-    for _, rule in pairs(BlackArgs) do
-        for eKey, eVal in pairs(nowTable) do
-            if eVal and type(eVal) ~= "boolean" and rule ~= "" and ngxMatch(ngxUnescapeUri(eVal), rule, "isjo") then
-                logWaf('GET', ngx.var.request_uri, "-", rule)
-                sayHtml()
-                return true
+local function checkPostArgs(data)
+    if data ~= "" and #BlackPostArgs > 0 then
+        for _, rule in pairs(BlackPostArgs) do
+            if ngxMatch(ngxUnescapeUri(data), rule, "isjo") then
+                logWaf('Post-Args', ngx.var.request_uri, data, rule)
+                sendErrorRsp(ngx.HTTP_FORBIDDEN, 'html')
             end
         end
     end
-    return false
 end
 
-local function checkUrl()
-    if OpenUrlDeny then
-        for _, rule in pairs(BlackUrls) do
-            if rule ~= "" and ngxMatch(ngx.var.request_uri, rule, "isjo") then
-                logWaf('GET', ngx.var.request_uri, "-", rule)
-                sayHtml()
-                return true
-            end
-        end
+local function checkHeader()
+    if ngx.var.http_Acunetix_Aspect or ngx.var.http_X_Scan_Memo then
+        sendErrorRsp(ngx.HTTP_CLOSE, 'html')
     end
-    return false
 end
 
-local function checkUserAgent()
-    local ua = ngx.var.http_user_agent
-    if ua ~= nil then
-        for _, rule in pairs(BlackUserAgents) do
-            if rule ~= "" and ngxMatch(ua, rule, "isjo") then
-                logWaf('UA', ngx.var.request_uri, "-", rule)
-                sayHtml()
-                return true
-            end
-        end
+local function checkIp()
+    local ip = sytool.getClientIp()
+    if configs.WhiteIps[ip] ~= nil then
+        return
     end
-    return false
-end
 
-local function checkCookie()
-    local ck = ngx.var.http_cookie
-    if OpenCookie and ck then
-        for _, rule in pairs(BlackCookies) do
-            if rule ~= "" and ngxMatch(ck, rule, "isjo") then
-                logWaf('Cookie', ngx.var.request_uri, "-", rule)
-                sayHtml()
-                return true
-            end
-        end
+    if configs.BlackIps[ip] ~= nil then
+        sendErrorRsp(ngx.HTTP_FORBIDDEN, 'html')
     end
-    return false
 end
 
 local function checkCCDeny()
     if OpenCCDeny then
-        local uri = ngx.var.uri
-        local token = sytool.getClientIp() .. uri
+        local token = ngx.md5(sytool.getClientIp() .. ngx.var.uri)
         local cachecc = ngx.shared.sywafcachecc
-        local reqNum, _ = cachecc:get(token)
+        local reqNum,_ = cachecc:get(token)
         if reqNum then
             if reqNum < configs.CCCount then
                 cachecc:incr(token, 1)
             else
-                ngx.header.content_type = "application/json;charset=UTF-8"
-                ngx.say('{"code":"22000","msg":"请求拒绝,请稍后再试","data":{}}')
-                ngx.exit(200)
-                return true
+                sendErrorRsp(ngx.HTTP_OK, 'json')
             end
         else
             cachecc:set(token, 1, configs.CCSeconds)
         end
     end
-    return false
 end
 
-local function checkWhiteIp()
-    local ip = sytool.getClientIp()
-    if configs.WhiteIps[ip] ~= nil then
-        return true
-    end
-    return false
-end
-
-local function checkBlackIp()
-    local ip = sytool.getClientIp()
-    if configs.BlackIps[ip] ~= nil then
-        ngx.header.content_type = "text/html;charset=UTF-8"
-        ngx.status = ngx.HTTP_FORBIDDEN
-        ngx.exit(ngx.status)
-        return true
-    end
-    return false
-end
-
-local function checkPostBody(data)
-    for _, rule in pairs(BlackPosts) do
-        if rule ~= "" and data ~= "" and ngxMatch(ngxUnescapeUri(data), rule, "isjo") then
-            logWaf('POST', ngx.var.request_uri, data, rule)
-            sayHtml()
-            return true
+local function checkUri()
+    local nowUri = ngx.var.uri
+    if OpenWhiteUri and #WhiteUris > 0 then
+        for _, rule in pairs(WhiteUris) do
+            if ngxMatch(nowUri, rule, "isjo") then
+                return
+            end
         end
     end
-    return false
+
+    if OpenBlackUri and #BlackUris > 0 then
+        for _, rule in pairs(BlackUris) do
+            if ngxMatch(nowUri, rule, "isjo") then
+                logWaf('Uri', ngx.var.request_uri, "-", rule)
+                sendErrorRsp(ngx.HTTP_FORBIDDEN, 'html')
+            end
+        end
+    end
+end
+
+local function checkUserAgent()
+    if #BlackUserAgents > 0 then
+        local ua = ngx.var.http_user_agent
+        if ua ~= nil then
+            for _, rule in pairs(BlackUserAgents) do
+                if ngxMatch(ua, rule, "isjo") then
+                    logWaf('User-Agent', ngx.var.request_uri, "-", rule)
+                    sendErrorRsp(ngx.HTTP_FORBIDDEN, 'html')
+                end
+            end
+        end
+    end
+end
+
+local function checkGetArgs()
+    if #BlackGetArgs > 0 then
+        local nowTable = {}
+        local nowArgs = ngx.req.get_uri_args()
+        for key, val in pairs(nowArgs) do
+            local valStr = val
+            if type(val) == 'table' then
+                local et = {}
+                for k, v in pairs(val) do
+                    if v == true then
+                        table.insert(et, "")
+                    else
+                        table.insert(et, v)
+                    end
+                end
+                valStr = table.concat(et, " ")
+            end
+            if valStr and type(valStr) ~= "boolean" then
+                table.insert(nowTable, valStr)
+            end
+        end
+
+        for eKey, eVal in pairs(nowTable) do
+            for _, rule in pairs(BlackGetArgs) do
+                if ngxMatch(ngxUnescapeUri(eVal), rule, "isjo") then
+                    logWaf('Get-Args', ngx.var.request_uri, "-", rule)
+                    sendErrorRsp(ngx.HTTP_FORBIDDEN, 'html')
+                end
+            end
+        end
+    end
+end
+
+local function checkCookie()
+    local ck = ngx.var.http_cookie
+    if OpenCookie and #BlackCookies > 0 and ck then
+        for _, rule in pairs(BlackCookies) do
+            if ngxMatch(ck, rule, "isjo") then
+                logWaf('Cookie', ngx.var.request_uri, "-", rule)
+                sendErrorRsp(ngx.HTTP_FORBIDDEN, 'html')
+            end
+        end
+    end
 end
 
 local function checkPost()
     local ngxReqMethod = ngx.req.get_method()
-    if ngxReqMethod == "POST" then
+    if OpenPost and ngxReqMethod == "POST" then
         local reqBoundary = sywaftool.getReqBoundary()
         if reqBoundary then
             local sock, err = ngx.req.socket()
@@ -222,24 +216,20 @@ local function checkPost()
 
             local contentSize = 0
             while contentSize < contentLength do
-                local data, err, partial = sock:receive(chunk_size)
+                local data, err, partial = sock:receive(chunkSize)
                 local eData = data or partial
                 if not eData then
                     return
                 end
                 ngx.req.append_body(eData)
-                if checkPostBody(eData) then
-                    return true
-                end
+                checkPostArgs(eData)
 
                 contentSize = contentSize + string.len(eData)
                 local fileInfo = ngxMatch(eData, [[Content-Disposition: form-data;(.+)filename="(.+)\\.(.*)"]], 'ijo')
                 if fileInfo then
                     checkFileExt(fileInfo[3])
                 elseif ngxMatch(eData, "Content-Disposition:", 'isjo') then
-                    if checkPostBody(eData) then
-                        return true
-                    end
+                    checkPostArgs(eData)
                 end
 
                 local leftSize = contentLength - contentSize
@@ -255,17 +245,16 @@ local function checkPost()
                 return
             end
             for key, val in pairs(nowArgs) do
-                local eData = ''
+                local eData = val
                 if type(val) == "table" then
                     if type(val[1]) == "boolean" then
                         return
                     end
                     eData = table.concat(val, ", ")
-                else
-                    eData = val
                 end
-                if eData and type(eData) ~= "boolean" and checkPostBody(eData) then
-                    checkPostBody(key)
+                if eData and type(eData) ~= "boolean" then
+                    checkPostArgs(eData)
+                    checkPostArgs(key)
                 end
             end
         end
@@ -276,23 +265,14 @@ local module = {}
 module.tokenSecret = 'jb6hNP'
 
 function module.checkWaf()
-    if checkWhiteIp() then
-    elseif checkBlackIp() then
-    elseif checkCCDeny() then
-    elseif ngx.var.http_Acunetix_Aspect then
-        ngx.exit(444)
-    elseif ngx.var.http_X_Scan_Memo then
-        ngx.exit(444)
-    elseif checkWhiteUrl() then
-    elseif checkUserAgent() then
-    elseif checkUrl() then
-    elseif checkArgs() then
-    elseif checkCookie() then
-    elseif OpenPost then
-        checkPost()
-    else
-        return
-    end
+    checkHeader()
+    checkIp()
+    checkCCDeny()
+    checkUri()
+    checkUserAgent()
+    checkGetArgs()
+    checkCookie()
+    checkPost()
 end
 
 function module.checkCookieToken()

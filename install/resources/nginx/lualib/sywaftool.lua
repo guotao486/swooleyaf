@@ -18,7 +18,9 @@ function module.readRule(file)
     local fd = io.open(file, "r")
     if fd ~= nil then
         for rule in fd:lines() do
-            table.insert(rules, rule)
+            if rule ~= "" then
+                table.insert(rules, rule)
+            end
         end
 
         fd:close()
