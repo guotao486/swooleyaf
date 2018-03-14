@@ -1,4 +1,7 @@
 # lua
+## 文档
+    https://github.com/openresty/lua-nginx-module
+
 ## 配置
     lua_ssl_trusted_certificate：用于PEM格式的Lua容器证书文件的绝对路径.当pg_ssl_verify或cassandra_ssl_verify被启用时,可使用此证书来验证Kong的数据库连接.详参 https://github.com/openresty/lua-nginx-module#lua_ssl_trusted_certificate.
     lua_ssl_verify_depth：通过由lua_ssl_trusted_certificate配置的Lua仓库,并使用服务器证书链来设置验证的深度(verification depth).这里包含了Kong数据库连接配置的证书.详参 https://github.com/openresty/lua-nginx-module#lua_ssl_verify_depth,默认值为1.
