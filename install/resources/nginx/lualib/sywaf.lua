@@ -11,17 +11,6 @@ local sytool = require("sytool")
 local sywaftool = require("sywaftool")
 local ngxMatch = ngx.re.find
 local ngxUnescapeUri = ngx.unescape_uri
-local OpenCCDeny = sywaftool.isOpen(configs.SwitchCCDeny)
-local OpenWhiteUri = sywaftool.isOpen(configs.SwitchWhiteUri)
-local OpenBlackUri = sywaftool.isOpen(configs.SwitchBlackUri)
-local OpenCookie = sywaftool.isOpen(configs.SwitchCookie)
-local OpenPost = sywaftool.isOpen(configs.SwitchPost)
-local WhiteUris = sywaftool.readRule(configs.DirRules .. 'white-uris')
-local BlackUris = sywaftool.readRule(configs.DirRules .. 'black-uris')
-local BlackUserAgents = sywaftool.readRule(configs.DirRules .. 'black-useragents')
-local BlackGetArgs = sywaftool.readRule(configs.DirRules .. 'black-getargs')
-local BlackCookies = sywaftool.readRule(configs.DirRules .. 'black-cookies')
-local BlackPostArgs = sywaftool.readRule(configs.DirRules .. 'black-postargs')
 
 local function writeWafLog(msgType, msgContent, rule)
     local msgs = {}
@@ -57,8 +46,8 @@ local function checkFileExt(ext)
 end
 
 local function checkPostArgs(data)
-    if data ~= "" and #BlackPostArgs > 0 then
-        for _, rule in pairs(BlackPostArgs) do
+    if data ~= "" and #configs['BlackPostArgs'] > 0 then
+        for _, rule in pairs(configs['BlackPostArgs']) do
             if ngxMatch(ngxUnescapeUri(data), rule, "isjo") then
                 writeWafLog('Post-Args', data, rule)
                 sendErrorRsp(ngx.HTTP_FORBIDDEN, 'html')
@@ -85,7 +74,7 @@ local function checkIp()
 end
 
 local function checkCCDeny()
-    if OpenCCDeny then
+    if configs.StatusCCDeny then
         local token = ngx.md5(sytool.getClientIp() .. ngx.var.uri)
         local cachecc = ngx.shared.sywafcachecc
         local reqNum,_ = cachecc:get(token)
@@ -103,16 +92,16 @@ end
 
 local function checkUri()
     local nowUri = ngx.var.uri
-    if OpenWhiteUri and #WhiteUris > 0 then
-        for _, rule in pairs(WhiteUris) do
+    if configs.StatusWhiteUri and #configs['WhiteUris'] > 0 then
+        for _, rule in pairs(configs['WhiteUris']) do
             if ngxMatch(nowUri, rule, "isjo") then
                 return
             end
         end
     end
 
-    if OpenBlackUri and #BlackUris > 0 then
-        for _, rule in pairs(BlackUris) do
+    if configs.StatusBlackUri and #configs['BlackUris'] > 0 then
+        for _, rule in pairs(configs['BlackUris']) do
             if ngxMatch(nowUri, rule, "isjo") then
                 writeWafLog('Uri', nowUri, rule)
                 sendErrorRsp(ngx.HTTP_FORBIDDEN, 'html')
@@ -122,10 +111,10 @@ local function checkUri()
 end
 
 local function checkUserAgent()
-    if #BlackUserAgents > 0 then
+    if #configs['BlackUserAgents'] > 0 then
         local ua = ngx.var.http_user_agent
         if ua ~= nil then
-            for _, rule in pairs(BlackUserAgents) do
+            for _, rule in pairs(configs['BlackUserAgents']) do
                 if ngxMatch(ua, rule, "isjo") then
                     writeWafLog('User-Agent', ua, rule)
                     sendErrorRsp(ngx.HTTP_FORBIDDEN, 'html')
@@ -136,7 +125,7 @@ local function checkUserAgent()
 end
 
 local function checkGetArgs()
-    if #BlackGetArgs > 0 then
+    if #configs['BlackGetArgs'] > 0 then
         local nowTable = {}
         local nowArgs = ngx.req.get_uri_args()
         for key, val in pairs(nowArgs) do
@@ -158,7 +147,7 @@ local function checkGetArgs()
         end
 
         for eKey, eVal in pairs(nowTable) do
-            for _, rule in pairs(BlackGetArgs) do
+            for _, rule in pairs(configs['BlackGetArgs']) do
                 if ngxMatch(ngxUnescapeUri(eVal), rule, "isjo") then
                     writeWafLog('Get-Args', eVal, rule)
                     sendErrorRsp(ngx.HTTP_FORBIDDEN, 'html')
@@ -170,8 +159,8 @@ end
 
 local function checkCookie()
     local ck = ngx.var.http_cookie
-    if OpenCookie and #BlackCookies > 0 and ck then
-        for _, rule in pairs(BlackCookies) do
+    if configs.StatusCookie and #configs['BlackCookies'] > 0 and ck then
+        for _, rule in pairs(configs['BlackCookies']) do
             if ngxMatch(ck, rule, "isjo") then
                 writeWafLog('Cookie', ck, rule)
                 sendErrorRsp(ngx.HTTP_FORBIDDEN, 'html')
@@ -182,7 +171,7 @@ end
 
 local function checkPost()
     local ngxReqMethod = ngx.req.get_method()
-    if OpenPost and ngxReqMethod == "POST" then
+    if configs.StatusPost and ngxReqMethod == "POST" then
         local reqBoundary = sywaftool.getReqBoundary()
         if reqBoundary then
             local sock, err = ngx.req.socket()

@@ -47,11 +47,11 @@
 ## 配置详解
 - DirRules: 过滤规则存放目录,以/结尾
 - DirLog: 日志存储目录,以/结尾
-- SwitchCCDeny: cc攻击拦截开关 on:开启 off:关闭
-- SwitchWhiteUri: uri白名单过滤开关 on:开启 off:关闭
-- SwitchBlackUri: uri黑名单过滤开关 on:开启 off:关闭
-- SwitchCookie: cookie过滤开关 on:开启 off:关闭
-- SwitchPost: post过滤开关 on:开启 off:关闭
+- StatusCCDeny: cc攻击拦截状态 true:开启 false:关闭
+- StatusWhiteUri: uri白名单过滤状态 true:开启 false:关闭
+- StatusBlackUri: uri黑名单过滤状态 true:开启 false:关闭
+- StatusCookie: cookie过滤状态 true:开启 false:关闭
+- StatusPost: post过滤状态 true:开启 false:关闭
 - BlackFileExts: 文件后缀黑名单列表
 - WhiteIps: ip白名单列表
 - BlackIps: ip黑名单列表

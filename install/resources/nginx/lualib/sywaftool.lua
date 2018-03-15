@@ -8,11 +8,6 @@
 
 local module = {}
 
-function module.isOpen(confVal)
-    local tag = confVal == 'on' and true or false
-    return tag
-end
-
 function module.readRule(file)
     local rules = {}
     local fd = io.open(file, "r")
