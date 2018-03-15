@@ -23,32 +23,16 @@ local BlackGetArgs = sywaftool.readRule(configs.DirRules .. 'black-getargs')
 local BlackCookies = sywaftool.readRule(configs.DirRules .. 'black-cookies')
 local BlackPostArgs = sywaftool.readRule(configs.DirRules .. 'black-postargs')
 
-local function logWaf(method, url, data, rule)
+local function writeWafLog(msgType, msgContent, rule)
     local msgs = {}
-    local serverName = ngx.var.server_name
-    table.insert(msgs, sytool.getClientIp())
-    table.insert(msgs, " [")
     table.insert(msgs, ngx.localtime())
-    table.insert(msgs, '] "')
-    table.insert(msgs, method)
-    table.insert(msgs, " ")
-    table.insert(msgs, serverName)
-    table.insert(msgs, url)
-    table.insert(msgs, '" "')
-    table.insert(msgs, data)
-
-    local ua = ngx.var.http_user_agent
-    if ua then
-        table.insert(msgs, '" "')
-        table.insert(msgs, ua)
-        table.insert(msgs, '" "')
-    else
-        table.insert(msgs, '" - "')
-    end
-    table.insert(msgs, rule)
-    table.insert(msgs, '"\n')
-    local filename = configs.DirLog .. serverName .. "_" .. ngx.today() .. "_attack.log"
-    sytool.log(filename, table.concat(msgs, ''))
+    table.insert(msgs, sytool.getClientIp())
+    table.insert(msgs, ngx.var.server_name .. ngx.var.request_uri)
+    table.insert(msgs, msgType)
+    table.insert(msgs, '"' .. rule .. '"')
+    table.insert(msgs, msgContent)
+    local logFile = configs.DirLog .. ngx.today() .. '_attack.log'
+    sytool.log(logFile, table.concat(msgs, ' '))
 end
 
 local function sendErrorRsp(status, msgType)
@@ -67,7 +51,7 @@ end
 local function checkFileExt(ext)
     local extStr = string.lower(ext)
     if configs.BlackFileExts[extStr] ~= nil then
-        logWaf('File-Ext', ngx.var.request_uri, "-", "file attack with ext " .. ext)
+        writeWafLog('File-Ext', 'invalid file ext', extStr)
         sendErrorRsp(ngx.HTTP_FORBIDDEN, 'html')
     end
 end
@@ -76,7 +60,7 @@ local function checkPostArgs(data)
     if data ~= "" and #BlackPostArgs > 0 then
         for _, rule in pairs(BlackPostArgs) do
             if ngxMatch(ngxUnescapeUri(data), rule, "isjo") then
-                logWaf('Post-Args', ngx.var.request_uri, data, rule)
+                writeWafLog('Post-Args', data, rule)
                 sendErrorRsp(ngx.HTTP_FORBIDDEN, 'html')
             end
         end
@@ -130,7 +114,7 @@ local function checkUri()
     if OpenBlackUri and #BlackUris > 0 then
         for _, rule in pairs(BlackUris) do
             if ngxMatch(nowUri, rule, "isjo") then
-                logWaf('Uri', ngx.var.request_uri, "-", rule)
+                writeWafLog('Uri', nowUri, rule)
                 sendErrorRsp(ngx.HTTP_FORBIDDEN, 'html')
             end
         end
@@ -143,7 +127,7 @@ local function checkUserAgent()
         if ua ~= nil then
             for _, rule in pairs(BlackUserAgents) do
                 if ngxMatch(ua, rule, "isjo") then
-                    logWaf('User-Agent', ngx.var.request_uri, "-", rule)
+                    writeWafLog('User-Agent', ua, rule)
                     sendErrorRsp(ngx.HTTP_FORBIDDEN, 'html')
                 end
             end
@@ -176,7 +160,7 @@ local function checkGetArgs()
         for eKey, eVal in pairs(nowTable) do
             for _, rule in pairs(BlackGetArgs) do
                 if ngxMatch(ngxUnescapeUri(eVal), rule, "isjo") then
-                    logWaf('Get-Args', ngx.var.request_uri, "-", rule)
+                    writeWafLog('Get-Args', eVal, rule)
                     sendErrorRsp(ngx.HTTP_FORBIDDEN, 'html')
                 end
             end
@@ -189,7 +173,7 @@ local function checkCookie()
     if OpenCookie and #BlackCookies > 0 and ck then
         for _, rule in pairs(BlackCookies) do
             if ngxMatch(ck, rule, "isjo") then
-                logWaf('Cookie', ngx.var.request_uri, "-", rule)
+                writeWafLog('Cookie', ck, rule)
                 sendErrorRsp(ngx.HTTP_FORBIDDEN, 'html')
             end
         end

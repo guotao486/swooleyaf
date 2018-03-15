@@ -27,7 +27,7 @@ function module.log(file, msg)
     if fd == nil then
         return
     end
-    fd:write(msg)
+    fd:write(msg .. '\n')
     fd:flush()
     fd:close()
 end

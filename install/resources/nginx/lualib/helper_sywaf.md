@@ -61,7 +61,7 @@
 - ErrRspContentJson: json格式错误响应内容,必须用```[[```和```]]```包容
 
 ## 过滤规则介绍
-    攻击日志格式:虚拟主机名_日期_attack.log
+    攻击日志格式: 日期_attack.log
 
 - white-uris: uri白名单
 - black-uris: uri黑名单
