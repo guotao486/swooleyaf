@@ -14,7 +14,6 @@ class Mongodb(SyBase):
             'ulimit -n 64000',
             'ulimit -m unlimited',
             'ulimit -u 64000',
-            'export PATH=\$PATH:/usr/local/git/bin',
         ]
 
     def install(self):

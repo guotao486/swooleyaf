@@ -8,7 +8,6 @@ class Mysql(SyBase):
         super(Mysql, self).__init__()
         self._profileEnv = [
             '',
-            'export PATH=\$PATH:/usr/local/git/bin',
         ]
 
     def install(self):
