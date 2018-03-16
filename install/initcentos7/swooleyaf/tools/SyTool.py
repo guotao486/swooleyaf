@@ -14,7 +14,7 @@ class SyTool():
     # 配置基础环境
     @staticmethod
     def initSystem():
-        run('yum -y install vim zip nss gcc gcc-c++ net-tools wget htop lsof unzip bzip2 curl-devel zlib-devel epel-release perl-ExtUtils-MakeMaker expat-devel gettext-devel openssl-devel iproute.x86_64 autoconf')
+        run('yum -y install vim zip nss gcc gcc-c++ net-tools wget htop lsof unzip bzip2 curl-devel zlib-devel epel-release perl-ExtUtils-MakeMaker expat-devel gettext-devel openssl-devel iproute.x86_64 autoconf automake libtool make')
         run('wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo')
         run('yum -y update')
         run('systemctl enable firewalld')
@@ -39,7 +39,7 @@ class SyTool():
         put(gitLocal, gitRemote)
         with cd(syDicts['path.package.remote']):
             run('tar -xzf git-2.10.2.tar.gz')
-            run('cd git-2.10.2 && make prefix=/usr/local/git all && make prefix=/usr/local/git install && cd ../ && rm -rf git-2.10.2/ && rm -rf git-2.10.2.tar.gz')
+            run('cd git-2.10.2/ && make prefix=/usr/local/git all && make prefix=/usr/local/git install && cd ../ && rm -rf git-2.10.2/ && rm -rf git-2.10.2.tar.gz')
             run('git config --global user.name "%s"' % syDicts['git.user.name'])
             run('git config --global user.email "%s"' % syDicts['git.user.email'])
 
