@@ -18,21 +18,37 @@ class FrontBackend(SyBase):
             'export CLASSPATH=.:\$JAVA_HOME/jre/lib/rt.jar:\$JAVA_HOME/lib/dt.jar:\$JAVA_HOME/lib/tools.jar',
             'export PATH=\$PATH:/usr/local/git/bin:/usr/local/bin:\$JAVA_HOME/bin:\$JAVA_HOME/jre/bin',
         ]
+        self._ports = [
+            '21/tcp',
+            '22/tcp',
+            '80/tcp',
+            '2379/tcp',
+            '6379/tcp',
+            '8983/tcp',
+        ]
+        self._steps = {
+            1: SyTool.initSystemEnv,
+            2: SyTool.initSystem,
+            3: SyTool.openPorts,
+            4: SyTool.installGit,
+            5: SyTool.installNginx,
+            6: SyTool.installPhp7,
+            7: SyTool.installJava,
+            8: SyTool.installRedis,
+            9: SyTool.installInotify,
+            10: SyTool.installEtcd
+        }
 
-    def install(self):
-        SyTool.initSystemEnv(self._profileEnv)
-        SyTool.initSystem()
-        SyTool.installGit()
-        run('firewall-cmd --zone=public --add-port=21/tcp --permanent')
-        run('firewall-cmd --zone=public --add-port=22/tcp --permanent')
-        run('firewall-cmd --zone=public --add-port=80/tcp --permanent')
-        run('firewall-cmd --zone=public --add-port=2379/tcp --permanent')
-        run('firewall-cmd --zone=public --add-port=6379/tcp --permanent')
-        run('firewall-cmd --zone=public --add-port=8983/tcp --permanent')
-        run('firewall-cmd --reload')
-        SyTool.installNginx()
-        SyTool.installPhp7()
-        SyTool.installJava()
-        SyTool.installRedis()
-        SyTool.installInotify()
-        SyTool.installEtcd()
+    def install(self, params):
+        step = params['step']
+        func = self._steps.get(step, '')
+        while hasattr(func, '__call__'):
+            if step == 1:
+                func(self._profileEnv)
+            elif step == 3:
+                func(self._ports)
+            else:
+                func()
+
+            step += 1
+            func = self._steps.get(step, '')

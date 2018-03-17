@@ -15,33 +15,29 @@ class Mongodb(SyBase):
             'ulimit -m unlimited',
             'ulimit -u 64000',
         ]
+        self._ports = [
+            '21/tcp',
+            '22/tcp',
+            '80/tcp',
+            '27017/tcp',
+        ]
+        self._steps = {
+            1: SyTool.initSystemEnv,
+            2: SyTool.initSystem,
+            3: SyTool.openPorts,
+            4: SyTool.installMongodb
+        }
 
-    def install(self):
-        SyTool.initSystemEnv(self._profileEnv)
-        SyTool.initSystem()
-        run('firewall-cmd --zone=public --add-port=21/tcp --permanent')
-        run('firewall-cmd --zone=public --add-port=22/tcp --permanent')
-        run('firewall-cmd --zone=public --add-port=80/tcp --permanent')
-        run('firewall-cmd --zone=public --add-port=27017/tcp --permanent')
-        run('firewall-cmd --reload')
-        run('echo "never" > /sys/kernel/mm/transparent_hugepage/enabled && echo "never" > /sys/kernel/mm/transparent_hugepage/defrag')
+    def install(self, params):
+        step = params['step']
+        func = self._steps.get(step, '')
+        while hasattr(func, '__call__'):
+            if step == 1:
+                func(self._profileEnv)
+            elif step == 3:
+                func(self._ports)
+            else:
+                func()
 
-        mongoLocal = ''.join([syDicts['path.package.local'], '/resources/mongodb/mongodb-linux-x86_64-rhel70-3.2.17.tgz'])
-        mongoRemote = ''.join([syDicts['path.package.remote'], '/mongodb-linux-x86_64-rhel70-3.2.17.tgz'])
-        put(mongoLocal, mongoRemote)
-        with cd(syDicts['path.package.remote']):
-            run('tar -zxvf mongodb-linux-x86_64-rhel70-3.2.17.tgz')
-            run('mv mongodb-linux-x86_64-rhel70-3.2.17/ /usr/local/mongodb')
-            run('mkdir /usr/local/mongodb/data && mkdir /usr/local/mongodb/data/db && mkdir /usr/local/mongodb/data/logs')
-            run('rm -rf mongodb-linux-x86_64-rhel70-3.2.17.tgz')
-
-        mongoConfigLocal = ''.join([syDicts['path.package.local'], '/configs/swooleyaf/mongodb/mongodb.conf'])
-        mongoConfigRemote = '/usr/local/mongodb/mongodb.conf'
-        put(mongoConfigLocal, mongoConfigRemote)
-
-        # crontab任务对应的txt文件结束必须按回车键另起一行
-        mongoCronLocal = ''.join([syDicts['path.package.local'], '/configs/swooleyaf/mongodb/crontab.txt'])
-        mongoCronRemote = ''.join([syDicts['path.package.remote'], '/crontab.txt'])
-        put(mongoCronLocal, mongoCronRemote)
-        run('crontab %s' % mongoCronRemote)
-        run('rm -rf %s' % mongoCronRemote)
+            step += 1
+            func = self._steps.get(step, '')

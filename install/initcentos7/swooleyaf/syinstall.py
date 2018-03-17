@@ -7,27 +7,27 @@ from initcentos7.swooleyaf.envs.FrontBackend import *
 
 # 配置之前先用命令rpm -qa | grep mariadb找出已经安装的数据库,然后用命令rpm -e --nodeps xxx删除已经安装的软件(xxx为前一步命令找到的软件名)
 @roles('mysql')
-def installSyMysql():
+def installSyMysql(params):
     obj = Mysql()
-    obj.install()
+    obj.install(params)
     # 后续设置mysql登录帐号和密码以及授权需要登录服务器设置
 
 @roles('mongodb')
-def installSyMongodb():
+def installSyMongodb(params):
     obj = Mongodb()
-    obj.install()
+    obj.install(params)
 
 @roles('front')
-def installSyFront():
+def installSyFront(params):
     obj = Front()
-    obj.install()
+    obj.install(params)
 
 @roles('backend')
-def installSyBackend():
+def installSyBackend(params):
     obj = Backend()
-    obj.install()
+    obj.install(params)
 
 @roles('mixfb')
-def installSyFrontAndBackend():
+def installSyFrontAndBackend(params):
     obj = FrontBackend()
-    obj.install()
+    obj.install(params)

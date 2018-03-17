@@ -27,6 +27,13 @@ class SyTool():
             run('mkdir /usr/local/mysql')
             run('mkdir %s' % syDicts['path.package.remote'])
 
+    # 开放防火墙端口
+    @staticmethod
+    def openPorts(portList):
+        for ePort in iter(portList):
+            run('firewall-cmd --zone=public --add-port=%s --permanent' % ePort, False)
+        run('firewall-cmd --reload')
+
     # 配置git环境
     @staticmethod
     def installGit():
@@ -450,3 +457,57 @@ class SyTool():
         put(ftpConfLocal, ftpConfRemote)
         run('systemctl enable vsftpd')
         run('systemctl restart vsftpd')
+
+    @staticmethod
+    def installMysql():
+        run('rm -rf /etc/my.cnf')
+        run('yum -y install make cmake libaio libaio-devel bison-devel ncurses-devel perl-Data-Dumpe')
+        run('groupadd mysql && useradd -g mysql mysql -s /sbin/nologin')
+        run('mkdir /usr/local/mysql/data && mkdir /home/logs/mysql && touch /home/logs/mysql/error.log && chown -R mysql /home/logs/mysql && chgrp -R mysql /home/logs/mysql')
+
+        mysqlLocal = ''.join([syDicts['path.package.local'], '/resources/mysql/mysql-5.6.37.tar.gz'])
+        mysqlRemote = ''.join([syDicts['path.package.remote'], '/mysql-5.6.37.tar.gz'])
+        put(mysqlLocal, mysqlRemote)
+        with cd(syDicts['path.package.remote']):
+            run('tar -zxvf mysql-5.6.37.tar.gz')
+            run('cd mysql-5.6.37/ && cmake -DCMAKE_INSTALL_PREFIX=/usr/local/mysql -DMYSQL_DATADIR=/usr/local/mysql/data -DSYSCONFDIR=/etc/my.cnf -DWITH_MYISAM_STORAGE_ENGINE=1 -DWITH_INNOBASE_STORAGE_ENGINE=1 -DMYSQL_UNIX_ADDR=/usr/local/mysql/mysql.sock -DMYSQL_TCP_PORT=3306 -DENABLED_LOCAL_INFILE=1 -DWITH_PARTITION_STORAGE_ENGINE=1 -DEXTRA_CHARSETS=all && make && make install')
+            run('chown -R mysql:mysql /usr/local/mysql')
+
+        mysqlConfigLocal = ''.join([syDicts['path.package.local'], '/configs/swooleyaf/mysql/my.cnf'])
+        mysqlConfigRemote = '/etc/my.cnf'
+        put(mysqlConfigLocal, mysqlConfigRemote)
+        with cd('/usr/local/mysql'):
+            run('./scripts/mysql_install_db --user=mysql --basedir=/usr/local/mysql --datadir=/usr/local/mysql/data')
+
+        mysqlServiceLocal = ''.join([syDicts['path.package.local'], '/configs/swooleyaf/mysql/mysql.service'])
+        mysqlServiceRemote = '/lib/systemd/system/mysql.service'
+        put(mysqlServiceLocal, mysqlServiceRemote)
+        run('chmod 754 %s' % mysqlServiceRemote)
+        run('systemctl enable mysql')
+
+        with cd(syDicts['path.package.remote']):
+            run('rm -rf mysql-5.6.37/ && rm -rf mysql-5.6.37.tar.gz')
+
+    @staticmethod
+    def installMongodb():
+        run('echo "never" > /sys/kernel/mm/transparent_hugepage/enabled && echo "never" > /sys/kernel/mm/transparent_hugepage/defrag')
+
+        mongoLocal = ''.join([syDicts['path.package.local'], '/resources/mongodb/mongodb-linux-x86_64-rhel70-3.2.17.tgz'])
+        mongoRemote = ''.join([syDicts['path.package.remote'], '/mongodb-linux-x86_64-rhel70-3.2.17.tgz'])
+        put(mongoLocal, mongoRemote)
+        with cd(syDicts['path.package.remote']):
+            run('tar -zxvf mongodb-linux-x86_64-rhel70-3.2.17.tgz')
+            run('mv mongodb-linux-x86_64-rhel70-3.2.17/ /usr/local/mongodb')
+            run('mkdir /usr/local/mongodb/data && mkdir /usr/local/mongodb/data/db && mkdir /usr/local/mongodb/data/logs')
+            run('rm -rf mongodb-linux-x86_64-rhel70-3.2.17.tgz')
+
+        mongoConfigLocal = ''.join([syDicts['path.package.local'], '/configs/swooleyaf/mongodb/mongodb.conf'])
+        mongoConfigRemote = '/usr/local/mongodb/mongodb.conf'
+        put(mongoConfigLocal, mongoConfigRemote)
+
+        # crontab任务对应的txt文件结束必须按回车键另起一行
+        mongoCronLocal = ''.join([syDicts['path.package.local'], '/configs/swooleyaf/mongodb/crontab.txt'])
+        mongoCronRemote = ''.join([syDicts['path.package.remote'], '/crontab.txt'])
+        put(mongoCronLocal, mongoCronRemote)
+        run('crontab %s' % mongoCronRemote)
+        run('rm -rf %s' % mongoCronRemote)
