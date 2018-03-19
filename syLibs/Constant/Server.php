@@ -19,18 +19,27 @@ final class Server {
         self::MODULE_NAME_SERVICE,
     ];
 
+    public static $totalModuleBases = [
+        self::MODULE_BASE_API,
+        self::MODULE_BASE_ORDER,
+        self::MODULE_BASE_USER,
+        self::MODULE_BASE_SERVICE,
+    ];
+
     //模块常量
     //考虑到yac缓存名称长度限制,名称不能超过30个字符串
-    const MODULE_NAME_API = SY_PROJECT . 'api';
-    const MODULE_NAME_ORDER = SY_PROJECT . 'order';
-    const MODULE_NAME_USER = SY_PROJECT . 'user';
-    const MODULE_NAME_SERVICE = SY_PROJECT . 'services';
+    const MODULE_BASE_API = 'api';
+    const MODULE_BASE_ORDER = 'order';
+    const MODULE_BASE_USER = 'user';
+    const MODULE_BASE_SERVICE = 'services';
+    const MODULE_NAME_API = SY_PROJECT . self::MODULE_BASE_API;
+    const MODULE_NAME_ORDER = SY_PROJECT . self::MODULE_BASE_ORDER;
+    const MODULE_NAME_USER = SY_PROJECT . self::MODULE_BASE_USER;
+    const MODULE_NAME_SERVICE = SY_PROJECT . self::MODULE_BASE_SERVICE;
 
     //服务常量
     const SERVER_PACKAGE_MAX_LENGTH = 12582912; //服务端消息最大长度-12M
     const SERVER_OUTPUT_MAX_LENGTH = 5242880; //服务端输出内容最大长度-5M
-    const SERVER_STATUS_CLOSE = '0'; //服务端状态-关闭
-    const SERVER_STATUS_OPEN = '1'; //服务端状态-开放
     const SERVER_TYPE_API = 'api'; //服务端类型-api
     const SERVER_TYPE_RPC = 'rpc'; //服务端类型-rpc
     const SERVER_HTTP_TAG_RESPONSE_EOF = "\r\r\rswoole@yaf\r\r\r"; //服务端http标识-响应结束符
@@ -42,7 +51,6 @@ final class Server {
 
     //REDIS常量 以sy000开头的前缀为框架内部前缀,以sy+3位数字开头的前缀为公共模块前缀
     const REDIS_PREFIX_SESSION = 'sy000001_'; //前缀-session
-    const REDIS_PREFIX_PROJECT_MODULES = 'sy000002_'; //前缀-项目模块
     const REDIS_PREFIX_TIMER = 'sy001001_'; //前缀-定时器
     const REDIS_PREFIX_CODE_IMAGE = 'sy001002_'; //前缀-验证码图片
     const REDIS_PREFIX_ORDER_SN = 'sy001003_'; //前缀-订单单号

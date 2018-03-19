@@ -61,7 +61,6 @@
     nohup etcd --listen-client-urls http://10.27.166.170:2379 --advertise-client-urls http://10.27.166.170:2379 >/dev/null & --启动etcd服务
     //服务命令-启动服务
     /usr/local/php7/bin/php helper_service_manager.php -s start-all
-    /usr/local/php7/bin/php helper_command.php -action refreshserver
     //服务命令-关闭服务
     /usr/local/php7/bin/php helper_service_manager.php -s stop-all
     //微信更新access token和js ticket缓存
@@ -81,19 +80,12 @@
 - SY_VERSION //框架版本号
 - SY_MODULE //框架模块名称
 - SY_API //框架API标识 true: 是对外的API接口 false:不是对外的API接口
-- SY_SID_LENGTH //框架服务标识长度
 
 ## 服务管理
 ### 获取框架概览信息
     请求地址: http://api.xxx.com/syinfo
 ### 获取php信息
     请求地址: http://api.xxx.com/phpinfo
-### 关闭或开启服务
-    请求地址: http://api.xxx.com/serverctl
-    请求参数:
-        server_ip: string 服务IP
-        server_port: int 服务端口
-        server_status: int 服务状态 0:关闭 1:开启
 ## Mongodb文档
     https://docs.mongodb.com/php-library/
     

@@ -17,7 +17,7 @@ class SyModuleService extends ModuleRpc {
 
     private function __construct() {
         parent::init();
-        $this->moduleName = Server::MODULE_NAME_SERVICE;
+        $this->moduleName = Server::MODULE_BASE_SERVICE;
     }
 
     /**

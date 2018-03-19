@@ -41,11 +41,6 @@ abstract class BaseServer {
      */
     protected static $_syServices = null;
     /**
-     * 模块列表
-     * @var \swoole_table
-     */
-    protected static $_syModules = null;
-    /**
      * 健康检查列表
      * @var \swoole_table
      */
@@ -122,17 +117,14 @@ abstract class BaseServer {
     /**
      * BaseServer constructor.
      * @param int $port 端口
-     * @param int $weight 权重
      */
-    public function __construct(int $port,int $weight) {
+    public function __construct(int $port) {
         if(version_compare(PHP_VERSION, '7.0.0', '<')){
             exit('PHP版本必须大于7.0' . PHP_EOL);
         } else if (!defined('SY_MODULE')) {
             exit('模块名称未定义' . PHP_EOL);
         } else if (($port <= 1000) || ($port > 65535)) {
             exit('端口不合法' . PHP_EOL);
-        } else if ($weight <= 0) {
-            exit('权重不合法' . PHP_EOL);
         } else if(!in_array(SY_ENV, ['dev', 'product'])){
             exit('环境类型不合法' . PHP_EOL);
         }
@@ -167,7 +159,6 @@ abstract class BaseServer {
         RedisSingleton::getInstance()->checkConn();
 
         $this->_configs['server']['port'] = $port;
-        $this->_configs['server']['weight'] = $weight;
         //开启TCP快速握手特性,可以提升TCP短连接的响应速度
         $this->_configs['swoole']['tcp_fastopen'] = true;
         //启用异步安全重启特性,Worker进程会等待异步事件完成后再退出
@@ -190,7 +181,6 @@ abstract class BaseServer {
 
         //生成服务唯一标识
         self::$_serverToken = hash('crc32b', $this->_configs['server']['host'] . ':' . $this->_configs['server']['port']);
-        define('SY_SID_LENGTH', strlen(self::$_serverToken));
 
         //设置日志目录
         Log::setPath(SY_LOG_PATH);
@@ -215,20 +205,11 @@ abstract class BaseServer {
         self::$_syServer->create();
 
         self::$_syServices = new \swoole_table(128);
-        self::$_syServices->column('token', \swoole_table::TYPE_STRING, SY_SID_LENGTH);
         self::$_syServices->column('module', \swoole_table::TYPE_STRING, 30);
-        self::$_syServices->column('host', \swoole_table::TYPE_STRING, 15);
+        self::$_syServices->column('host', \swoole_table::TYPE_STRING, 128);
         self::$_syServices->column('port', \swoole_table::TYPE_STRING, 5);
-        self::$_syServices->column('weight', \swoole_table::TYPE_INT, 4);
-        self::$_syServices->column('status', \swoole_table::TYPE_STRING, 1);
+        self::$_syServices->column('type', \swoole_table::TYPE_STRING, 16);
         self::$_syServices->create();
-
-        $maxLength = (SY_SID_LENGTH + 1) * 2048;
-        self::$_syModules = new \swoole_table(128);
-        self::$_syModules->column('module', \swoole_table::TYPE_STRING, 30);
-        self::$_syModules->column('weight', \swoole_table::TYPE_INT, 4);
-        self::$_syModules->column('tokens', \swoole_table::TYPE_STRING, $maxLength);
-        self::$_syModules->create();
 
         self::$_syHealths = new \swoole_table(2048);
         self::$_syHealths->column('tag', \swoole_table::TYPE_STRING, 60);
@@ -360,23 +341,13 @@ abstract class BaseServer {
     }
 
     /**
-     * 通过服务标识获取注册的服务信息
-     * @param string $token
+     * 通过模块名称获取注册的服务信息
+     * @param string $moduleName
      * @return array
      */
-    public static function getServiceInfo(string $token) {
-        $serviceInfo = self::$_syServices->get($token);
+    public static function getServiceInfo(string $moduleName) {
+        $serviceInfo = self::$_syServices->get($moduleName);
         return $serviceInfo === false ? [] : $serviceInfo;
-    }
-
-    /**
-     * 获取模块配置信息
-     * @param string $moduleName 模块名
-     * @return array
-     */
-    public static function getModuleConfig(string $moduleName){
-        $config = self::$_syModules->get($moduleName);
-        return $config === false ? [] : $config;
     }
 
     /**
@@ -392,26 +363,6 @@ abstract class BaseServer {
         } else {
             $data = self::$_syServer->get(self::$_serverToken, $field);
             return $data === false ? $default : $data;
-        }
-    }
-
-    /**
-     * 清除注册的服务列表
-     */
-    private function clearRegisterServices() {
-        $oldTokens = [];
-        foreach (self::$_syServices as $eService) {
-            if (!isset($oldTokens[$eService['module']])) {
-                $oldTokens[$eService['module']] = [];
-            }
-            $oldTokens[$eService['module']][] = $eService['token'];
-        }
-
-        foreach ($oldTokens as $module => $tokens) {
-            foreach ($tokens as $eToken) {
-                self::$_syServices->del($eToken);
-            }
-            self::$_syModules->del($module);
         }
     }
 
@@ -499,37 +450,6 @@ abstract class BaseServer {
         }
     }
 
-    /**
-     * 刷新项目模块信息
-     * @param array $modules 模块信息列表
-     */
-    protected function refreshProjectModules(array $modules) {
-        $this->clearRegisterServices();
-
-        $groupServices = [];
-        foreach ($modules as $serverToken => $serverData) {
-            self::$_syServices->set($serverToken, $serverData);
-            if (!isset($groupServices[$serverData['module']])) {
-                $groupServices[$serverData['module']] = [
-                    'weight' => 0,
-                    'tokens' => [],
-                ];
-            }
-            for ($i = 0;$i < $serverData['weight'];$i++) {
-                $groupServices[$serverData['module']]['tokens'][] = $serverToken;
-            }
-            $groupServices[$serverData['module']]['weight'] += $serverData['weight'];
-        }
-
-        foreach ($groupServices as $moduleTag => $moduleData) {
-            self::$_syModules->set($moduleTag, [
-                'module' => $moduleTag,
-                'weight' => $moduleData['weight'],
-                'tokens' => ',' . implode(',', $moduleData['tokens']),
-            ]);
-        }
-    }
-
     protected function basicWorkStart(\swoole_server $server, $workerId){
         //设置错误和异常处理
         set_exception_handler('\SyError\ErrorHandler::handleException');
@@ -548,16 +468,16 @@ abstract class BaseServer {
         }
 
         if($workerId == 0){ //保证每一个服务只执行一次定时任务
-            $weight = (int)Tool::getArrayVal($this->_configs['server'], 'weight', 1);
-            Tool::setProjectModules(SY_PROJECT, self::$_serverToken, [
-                'token' => self::$_serverToken,
-                'module' => SY_MODULE,
-                'type' => SY_API ? Server::SERVER_TYPE_API : Server::SERVER_TYPE_RPC,
-                'host' => $this->_host,
-                'port' => (string)$this->_port,
-                'weight' => $weight > 0 ? $weight : 1,
-                'status' => Server::SERVER_STATUS_OPEN,
-            ]);
+            $modules = Tool::getConfig('project.' . SY_ENV . SY_PROJECT . '.modules');
+            foreach (Server::$totalModuleBases as $eModuleName) {
+                $moduleData = Tool::getArrayVal($modules, $eModuleName, []);
+                self::$_syServices->set($eModuleName, [
+                    'module' => $eModuleName,
+                    'host' => $moduleData['host'],
+                    'port' => (string)$moduleData['port'],
+                    'type' => $moduleData['type'],
+                ]);
+            }
         }
     }
 
@@ -616,8 +536,6 @@ abstract class BaseServer {
      * @param \swoole_server $server
      */
     public function onShutdown(\swoole_server $server){
-        $activeModules = Tool::getProjectModulesByServer(SY_PROJECT, self::$_serverToken, []);
-        Tool::updateProjectModules($activeModules);
     }
 
     /**

@@ -9,7 +9,6 @@ namespace SyServer;
 
 use Constant\ErrorCode;
 use Constant\Server;
-use DesignPatterns\Singletons\Etcd3Singleton;
 use Exception\Swoole\HttpServerException;
 use Exception\Validator\ValidatorException;
 use Log\Log;
@@ -85,8 +84,8 @@ class HttpServer extends BaseServer {
      */
     private static $_sySigns = null;
 
-    public function __construct(int $port,int $weight) {
-        parent::__construct($port, $weight);
+    public function __construct(int $port) {
+        parent::__construct($port);
         define('SY_API', true);
         //设置静态文件访问，swoole1.9.17+才能使用
         $this->_configs['swoole']['document_root'] = SY_ROOT . '/static';
@@ -375,47 +374,6 @@ class HttpServer extends BaseServer {
                 $result = ob_get_contents();
                 ob_end_clean();
                 break;
-            case '/serverctl' :
-                $resArr = [
-                    'code' => 0,
-                ];
-                $_GET = $request->get ?? [];
-                if(!(isset($_GET['server_ip']) && is_string($_GET['server_ip']))){
-                    $resArr['code'] = ErrorCode::COMMON_PARAM_ERROR;
-                    $resArr['msg'] = '服务IP必须设置';
-                } else if(!(isset($_GET['server_port']) && is_string($_GET['server_port']))){
-                    $resArr['code'] = ErrorCode::COMMON_PARAM_ERROR;
-                    $resArr['msg'] = '服务端口必须设置';
-                } else if(!(isset($_GET['server_status']) && in_array($_GET['server_status'], [Server::SERVER_STATUS_CLOSE, Server::SERVER_STATUS_OPEN], true))){
-                    $resArr['code'] = ErrorCode::COMMON_PARAM_ERROR;
-                    $resArr['msg'] = '服务状态必须设置';
-                } else {
-                    $projectKey = Etcd3Singleton::getInstance()->getPrefixProjects() . SY_PROJECT;
-                    $projectStr = Etcd3Singleton::getInstance()->get($projectKey);
-                    if ($projectStr === false) {
-                        $resArr['code'] = ErrorCode::COMMON_PARAM_ERROR;
-                        $resArr['msg'] = '项目不存在';
-                    } else {
-                        $projectData = Tool::jsonDecode($projectStr);
-                        $serverToken = hash('crc32b', $_GET['server_ip'] . ':' . $_GET['server_port']);
-                        if (isset($projectData[$serverToken])) {
-                            $activeModules = Tool::getProjectModulesByServer(SY_PROJECT, $serverToken, [
-                                'status' => $_GET['server_status'],
-                            ]);
-                            Tool::updateProjectModules($activeModules);
-
-                            $resArr['data'] = [
-                                'update_num' => 1,
-                            ];
-                        } else {
-                            $resArr['code'] = ErrorCode::COMMON_PARAM_ERROR;
-                            $resArr['msg'] = '服务不存在';
-                        }
-                    }
-                }
-
-                $result = Tool::jsonEncode($resArr, JSON_UNESCAPED_UNICODE);
-                break;
             case '/refreshcache':
                 $resArr = [
                     'code' => 0,
@@ -433,30 +391,6 @@ class HttpServer extends BaseServer {
                     $resArr['data'] = [
                         'msg' => '设置成功',
                     ];
-                }
-                $result = Tool::jsonEncode($resArr, JSON_UNESCAPED_UNICODE);
-
-                break;
-            case '/refreshservices':
-                $resArr = [
-                    'code' => 0,
-                ];
-
-                $_POST = $request->post ?? [];
-                if(!(isset($_POST['_services']) && is_string($_POST['_services']))){
-                    $resArr['code'] = ErrorCode::COMMON_PARAM_ERROR;
-                    $resArr['msg'] = '服务模块信息必须设置';
-                } else {
-                    $services = Tool::jsonDecode($_POST['_services']);
-                    if (is_array($services) && !empty($services)) {
-                        $this->refreshProjectModules($services);
-                        $resArr['data'] = [
-                            'msg' => '刷新服务模块信息成功',
-                        ];
-                    } else {
-                        $resArr['code'] = ErrorCode::COMMON_PARAM_ERROR;
-                        $resArr['msg'] = '服务模块信息不合法';
-                    }
                 }
                 $result = Tool::jsonEncode($resArr, JSON_UNESCAPED_UNICODE);
 

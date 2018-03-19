@@ -58,6 +58,7 @@ class SyTool():
         run('mkdir /home/configs/nginx/certs')
         run('mkdir /home/configs/nginx/modules')
         run('mkdir /home/configs/nginx/servers')
+        run('mkdir /home/configs/nginx/streams')
         pcreLocal = ''.join([syDicts['path.package.local'], '/resources/nginx/pcre-8.39.tar.gz'])
         pcreRemote = ''.join([syDicts['path.package.remote'], '/pcre-8.39.tar.gz'])
         put(pcreLocal, pcreRemote)
@@ -176,6 +177,18 @@ class SyTool():
         nginxApiConfLocal = ''.join([syDicts['path.package.local'], '/configs/swooleyaf/nginx/demoapi.conf'])
         nginxApiConfRemote = '/home/configs/nginx/servers/demoapi.conf'
         put(nginxApiConfLocal, nginxApiConfRemote)
+
+        nginxOrderConfLocal = ''.join([syDicts['path.package.local'], '/configs/swooleyaf/nginx/a01order.conf'])
+        nginxOrderConfRemote = '/home/configs/nginx/streams/a01order.conf'
+        put(nginxOrderConfLocal, nginxOrderConfRemote)
+
+        nginxServiceConfLocal = ''.join([syDicts['path.package.local'], '/configs/swooleyaf/nginx/a01services.conf'])
+        nginxServiceConfRemote = '/home/configs/nginx/streams/a01services.conf'
+        put(nginxServiceConfLocal, nginxServiceConfRemote)
+
+        nginxUserConfLocal = ''.join([syDicts['path.package.local'], '/configs/swooleyaf/nginx/a01user.conf'])
+        nginxUserConfRemote = '/home/configs/nginx/streams/a01user.conf'
+        put(nginxUserConfLocal, nginxUserConfRemote)
 
         nginxFrontConfLocal = ''.join([syDicts['path.package.local'], '/configs/swooleyaf/nginx/demofront.conf'])
         nginxFrontConfRemote = '/home/configs/nginx/servers/demofront.conf'
