@@ -19,18 +19,12 @@ abstract class ModuleBase {
     const NODE_TYPE_RPC = 'rpc';
 
     /**
-     * 服务标识截取长度
-     * @var int
-     */
-    private $tokenCutLength = 0;
-    /**
      * 模块名称
      * @var string
      */
     protected $moduleName = '';
 
     protected function init() {
-        $this->tokenCutLength = SY_SID_LENGTH + 1;
     }
 
     /**
@@ -51,15 +45,7 @@ abstract class ModuleBase {
      * @throws \Exception\Swoole\ServerException
      */
     private function getNodeServerInfo(string $nodeType) {
-        $moduleConfig = BaseServer::getModuleConfig($this->moduleName);
-        if(empty($moduleConfig)){
-            throw new ServerException('服务不存在', ErrorCode::SWOOLE_SERVER_NOT_EXIST_ERROR);
-        }
-
-        $serverNum = mt_rand(1, $moduleConfig['weight']);
-        $startIndex = $this->tokenCutLength * ($serverNum - 1) + 1;
-        $token = substr($moduleConfig['tokens'], $startIndex, SY_SID_LENGTH);
-        $serviceInfo = BaseServer::getServiceInfo($token);
+        $serviceInfo = BaseServer::getServiceInfo($this->moduleName);
         if (empty($serviceInfo)) {
             throw new ServerException('服务不存在', ErrorCode::SWOOLE_SERVER_NOT_EXIST_ERROR);
         }

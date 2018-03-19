@@ -17,7 +17,7 @@ class SyModuleUser extends ModuleRpc {
 
     private function __construct() {
         parent::init();
-        $this->moduleName = Server::MODULE_NAME_USER;
+        $this->moduleName = Server::MODULE_BASE_USER;
     }
 
     /**

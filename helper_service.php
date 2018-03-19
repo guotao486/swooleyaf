@@ -36,23 +36,10 @@ if (strlen($port) == 0) {
     $truePort = (int)$port;
 }
 
-$weight = trim(\Tool\Tool::getClientOption('-weight'));
-if (strlen($weight) == 0) {
-    $trueWeight = 1;
-} else if (!is_numeric($weight)) {
-    print_r('weight must is numeric' . PHP_EOL);
-    exit(7);
-} else if($weight < 1){
-    print_r('weight must greater than 1 or equal 1' . PHP_EOL);
-    exit(8);
-} else {
-    $trueWeight = (int)$weight;
-}
-
 if($moduleName == \Constant\Server::MODULE_NAME_API){
-    $server = new \SyServer\HttpServer($truePort, $trueWeight);
+    $server = new \SyServer\HttpServer($truePort);
 } else {
-    $server = new \SyServer\RpcServer($truePort, $trueWeight);
+    $server = new \SyServer\RpcServer($truePort);
 }
 
 $action = \Tool\Tool::getClientOption('-s', false, 'start');

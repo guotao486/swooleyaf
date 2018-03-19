@@ -19,12 +19,23 @@ final class Server {
         self::MODULE_NAME_SERVICE,
     ];
 
+    public static $totalModuleBases = [
+        self::MODULE_BASE_API,
+        self::MODULE_BASE_ORDER,
+        self::MODULE_BASE_USER,
+        self::MODULE_BASE_SERVICE,
+    ];
+
     //模块常量
     //考虑到yac缓存名称长度限制,名称不能超过30个字符串
-    const MODULE_NAME_API = SY_PROJECT . 'api';
-    const MODULE_NAME_ORDER = SY_PROJECT . 'order';
-    const MODULE_NAME_USER = SY_PROJECT . 'user';
-    const MODULE_NAME_SERVICE = SY_PROJECT . 'services';
+    const MODULE_BASE_API = 'api';
+    const MODULE_BASE_ORDER = 'order';
+    const MODULE_BASE_USER = 'user';
+    const MODULE_BASE_SERVICE = 'services';
+    const MODULE_NAME_API = SY_PROJECT . self::MODULE_BASE_API;
+    const MODULE_NAME_ORDER = SY_PROJECT . self::MODULE_BASE_ORDER;
+    const MODULE_NAME_USER = SY_PROJECT . self::MODULE_BASE_USER;
+    const MODULE_NAME_SERVICE = SY_PROJECT . self::MODULE_BASE_SERVICE;
 
     //服务常量
     const SERVER_PACKAGE_MAX_LENGTH = 12582912; //服务端消息最大长度-12M

@@ -24,8 +24,8 @@ class RpcServer extends BaseServer {
      */
     private $_receivePack = null;
 
-    public function __construct(int $port,int $weight) {
-        parent::__construct($port, $weight);
+    public function __construct(int $port) {
+        parent::__construct($port);
         define('SY_API', false);
         $this->_configs['swoole']['open_length_check'] = true;
         $this->_configs['swoole']['package_max_length'] = Server::SERVER_PACKAGE_MAX_LENGTH;
@@ -122,23 +122,6 @@ class RpcServer extends BaseServer {
                             'msg' => '设置成功',
                         ]);
                     }
-                    break;
-                case '/refreshservices':
-                    $result = new Result();
-                    if(!(isset($_POST['_services']) && is_string($_POST['_services']))){
-                        $result->setCodeMsg(ErrorCode::COMMON_PARAM_ERROR, '服务模块信息必须设置');
-                    } else {
-                        $services = Tool::jsonDecode($_POST['_services']);
-                        if (is_array($services) && !empty($services)) {
-                            $this->refreshProjectModules($services);
-                            $result->setData([
-                                'msg' => '刷新服务模块信息成功',
-                            ]);
-                        } else {
-                            $result->setCodeMsg(ErrorCode::COMMON_PARAM_ERROR, '服务模块信息不合法');
-                        }
-                    }
-
                     break;
                 default:
                     $result = $this->_app->bootstrap()->getDispatcher()->dispatch(new Http($data['api_uri']))->getBody();
@@ -250,7 +233,10 @@ class RpcServer extends BaseServer {
         $rspData = $this->_receivePack->packData();
         $this->_receivePack->init();
 
-        $server->send($fd, $rspData);
+        $sendRes = $server->send($fd, $rspData);
+        if(!$sendRes){
+            Log::error('rpc send response error, error_code:' . $server->getLastError());
+        }
         self::$_reqId = '';
     }
 }
