@@ -56,37 +56,12 @@ $needMinute1 = $minute % 5;
 $clearApiSign = $needMinute1 == 1 ? true : false;
 $clearLocalUser = $needMinute1 == 2 ? true : false;
 
-$wxTag = \Tool\Tool::getClientOption('-refreshwx');
-if($wxTag > 0){
-    $wxRefreshMinute = -1;
-} else if(($hour % 2) == 0){
-    $wxRefreshMinute = $minute;
-} else {
-    $wxRefreshMinute = $minute + 60;
-}
-
-$refreshWx = in_array($wxRefreshMinute, [-1, 33, 73, 113]);
 $taskParams = [
     'task_minute' => $minute,
     'task_hour' => $hour,
-    'wxcache_refresh' => $refreshWx,
     'clear_apisign' => $clearApiSign,
     'clear_localuser' => $clearLocalUser,
 ];
-
-if($refreshWx){
-    $shopConfigs = \DesignPatterns\Singletons\WxConfigSingleton::getInstance()->getShopConfigs();
-    $taskParams['wxcaches'] = [];
-    foreach ($shopConfigs as $eAppId => $shopConfig) {
-        $wxAccessToken = \Wx\WxUtil::refreshAccessToken($eAppId);
-        $wxJsTicket = \Wx\WxUtil::refreshJsTicket($eAppId, $wxAccessToken);
-        $taskParams['wxcaches'][] = [
-            'appid' => $eAppId,
-            'accesstoken' => $wxAccessToken,
-            'jsticket' => $wxJsTicket,
-        ];
-    }
-}
 
 foreach ($modules as $moduleTag => $eModule) {
     $taskParams['projects'] = $eModule['projects'];

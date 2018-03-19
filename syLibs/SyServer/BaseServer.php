@@ -231,6 +231,7 @@ abstract class BaseServer {
         self::$_syProject = new \swoole_table(64);
         self::$_syProject->column('tag', \swoole_table::TYPE_STRING, 64);
         self::$_syProject->column('value', \swoole_table::TYPE_STRING, 200);
+        self::$_syProject->column('add_time', \swoole_table::TYPE_INT, 4);
         self::$_syProject->create();
     }
 
@@ -433,16 +434,14 @@ abstract class BaseServer {
     /**
      * 设置项目缓存
      * @param string $key 键名
-     * @param string $data 键值
+     * @param array $data 键值
      * @return bool
      */
-    protected function setProjectCache(string $key,string $data) : bool {
+    public static function setProjectCache(string $key,array $data) : bool {
         $trueKey = trim($key);
         if(strlen($trueKey) > 0){
-            self::$_syProject->set($key, [
-                'tag' => $trueKey,
-                'value' => $data,
-            ]);
+            $data['tag'] = $trueKey;
+            self::$_syProject->set($trueKey, $data);
 
             return true;
         } else {

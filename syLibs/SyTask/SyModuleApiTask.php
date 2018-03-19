@@ -22,17 +22,6 @@ class SyModuleApiTask extends SyModuleTaskBase implements SyModuleTaskInterface 
     }
 
     public function handleTask(array $data) {
-        if($data['wxcache_refresh']){
-            foreach ($data['wxcaches'] as $eCache) {
-                $this->handleRefreshWxCache([
-                    'app_id' => $eCache['appid'],
-                    'access_token' => $eCache['accesstoken'],
-                    'js_ticket' => $eCache['jsticket'],
-                    'projects' => $data['projects'],
-                ], $this->moduleTag);
-            }
-        }
-
 //        //添加mysql日志任务
 //        $mysqlLogService = new AddMysqlLogService();
 //        $mysqlLogService->handleMessage([]);

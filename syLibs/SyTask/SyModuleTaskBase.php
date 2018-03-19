@@ -33,7 +33,6 @@ abstract class SyModuleTaskBase {
         if(($method == 'GET') && !empty($params)){
             $sendUrl .= '?' . http_build_query($params);
         }
-
         $curlConfigs = [
             CURLOPT_URL => $sendUrl,
             CURLOPT_TIMEOUT_MS => 2000,
@@ -57,53 +56,6 @@ abstract class SyModuleTaskBase {
             Tool::sendSyHttpTaskReq($url, $taskStr);
         } else {
             Tool::sendSyRpcReq($host, $port, $taskStr);
-        }
-    }
-
-    protected function handleRefreshWxCache(array $data,string $moduleTag) {
-        if(strlen($moduleTag) == 0){
-            //刷新微信access token缓存
-            $this->syPack->setCommandAndData(SyPack::COMMAND_TYPE_RPC_CLIENT_SEND_API_REQ, [
-                'api_module' => Server::MODULE_NAME_API,
-                'api_uri' => '/refreshcache',
-                'api_method' => 'POST',
-                'api_params' => [
-                    'key' => 'wx01_' . $data['app_id'],
-                    'value' => $data['access_token'],
-                ],
-            ]);
-            $accessTokenStr = $this->syPack->packData();
-            $this->syPack->init();
-
-            //刷新微信js ticket缓存
-            $this->syPack->setCommandAndData(SyPack::COMMAND_TYPE_RPC_CLIENT_SEND_API_REQ, [
-                'api_module' => Server::MODULE_NAME_API,
-                'api_uri' => '/refreshcache',
-                'api_method' => 'POST',
-                'api_params' => [
-                    'key' => 'wx02_' . $data['app_id'],
-                    'value' => $data['js_ticket'],
-                ],
-            ]);
-            $jsTicketStr = $this->syPack->packData();
-            $this->syPack->init();
-
-            foreach ($data['projects'] as $eProject) {
-                Tool::sendSyRpcReq($eProject['host'], $eProject['port'], $accessTokenStr);
-                Tool::sendSyRpcReq($eProject['host'], $eProject['port'], $jsTicketStr);
-            }
-        } else {
-            foreach ($data['projects'] as $eProject) {
-                $url = 'http://' . $eProject['host'] . ':' . $eProject['port'] . '/refreshcache';
-                $this->sendSyHttpReq($url, [
-                    'key' => 'wx01_' . $data['app_id'],
-                    'value' => $data['access_token'],
-                ], 'POST');
-                $this->sendSyHttpReq($url, [
-                    'key' => 'wx02_' . $data['app_id'],
-                    'value' => $data['js_ticket'],
-                ], 'POST');
-            }
         }
     }
 

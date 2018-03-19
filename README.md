@@ -63,13 +63,7 @@
     /usr/local/php7/bin/php helper_service_manager.php -s start-all
     //服务命令-关闭服务
     /usr/local/php7/bin/php helper_service_manager.php -s stop-all
-    //微信更新access token和js ticket缓存
-    //1:必须将helper_sytask.php文件加入到linux系统cron执行任务中
-    //2:强制刷新缓存: /usr/local/php7/bin/php helper_sytask.php -refreshwx 1
-    //3:如需要用到微信缓存,必须在每次启动服务后执行上述命令
-    
-    //清理脚本-解决cli模式php内存缓慢泄漏的问题(待验证),建议每隔一段时间执行一次,比如一个小时执行一次
-    sync && echo 3 > /proc/sys/vm/drop_caches
+    //必须将helper_sytask.php文件加入到linux系统cron执行任务中
 ```
 
 ## 预定义常量

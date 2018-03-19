@@ -374,27 +374,6 @@ class HttpServer extends BaseServer {
                 $result = ob_get_contents();
                 ob_end_clean();
                 break;
-            case '/refreshcache':
-                $resArr = [
-                    'code' => 0,
-                ];
-
-                $_POST = $request->post ?? [];
-                if(!(isset($_POST['key']) && is_string($_POST['key']))){
-                    $resArr['code'] = ErrorCode::COMMON_PARAM_ERROR;
-                    $resArr['msg'] = '键名必须设置';
-                } else if(!(isset($_POST['value']) && is_string($_POST['value']))){
-                    $resArr['code'] = ErrorCode::COMMON_PARAM_ERROR;
-                    $resArr['msg'] = '键值必须设置';
-                } else {
-                    $this->setProjectCache($_POST['key'], $_POST['value']);
-                    $resArr['data'] = [
-                        'msg' => '设置成功',
-                    ];
-                }
-                $result = Tool::jsonEncode($resArr, JSON_UNESCAPED_UNICODE);
-
-                break;
             default:
                 self::$_reqStartTime = microtime(true);
                 self::$_syServer->incr(self::$_serverToken, 'request_times', 1);
