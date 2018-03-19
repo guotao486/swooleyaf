@@ -109,24 +109,7 @@ class RpcServer extends BaseServer {
         $healthTag = $this->sendReqHealthCheckTask($data['api_uri']);
         $this->init($data['api_params']);
         try {
-            switch ($data['api_uri']) {
-                case '/refreshcache':
-                    $result = new Result();
-                    if(!(isset($_POST['key']) && is_string($_POST['key']))){
-                        $result->setCodeMsg(ErrorCode::COMMON_PARAM_ERROR, '键名必须设置');
-                    } else if(!(isset($_POST['value']) && is_string($_POST['value']))){
-                        $result->setCodeMsg(ErrorCode::COMMON_PARAM_ERROR, '键值必须设置');
-                    } else {
-                        $this->setProjectCache($_POST['key'], $_POST['value']);
-                        $result->setData([
-                            'msg' => '设置成功',
-                        ]);
-                    }
-                    break;
-                default:
-                    $result = $this->_app->bootstrap()->getDispatcher()->dispatch(new Http($data['api_uri']))->getBody();
-                    break;
-            }
+            $result = $this->_app->bootstrap()->getDispatcher()->dispatch(new Http($data['api_uri']))->getBody();
         } catch (\Exception $e) {
             Log::error($e->getMessage(), $e->getCode(), $e->getTraceAsString());
             if (!($e instanceof ValidatorException)) {

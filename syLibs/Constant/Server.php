@@ -40,8 +40,6 @@ final class Server {
     //服务常量
     const SERVER_PACKAGE_MAX_LENGTH = 12582912; //服务端消息最大长度-12M
     const SERVER_OUTPUT_MAX_LENGTH = 5242880; //服务端输出内容最大长度-5M
-    const SERVER_STATUS_CLOSE = '0'; //服务端状态-关闭
-    const SERVER_STATUS_OPEN = '1'; //服务端状态-开放
     const SERVER_TYPE_API = 'api'; //服务端类型-api
     const SERVER_TYPE_RPC = 'rpc'; //服务端类型-rpc
     const SERVER_HTTP_TAG_RESPONSE_EOF = "\r\r\rswoole@yaf\r\r\r"; //服务端http标识-响应结束符
@@ -53,24 +51,22 @@ final class Server {
 
     //REDIS常量 以sy000开头的前缀为框架内部前缀,以sy+3位数字开头的前缀为公共模块前缀
     const REDIS_PREFIX_SESSION = 'sy000001_'; //前缀-session
-    const REDIS_PREFIX_PROJECT_MODULES = 'sy000002_'; //前缀-项目模块
     const REDIS_PREFIX_TIMER = 'sy001001_'; //前缀-定时器
     const REDIS_PREFIX_CODE_IMAGE = 'sy001002_'; //前缀-验证码图片
     const REDIS_PREFIX_ORDER_SN = 'sy001003_'; //前缀-订单单号
     const REDIS_PREFIX_REQUEST_SIGN = 'sy001004_'; //前缀-请求签名
     const REDIS_PREFIX_MESSAGE_QUEUE = 'sy001005_'; //前缀-消息队列
     const REDIS_PREFIX_IMAGE_DATA = 'sy001006_'; //前缀-图片缓存
-    const REDIS_PREFIX_WX_JS_TICKET = 'sy002001_'; //前缀-微信公众号js ticket
-    const REDIS_PREFIX_WX_ACCESS_TOKEN = 'sy002002_'; //前缀-微信公众号access token
-    const REDIS_PREFIX_WX_COMPONENT_ACCESS_TOKEN = 'sy002003'; //前缀-微信开放平台access token
-    const REDIS_PREFIX_WX_AUTHORIZER_CONSTANT = 'sy002004_'; //前缀-微信开放平台授权公众号常量
-    const REDIS_PREFIX_WX_AUTHORIZER_JS_TICKET = 'sy002005_'; //前缀-微信开放平台授权公众号js ticket
-    const REDIS_PREFIX_WX_AUTHORIZER_ACCESS_TOKEN = 'sy002006_'; //前缀-微信开放平台授权公众号access token
-    const REDIS_PREFIX_WX_NATIVE_PRE = 'sy002007_'; //前缀-微信扫码预支付
+    const REDIS_PREFIX_WX_ACCOUNT = 'sy002000_'; //前缀-微信公众号
+    const REDIS_PREFIX_WX_COMPONENT_ACCESS_TOKEN = 'sy002001'; //前缀-微信开放平台access token
+    const REDIS_PREFIX_WX_AUTHORIZER_CONSTANT = 'sy002002_'; //前缀-微信开放平台授权公众号常量
+    const REDIS_PREFIX_WX_AUTHORIZER_JS_TICKET = 'sy002003_'; //前缀-微信开放平台授权公众号js ticket
+    const REDIS_PREFIX_WX_AUTHORIZER_ACCESS_TOKEN = 'sy002004_'; //前缀-微信开放平台授权公众号access token
+    const REDIS_PREFIX_WX_NATIVE_PRE = 'sy002005_'; //前缀-微信扫码预支付
 
-    //YAC常量,长度不能超过30个字节,因为yac缓存的key长度不能超过40个字节
-    const YAC_PREFIX_WX_JS_TICKET = 'wx001'; //前缀-微信公众号js ticket
-    const YAC_PREFIX_WX_ACCESS_TOKEN = 'wx002'; //前缀-微信开放平台access token
+    //本地缓存标识
+    const CACHE_LOCAL_TAG_PREFIX_WX_JS_TICKET = 'a001_'; //前缀-微信公众号js ticket
+    const CACHE_LOCAL_TAG_PREFIX_WX_ACCESS_TOKEN = 'a002_'; //前缀-微信公众号access token
 
     //校验器常量
     const VALIDATOR_STRING_TYPE_REQUIRED = 'string_required'; //字符串校验器类型-必填

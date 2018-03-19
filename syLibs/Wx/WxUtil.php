@@ -33,6 +33,7 @@ final class WxUtil {
     private static $urlMicroPay = 'https://api.mch.weixin.qq.com/pay/micropay';
     private static $urlAuthorizeBase = 'https://api.weixin.qq.com/sns/oauth2/access_token?grant_type=authorization_code&appid=';
     private static $urlAuthorizeInfo = 'https://api.weixin.qq.com/sns/userinfo?lang=zh_CN&access_token=';
+    private static $urlAuthorizeMiniProgram = 'https://api.weixin.qq.com/sns/jscode2session?grant_type=authorization_code&appid=';
     private static $urlAuthorizeRefreshToken = 'https://api.weixin.qq.com/sns/oauth2/refresh_token?grant_type=refresh_token&appid=';
     private static $urlSendTemplateMsg = 'https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=';
     private static $urlUserInfo = 'https://api.weixin.qq.com/cgi-bin/user/info?lang=zh_CN&access_token=';
@@ -197,6 +198,7 @@ final class WxUtil {
             $curlConfigs[CURLOPT_SSL_VERIFYPEER] = false;
             $curlConfigs[CURLOPT_SSL_VERIFYHOST] = false;
         }
+
         if (Tool::getArrayVal($configs, 'use_cert', false)) { //是否需要证书，默认不需要
             $curlConfigs[CURLOPT_SSLCERTTYPE] = 'PEM';
             $curlConfigs[CURLOPT_SSLCERT] = Tool::getArrayVal($configs, 'sslcert_path', '');
@@ -414,12 +416,75 @@ final class WxUtil {
     }
 
     /**
+     * 刷新微信公众号缓存
+     * @param string $appId
+     * @return array
+     */
+    private static function refreshWxAccountCache(string $appId) : array {
+        $nowTime = time();
+        $localTagJsTicket = Server::CACHE_LOCAL_TAG_PREFIX_WX_JS_TICKET . $appId;
+        $localTagAccessToken = Server::CACHE_LOCAL_TAG_PREFIX_WX_ACCESS_TOKEN . $appId;
+
+        $redisKey = Server::REDIS_PREFIX_WX_ACCOUNT . $appId;
+        $redisData = CacheSimpleFactory::getRedisInstance()->hGetAll($redisKey);
+        if (is_array($redisData) && isset($redisData['unique_key']) && ($redisData['unique_key'] == $redisKey) && ($redisData['expire_time'] >= $nowTime)) {
+            $expireTime = (int)$redisData['expire_time'];
+            BaseServer::setProjectCache($localTagJsTicket, [
+                'value' => $redisData['js_ticket'],
+                'add_time' => $expireTime,
+            ]);
+            BaseServer::setProjectCache($localTagAccessToken, [
+                'value' => $redisData['access_token'],
+                'add_time' => $expireTime,
+            ]);
+
+            return [
+                'js_ticket' => $redisData['js_ticket'],
+                'access_token' => $redisData['access_token'],
+            ];
+        }
+
+        $accessToken = self::refreshAccessToken($appId);
+        $jsTicket = self::refreshJsTicket($appId, $accessToken);
+        $expireTime = $nowTime + 7000;
+        CacheSimpleFactory::getRedisInstance()->hMset($redisKey, [
+            'js_ticket' => $jsTicket,
+            'access_token' => $accessToken,
+            'expire_time' => $expireTime,
+            'unique_key' => $redisKey,
+        ]);
+        CacheSimpleFactory::getRedisInstance()->expire($redisKey, 7100);
+
+        BaseServer::setProjectCache($localTagJsTicket, [
+            'value' => $jsTicket,
+            'add_time' => $expireTime,
+        ]);
+        BaseServer::setProjectCache($localTagAccessToken, [
+            'value' => $accessToken,
+            'add_time' => $expireTime,
+        ]);
+
+        return [
+            'js_ticket' => $jsTicket,
+            'access_token' => $accessToken,
+        ];
+    }
+
+    /**
      * 获取access token
      * @param string $appId
      * @return string
      */
     public static function getAccessToken(string $appId) : string {
-        return (string)BaseServer::getProjectCache('wx01_' . $appId, 'value', '');
+        $nowTime = time();
+        $localTag = Server::CACHE_LOCAL_TAG_PREFIX_WX_ACCESS_TOKEN . $appId;
+        $localCacheData = BaseServer::getProjectCache($localTag, '', []);
+        if (isset($localCacheData['add_time']) && ($localCacheData['add_time'] >= $nowTime)) {
+            return $localCacheData['value'];
+        }
+
+        $cacheData = self::refreshWxAccountCache($appId);
+        return $cacheData['access_token'];
     }
 
     /**
@@ -428,7 +493,15 @@ final class WxUtil {
      * @return string
      */
     public static function getJsTicket(string $appId) : string {
-        return (string)BaseServer::getProjectCache('wx02_' . $appId, 'value', '');
+        $nowTime = time();
+        $localTag = Server::CACHE_LOCAL_TAG_PREFIX_WX_JS_TICKET . $appId;
+        $localCacheData = BaseServer::getProjectCache($localTag, '', []);
+        if (isset($localCacheData['add_time']) && ($localCacheData['add_time'] >= $nowTime)) {
+            return $localCacheData['value'];
+        }
+
+        $cacheData = self::refreshWxAccountCache($appId);
+        return $cacheData['js_ticket'];
     }
 
     /**
@@ -451,13 +524,6 @@ final class WxUtil {
         } else if(!isset($dataArr['access_token'])){
             throw new WxException($dataArr['errmsg'], ErrorCode::WX_PARAM_ERROR);
         }
-
-        $redisKey = Server::REDIS_PREFIX_WX_ACCESS_TOKEN . $shopConfig->getAppId();
-        CacheSimpleFactory::getRedisInstance()->hMset($redisKey, [
-            'app_id' => $appId,
-            'access_token' => $dataArr['access_token'],
-            'expire_time' => time() + 7000,
-        ]);
 
         return $dataArr['access_token'];
     }
@@ -483,13 +549,6 @@ final class WxUtil {
         } else if($dataArr['errcode'] > 0){
             throw new WxException($dataArr['errmsg'], ErrorCode::WX_PARAM_ERROR);
         }
-
-        $redisKey = Server::REDIS_PREFIX_WX_JS_TICKET . $shopConfig->getAppId();
-        CacheSimpleFactory::getRedisInstance()->hMset($redisKey, [
-            'app_id' => $appId,
-            'js_ticket' => $dataArr['ticket'],
-            'expire_time' => time() + 7000,
-        ]);
 
         return $dataArr['ticket'];
     }
@@ -805,6 +864,31 @@ final class WxUtil {
     }
 
     /**
+     * 处理用户小程序授权
+     * @param string $code 换取授权access_token的票据
+     * @param string $appId
+     * @return array
+     */
+    public static function handleUserAuthorizeMiniProgram(string $code,string $appId) : array {
+        $resArr = [
+            'code' => 0
+        ];
+
+        $shopConfig = WxConfigSingleton::getInstance()->getShopConfig($appId);
+        $url = self::$urlAuthorizeMiniProgram . $shopConfig->getAppId() . '&secret=' . $shopConfig->getSecret() . '&js_code=' . $code;
+        $getRes = self::sendGetReq($url);
+        $getData = Tool::jsonDecode($getRes);
+        if(isset($getData['openid'])){
+            $resArr['data'] = $getData;
+        } else {
+            $resArr['code'] = ErrorCode::WX_GET_ERROR;
+            $resArr['message'] = $getData['errmsg'];
+        }
+
+        return $resArr;
+    }
+
+    /**
      * 发送模版消息
      * @param \Wx\TemplateMsg $msg
      * @param string $appId
@@ -1041,6 +1125,12 @@ final class WxUtil {
         }
     }
 
+    /**
+     * 获取小程序二维码
+     * @param string $appId
+     * @param MiniProgramQrcode $qrcode
+     * @return array
+     */
     public static function getMiniProgramQrcode(string $appId,MiniProgramQrcode $qrcode){
         $resArr = [
             'code' => 0
@@ -1058,6 +1148,43 @@ final class WxUtil {
             $resArr['data'] = [
                 'image' => base64_encode($getRes),
             ];
+        }
+
+        return $resArr;
+    }
+
+    /**
+     * 解密小程序用户数据
+     * @param string $encryptedData 加密数据
+     * @param string $iv 初始向量
+     * @param string $sessionKey 会话密钥
+     * @param string $appId 小程序应用ID
+     * @return array
+     */
+    public static function decryptMiniProgramUserData(string $encryptedData,string $iv,string $sessionKey,string $appId) {
+        $resArr = [
+            'code' => 0
+        ];
+
+        if (strlen($iv) != 24) {
+            $resArr['code'] = ErrorCode::WX_PARAM_ERROR;
+            $resArr['message'] = '初始向量不合法';
+            return $resArr;
+        } else if (strlen($sessionKey) != 24) {
+            $resArr['code'] = ErrorCode::WX_PARAM_ERROR;
+            $resArr['message'] = '会话密钥不合法';
+            return $resArr;
+        }
+
+        $aesIV = base64_decode($iv);
+        $aesKey = base64_decode($sessionKey);
+        $aesCipher = base64_decode($encryptedData);
+        $decryptData = Tool::jsonDecode(openssl_decrypt($aesCipher, 'AES-128-CBC', $aesKey, 1, $aesIV));
+        if (is_array($decryptData) && isset($decryptData['watermark']['appid']) && ($decryptData['watermark']['appid'] == $appId)) {
+            $resArr['data'] = $decryptData;
+        } else {
+            $resArr['code'] = ErrorCode::WX_PARAM_ERROR;
+            $resArr['message'] = '解密用户数据失败';
         }
 
         return $resArr;
