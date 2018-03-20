@@ -49,11 +49,11 @@ class BaseReflect {
 
             $instance = $class->newInstanceWithoutConstructor();
             if(($instance instanceof BaseController) && $instance->signStatus){
-                if(isset($annotations[Validator::ANNOTATION_NAME])){
+                if(!isset($annotations[Validator::ANNOTATION_NAME])){
                     $annotations[Validator::ANNOTATION_NAME] = [];
                 }
 
-                $annotations[Validator::ANNOTATION_NAME][] = '{"field":"_sign","explain":"签名值","type":"string","rules":{"sign":3600,"required":1}}';
+                $annotations[Validator::ANNOTATION_NAME][] = '{"field":"' . Validator::ANNOTATION_TAG_SIGN . '","explain":"签名值","type":"string","rules":{"sign":3600,"required":1}}';
             }
         } catch (ReflectException $e) {
             throw $e;
@@ -75,6 +75,7 @@ class BaseReflect {
         $resArr = [];
         $annotations = self::getMethodDefinedAnnotations($className, $methodName);
         if (isset($annotations[Validator::ANNOTATION_NAME]) && !empty($annotations[Validator::ANNOTATION_NAME])) {
+            $ignoreSign = false;
             foreach ($annotations[Validator::ANNOTATION_NAME] as $eAnnotation) {
                 $data = Tool::jsonDecode($eAnnotation);
                 if($data === false){
@@ -97,12 +98,19 @@ class BaseReflect {
                     throw new ReflectException('校验规则必须为数组', ErrorCode::REFLECT_ANNOTATION_DATA_ERROR);
                 }
 
-                $result = new ValidatorResult();
-                $result->setExplain($data['explain']);
-                $result->setField($data['field']);
-                $result->setType($data['type']);
-                $result->setRules($data['rules']);
-                $resArr[$data['field']] = $result;
+                if($data['field'] != Validator::ANNOTATION_TAG_IGNORE_SIGN){
+                    $result = new ValidatorResult();
+                    $result->setExplain($data['explain']);
+                    $result->setField($data['field']);
+                    $result->setType($data['type']);
+                    $result->setRules($data['rules']);
+                    $resArr[$data['field']] = $result;
+                } else {
+                    $ignoreSign = true;
+                }
+            }
+            if($ignoreSign){
+                unset($resArr[Validator::ANNOTATION_TAG_SIGN]);
             }
         }
 

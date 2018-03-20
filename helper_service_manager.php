@@ -36,7 +36,6 @@ $projects = [
         'listens' => [
             0 => [
                 'port' => 7100,
-                'weight' => 1,
             ],
         ],
     ],
@@ -48,7 +47,7 @@ switch ($command) {
         foreach ($projects as $name => $eProject) {
             if ($eProject['type'] == 'module') {
                 foreach ($eProject['listens'] as $eListen) {
-                    controllerLog($sudo, $name, '-s start -module ' . $eProject['module_name'] . ' -port ' . $eListen['port'] . ' -weight ' . $eListen['weight']);
+                    controllerLog($sudo, $name, '-s start -module ' . $eProject['module_name'] . ' -port ' . $eListen['port']);
                 }
             }
         }
@@ -57,7 +56,7 @@ switch ($command) {
         foreach ($projects as $name => $eProject) {
             if ($eProject['type'] == 'module') {
                 foreach ($eProject['listens'] as $eListen) {
-                    controllerLog($sudo, $name, '-s stop -module ' . $eProject['module_name'] . ' -port ' . $eListen['port'] . ' -weight ' . $eListen['weight']);
+                    controllerLog($sudo, $name, '-s stop -module ' . $eProject['module_name'] . ' -port ' . $eListen['port']);
                 }
             }
         }
@@ -66,7 +65,7 @@ switch ($command) {
         foreach ($projects as $name => $eProject) {
             if ($eProject['type'] == 'module') {
                 foreach ($eProject['listens'] as $eListen) {
-                    controllerLog($sudo, $name, '-s restart -module ' . $eProject['module_name'] . ' -port ' . $eListen['port'] . ' -weight ' . $eListen['weight']);
+                    controllerLog($sudo, $name, '-s restart -module ' . $eProject['module_name'] . ' -port ' . $eListen['port']);
                 }
             }
         }
