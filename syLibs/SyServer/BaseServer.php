@@ -204,14 +204,14 @@ abstract class BaseServer {
         self::$_syServer->column('cookiedomain_base', \swoole_table::TYPE_STRING, 60);
         self::$_syServer->create();
 
-        self::$_syServices = new \swoole_table(128);
+        self::$_syServices = new \swoole_table((int)$this->_configs['server']['cachenum']['modules']);
         self::$_syServices->column('module', \swoole_table::TYPE_STRING, 30);
         self::$_syServices->column('host', \swoole_table::TYPE_STRING, 128);
         self::$_syServices->column('port', \swoole_table::TYPE_STRING, 5);
         self::$_syServices->column('type', \swoole_table::TYPE_STRING, 16);
         self::$_syServices->create();
 
-        self::$_syHealths = new \swoole_table(2048);
+        self::$_syHealths = new \swoole_table((int)$this->_configs['server']['cachenum']['hc']);
         self::$_syHealths->column('tag', \swoole_table::TYPE_STRING, 60);
         self::$_syHealths->column('module', \swoole_table::TYPE_STRING, 30);
         self::$_syHealths->column('uri', \swoole_table::TYPE_STRING, 200);
@@ -228,7 +228,7 @@ abstract class BaseServer {
         self::$_syUsers->column('add_time', \swoole_table::TYPE_INT, 4);
         self::$_syUsers->create();
 
-        self::$_syProject = new \swoole_table(64);
+        self::$_syProject = new \swoole_table((int)$this->_configs['server']['cachenum']['local']);
         self::$_syProject->column('tag', \swoole_table::TYPE_STRING, 64);
         self::$_syProject->column('value', \swoole_table::TYPE_STRING, 200);
         self::$_syProject->column('add_time', \swoole_table::TYPE_INT, 4);
