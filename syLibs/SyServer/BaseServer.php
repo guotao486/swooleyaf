@@ -314,7 +314,6 @@ abstract class BaseServer {
         print_r('-n 项目名' . PHP_EOL);
         print_r('-module 模块名' . PHP_EOL);
         print_r('-port 端口,取值范围为1001-65535' . PHP_EOL);
-        print_r('-weight 权重,大于0的整数' . PHP_EOL);
     }
 
     /**
