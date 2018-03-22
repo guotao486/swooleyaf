@@ -150,7 +150,8 @@ class WxOpenController extends CommonController {
         $allParams = \Request\SyRequest::getParams();
         $incomeData = \Wx\WxOpenUtil::xmlToArray($allParams['wx_xml']);
         if (isset($incomeData['Encrypt']) && isset($incomeData['AppId'])) {
-            $decryptRes = \Wx\WxOpenUtil::decryptMsg($incomeData['Encrypt'], \DesignPatterns\Singletons\WxConfigSingleton::getInstance()->getOpenCommonConfig(), $allParams['msg_signature'], $allParams['nonce'], $allParams['timestamp']);
+            $openCommonConfig = \DesignPatterns\Singletons\WxConfigSingleton::getInstance()->getOpenCommonConfig();
+            $decryptRes = \Wx\WxOpenUtil::decryptMsg($incomeData['Encrypt'], $openCommonConfig->getAppId(), $allParams['msg_signature'], $allParams['nonce'], $allParams['timestamp']);
             $msgData = \Wx\WxOpenUtil::xmlToArray($decryptRes['content']);
             if(isset($msgData['MsgType'])){
                 $saveArr = [];
@@ -183,7 +184,7 @@ class WxOpenController extends CommonController {
                         ];
 
                         //使用授权码换取公众号的授权信息
-                        $authInfo = \Wx\WxOpenUtil::getAuthorizerAuth($authCode);
+                        $authInfo = \Wx\WxOpenUtil::getAuthorizerAuth($openCommonConfig->getAppId(), $authCode);
                         //调用发送客服消息api回复文本消息
                         $url = 'https://api.weixin.qq.com/cgi-bin/message/custom/send?access_token=' . $authInfo['data']['authorization_info']['authorizer_access_token'];
                         \Tool\Tool::sendCurlReq([
@@ -215,7 +216,7 @@ class WxOpenController extends CommonController {
                 }
                 if(!empty($saveArr)){
                     $replyXml = \Wx\WxOpenUtil::arrayToXml($saveArr);
-                    $returnStr = \Wx\WxOpenUtil::encryptMsg($replyXml, \DesignPatterns\Singletons\WxConfigSingleton::getInstance()->getOpenCommonConfig(), $decryptRes['aes_key']);
+                    $returnStr = \Wx\WxOpenUtil::encryptMsg($replyXml, $openCommonConfig->getAppId(), $decryptRes['aes_key']);
                 }
             }
         }
