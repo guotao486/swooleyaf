@@ -9,7 +9,6 @@ namespace DesignPatterns\Singletons;
 
 use Tool\Tool;
 use Traits\SingletonTrait;
-use Wx\WxConfigOpenAuthorizer;
 use Wx\WxConfigOpenCommon;
 use Wx\WxConfigShop;
 
@@ -31,11 +30,6 @@ class WxConfigSingleton {
      * @var WxConfigOpenCommon
      */
     private $openCommonConfig = null;
-    /**
-     * 开放平台授权者配置数组
-     * @var array
-     */
-    private $openAuthConfigs = null;
 
     /**
      * @return \DesignPatterns\Singletons\WxConfigSingleton
@@ -94,9 +88,6 @@ class WxConfigSingleton {
         $openCommonConfig->setAuthUrlDomain((string)Tool::getArrayVal($configs, 'open.authurl.domain', '', true));
         $openCommonConfig->setAuthUrlCallback((string)Tool::getArrayVal($configs, 'open.authurl.callback', '', true));
         $this->openCommonConfig = $openCommonConfig;
-
-        //TODO: 初始化开放平台授权者配置
-        $this->openAuthConfigs = [];
     }
 
     /**
@@ -170,30 +161,5 @@ class WxConfigSingleton {
      */
     public function setOpenCommonConfig(WxConfigOpenCommon $config) {
         $this->openCommonConfig = $config;
-    }
-
-    /**
-     * 获取开放平台授权者配置
-     * @param string $appId 授权者微信号
-     * @return \Wx\WxConfigOpenAuthorizer|null
-     */
-    public function getOpenAuthorizerConfigs(string $appId){
-        return Tool::getArrayVal($this->openAuthConfigs, $appId, null);
-    }
-
-    /**
-     * 设置开放平台授权者配置
-     * @param \Wx\WxConfigOpenAuthorizer $config 授权者配置
-     */
-    public function setOpenAuthorizerConfigs(WxConfigOpenAuthorizer $config){
-        $this->openAuthConfigs[$config->getAppId()] = $config;
-    }
-
-    /**
-     * 移除开放平台授权者配置
-     * @param string $appId 授权者微信号
-     */
-    public function removeOpenAuthorizerConfigs(string $appId){
-        unset($this->openAuthConfigs[$appId]);
     }
 }
