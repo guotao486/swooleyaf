@@ -30,35 +30,85 @@ class WxOpenController extends CommonController {
         $allParams = \Request\SyRequest::getParams();
         $incomeData = \Wx\WxOpenUtil::xmlToArray($allParams['wx_xml']);
         if (isset($incomeData['Encrypt']) && isset($incomeData['AppId'])) {
-            $decryptRes = \Wx\WxOpenUtil::decryptMsg($incomeData['Encrypt'], \DesignPatterns\Singletons\WxConfigSingleton::getInstance()->getOpenCommonConfig(), $allParams['msg_signature'], $allParams['nonce'], $allParams['timestamp']);
+            $nowTime = time();
+            $openCommonConfig = \DesignPatterns\Singletons\WxConfigSingleton::getInstance()->getOpenCommonConfig();
+            $decryptRes = \Wx\WxOpenUtil::decryptMsg($incomeData['Encrypt'], $openCommonConfig->getAppId(), $allParams['msg_signature'], $allParams['nonce'], $allParams['timestamp']);
             $msgData = \Wx\WxOpenUtil::xmlToArray($decryptRes['content']);
             if($msgData['InfoType'] == 'component_verify_ticket') { //微信服务器定时监听
-                \Wx\WxOpenUtil::getComponentAccessToken('timer', $msgData['ComponentVerifyTicket'] . '');
+                \Wx\WxOpenUtil::refreshComponentAccessToken($msgData['ComponentVerifyTicket']);
             } else if($msgData['InfoType'] == 'authorized'){ //授权
-                $redis = \DesignPatterns\Factories\CacheSimpleFactory::getRedisInstance();
-                $redisKey = \Constant\Server::REDIS_PREFIX_WX_AUTHORIZER_CONSTANT . $msgData['AuthorizerAppid'];
-                $redis->hset($redisKey, 'authcode', $msgData['AuthorizationCode']);
-                //获取授权信息
-                $authInfo = \Wx\WxOpenUtil::getAuthorizerAuth($msgData['AuthorizationCode']);
-                if($authInfo['code'] == 0){
-                    $redis->hset($redisKey, 'refreshtoken', $authInfo['data']['authorization_info']['authorizer_refresh_token']);
-                }
-                //TODO：更新数据库授权信息
+                $entity = \Factories\SyBaseMysqlFactory::WxopenAuthorizerEntity();
+                $ormResult1 = $entity->getContainer()->getModel()->getOrmDbTable();
+                $entity->getContainer()->getModel()->insertOrUpdate($ormResult1, [
+                    'component_appid' => $openCommonConfig->getAppId(),
+                    'authorizer_appid' => $msgData['AuthorizerAppid'],
+                ], [
+                    'component_appid' => $openCommonConfig->getAppId(),
+                    'authorizer_appid' => $msgData['AuthorizerAppid'],
+                    'authorizer_authcode' => $msgData['AuthorizationCode'],
+                    'authorizer_status' => \Constant\Server::WX_COMPONENT_AUTHORIZER_STATUS_ALLOW,
+                    'created' => $nowTime,
+                    'updated' => $nowTime,
+                ], [
+                    'authorizer_authcode' => $msgData['AuthorizationCode'],
+                    'authorizer_refreshtoken' => '',
+                    'authorizer_allowpower' => '',
+                    'authorizer_info' => '',
+                    'authorizer_status' => \Constant\Server::WX_COMPONENT_AUTHORIZER_STATUS_ALLOW,
+                    'updated' => $nowTime,
+                ]);
+                unset($ormResult1, $entity);
+
+                $redisKey = \Constant\Server::REDIS_PREFIX_WX_COMPONENT_AUTHORIZER . $msgData['AuthorizerAppid'];
+                \DesignPatterns\Factories\CacheSimpleFactory::getRedisInstance()->del($redisKey);
             } else if($msgData['InfoType'] == 'unauthorized'){ //取消授权
-                $redis = \DesignPatterns\Factories\CacheSimpleFactory::getRedisInstance();
-                $redisKey = \Constant\Server::REDIS_PREFIX_WX_AUTHORIZER_CONSTANT . $msgData['AuthorizerAppid'];
-                $redis->del($redisKey);
-                //TODO：更新数据库授权信息
+                $entity = \Factories\SyBaseMysqlFactory::WxopenAuthorizerEntity();
+                $ormResult1 = $entity->getContainer()->getModel()->getOrmDbTable();
+                $entity->getContainer()->getModel()->insertOrUpdate($ormResult1, [
+                    'component_appid' => $openCommonConfig->getAppId(),
+                    'authorizer_appid' => $msgData['AuthorizerAppid'],
+                ], [
+                    'component_appid' => $openCommonConfig->getAppId(),
+                    'authorizer_appid' => $msgData['AuthorizerAppid'],
+                    'authorizer_status' => \Constant\Server::WX_COMPONENT_AUTHORIZER_STATUS_CANCEL,
+                    'created' => $nowTime,
+                    'updated' => $nowTime,
+                ], [
+                    'authorizer_refreshtoken' => '',
+                    'authorizer_allowpower' => '',
+                    'authorizer_info' => '',
+                    'authorizer_status' => \Constant\Server::WX_COMPONENT_AUTHORIZER_STATUS_CANCEL,
+                    'updated' => $nowTime,
+                ]);
+                unset($ormResult1, $entity);
+
+                $redisKey = \Constant\Server::REDIS_PREFIX_WX_COMPONENT_AUTHORIZER . $msgData['AuthorizerAppid'];
+                \DesignPatterns\Factories\CacheSimpleFactory::getRedisInstance()->del($redisKey);
             } else if($msgData['InfoType'] == 'updateauthorized'){ //更新授权
-                $redis = \DesignPatterns\Factories\CacheSimpleFactory::getRedisInstance();
-                $redisKey = \Constant\Server::REDIS_PREFIX_WX_AUTHORIZER_CONSTANT . $msgData['AuthorizerAppid'];
-                $redis->hset($redisKey, 'authcode', $msgData['AuthorizationCode']);
-                //获取授权信息
-                $authInfo = \Wx\WxOpenUtil::getAuthorizerAuth($msgData['AuthorizationCode']);
-                if($authInfo['code'] == 0){
-                    $redis->hset($redisKey, 'refreshtoken', $authInfo['data']['authorization_info']['authorizer_refresh_token']);
-                }
-                //TODO：更新数据库授权信息
+                $entity = \Factories\SyBaseMysqlFactory::WxopenAuthorizerEntity();
+                $ormResult1 = $entity->getContainer()->getModel()->getOrmDbTable();
+                $entity->getContainer()->getModel()->insertOrUpdate($ormResult1, [
+                    'component_appid' => $openCommonConfig->getAppId(),
+                    'authorizer_appid' => $msgData['AuthorizerAppid'],
+                ], [
+                    'component_appid' => $openCommonConfig->getAppId(),
+                    'authorizer_appid' => $msgData['AuthorizerAppid'],
+                    'authorizer_authcode' => $msgData['AuthorizationCode'],
+                    'authorizer_status' => \Constant\Server::WX_COMPONENT_AUTHORIZER_STATUS_ALLOW,
+                    'created' => $nowTime,
+                    'updated' => $nowTime,
+                ], [
+                    'authorizer_authcode' => $msgData['AuthorizationCode'],
+                    'authorizer_refreshtoken' => '',
+                    'authorizer_allowpower' => '',
+                    'authorizer_info' => '',
+                    'authorizer_status' => \Constant\Server::WX_COMPONENT_AUTHORIZER_STATUS_ALLOW,
+                    'updated' => $nowTime,
+                ]);
+                unset($ormResult1, $entity);
+
+                $redisKey = \Constant\Server::REDIS_PREFIX_WX_COMPONENT_AUTHORIZER . $msgData['AuthorizerAppid'];
+                \DesignPatterns\Factories\CacheSimpleFactory::getRedisInstance()->del($redisKey);
             }
 
             $this->SyResult->setData('success');

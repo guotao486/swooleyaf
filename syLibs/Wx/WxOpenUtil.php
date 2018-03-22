@@ -12,6 +12,8 @@ use Constant\Server;
 use DesignPatterns\Factories\CacheSimpleFactory;
 use DesignPatterns\Singletons\WxConfigSingleton;
 use Exception\Wx\WxOpenException;
+use Factories\SyBaseMysqlFactory;
+use SyServer\BaseServer;
 use Tool\Tool;
 use Traits\SimpleTrait;
 
@@ -30,7 +32,7 @@ final class WxOpenUtil {
      * 数组转xml
      * @param array $data
      * @return string
-     * @throws WxOpenException
+     * @throws \Exception\Wx\WxOpenException
      */
     public static function arrayToXml(array $data) : string {
         if (count($data) == 0) {
@@ -54,7 +56,7 @@ final class WxOpenUtil {
      * xml转数组
      * @param string $xml
      * @return array
-     * @throws WxOpenException
+     * @throws \Exception\Wx\WxOpenException
      */
     public static function xmlToArray(string $xml) : array {
         if (strlen($xml . '') == 0) {
@@ -74,7 +76,7 @@ final class WxOpenUtil {
      * @param string|array $data 数据
      * @param array $configs 配置数组
      * @return mixed
-     * @throws WxOpenException
+     * @throws \Exception\Wx\WxOpenException
      */
     private static function sendPost(string $url, $data,array $configs=[]) {
         if (is_string($data)) {
@@ -93,7 +95,6 @@ final class WxOpenUtil {
 
         $timeout = (int)Tool::getArrayVal($configs, 'timeout', 2000);
         $headers = Tool::getArrayVal($configs, 'headers', false);
-
         $sendRes = Tool::sendCurlReq([
             CURLOPT_URL => $url,
             CURLOPT_POST => true,
@@ -114,7 +115,7 @@ final class WxOpenUtil {
      * @param string $url 请求地址
      * @param int $timeout 执行超时时间，默认2s
      * @return mixed
-     * @throws WxOpenException
+     * @throws \Exception\Wx\WxOpenException
      */
     private static function sendGetReq(string $url,int $timeout=2000) {
         $sendRes = Tool::sendCurlReq([
@@ -133,22 +134,11 @@ final class WxOpenUtil {
     }
 
     /**
-     * 获取平台access token
-     * @param string $getType 获取类型 timer：通过微信服务器定时请求获取 inner：系统内部获取
+     * 更新平台access token
      * @param string $verifyTicket
-     * @return string
-     * @throws WxOpenException
+     * @throws \Exception\Wx\WxOpenException
      */
-    public static function getComponentAccessToken(string $getType,string $verifyTicket='') : string {
-        $nowTime = time();
-        $redis = CacheSimpleFactory::getRedisInstance();
-        $expireTime = (int)$redis->hGet(Server::REDIS_PREFIX_WX_COMPONENT_ACCESS_TOKEN, 'expire');
-        if (($nowTime + 600) < $expireTime) {
-            return $redis->hGet(Server::REDIS_PREFIX_WX_COMPONENT_ACCESS_TOKEN, 'content');
-        } else if ($getType != 'timer') {
-            throw new WxOpenException('获取平台access token失败', ErrorCode::WXOPEN_POST_ERROR);
-        }
-
+    public static function refreshComponentAccessToken(string $verifyTicket){
         $openCommonConfig = WxConfigSingleton::getInstance()->getOpenCommonConfig();
         $resData = self::sendPost(self::$urlComponentToken, [
             'component_appid' => $openCommonConfig->getAppId(),
@@ -159,47 +149,71 @@ final class WxOpenUtil {
         ]);
         $resArr = Tool::jsonDecode($resData);
         if (isset($resArr['component_access_token'])) {
-            $expireTime = $nowTime + $openCommonConfig->getExpireComponentAccessToken();
-            $redis->hSet(Server::REDIS_PREFIX_WX_COMPONENT_ACCESS_TOKEN, 'content', $resArr['component_access_token']);
-            $redis->hSet(Server::REDIS_PREFIX_WX_COMPONENT_ACCESS_TOKEN, 'expire', $expireTime . '');
+            $expireTime = time() + 7000;
+            $redisKey = Server::REDIS_PREFIX_WX_COMPONENT_ACCOUNT . $openCommonConfig->getAppId();
+            CacheSimpleFactory::getRedisInstance()->hMset($redisKey, [
+                'access_token' => $resArr['component_access_token'],
+                'expire_time' => $expireTime,
+                'unique_key' => $redisKey,
+            ]);
+            CacheSimpleFactory::getRedisInstance()->expire($redisKey, 7100);
 
-            return $resArr['component_access_token'];
+            $localKey = Server::CACHE_LOCAL_TAG_PREFIX_WX_COMPONENT_ACCESS_TOKEN . $openCommonConfig->getAppId();
+            BaseServer::setProjectCache($localKey, [
+                'value' => $resArr['component_access_token'],
+                'add_time' => $expireTime,
+            ]);
         } else {
             throw new WxOpenException('获取平台access token失败', ErrorCode::WXOPEN_POST_ERROR);
         }
     }
 
     /**
-     * 获取授权者access token
-     * @param string $appId 授权者微信号
+     * 获取平台access token
+     * @param string $appId 开放平台app id
      * @return string
-     * @throws WxOpenException
+     * @throws \Exception\Wx\WxOpenException
      */
-    public static function getAuthorizerAccessToken(string $appId) : string {
-        $configs = WxConfigSingleton::getInstance()->getOpenAuthorizerConfigs($appId);
-        if(empty($configs)){
-            throw new WxOpenException('授权者不存在', ErrorCode::WXOPEN_PARAM_ERROR);
+    public static function getComponentAccessToken(string $appId) : string {
+        $localKey = Server::CACHE_LOCAL_TAG_PREFIX_WX_COMPONENT_ACCESS_TOKEN . $appId;
+        $accessToken = BaseServer::getProjectCache($localKey, 'value', '');
+        if(strlen($accessToken) > 0){
+            return $accessToken;
         }
 
-        $redis = CacheSimpleFactory::getRedisInstance();
-        $redisKey = Server::REDIS_PREFIX_WX_AUTHORIZER_ACCESS_TOKEN . $appId;
-        if ($redis->exists($redisKey)) {
-            return $redis->get($redisKey);
+        $redisKey = Server::REDIS_PREFIX_WX_COMPONENT_ACCOUNT . $appId;
+        $redisData = CacheSimpleFactory::getRedisInstance()->hGetAll($redisKey);
+        if(is_array($redisData) && isset($redisData['unique_key']) && ($redisData['unique_key'] == $redisKey)){
+            BaseServer::setProjectCache($localKey, [
+                'value' => $redisData['access_token'],
+                'add_time' => (int)$redisData['expire_time'],
+            ]);
+
+            return $redisData['access_token'];
         }
 
-        $openCommonConfig = WxConfigSingleton::getInstance()->getOpenCommonConfig();
-        $url = self::$urlAuthorizerToken . self::getComponentAccessToken(2);
-        $resData = self::sendPost($url, [
-            'component_appid' => $openCommonConfig->getAppId(),
-            'authorizer_appid' => $configs['appid'],
-            'authorizer_refresh_token' => $configs['refreshtoken'],
+        throw new WxOpenException('获取平台access token失败', ErrorCode::WXOPEN_PARAM_ERROR);
+    }
+
+    /**
+     * 刷新授权公众号access token
+     * @param string $componentAppId 开放平台app id
+     * @param string $authorizerAppId 授权公众号app id
+     * @param string $refreshToken 授权公众号刷新令牌
+     * @return string
+     * @throws \Exception\Wx\WxOpenException
+     */
+    private static function refreshAuthorizerAccessToken(string $componentAppId,string $authorizerAppId,string $refreshToken) : string {
+        $urlAccessToken = self::$urlAuthorizerToken . self::getComponentAccessToken($componentAppId);
+        $resData = self::sendPost($urlAccessToken, [
+            'component_appid' => $componentAppId,
+            'authorizer_appid' => $authorizerAppId,
+            'authorizer_refresh_token' => $refreshToken,
         ], [
             'data_type' => 'json',
         ]);
         $resArr = Tool::jsonDecode($resData);
         if (isset($resArr['authorizer_access_token'])) {
-            $redis->set($redisKey, $resArr['authorizer_access_token'], (int)$openCommonConfig->getExpireAuthorizerAccessToken());
-
             return $resArr['authorizer_access_token'];
         } else {
             throw new WxOpenException('获取授权者access token失败', ErrorCode::WXOPEN_POST_ERROR);
@@ -207,28 +221,123 @@ final class WxOpenUtil {
     }
 
     /**
-     * 获取授权者jsapi ticket
-     * @param string $appId 授权者微信号
+     * 刷新授权公众号js ticket
+     * @param string $accessToken 授权公众号access token
      * @return string
-     * @throws WxOpenException
+     * @throws \Exception\Wx\WxOpenException
      */
-    public static function getJsTicket(string $appId) : string {
-        $redis = CacheSimpleFactory::getRedisInstance();
-        $redisKey = Server::REDIS_PREFIX_WX_AUTHORIZER_JS_TICKET . $appId;
-        if ($redis->exists($redisKey)) {
-            return $redis->get($redisKey);
-        }
-
-        $url = self::$urlJsTicket . self::getAuthorizerAccessToken($appId);
+    private static function refreshAuthorizerJsTicket(string $accessToken) : string {
+        $url = self::$urlJsTicket . $accessToken;
         $data = self::sendGetReq($url);
         $dataArr = Tool::jsonDecode($data);
         if ($dataArr['errcode'] == 0) {
-            $redis->set($redisKey, $dataArr['ticket'], (int)WxConfigSingleton::getInstance()->getOpenCommonConfig()->getExpireAuthorizerJsTicket());
-
             return $dataArr['ticket'];
         } else {
             throw new WxOpenException($dataArr['errmsg'], ErrorCode::WXOPEN_PARAM_ERROR);
         }
+    }
+
+    /**
+     * 刷新授权公众号缓存
+     * @param string $appId 授权公众号app id
+     * @return array
+     * @throws \Exception\Wx\WxOpenException
+     */
+    private static function refreshAuthorizerCache(string $appId) : array {
+        $nowTime = time();
+        $cacheData = [];
+        $openCommonConfig = WxConfigSingleton::getInstance()->getOpenCommonConfig();
+        $redisKey = Server::REDIS_PREFIX_WX_COMPONENT_AUTHORIZER . $appId;
+        $redisData = CacheSimpleFactory::getRedisInstance()->hGetAll($redisKey);
+        if(!empty($redisData)){
+            $uniqueKey = $redisData['unique_key'] ?? '';
+            if($uniqueKey != $redisKey){
+                throw new WxOpenException('获取缓存失败', ErrorCode::WXOPEN_PARAM_ERROR);
+            }
+
+            $refreshToken = $redisData['refresh_token'];
+        } else {
+            $entity = SyBaseMysqlFactory::WxopenAuthorizerEntity();
+            $ormResult1 = $entity->getContainer()->getModel()->getOrmDbTable();
+            $ormResult1->where('`component_appid`=? AND `authorizer_appid`=?', [$openCommonConfig->getAppId(), $appId,]);
+            $authorizerInfo = $entity->getContainer()->getModel()->findOne($ormResult1);
+            if(empty($authorizerInfo)){
+                throw new WxOpenException('授权公众号不存在', ErrorCode::WXOPEN_PARAM_ERROR);
+            } else if($authorizerInfo['authorizer_status'] != Server::WX_COMPONENT_AUTHORIZER_STATUS_ALLOW){
+                throw new WxOpenException('授权公众号已取消授权', ErrorCode::WXOPEN_PARAM_ERROR);
+            }
+
+            $cacheData['auth_code'] = $authorizerInfo['authorizer_authcode'];
+            if(strlen($authorizerInfo['authorizer_refreshtoken']) > 0){
+                $cacheData['refresh_token'] = $authorizerInfo['authorizer_refreshtoken'];
+            } else {
+                $authInfo = self::getAuthorizerAuth($openCommonConfig->getAppId(), $authorizerInfo['authorizer_authcode']);
+                if($authInfo['code'] > 0){
+                    throw new WxOpenException($authInfo['message'], ErrorCode::WXOPEN_PARAM_ERROR);
+                }
+                $cacheData['refresh_token'] = $authInfo['data']['authorization_info']['authorizer_refresh_token'];
+
+                $entity->getContainer()->getModel()->update($ormResult1, [
+                    'authorizer_refreshtoken' => $authInfo['data']['authorization_info']['authorizer_refresh_token'],
+                    'authorizer_allowpower' => Tool::jsonEncode($authInfo['data']['authorization_info']['func_info'], JSON_UNESCAPED_UNICODE),
+                    'authorizer_info' => Tool::jsonEncode($authInfo['data'], JSON_UNESCAPED_UNICODE),
+                    'updated' => $nowTime,
+                ]);
+            }
+            unset($ormResult1, $entity);
+            $refreshToken = $cacheData['refresh_token'];
+        }
+
+        $accessToken = self::refreshAuthorizerAccessToken($openCommonConfig->getAppId(), $appId, $refreshToken);
+        $jsTicket = self::refreshAuthorizerJsTicket($accessToken);
+        $cacheData['js_ticket'] = $jsTicket;
+        $cacheData['access_token'] = $accessToken;
+        $cacheData['expire_time'] = $nowTime + 7000;
+        CacheSimpleFactory::getRedisInstance()->hMset($redisKey, $cacheData);
+        if(empty($redisData)){
+            CacheSimpleFactory::getRedisInstance()->expire($redisKey, 86400);
+        }
+
+        return [
+            'js_ticket' => $jsTicket,
+            'access_token' => $accessToken,
+        ];
+    }
+
+    /**
+     * 获取授权者access token
+     * @param string $appId 授权公众号app id
+     * @return string
+     * @throws \Exception\Wx\WxOpenException
+     */
+    public static function getAuthorizerAccessToken(string $appId) : string {
+        $nowTime = time();
+        $redisKey = Server::REDIS_PREFIX_WX_COMPONENT_AUTHORIZER . $appId;
+        $redisData = CacheSimpleFactory::getRedisInstance()->hGetAll($redisKey);
+        if(is_array($redisData) && isset($redisData['unique_key']) && ($redisData['unique_key'] == $redisKey) && ($redisData['expire_time'] >= $nowTime)){
+            return $redisData['access_token'];
+        }
+
+        $cacheData = self::refreshAuthorizerCache($appId);
+        return $cacheData['access_token'];
+    }
+
+    /**
+     * 获取授权者jsapi ticket
+     * @param string $appId 授权者微信号
+     * @return string
+     * @throws \Exception\Wx\WxOpenException
+     */
+    public static function getAuthorizerJsTicket(string $appId) : string {
+        $nowTime = time();
+        $redisKey = Server::REDIS_PREFIX_WX_COMPONENT_AUTHORIZER . $appId;
+        $redisData = CacheSimpleFactory::getRedisInstance()->hGetAll($redisKey);
+        if(is_array($redisData) && isset($redisData['unique_key']) && ($redisData['unique_key'] == $redisKey) && ($redisData['expire_time'] >= $nowTime)){
+            return $redisData['js_ticket'];
+        }
+
+        $cacheData = self::refreshAuthorizerCache($appId);
+        return $cacheData['js_ticket'];
     }
 
     /**
@@ -238,7 +347,7 @@ final class WxOpenUtil {
      * @param string $nonce 随机字符串
      * @param string $encryptMsg 密文消息
      * @return string
-     * @throws WxOpenException
+     * @throws \Exception\Wx\WxOpenException
      */
     private static function getSha1Val(string $token,string $timestamp,string $nonce,string $encryptMsg) : string {
         try {
@@ -296,7 +405,7 @@ final class WxOpenUtil {
      * @param string $appid 公众号appid
      * @param string $tag 标识 new：用新的aeskey解密 old：用旧的aeskey解密
      * @return array
-     * @throws WxOpenException
+     * @throws \Exception\Wx\WxOpenException
      */
     private static function decrypt(string $encryptMsg,string $appid,string $tag='new') : array {
         $openCommonConfig = WxConfigSingleton::getInstance()->getOpenCommonConfig();
@@ -344,7 +453,7 @@ final class WxOpenUtil {
      * @param string $nonceStr 随机串，对应URL参数的nonce
      * @param string $timestamp 时间戳 对应URL参数的timestamp
      * @return array
-     * @throws WxOpenException
+     * @throws \Exception\Wx\WxOpenException
      */
     public static function decryptMsg(string $encryptXml,string $appid,string $msgSignature,string $nonceStr,string $timestamp='') : array {
         if ($timestamp) {
@@ -412,7 +521,7 @@ final class WxOpenUtil {
     public static function getAuthUrl() : string {
         $authUrl = '';
         $openCommonConfig = WxConfigSingleton::getInstance()->getOpenCommonConfig();
-        $url = self::$urlPreAuthCode . self::getComponentAccessToken('inner');
+        $url = self::$urlPreAuthCode . self::getComponentAccessToken($openCommonConfig->getAppId());
         $resData = self::sendPost($url, [
             'component_appid' => $openCommonConfig->getAppId(),
         ], [
@@ -430,17 +539,18 @@ final class WxOpenUtil {
 
     /**
      * 获取授权者的授权信息
+     * @param string $appId 开放平台app id
      * @param string $authCode 授权码
      * @return array
      */
-    public static function getAuthorizerAuth(string $authCode) : array {
+    public static function getAuthorizerAuth(string $appId,string $authCode) : array {
         $resArr = [
             'code' => 0,
         ];
 
-        $url = self::$urlAuthorizerAuth . self::getComponentAccessToken('inner');
+        $url = self::$urlAuthorizerAuth . self::getComponentAccessToken($appId);
         $getRes = self::sendPost($url, [
-            'component_appid' => WxConfigSingleton::getInstance()->getOpenCommonConfig()->getAppId(),
+            'component_appid' => $appId,
             'authorization_code' => $authCode,
         ], [
             'data_type' => 'json',
@@ -459,15 +569,15 @@ final class WxOpenUtil {
     /**
      * 发送客服消息
      * @param array $data 消息数据
-     * @param string $authNum 授权者编号
+     * @param string $appId 授权公众号app id
      * @return array
      */
-    public static function sendCustomMsg(array $data,string $authNum) : array {
+    public static function sendCustomMsg(array $data,string $appId) : array {
         $resArr = [
             'code' => 0,
         ];
 
-        $url = self::$urlSendCustom . self::getAuthorizerAccessToken($authNum);
+        $url = self::$urlSendCustom . self::getAuthorizerAccessToken($appId);
         $sendRes = self::sendPost($url, $data, [
             'data_type' => 'json',
             'headers' => [
