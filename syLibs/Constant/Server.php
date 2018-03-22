@@ -58,15 +58,18 @@ final class Server {
     const REDIS_PREFIX_MESSAGE_QUEUE = 'sy001005_'; //前缀-消息队列
     const REDIS_PREFIX_IMAGE_DATA = 'sy001006_'; //前缀-图片缓存
     const REDIS_PREFIX_WX_ACCOUNT = 'sy002000_'; //前缀-微信公众号
-    const REDIS_PREFIX_WX_COMPONENT_ACCESS_TOKEN = 'sy002001'; //前缀-微信开放平台access token
-    const REDIS_PREFIX_WX_AUTHORIZER_CONSTANT = 'sy002002_'; //前缀-微信开放平台授权公众号常量
-    const REDIS_PREFIX_WX_AUTHORIZER_JS_TICKET = 'sy002003_'; //前缀-微信开放平台授权公众号js ticket
-    const REDIS_PREFIX_WX_AUTHORIZER_ACCESS_TOKEN = 'sy002004_'; //前缀-微信开放平台授权公众号access token
-    const REDIS_PREFIX_WX_NATIVE_PRE = 'sy002005_'; //前缀-微信扫码预支付
+    const REDIS_PREFIX_WX_COMPONENT_ACCOUNT = 'sy002001_'; //前缀-微信开放平台账号
+    const REDIS_PREFIX_WX_COMPONENT_AUTHORIZER = 'sy002002_'; //前缀-微信开放平台授权公众号
+    const REDIS_PREFIX_WX_NATIVE_PRE = 'sy002003_'; //前缀-微信扫码预支付
+
+    //微信开放平台常量
+    const WX_COMPONENT_AUTHORIZER_STATUS_CANCEL = 0; //授权公众号状态-取消授权
+    const WX_COMPONENT_AUTHORIZER_STATUS_ALLOW = 1; //授权公众号状态-允许授权
 
     //本地缓存标识
     const CACHE_LOCAL_TAG_PREFIX_WX_JS_TICKET = 'a001_'; //前缀-微信公众号js ticket
     const CACHE_LOCAL_TAG_PREFIX_WX_ACCESS_TOKEN = 'a002_'; //前缀-微信公众号access token
+    const CACHE_LOCAL_TAG_PREFIX_WX_COMPONENT_ACCESS_TOKEN = 'a101_'; //前缀-微信开放平台access token
 
     //校验器常量
     const VALIDATOR_STRING_TYPE_REQUIRED = 'string_required'; //字符串校验器类型-必填
@@ -119,4 +122,13 @@ final class Server {
     //任务常量,4位字符串,数字和字母组成,纯数字的为框架内部任务,其他为自定义任务
     const TASK_TYPE_CLEAR_API_SIGN_CACHE = '0001'; //任务类型-清理api签名缓存
     const TASK_TYPE_CLEAR_LOCAL_USER_CACHE = '0002'; //任务类型-清除本地用户信息缓存
+
+    //支付常量
+    const PAY_WAY_WX = 1; //方式-微信
+    const PAY_WAY_ALI = 2; //方式-支付宝
+    const PAY_TYPE_WX_JS = 'a000'; //类型-微信js支付
+    const PAY_TYPE_WX_NATIVE_DYNAMIC = 'a001'; //类型-微信动态扫码支付
+    const PAY_TYPE_WX_NATIVE_STATIC = 'a002'; //类型-微信静态扫码支付
+    const PAY_TYPE_ALI_CODE = 'a100'; //类型-支付宝扫码支付
+    const PAY_TYPE_ALI_WEB = 'a101'; //类型-支付宝网页支付
 }

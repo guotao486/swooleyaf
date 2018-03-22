@@ -29,18 +29,18 @@ class PayDao {
     use SimpleDaoTrait;
 
     private static $payTypeCheckMap = [
-        'a000' => 'payTypeCheckWxJs',
-        'a001' => 'payTypeCheckWxNativeDynamic',
-        'a002' => 'payTypeCheckWxNativeStatic',
-        'a100' => 'payTypeCheckAliCode',
-        'a101' => 'payTypeCheckAliWeb',
+        Server::PAY_TYPE_WX_JS => 'payTypeCheckWxJs',
+        Server::PAY_TYPE_WX_NATIVE_DYNAMIC => 'payTypeCheckWxNativeDynamic',
+        Server::PAY_TYPE_WX_NATIVE_STATIC => 'payTypeCheckWxNativeStatic',
+        Server::PAY_TYPE_ALI_CODE => 'payTypeCheckAliCode',
+        Server::PAY_TYPE_ALI_WEB => 'payTypeCheckAliWeb',
     ];
     private static $payTypeHandleMap = [
-        'a000' => 'payTypeHandleWxJs',
-        'a001' => 'payTypeHandleWxNativeDynamic',
-        'a002' => 'payTypeHandleWxNativeStatic',
-        'a100' => 'payTypeHandleAliCode',
-        'a101' => 'payTypeHandleAliWeb',
+        Server::PAY_TYPE_WX_JS => 'payTypeHandleWxJs',
+        Server::PAY_TYPE_WX_NATIVE_DYNAMIC => 'payTypeHandleWxNativeDynamic',
+        Server::PAY_TYPE_WX_NATIVE_STATIC => 'payTypeHandleWxNativeStatic',
+        Server::PAY_TYPE_ALI_CODE => 'payTypeHandleAliCode',
+        Server::PAY_TYPE_ALI_WEB => 'payTypeHandleAliWeb',
     ];
 
     /**
