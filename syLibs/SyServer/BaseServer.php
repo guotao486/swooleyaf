@@ -467,13 +467,17 @@ abstract class BaseServer {
 
         if($workerId == 0){ //保证每一个服务只执行一次定时任务
             $modules = Tool::getConfig('project.' . SY_ENV . SY_PROJECT . '.modules');
-            $moduleData = Tool::getArrayVal($modules, Server::MODULE_BASE_API, []);
-            self::$_syServices->set(Server::MODULE_BASE_API, [
-                'module' => Server::MODULE_BASE_API,
-                'host' => $moduleData['host'],
-                'port' => (string)$moduleData['port'],
-                'type' => $moduleData['type'],
-            ]);
+            foreach (Server::$totalModuleBases as $eModuleName) {
+                $moduleData = Tool::getArrayVal($modules, $eModuleName, []);
+                if (!empty($moduleData)) {
+                    self::$_syServices->set($eModuleName, [
+                        'module' => $eModuleName,
+                        'host' => $moduleData['host'],
+                        'port' => (string)$moduleData['port'],
+                        'type' => $moduleData['type'],
+                    ]);
+                }
+            }
         }
     }
 
