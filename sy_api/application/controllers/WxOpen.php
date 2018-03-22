@@ -30,9 +30,21 @@ class WxOpenController extends CommonController {
 
     /**
      * 获取开放平台授权地址
+     * @api {get} /Index/WxOpen/getComponentAuthUrl 获取开放平台授权地址
+     * @apiDescription 获取开放平台授权地址
+     * @apiGroup ServiceWxOpen
+     * @apiUse CommonSuccess
+     * @apiUse CommonFail
      */
     public function getComponentAuthUrlAction() {
-        $getRes = \SyModule\SyModuleService::getInstance()->sendApiReq('/Index/WxOpen/getComponentAuthUrl', []);
-        $this->sendRsp($getRes);
+        $authUrl = \Wx\WxOpenUtil::getAuthUrl();
+        if(strlen($authUrl) > 0){
+            $this->SyResult->setData([
+                'url' => $authUrl,
+            ]);
+        } else {
+            $this->SyResult->setCodeMsg(\Constant\ErrorCode::COMMON_PARAM_ERROR, '获取授权地址失败');
+        }
+        $this->sendRsp();
     }
 }
