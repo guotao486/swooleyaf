@@ -50,7 +50,7 @@ class PayController extends CommonController {
         $wxReturnCode = (string)\Tool\Tool::getArrayVal($allParams, 'return_code', '');
         if (($wxResultCode == 'SUCCESS') && ($wxReturnCode == 'SUCCESS')) { //支付成功
             \Dao\PayDao::completePay([
-                'pay_type' => \Constant\Project::PAY_TYPE_WX,
+                'pay_type' => \Constant\Server::PAY_WAY_WX,
                 'pay_tradesn' => $allParams['transaction_id'],
                 'pay_sellersn' => $allParams['out_trade_no'],
                 'pay_appid' => $allParams['appid'],
@@ -166,7 +166,7 @@ class PayController extends CommonController {
             }
 
             \Dao\PayDao::completePay([
-                'pay_type' => \Constant\Project::PAY_TYPE_ALI,
+                'pay_type' => \Constant\Server::PAY_WAY_ALI,
                 'pay_tradesn' => $allParams['trade_no'],
                 'pay_sellersn' => $allParams['out_trade_no'],
                 'pay_appid' => $allParams['app_id'],

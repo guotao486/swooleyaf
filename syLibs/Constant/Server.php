@@ -122,4 +122,13 @@ final class Server {
     //任务常量,4位字符串,数字和字母组成,纯数字的为框架内部任务,其他为自定义任务
     const TASK_TYPE_CLEAR_API_SIGN_CACHE = '0001'; //任务类型-清理api签名缓存
     const TASK_TYPE_CLEAR_LOCAL_USER_CACHE = '0002'; //任务类型-清除本地用户信息缓存
+
+    //支付常量
+    const PAY_WAY_WX = 1; //方式-微信
+    const PAY_WAY_ALI = 2; //方式-支付宝
+    const PAY_TYPE_WX_JS = 'a000'; //类型-微信js支付
+    const PAY_TYPE_WX_NATIVE_DYNAMIC = 'a001'; //类型-微信动态扫码支付
+    const PAY_TYPE_WX_NATIVE_STATIC = 'a002'; //类型-微信静态扫码支付
+    const PAY_TYPE_ALI_CODE = 'a100'; //类型-支付宝扫码支付
+    const PAY_TYPE_ALI_WEB = 'a101'; //类型-支付宝网页支付
 }
