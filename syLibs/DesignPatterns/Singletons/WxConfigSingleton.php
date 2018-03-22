@@ -88,9 +88,6 @@ class WxConfigSingleton {
         $openCommonConfig->setAuthUrlDomain((string)Tool::getArrayVal($configs, 'open.authurl.domain', '', true));
         $openCommonConfig->setAuthUrlCallback((string)Tool::getArrayVal($configs, 'open.authurl.callback', '', true));
         $this->openCommonConfig = $openCommonConfig;
-
-        //TODO: 初始化开放平台授权者配置
-        $this->openAuthConfigs = [];
     }
 
     /**
