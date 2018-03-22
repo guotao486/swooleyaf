@@ -469,12 +469,14 @@ abstract class BaseServer {
             $modules = Tool::getConfig('project.' . SY_ENV . SY_PROJECT . '.modules');
             foreach (Server::$totalModuleBases as $eModuleName) {
                 $moduleData = Tool::getArrayVal($modules, $eModuleName, []);
-                self::$_syServices->set($eModuleName, [
-                    'module' => $eModuleName,
-                    'host' => $moduleData['host'],
-                    'port' => (string)$moduleData['port'],
-                    'type' => $moduleData['type'],
-                ]);
+                if (!empty($moduleData)) {
+                    self::$_syServices->set($eModuleName, [
+                        'module' => $eModuleName,
+                        'host' => $moduleData['host'],
+                        'port' => (string)$moduleData['port'],
+                        'type' => $moduleData['type'],
+                    ]);
+                }
             }
         }
     }
