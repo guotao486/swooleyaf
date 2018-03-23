@@ -27,94 +27,11 @@ class WxOpenController extends CommonController {
      * @SyFilter-{"field": "timestamp","explain": "时间戳","type": "string","rules": {"required": 1,"regex": "/^[1-4]\d{9}$/"}}
      */
     public function handleWxNotifyAction() {
-        $allParams = \Request\SyRequest::getParams();
-        $incomeData = \Wx\WxOpenUtil::xmlToArray($allParams['wx_xml']);
-        if (isset($incomeData['Encrypt']) && isset($incomeData['AppId'])) {
-            $nowTime = time();
-            $openCommonConfig = \DesignPatterns\Singletons\WxConfigSingleton::getInstance()->getOpenCommonConfig();
-            $decryptRes = \Wx\WxOpenUtil::decryptMsg($incomeData['Encrypt'], $openCommonConfig->getAppId(), $allParams['msg_signature'], $allParams['nonce'], $allParams['timestamp']);
-            $msgData = \Wx\WxOpenUtil::xmlToArray($decryptRes['content']);
-            if($msgData['InfoType'] == 'component_verify_ticket') { //微信服务器定时监听
-                \Wx\WxOpenUtil::refreshComponentAccessToken($msgData['ComponentVerifyTicket']);
-            } else if($msgData['InfoType'] == 'authorized'){ //授权
-                $entity = \Factories\SyBaseMysqlFactory::WxopenAuthorizerEntity();
-                $ormResult1 = $entity->getContainer()->getModel()->getOrmDbTable();
-                $entity->getContainer()->getModel()->insertOrUpdate($ormResult1, [
-                    'component_appid' => $openCommonConfig->getAppId(),
-                    'authorizer_appid' => $msgData['AuthorizerAppid'],
-                ], [
-                    'component_appid' => $openCommonConfig->getAppId(),
-                    'authorizer_appid' => $msgData['AuthorizerAppid'],
-                    'authorizer_authcode' => $msgData['AuthorizationCode'],
-                    'authorizer_status' => \Constant\Server::WX_COMPONENT_AUTHORIZER_STATUS_ALLOW,
-                    'created' => $nowTime,
-                    'updated' => $nowTime,
-                ], [
-                    'authorizer_authcode' => $msgData['AuthorizationCode'],
-                    'authorizer_refreshtoken' => '',
-                    'authorizer_allowpower' => '',
-                    'authorizer_info' => '',
-                    'authorizer_status' => \Constant\Server::WX_COMPONENT_AUTHORIZER_STATUS_ALLOW,
-                    'updated' => $nowTime,
-                ]);
-                unset($ormResult1, $entity);
-
-                $redisKey = \Constant\Server::REDIS_PREFIX_WX_COMPONENT_AUTHORIZER . $msgData['AuthorizerAppid'];
-                \DesignPatterns\Factories\CacheSimpleFactory::getRedisInstance()->del($redisKey);
-            } else if($msgData['InfoType'] == 'unauthorized'){ //取消授权
-                $entity = \Factories\SyBaseMysqlFactory::WxopenAuthorizerEntity();
-                $ormResult1 = $entity->getContainer()->getModel()->getOrmDbTable();
-                $entity->getContainer()->getModel()->insertOrUpdate($ormResult1, [
-                    'component_appid' => $openCommonConfig->getAppId(),
-                    'authorizer_appid' => $msgData['AuthorizerAppid'],
-                ], [
-                    'component_appid' => $openCommonConfig->getAppId(),
-                    'authorizer_appid' => $msgData['AuthorizerAppid'],
-                    'authorizer_status' => \Constant\Server::WX_COMPONENT_AUTHORIZER_STATUS_CANCEL,
-                    'created' => $nowTime,
-                    'updated' => $nowTime,
-                ], [
-                    'authorizer_refreshtoken' => '',
-                    'authorizer_allowpower' => '',
-                    'authorizer_info' => '',
-                    'authorizer_status' => \Constant\Server::WX_COMPONENT_AUTHORIZER_STATUS_CANCEL,
-                    'updated' => $nowTime,
-                ]);
-                unset($ormResult1, $entity);
-
-                $redisKey = \Constant\Server::REDIS_PREFIX_WX_COMPONENT_AUTHORIZER . $msgData['AuthorizerAppid'];
-                \DesignPatterns\Factories\CacheSimpleFactory::getRedisInstance()->del($redisKey);
-            } else if($msgData['InfoType'] == 'updateauthorized'){ //更新授权
-                $entity = \Factories\SyBaseMysqlFactory::WxopenAuthorizerEntity();
-                $ormResult1 = $entity->getContainer()->getModel()->getOrmDbTable();
-                $entity->getContainer()->getModel()->insertOrUpdate($ormResult1, [
-                    'component_appid' => $openCommonConfig->getAppId(),
-                    'authorizer_appid' => $msgData['AuthorizerAppid'],
-                ], [
-                    'component_appid' => $openCommonConfig->getAppId(),
-                    'authorizer_appid' => $msgData['AuthorizerAppid'],
-                    'authorizer_authcode' => $msgData['AuthorizationCode'],
-                    'authorizer_status' => \Constant\Server::WX_COMPONENT_AUTHORIZER_STATUS_ALLOW,
-                    'created' => $nowTime,
-                    'updated' => $nowTime,
-                ], [
-                    'authorizer_authcode' => $msgData['AuthorizationCode'],
-                    'authorizer_refreshtoken' => '',
-                    'authorizer_allowpower' => '',
-                    'authorizer_info' => '',
-                    'authorizer_status' => \Constant\Server::WX_COMPONENT_AUTHORIZER_STATUS_ALLOW,
-                    'updated' => $nowTime,
-                ]);
-                unset($ormResult1, $entity);
-
-                $redisKey = \Constant\Server::REDIS_PREFIX_WX_COMPONENT_AUTHORIZER . $msgData['AuthorizerAppid'];
-                \DesignPatterns\Factories\CacheSimpleFactory::getRedisInstance()->del($redisKey);
-            }
-
-            $this->SyResult->setData('success');
-        } else {
-            $this->SyResult->setData('fail');
-        }
+        $needParams = \Request\SyRequest::getParams();
+        $handleRes = \Dao\WxOpenDao::handleNotifyWx($needParams);
+        $this->SyResult->setData([
+            'result' => $handleRes,
+        ]);
 
         $this->sendRsp();
     }
@@ -146,82 +63,12 @@ class WxOpenController extends CommonController {
      * @SyFilter-{"field": "timestamp","explain": "时间戳","type": "string","rules": {"required": 1,"regex": "/^[1-4]\d{9}$/"}}
      */
     public function handleAuthorizerNotifyAction() {
-        $returnStr = 'fail';
-        $allParams = \Request\SyRequest::getParams();
-        $incomeData = \Wx\WxOpenUtil::xmlToArray($allParams['wx_xml']);
-        if (isset($incomeData['Encrypt']) && isset($incomeData['AppId'])) {
-            $openCommonConfig = \DesignPatterns\Singletons\WxConfigSingleton::getInstance()->getOpenCommonConfig();
-            $decryptRes = \Wx\WxOpenUtil::decryptMsg($incomeData['Encrypt'], $openCommonConfig->getAppId(), $allParams['msg_signature'], $allParams['nonce'], $allParams['timestamp']);
-            $msgData = \Wx\WxOpenUtil::xmlToArray($decryptRes['content']);
-            if(isset($msgData['MsgType'])){
-                $saveArr = [];
-                if($msgData['MsgType'] == 'event'){
-                    $saveArr = [
-                        'ToUserName' => $msgData['FromUserName'],
-                        'FromUserName' => $msgData['ToUserName'],
-                        'CreateTime' => $msgData['CreateTime'],
-                        'MsgType' => 'text',
-                        'Content' => $msgData['Event'] . 'from_callback',
-                    ];
-                } else if($msgData['MsgType'] == 'text'){
-                    if($msgData['Content'] == 'TESTCOMPONENT_MSG_TYPE_TEXT'){
-                        $saveArr = [
-                            'ToUserName' => $msgData['FromUserName'],
-                            'FromUserName' => $msgData['ToUserName'],
-                            'CreateTime' => $msgData['CreateTime'],
-                            'MsgType' => 'text',
-                            'Content' => 'TESTCOMPONENT_MSG_TYPE_TEXT_callback',
-                        ];
-                    } else if(strpos($msgData['Content'], 'QUERY_AUTH_CODE:') === 0){ //全网开通专用
-                        $authCode = str_replace('QUERY_AUTH_CODE:', '', $msgData['Content']);
-                        //设置返回空消息
-                        $saveArr = [
-                            'ToUserName' => $msgData['FromUserName'],
-                            'FromUserName' => $msgData['ToUserName'],
-                            'CreateTime' => $msgData['CreateTime'],
-                            'MsgType' => 'text',
-                            'Content' => '',
-                        ];
+        $needParams = \Request\SyRequest::getParams();
+        $handleRes = \Dao\WxOpenDao::handleNotifyAuthorizer($needParams);
+        $this->SyResult->setData([
+            'result' => $handleRes,
+        ]);
 
-                        //使用授权码换取公众号的授权信息
-                        $authInfo = \Wx\WxOpenUtil::getAuthorizerAuth($openCommonConfig->getAppId(), $authCode);
-                        //调用发送客服消息api回复文本消息
-                        $url = 'https://api.weixin.qq.com/cgi-bin/message/custom/send?access_token=' . $authInfo['data']['authorization_info']['authorizer_access_token'];
-                        \Tool\Tool::sendCurlReq([
-                            CURLOPT_URL => $url,
-                            CURLOPT_POST => true,
-                            CURLOPT_POSTFIELDS => \Tool\Tool::jsonEncode([
-                                'touser' => $msgData['FromUserName'],
-                                'msgtype' => 'text',
-                                'text' => [
-                                    'content' => $authCode . '_from_api',
-                                ],
-                            ], JSON_UNESCAPED_UNICODE),
-                            CURLOPT_RETURNTRANSFER => true,
-                            CURLOPT_SSL_VERIFYPEER => false,
-                            CURLOPT_SSL_VERIFYHOST => false,
-                            CURLOPT_HTTPHEADER => [
-                                'Expect:',
-                            ],
-                        ]);
-                    } else {
-                        $saveArr = [
-                            'ToUserName' => $msgData['FromUserName'],
-                            'FromUserName' => $msgData['ToUserName'],
-                            'CreateTime' => $msgData['CreateTime'],
-                            'MsgType' => 'text',
-                            'Content' => '',
-                        ];
-                    }
-                }
-                if(!empty($saveArr)){
-                    $replyXml = \Wx\WxOpenUtil::arrayToXml($saveArr);
-                    $returnStr = \Wx\WxOpenUtil::encryptMsg($replyXml, $openCommonConfig->getAppId(), $decryptRes['aes_key']);
-                }
-            }
-        }
-
-        $this->SyResult->setData($returnStr);
         $this->sendRsp();
     }
 }

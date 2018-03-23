@@ -1,7 +1,10 @@
 <?php
 class WxOpenController extends CommonController {
+    public $signStatus = false;
+
     public function init() {
         parent::init();
+        $this->signStatus = false;
     }
 
     /**
@@ -12,8 +15,11 @@ class WxOpenController extends CommonController {
         $allParams['wx_xml'] = \Tool\Tool::getArrayVal($GLOBALS, 'HTTP_RAW_POST_DATA', '');
         $handleRes = \SyModule\SyModuleService::getInstance()->sendApiReq('/Index/WxOpen/handleWxNotify', $allParams);
         $resData = \Tool\Tool::jsonDecode($handleRes);
-
-        $this->sendRsp($resData['data']);
+        if (is_array($resData) && isset($resData['code']) && ($resData['code'] == \Constant\ErrorCode::COMMON_SUCCESS)) {
+            $this->sendRsp($resData['data']['result']);
+        } else {
+            $this->sendRsp('fail');
+        }
     }
 
     /**
@@ -24,8 +30,11 @@ class WxOpenController extends CommonController {
         $allParams['wx_xml'] = \Tool\Tool::getArrayVal($GLOBALS, 'HTTP_RAW_POST_DATA', '');
         $handleRes = \SyModule\SyModuleService::getInstance()->sendApiReq('/Index/WxOpen/handleAuthorizerNotify', $allParams);
         $resData = \Tool\Tool::jsonDecode($handleRes);
-
-        $this->sendRsp($resData['data']);
+        if (is_array($resData) && isset($resData['code']) && ($resData['code'] == \Constant\ErrorCode::COMMON_SUCCESS)) {
+            $this->sendRsp($resData['data']['result']);
+        } else {
+            $this->sendRsp('fail');
+        }
     }
 
     /**
@@ -45,6 +54,7 @@ class WxOpenController extends CommonController {
         } else {
             $this->SyResult->setCodeMsg(\Constant\ErrorCode::COMMON_PARAM_ERROR, '获取授权地址失败');
         }
+
         $this->sendRsp();
     }
 }

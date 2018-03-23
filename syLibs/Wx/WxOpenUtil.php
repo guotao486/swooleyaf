@@ -402,12 +402,12 @@ final class WxOpenUtil {
     /**
      * 消息解密
      * @param string $encryptMsg 加密消息
-     * @param string $appid 公众号appid
+     * @param string $appId 开放平台app id
      * @param string $tag 标识 new：用新的aeskey解密 old：用旧的aeskey解密
      * @return array
      * @throws \Exception\Wx\WxOpenException
      */
-    private static function decrypt(string $encryptMsg,string $appid,string $tag='new') : array {
+    private static function decrypt(string $encryptMsg,string $appId,string $tag='new') : array {
         $openCommonConfig = WxConfigSingleton::getInstance()->getOpenCommonConfig();
         if ($tag == 'new') {
             $aesKey = $openCommonConfig->getAesKeyNow();
@@ -428,7 +428,7 @@ final class WxOpenUtil {
             $lengthList = unpack("N", substr($msgContent, 0, 4));
             $xml = substr($msgContent, 4, $lengthList[1]);
             $fromAppId = substr($msgContent, ($lengthList[1] + 4));
-            if ($fromAppId != $appid) {
+            if ($fromAppId != $appId) {
                 $error = 'appid不匹配';
             }
         } else {
@@ -448,31 +448,32 @@ final class WxOpenUtil {
     /**
      * 密文解密
      * @param string $encryptXml 密文，对应POST请求的数据
-     * @param string $appid 公众号appid
+     * @param string $appId 开放平台app id
+     * @param string $appToken 开放平台消息校验token
      * @param string $msgSignature 签名串，对应URL参数的msg_signature
      * @param string $nonceStr 随机串，对应URL参数的nonce
      * @param string $timestamp 时间戳 对应URL参数的timestamp
      * @return array
      * @throws \Exception\Wx\WxOpenException
      */
-    public static function decryptMsg(string $encryptXml,string $appid,string $msgSignature,string $nonceStr,string $timestamp='') : array {
+    public static function decryptMsg(string $encryptXml,string $appId,string $appToken,string $msgSignature,string $nonceStr,string $timestamp='') : array {
         if ($timestamp) {
             $nowTime = $timestamp . '';
         } else {
             $nowTime = time() . '';
         }
 
-        $signature = self::getSha1Val(WxConfigSingleton::getInstance()->getOpenCommonConfig()->getToken(), $nowTime, $nonceStr, $encryptXml);
+        $signature = self::getSha1Val($appToken, $nowTime, $nonceStr, $encryptXml);
         if ($signature != $msgSignature) {
             throw new WxOpenException('签名验证错误', ErrorCode::WXOPEN_PARAM_ERROR);
         }
 
         try {
             //用当前的key校验密文
-            $res = self::decrypt($encryptXml, $appid, 'new');
+            $res = self::decrypt($encryptXml, $appId, 'new');
         } catch (\Exception $e) {
             //用上次的key校验密文
-            $res = self::decrypt($encryptXml, $appid, 'old');
+            $res = self::decrypt($encryptXml, $appId, 'old');
         }
 
         return $res;
@@ -481,17 +482,17 @@ final class WxOpenUtil {
     /**
      * 消息加密
      * @param string $replyMsg 公众平台待回复用户的消息，xml格式的字符串
-     * @param string $appid 公众号appid
+     * @param string $appId 开放平台app id
      * @param string $aesKey 第三方平台的aes key
      * @param string $nonce 16位随机字符串
      * @return string
      */
-    private static function encrypt(string $replyMsg,string $appid,string $aesKey,string $nonce) : string {
+    private static function encrypt(string $replyMsg,string $appId,string $aesKey,string $nonce) : string {
         $key = base64_decode($aesKey . '=');
         $iv = substr($key, 0, 16);
 
         //获得16位随机字符串，填充到明文之前
-        $content1 = $nonce . pack("N", strlen($replyMsg)) . $replyMsg . $appid;
+        $content1 = $nonce . pack("N", strlen($replyMsg)) . $replyMsg . $appId;
         $content2 = self::pkcs7Encode($content1);
         $encryptMsg = openssl_encrypt($content2, 'aes-256-cbc', substr($key, 0, 32), OPENSSL_ZERO_PADDING, $iv);
         return $encryptMsg;
@@ -500,15 +501,16 @@ final class WxOpenUtil {
     /**
      * 明文加密
      * @param string $replyMsg 公众平台待回复用户的消息，xml格式的字符串
-     * @param string $appid 公众号appid
+     * @param string $appId 开放平台app id
+     * @param string $appToken 开放平台消息校验token
      * @param string $aesKey 第三方平台的aes key
      * @return string 加密后的可以直接回复用户的密文，包括msg_signature, timestamp, nonce, encrypt的xml格式的字符串
      */
-    public static function encryptMsg(string $replyMsg,string $appid,string $aesKey) : string {
+    public static function encryptMsg(string $replyMsg,string $appId,string $appToken,string $aesKey) : string {
         $nonceStr = Tool::createNonceStr(16);
         $nowTime = time() . '';
-        $encryptMsg = self::encrypt($replyMsg, $appid, $aesKey, $nonceStr);
-        $signature = self::getSha1Val(WxConfigSingleton::getInstance()->getOpenCommonConfig()->getToken(), $nowTime, $nonceStr, $encryptMsg);
+        $encryptMsg = self::encrypt($replyMsg, $appId, $aesKey, $nonceStr);
+        $signature = self::getSha1Val($appToken, $nowTime, $nonceStr, $encryptMsg);
         $format = "<xml><Encrypt><![CDATA[%s]]></Encrypt><MsgSignature><![CDATA[%s]]></MsgSignature><TimeStamp>%s</TimeStamp><Nonce><![CDATA[%s]]></Nonce></xml>";
 
         return sprintf($format, $encryptMsg, $signature, $nowTime, $nonceStr);
