@@ -78,8 +78,8 @@ class BaseReflect {
             $ignoreSign = false;
             foreach ($annotations[Validator::ANNOTATION_NAME] as $eAnnotation) {
                 $data = Tool::jsonDecode($eAnnotation);
-                if($data === false){
-                    throw new ReflectException('数据格式不正确', ErrorCode::REFLECT_ANNOTATION_DATA_ERROR);
+                if(!is_array($data)){
+                    throw new ReflectException('数据校验格式不正确', ErrorCode::REFLECT_ANNOTATION_DATA_ERROR);
                 } else if(!isset($data['field'])){
                     throw new ReflectException('字段名称必须填写', ErrorCode::REFLECT_ANNOTATION_DATA_ERROR);
                 } else if(!is_string($data['field'])){
