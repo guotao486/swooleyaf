@@ -13,7 +13,7 @@ use DesignPatterns\Singletons\WxConfigSingleton;
 use Factories\SyBaseMysqlFactory;
 use Tool\Tool;
 use Traits\SimpleDaoTrait;
-use Wx\WxOpenUtil;
+use Wx\WxUtilOpen;
 
 class WxOpenDao {
     use SimpleDaoTrait;
@@ -34,7 +34,7 @@ class WxOpenDao {
      * @param array $data
      */
     private static function handleNotifyWxComponentVerifyTicket(array $data) {
-        WxOpenUtil::refreshComponentAccessToken($data['ComponentVerifyTicket']);
+        WxUtilOpen::refreshComponentAccessToken($data['ComponentVerifyTicket']);
     }
 
     /**
@@ -135,7 +135,7 @@ class WxOpenDao {
     }
 
     public static function handleNotifyWx(array $data) {
-        $incomeData = WxOpenUtil::xmlToArray($data['wx_xml']);
+        $incomeData = WxUtilOpen::xmlToArray($data['wx_xml']);
         if (!isset($incomeData['Encrypt'])) {
             return 'fail';
         }
@@ -144,8 +144,8 @@ class WxOpenDao {
         }
 
         $openCommonConfig = WxConfigSingleton::getInstance()->getOpenCommonConfig();
-        $decryptRes = WxOpenUtil::decryptMsg($incomeData['Encrypt'], $openCommonConfig->getAppId(), $openCommonConfig->getToken(), $data['msg_signature'], $data['nonce'], $data['timestamp']);
-        $msgData = WxOpenUtil::xmlToArray($decryptRes['content']);
+        $decryptRes = WxUtilOpen::decryptMsg($incomeData['Encrypt'], $openCommonConfig->getAppId(), $openCommonConfig->getToken(), $data['msg_signature'], $data['nonce'], $data['timestamp']);
+        $msgData = WxUtilOpen::xmlToArray($decryptRes['content']);
         $funcName = Tool::getArrayVal(self::$notifyWxMap, $msgData['InfoType'], null);
         if (!is_null($funcName)) {
             self::$funcName($msgData);
@@ -177,7 +177,7 @@ class WxOpenDao {
             $openCommonConfig = WxConfigSingleton::getInstance()->getOpenCommonConfig();
             $authCode = str_replace('QUERY_AUTH_CODE:', '', $data['Content']);
             //使用授权码换取公众号的授权信息
-            $authInfo = WxOpenUtil::getAuthorizerAuth($openCommonConfig->getAppId(), $authCode);
+            $authInfo = WxUtilOpen::getAuthorizerAuth($openCommonConfig->getAppId(), $authCode);
             //调用发送客服消息api回复文本消息
             $url = 'https://api.weixin.qq.com/cgi-bin/message/custom/send?access_token=' . $authInfo['data']['authorization_info']['authorizer_access_token'];
             Tool::sendCurlReq([
@@ -217,7 +217,7 @@ class WxOpenDao {
     }
 
     public static function handleNotifyAuthorizer(array $data) {
-        $incomeData = WxOpenUtil::xmlToArray($data['wx_xml']);
+        $incomeData = WxUtilOpen::xmlToArray($data['wx_xml']);
         if(!isset($incomeData['Encrypt'])){
             return 'fail';
         }
@@ -226,8 +226,8 @@ class WxOpenDao {
         }
 
         $openCommonConfig = WxConfigSingleton::getInstance()->getOpenCommonConfig();
-        $decryptRes = WxOpenUtil::decryptMsg($incomeData['Encrypt'], $openCommonConfig->getAppId(), $openCommonConfig->getToken(), $data['msg_signature'], $data['nonce'], $data['timestamp']);
-        $msgData = WxOpenUtil::xmlToArray($decryptRes['content']);
+        $decryptRes = WxUtilOpen::decryptMsg($incomeData['Encrypt'], $openCommonConfig->getAppId(), $openCommonConfig->getToken(), $data['msg_signature'], $data['nonce'], $data['timestamp']);
+        $msgData = WxUtilOpen::xmlToArray($decryptRes['content']);
         if(!isset($msgData['MsgType'])){
             return 'fail';
         }
@@ -238,7 +238,7 @@ class WxOpenDao {
         }
 
         $handleRes = self::$funcName($msgData);
-        $replyXml = WxOpenUtil::arrayToXml($handleRes);
-        return WxOpenUtil::encryptMsg($replyXml, $openCommonConfig->getAppId(), $openCommonConfig->getToken(), $decryptRes['aes_key']);
+        $replyXml = WxUtilOpen::arrayToXml($handleRes);
+        return WxUtilOpen::encryptMsg($replyXml, $openCommonConfig->getAppId(), $openCommonConfig->getToken(), $decryptRes['aes_key']);
     }
 }

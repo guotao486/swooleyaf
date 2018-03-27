@@ -46,7 +46,7 @@ class JsConfig {
         if ($platType == 'shop') { //公众号获取jsapi_ticket
             $ticket = WxUtilShop::getJsTicket($this->appId);
         } else { //第三方平台获取jsapi_ticket
-            $ticket = WxOpenUtil::getAuthorizerJsTicket($appId);
+            $ticket = WxUtilOpen::getAuthorizerJsTicket($appId);
         }
 
         $needStr = 'jsapi_ticket=' . $ticket . '&noncestr=' . $this->nonceStr . '&timestamp=' . $this->timestamp . '&url=' . WxConfigSingleton::getInstance()->getShopConfig($this->appId)->getPayAuthUrl();

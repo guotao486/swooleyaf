@@ -46,7 +46,7 @@ class WxOpenController extends CommonController {
      * @apiUse CommonFail
      */
     public function getComponentAuthUrlAction() {
-        $authUrl = \Wx\WxOpenUtil::getAuthUrl();
+        $authUrl = \Wx\WxUtilOpen::getAuthUrl();
         if(strlen($authUrl) > 0){
             $this->SyResult->setData([
                 'url' => $authUrl,

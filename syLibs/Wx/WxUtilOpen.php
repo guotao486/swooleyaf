@@ -17,7 +17,7 @@ use SyServer\BaseServer;
 use Tool\Tool;
 use Traits\SimpleTrait;
 
-final class WxOpenUtil {
+final class WxUtilOpen {
     use SimpleTrait;
 
     private static $urlComponentToken = 'https://api.weixin.qq.com/cgi-bin/component/api_component_token';
