@@ -14,7 +14,7 @@ class JsPayConfig {
     public function __construct(string $appId) {
         $this->appId = $appId;
         $this->signType = 'MD5';
-        $this->nonceStr = WxUtil::createNonceStr();
+        $this->nonceStr = WxUtilShop::createNonceStr();
     }
 
     /**
@@ -79,7 +79,7 @@ class JsPayConfig {
                 $resArr[$key] = $value;
             }
         }
-        $resArr['paySign'] = WxUtil::createSign($resArr, $this->appId);
+        $resArr['paySign'] = WxUtilShop::createSign($resArr, $this->appId);
 
         return $resArr;
     }

@@ -17,7 +17,7 @@ class PayMicro {
         $this->appid = $shopConfig->getAppId();
         $this->mch_id = $shopConfig->getPayMchId();
         $this->sign_type = 'MD5';
-        $this->nonce_str = WxUtil::createNonceStr();
+        $this->nonce_str = WxUtilShop::createNonceStr();
         $this->fee_type = 'CNY';
         $this->spbill_create_ip = $shopConfig->getClientIp();
     }
@@ -194,7 +194,7 @@ class PayMicro {
             throw new WxException('授权码不能为空', ErrorCode::WX_PARAM_ERROR);
         }
 
-        $resArr['sign'] = WxUtil::createSign($resArr, $this->appid);
+        $resArr['sign'] = WxUtilShop::createSign($resArr, $this->appid);
 
         return $resArr;
     }

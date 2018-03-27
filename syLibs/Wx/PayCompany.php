@@ -21,7 +21,7 @@ class PayCompany {
         $shopConfig = WxConfigSingleton::getInstance()->getShopConfig($appId);
         $this->mch_appid = $shopConfig->getAppId();
         $this->mchid = $shopConfig->getPayMchId();
-        $this->nonce_str = WxUtil::createNonceStr();
+        $this->nonce_str = WxUtilShop::createNonceStr();
         $this->spbill_create_ip = $shopConfig->getClientIp();
     }
 
@@ -187,7 +187,7 @@ class PayCompany {
             throw new WxException('收款用户姓名不能为空', ErrorCode::WX_PARAM_ERROR);
         }
 
-        $resArr['sign'] = WxUtil::createSign($resArr, $this->mch_appid);
+        $resArr['sign'] = WxUtilShop::createSign($resArr, $this->mch_appid);
 
         return $resArr;
     }

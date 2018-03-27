@@ -13,7 +13,7 @@ class JsConfig {
     public function __construct(string $appId) {
         $this->appId = $appId;
         $this->timestamp = time();
-        $this->nonceStr = WxUtil::createNonceStr();
+        $this->nonceStr = WxUtilShop::createNonceStr();
     }
 
     /**
@@ -44,7 +44,7 @@ class JsConfig {
         ];
 
         if ($platType == 'shop') { //公众号获取jsapi_ticket
-            $ticket = WxUtil::getJsTicket($this->appId);
+            $ticket = WxUtilShop::getJsTicket($this->appId);
         } else { //第三方平台获取jsapi_ticket
             $ticket = WxOpenUtil::getAuthorizerJsTicket($appId);
         }

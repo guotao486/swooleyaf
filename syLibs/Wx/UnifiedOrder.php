@@ -45,7 +45,7 @@ class UnifiedOrder {
 
         $shopConfig = WxConfigSingleton::getInstance()->getShopConfig($appId);
         $this->fee_type = 'CNY';
-        $this->nonce_str = WxUtil::createNonceStr();
+        $this->nonce_str = WxUtilShop::createNonceStr();
         $this->appid = $shopConfig->getAppId();
         $this->mch_id = $shopConfig->getPayMchId();
         $this->notify_url = $shopConfig->getPayNotifyUrl();
@@ -348,7 +348,7 @@ class UnifiedOrder {
             }
         }
 
-        $resArr['sign'] = WxUtil::createSign($resArr, $this->appid);
+        $resArr['sign'] = WxUtilShop::createSign($resArr, $this->appid);
 
         return $resArr;
     }

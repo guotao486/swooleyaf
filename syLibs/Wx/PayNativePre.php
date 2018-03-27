@@ -87,7 +87,7 @@ class PayNativePre {
             throw  new WxException('商品ID不能为空', ErrorCode::WX_PARAM_ERROR);
         }
 
-        $resArr['sign'] = WxUtil::createSign($resArr, $this->appid);
+        $resArr['sign'] = WxUtilShop::createSign($resArr, $this->appid);
 
         return $resArr;
     }

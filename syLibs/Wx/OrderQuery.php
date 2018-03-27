@@ -17,7 +17,7 @@ class OrderQuery {
         $this->appid = $shopConfig->getAppId();
         $this->mch_id = $shopConfig->getPayMchId();
         $this->sign_type = 'MD5';
-        $this->nonce_str = WxUtil::createNonceStr();
+        $this->nonce_str = WxUtilShop::createNonceStr();
     }
 
     /**
@@ -103,7 +103,7 @@ class OrderQuery {
             throw new WxException('微信订单号与商户订单号不能同时为空', ErrorCode::WX_PARAM_ERROR);
         }
 
-        $resArr['sign'] = WxUtil::createSign($resArr, $this->appid);
+        $resArr['sign'] = WxUtilShop::createSign($resArr, $this->appid);
 
         return $resArr;
     }
