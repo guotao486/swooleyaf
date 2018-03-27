@@ -17,7 +17,7 @@ use SyServer\BaseServer;
 use Tool\Tool;
 use Traits\SimpleTrait;
 
-final class WxUtilOpen {
+final class WxUtilOpen extends WxUtilBase {
     use SimpleTrait;
 
     private static $urlComponentToken = 'https://api.weixin.qq.com/cgi-bin/component/api_component_token';
@@ -27,111 +27,6 @@ final class WxUtilOpen {
     private static $urlAuthUrl = 'https://mp.weixin.qq.com/cgi-bin/componentloginpage?component_appid=';
     private static $urlAuthorizerAuth = 'https://api.weixin.qq.com/cgi-bin/component/api_query_auth?component_access_token=';
     private static $urlSendCustom = 'https://api.weixin.qq.com/cgi-bin/message/custom/send?access_token=';
-
-    /**
-     * 数组转xml
-     * @param array $data
-     * @return string
-     * @throws \Exception\Wx\WxOpenException
-     */
-    public static function arrayToXml(array $data) : string {
-        if (count($data) == 0) {
-            throw new WxOpenException('数组为空', ErrorCode::WXOPEN_PARAM_ERROR);
-        }
-
-        $xml = '<xml>';
-        foreach ($data as $key => $value) {
-            if (is_numeric($value)) {
-                $xml .= '<' . $key . '>' . $value . '</' . $key . '>';
-            } else {
-                $xml .= '<' . $key . '><![CDATA[' . $value . ']]></' . $key . '>';
-            }
-        }
-        $xml .= '</xml>';
-
-        return $xml;
-    }
-
-    /**
-     * xml转数组
-     * @param string $xml
-     * @return array
-     * @throws \Exception\Wx\WxOpenException
-     */
-    public static function xmlToArray(string $xml) : array {
-        if (strlen($xml . '') == 0) {
-            throw new WxOpenException('xml数据异常', ErrorCode::WXOPEN_PARAM_ERROR);
-        }
-
-        //禁止引用外部xml实体
-        libxml_disable_entity_loader(true);
-        $element = simplexml_load_string($xml, 'SimpleXMLElement', LIBXML_NOCDATA);
-        $jsonStr = Tool::jsonEncode($element);
-        return Tool::jsonDecode($jsonStr);
-    }
-
-    /**
-     * 发送post请求
-     * @param string $url 请求地址
-     * @param string|array $data 数据
-     * @param array $configs 配置数组
-     * @return mixed
-     * @throws \Exception\Wx\WxOpenException
-     */
-    private static function sendPost(string $url, $data,array $configs=[]) {
-        if (is_string($data)) {
-            $dataStr = $data;
-        } else if (is_array($data)) {
-            if (isset($configs['data_type']) && ($configs['data_type'] == 'xml')) {
-                $dataStr = self::arrayToXml($data);
-            } else if (isset($configs['data_type']) && ($configs['data_type'] == 'json')) {
-                $dataStr = Tool::jsonEncode($data, JSON_UNESCAPED_UNICODE);
-            } else {
-                $dataStr = http_build_query($data);
-            }
-        } else {
-            throw new WxOpenException('数据格式不合法', ErrorCode::WXOPEN_PARAM_ERROR);
-        }
-
-        $timeout = (int)Tool::getArrayVal($configs, 'timeout', 2000);
-        $headers = Tool::getArrayVal($configs, 'headers', false);
-        $sendRes = Tool::sendCurlReq([
-            CURLOPT_URL => $url,
-            CURLOPT_POST => true,
-            CURLOPT_POSTFIELDS => $dataStr,
-            CURLOPT_TIMEOUT_MS => $timeout,
-            CURLOPT_HEADER => $headers,
-            CURLOPT_RETURNTRANSFER => true,
-        ]);
-        if ($sendRes['res_no'] == 0) {
-            return $sendRes['res_content'];
-        } else {
-            throw new WxOpenException('curl出错，错误码=' . $sendRes['res_no'], ErrorCode::WXOPEN_POST_ERROR);
-        }
-    }
-
-    /**
-     * 发送get请求
-     * @param string $url 请求地址
-     * @param int $timeout 执行超时时间，默认2s
-     * @return mixed
-     * @throws \Exception\Wx\WxOpenException
-     */
-    private static function sendGetReq(string $url,int $timeout=2000) {
-        $sendRes = Tool::sendCurlReq([
-            CURLOPT_URL => $url,
-            CURLOPT_TIMEOUT_MS => $timeout,
-            CURLOPT_SSL_VERIFYPEER => false,
-            CURLOPT_SSL_VERIFYHOST => false,
-            CURLOPT_HEADER => false,
-            CURLOPT_RETURNTRANSFER => true,
-        ]);
-        if ($sendRes['res_no'] == 0) {
-            return $sendRes['res_content'];
-        } else {
-            throw new WxOpenException('curl出错，错误码=' . $sendRes['res_no'], ErrorCode::WXOPEN_GET_ERROR);
-        }
-    }
 
     /**
      * 更新平台access token
