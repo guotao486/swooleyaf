@@ -82,7 +82,7 @@ class ShortUrl {
             throw  new WxException('长链接不能为空', ErrorCode::WX_PARAM_ERROR);
         }
 
-        $resArr['sign'] = WxUtil::createSign($resArr, $this->appid);
+        $resArr['sign'] = WxUtilShop::createSign($resArr, $this->appid);
 
         return $resArr;
     }

@@ -23,7 +23,7 @@ use Tool\Tool;
 use Traits\SimpleDaoTrait;
 use Wx\PayNativePre;
 use Wx\UnifiedOrder;
-use Wx\WxUtil;
+use Wx\WxUtilShop;
 
 class PayDao {
     use SimpleDaoTrait;
@@ -99,7 +99,7 @@ class PayDao {
         $order->setOutTradeNo($data['content_result']['pay_sn']);
         $order->setAttach($data['content_result']['pay_attach']);
         $order->setOpenid($data['a00_openid']);
-        $applyRes = WxUtil::applyJsPay($order, 'shop');
+        $applyRes = WxUtilShop::applyJsPay($order, 'shop');
         unset($order);
         if($applyRes['code'] > 0){
             throw new CheckException($applyRes['message'], ErrorCode::COMMON_PARAM_ERROR);
@@ -117,7 +117,7 @@ class PayDao {
         $order->setTotalFee($data['content_result']['pay_money']);
         $order->setOutTradeNo($data['content_result']['pay_sn']);
         $order->setAttach($data['content_result']['pay_attach']);
-        $applyRes = WxUtil::applyNativePay($order);
+        $applyRes = WxUtilShop::applyNativePay($order);
         unset($order);
         if($applyRes['code'] > 0){
             throw new CheckException($applyRes['message'], ErrorCode::COMMON_PARAM_ERROR);
@@ -131,7 +131,7 @@ class PayDao {
     private static function payTypeHandleWxNativeStatic(array $data) {
         $prePay = new PayNativePre($data['a00_appid']);
         $prePay->setProductId($data['content_result']['pay_sn']);
-        $applyRes = WxUtil::applyPreNativePay($prePay);
+        $applyRes = WxUtilShop::applyPreNativePay($prePay);
         unset($prePay);
 
         $redisKey = Server::REDIS_PREFIX_WX_NATIVE_PRE . $data['content_result']['pay_sn'];

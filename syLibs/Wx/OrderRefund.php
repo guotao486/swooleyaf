@@ -17,7 +17,7 @@ class OrderRefund {
         $this->appid = $shopConfig->getAppId();
         $this->mch_id = $shopConfig->getPayMchId();
         $this->sign_type = 'MD5';
-        $this->nonce_str = WxUtil::createNonceStr();
+        $this->nonce_str = WxUtilShop::createNonceStr();
         $this->refund_fee_type = 'CNY';
         $this->op_user_id = $shopConfig->getPayMchId();
     }
@@ -189,7 +189,7 @@ class OrderRefund {
             throw new WxException('订单金额必须大于等于退款金额', ErrorCode::WX_PARAM_ERROR);
         }
 
-        $resArr['sign'] = WxUtil::createSign($resArr, $this->appid);
+        $resArr['sign'] = WxUtilShop::createSign($resArr, $this->appid);
 
         return $resArr;
     }

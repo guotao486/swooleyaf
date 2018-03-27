@@ -17,7 +17,7 @@ class OrderBill {
         $this->appid = $shopConfig->getAppId();
         $this->mch_id = $shopConfig->getPayMchId();
         $this->sign_type = 'MD5';
-        $this->nonce_str = WxUtil::createNonceStr();
+        $this->nonce_str = WxUtilShop::createNonceStr();
         $this->tar_type = 'GZIP';
         $this->bill_type = 'ALL';
     }
@@ -113,7 +113,7 @@ class OrderBill {
             throw new WxException('对账单日期不能为空', ErrorCode::WX_PARAM_ERROR);
         }
 
-        $resArr['sign'] = WxUtil::createSign($resArr, $this->appid);
+        $resArr['sign'] = WxUtilShop::createSign($resArr, $this->appid);
 
         return $resArr;
     }

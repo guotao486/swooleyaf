@@ -17,7 +17,7 @@ use SyServer\BaseServer;
 use Tool\Tool;
 use Traits\SimpleTrait;
 
-final class WxUtil {
+final class WxUtilShop {
     use SimpleTrait;
 
     private static $urlUnifiedOrder = 'https://api.mch.weixin.qq.com/pay/unifiedorder';

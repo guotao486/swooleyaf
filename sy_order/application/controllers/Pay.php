@@ -91,7 +91,7 @@ class PayController extends CommonController {
             $order->setOutTradeNo($orderSn);
             $order->setTotalFee($cacheData['pay_money']);
             $order->setAttach($cacheData['pay_attach']);
-            $applyRes = \Wx\WxUtil::applyNativePay($order);
+            $applyRes = \Wx\WxUtilShop::applyNativePay($order);
             if($applyRes['code'] == 0){
                 $returnObj->setNonceStr($nonceStr);
                 $returnObj->setPrepayId($applyRes['data']['prepay_id']);
@@ -105,7 +105,7 @@ class PayController extends CommonController {
         //返回结果
         $resData = $returnObj->getDetail();
         $this->SyResult->setData([
-            'result' => \Wx\WxUtil::arrayToXml($resData),
+            'result' => \Wx\WxUtilShop::arrayToXml($resData),
         ]);
         unset($returnObj);
 
