@@ -281,7 +281,7 @@ final class WxUtilShop extends WxUtilBase {
 
         $redisKey = Server::REDIS_PREFIX_WX_ACCOUNT . $appId;
         $redisData = CacheSimpleFactory::getRedisInstance()->hGetAll($redisKey);
-        if (is_array($redisData) && isset($redisData['unique_key']) && ($redisData['unique_key'] == $redisKey) && ($redisData['expire_time'] >= $nowTime)) {
+        if (isset($redisData['unique_key']) && ($redisData['unique_key'] == $redisKey) && ($redisData['expire_time'] >= $nowTime)) {
             $expireTime = (int)$redisData['expire_time'];
             BaseServer::setProjectCache($localTagJsTicket, [
                 'value' => $redisData['js_ticket'],
