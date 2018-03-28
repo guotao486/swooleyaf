@@ -83,7 +83,7 @@ class SySession {
             $refreshTag = true;
         }
 
-        if (is_array($cacheData) && isset($cacheData['session_id']) && ($cacheData['session_id'] == $token)) {
+        if (isset($cacheData['session_id']) && ($cacheData['session_id'] == $token)) {
             if($refreshTag){
                 BaseServer::addLocalUserInfo($token, $cacheData);
             }
