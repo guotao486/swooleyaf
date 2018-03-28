@@ -78,7 +78,7 @@ final class WxUtilOpen extends WxUtilBase {
 
         $redisKey = Server::REDIS_PREFIX_WX_COMPONENT_ACCOUNT . $appId;
         $redisData = CacheSimpleFactory::getRedisInstance()->hGetAll($redisKey);
-        if(is_array($redisData) && isset($redisData['unique_key']) && ($redisData['unique_key'] == $redisKey)){
+        if(isset($redisData['unique_key']) && ($redisData['unique_key'] == $redisKey)){
             BaseServer::setProjectCache($localKey, [
                 'value' => $redisData['access_token'],
                 'add_time' => (int)$redisData['expire_time'],
@@ -209,7 +209,7 @@ final class WxUtilOpen extends WxUtilBase {
         $nowTime = time();
         $redisKey = Server::REDIS_PREFIX_WX_COMPONENT_AUTHORIZER . $appId;
         $redisData = CacheSimpleFactory::getRedisInstance()->hGetAll($redisKey);
-        if(is_array($redisData) && isset($redisData['unique_key']) && ($redisData['unique_key'] == $redisKey) && ($redisData['expire_time'] >= $nowTime)){
+        if(isset($redisData['unique_key']) && ($redisData['unique_key'] == $redisKey) && ($redisData['expire_time'] >= $nowTime)){
             return $redisData['access_token'];
         }
 
@@ -227,7 +227,7 @@ final class WxUtilOpen extends WxUtilBase {
         $nowTime = time();
         $redisKey = Server::REDIS_PREFIX_WX_COMPONENT_AUTHORIZER . $appId;
         $redisData = CacheSimpleFactory::getRedisInstance()->hGetAll($redisKey);
-        if(is_array($redisData) && isset($redisData['unique_key']) && ($redisData['unique_key'] == $redisKey) && ($redisData['expire_time'] >= $nowTime)){
+        if(isset($redisData['unique_key']) && ($redisData['unique_key'] == $redisKey) && ($redisData['expire_time'] >= $nowTime)){
             return $redisData['js_ticket'];
         }
 

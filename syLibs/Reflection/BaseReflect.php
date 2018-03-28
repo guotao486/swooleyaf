@@ -80,20 +80,12 @@ class BaseReflect {
                 $data = Tool::jsonDecode($eAnnotation);
                 if(!is_array($data)){
                     throw new ReflectException('数据校验格式不正确', ErrorCode::REFLECT_ANNOTATION_DATA_ERROR);
-                } else if(!isset($data['field'])){
-                    throw new ReflectException('字段名称必须填写', ErrorCode::REFLECT_ANNOTATION_DATA_ERROR);
                 } else if(!is_string($data['field'])){
                     throw new ReflectException('字段名称必须为字符串', ErrorCode::REFLECT_ANNOTATION_DATA_ERROR);
-                } else if(!isset($data['explain'])){
-                    throw new ReflectException('字段解释必须填写', ErrorCode::REFLECT_ANNOTATION_DATA_ERROR);
                 } else if(!is_string($data['explain'])){
                     throw new ReflectException('字段解释必须为字符串', ErrorCode::REFLECT_ANNOTATION_DATA_ERROR);
-                } else if(!isset($data['type'])){
-                    throw new ReflectException('校验器类型必须填写', ErrorCode::REFLECT_ANNOTATION_DATA_ERROR);
                 } else if(!is_string($data['type'])){
                     throw new ReflectException('校验器类型必须为字符串', ErrorCode::REFLECT_ANNOTATION_DATA_ERROR);
-                } else if(!isset($data['rules'])){
-                    throw new ReflectException('校验规则必须填写', ErrorCode::REFLECT_ANNOTATION_DATA_ERROR);
                 } else if(!is_array($data['rules'])){
                     throw new ReflectException('校验规则必须为数组', ErrorCode::REFLECT_ANNOTATION_DATA_ERROR);
                 }
