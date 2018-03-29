@@ -186,7 +186,7 @@ class TaskDao {
         $timeStr = str_replace('/\s+/', ' ', trim(SyRequest::getParams('task_time')));
         if (strlen($timeStr) == 0) {
             throw new CheckException('任务时间不合法', ErrorCode::TIMER_PARAM_ERROR);
-        } else if (preg_match('/^(\=(\*|\d+(\,\d+)*|\d+\-\d+(\,\d+\-\d+)*)(\/\d+){0,1}){6}$/', ' ' . $timeStr) == 0) {
+        } else if (preg_match('/^(\s(\*|\d+(\,\d+)*|\d+\-\d+(\,\d+\-\d+)*)(\/\d+){0,1}){6}$/', ' ' . $timeStr) == 0) {
             throw new CheckException('cron格式不合法', ErrorCode::COMMON_PARAM_ERROR);
         }
         CronTool::analyseCron($timeStr);
