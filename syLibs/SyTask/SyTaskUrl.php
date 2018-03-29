@@ -100,7 +100,7 @@ class SyTaskUrl {
             } else {
                 $this->exec_obj .= '&';
             }
-            $this->exec_obj .= http_build_query($execObj);
+            $this->exec_obj .= http_build_query($params);
         }
     }
 
