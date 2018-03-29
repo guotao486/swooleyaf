@@ -266,22 +266,26 @@ class CronData {
      * @return bool
      */
     public function checkTime(array $timeArr) : bool {
-        if (!$this->checkSecond((int)$timeArr[0])) {
+        if (empty($timeArr)) {
             return false;
         }
-        if (!$this->checkMinute((int)$timeArr[1])) {
+
+        if (!$this->checkSecond($timeArr['second'])) {
             return false;
         }
-        if (!$this->checkHour((int)$timeArr[2])) {
+        if (!$this->checkMinute($timeArr['minute'])) {
             return false;
         }
-        if (!$this->checkDay((int)$timeArr[3])) {
+        if (!$this->checkHour($timeArr['hour'])) {
             return false;
         }
-        if (!$this->checkMonth((int)$timeArr[4])) {
+        if (!$this->checkDay($timeArr['day'])) {
             return false;
         }
-        if (!$this->checkWeek((int)$timeArr[5])) {
+        if (!$this->checkMonth($timeArr['month'])) {
+            return false;
+        }
+        if (!$this->checkWeek($timeArr['week'])) {
             return false;
         }
 
