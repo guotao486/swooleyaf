@@ -262,15 +262,10 @@ class CronData {
 
     /**
      * 校验时间戳是否满足cron计划
-     * @param int $timestamp
+     * @param array $timeArr
      * @return bool
      */
-    public function checkTime(int $timestamp) : bool {
-        if (preg_match('/^[1-4]\d{9}$/', $timestamp) == 0) {
-            return false;
-        }
-
-        $timeArr = explode('-', date('s-i-G-j-n-w', $timestamp));
+    public function checkTime(array $timeArr) : bool {
         if (!$this->checkSecond((int)$timeArr[0])) {
             return false;
         }
