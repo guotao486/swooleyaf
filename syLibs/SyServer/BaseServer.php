@@ -404,10 +404,14 @@ abstract class BaseServer {
      */
     protected function clearLocalUsers() {
         $time = time() - 300;
+        $delKeys = [];
         foreach (self::$_syUsers as $eUser) {
             if($eUser['add_time'] <= $time){
-                self::$_syUsers->del($eUser['session_id']);
+                $delKeys[] = $eUser['session_id'];
             }
+        }
+        foreach ($delKeys as $eKey) {
+            self::$_syUsers->del($eKey);
         }
         self::$_syUserNowNum = count(self::$_syUsers);
     }
