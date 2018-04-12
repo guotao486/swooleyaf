@@ -131,4 +131,7 @@ final class Server {
     const PAY_TYPE_WX_NATIVE_STATIC = 'a002'; //类型-微信静态扫码支付
     const PAY_TYPE_ALI_CODE = 'a100'; //类型-支付宝扫码支付
     const PAY_TYPE_ALI_WEB = 'a101'; //类型-支付宝网页支付
+
+    //时间常量
+    const TIME_EXPIRE_LOCAL_USER_CACHE = 300; //超时时间-本地用户缓存,单位为秒
 }

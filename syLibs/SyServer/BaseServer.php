@@ -403,7 +403,7 @@ abstract class BaseServer {
      * 清理本地用户信息缓存
      */
     protected function clearLocalUsers() {
-        $time = time() - 300;
+        $time = time() - Server::TIME_EXPIRE_LOCAL_USER_CACHE;
         $delKeys = [];
         foreach (self::$_syUsers as $eUser) {
             if($eUser['add_time'] <= $time){
