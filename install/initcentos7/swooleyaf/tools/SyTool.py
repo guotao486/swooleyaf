@@ -350,14 +350,14 @@ class SyTool():
             run('rm -rf yaconf-1.0.7.tgz')
 
         # 扩展yaf
-        extYafLocal = ''.join([syDicts['path.package.local'], '/resources/php7/yaf-3.0.6.tgz'])
-        extYafRemote = ''.join([syDicts['path.package.remote'], '/yaf-3.0.6.tgz'])
+        extYafLocal = ''.join([syDicts['path.package.local'], '/resources/php7/yaf-3.0.7.tgz'])
+        extYafRemote = ''.join([syDicts['path.package.remote'], '/yaf-3.0.7.tgz'])
         put(extYafLocal, extYafRemote)
         with cd(syDicts['path.package.remote']):
-            run('tar -zxvf yaf-3.0.6.tgz')
-            run('cd yaf-3.0.6/ && /usr/local/php7/bin/phpize && ./configure --with-php-config=/usr/local/php7/bin/php-config && make && make install')
-            run('rm -rf yaf-3.0.6/')
-            run('rm -rf yaf-3.0.6.tgz')
+            run('tar -zxvf yaf-3.0.7.tgz')
+            run('cd yaf-3.0.7/ && /usr/local/php7/bin/phpize && ./configure --with-php-config=/usr/local/php7/bin/php-config && make && make install')
+            run('rm -rf yaf-3.0.7/')
+            run('rm -rf yaf-3.0.7.tgz')
 
         # 扩展swoole
         extSwooleJemallocLocal = ''.join([syDicts['path.package.local'], '/resources/php7/jemalloc-4.5.0.tar.bz2'])
