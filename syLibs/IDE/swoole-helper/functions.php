@@ -48,9 +48,19 @@ function swoole_event_defer($callback){}
 
 /**
  * @param $callback[required]
+ * @param $before[optional]
  * @return mixed
  */
-function swoole_event_cycle($callback){}
+function swoole_event_cycle($callback, $before=null){}
+
+function swoole_event_dispatch(){}
+
+/**
+ * @param $fd[required]
+ * @param $events[optional]
+ * @return mixed
+ */
+function swoole_event_isset($fd, $events=null){}
 
 /**
  * @param $ms[required]
