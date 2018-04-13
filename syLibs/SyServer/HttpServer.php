@@ -127,11 +127,15 @@ class HttpServer extends BaseServer {
      * 清理签名缓存
      */
     private function clearApiSign() {
-        $time = time() - 300;
+        $time = time() - Server::TIME_EXPIRE_LOCAL_API_SIGN_CACHE;
+        $delKeys = [];
         foreach (self::$_sySigns as $eSign) {
-            if ($eSign['time'] <= $time) {
-                self::$_sySigns->del($eSign['sign']);
+            if($eSign['time'] <= $time){
+                $delKeys[] = $eSign['sign'];
             }
+        }
+        foreach ($delKeys as $eKey) {
+            self::$_sySigns->del($eKey);
         }
         self::$_sySignNowNum = count(self::$_sySigns);
     }
