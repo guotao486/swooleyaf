@@ -2,7 +2,7 @@
 namespace Swoole;
 
 /**
- * @since 1.10.1
+ * @since 1.10.4
  */
 class Serialize
 {

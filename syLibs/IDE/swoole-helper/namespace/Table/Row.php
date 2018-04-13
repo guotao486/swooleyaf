@@ -2,7 +2,7 @@
 namespace Swoole\Table;
 
 /**
- * @since 1.10.1
+ * @since 1.10.4
  */
 class Row
 {

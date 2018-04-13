@@ -2,7 +2,7 @@
 namespace Swoole;
 
 /**
- * @since 1.10.1
+ * @since 1.10.4
  */
 class Process
 {
@@ -70,6 +70,12 @@ class Process
      * @return mixed
      */
     public function setTimeout($seconds){}
+
+    /**
+     * @param $blocking[required]
+     * @return mixed
+     */
+    public function setBlocking($blocking){}
 
     /**
      * @param $key[optional]
