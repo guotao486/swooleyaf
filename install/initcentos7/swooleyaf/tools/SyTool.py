@@ -492,6 +492,9 @@ class SyTool():
         with cd('/usr/local/mysql'):
             run('./scripts/mysql_install_db --user=mysql --basedir=/usr/local/mysql --datadir=/usr/local/mysql/data')
 
+        run('echo "/usr/local/mysql/lib" > /etc/ld.so.conf.d/mysql.conf')
+        run('ldconfig')
+
         mysqlServiceLocal = ''.join([syDicts['path.package.local'], '/configs/swooleyaf/mysql/mysql.service'])
         mysqlServiceRemote = '/lib/systemd/system/mysql.service'
         put(mysqlServiceLocal, mysqlServiceRemote)
