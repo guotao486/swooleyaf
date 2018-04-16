@@ -456,6 +456,7 @@ class SyTool():
         ftpUserLocal = ''.join([syDicts['path.package.local'], '/configs/swooleyaf/ftp/vftpuser.txt'])
         ftpUserRemote = '/etc/vsftpd/vftpuser.txt'
         put(ftpUserLocal, ftpUserRemote)
+        run('echo "" >> %s' % ftpUserRemote, False)
         run('db_load -T -t hash -f %s /etc/vsftpd/vftpuser.db' % ftpUserRemote)
         ftpdLocal = ''.join([syDicts['path.package.local'], '/configs/swooleyaf/ftp/vsftpd'])
         ftpdRemote = '/etc/pam.d/vsftpd'
