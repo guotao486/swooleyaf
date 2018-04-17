@@ -1,0 +1,10 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=Navicat Premium
+Comment=The Smarter Way to manage dadabase
+Exec=/bin/sh "/home/jw/softwares/navicat/start_navicat"
+Icon=/home/jw/softwares/navicat/navicat.png
+Categories=Application;Database;MySQL;navicat
+Version=1.0
+Type=Application
+Terminal=0
