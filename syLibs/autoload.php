@@ -65,7 +65,7 @@ final class SyFrameLoader {
         if(isset($this->smartyRootClasses[$lowerClassName])){
             $file = SMARTY_DIR . $this->smartyRootClasses[$lowerClassName];
         } else {
-            $file = SMARTY_SYSPLUGINS_DIR . strtolower($className) . '.php';
+            $file = SMARTY_SYSPLUGINS_DIR . $lowerClassName . '.php';
         }
 
         return $file;
