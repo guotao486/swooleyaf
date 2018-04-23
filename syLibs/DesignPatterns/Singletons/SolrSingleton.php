@@ -24,6 +24,10 @@ class SolrSingleton {
      * @var string
      */
     private $core = '';
+    /**
+     * @var string
+     */
+    private $authToken = '';
 
     private function __construct() {
         $this->init();
@@ -43,6 +47,12 @@ class SolrSingleton {
         $coreName = (string)Tool::getArrayVal($configs, 'core.name', '', true);
         if(preg_match('/^[0-9a-zA-Z]{2,50}$/', $coreName) == 0){
             throw new SolrException('core名称不合法', ErrorCode::SOLR_PARAM_ERROR);
+        }
+
+        $userName = (string)Tool::getArrayVal($configs, 'user.name', '', true);
+        if(strlen($userName) > 0){
+            $userPwd = (string)Tool::getArrayVal($configs, 'user.password', '', true);
+            $this->authToken = 'Basic ' . base64_encode($userName . ':' . $userPwd);
         }
 
         $this->server = $connectUrl;
@@ -231,17 +241,23 @@ class SolrSingleton {
         $dataStr = Tool::jsonEncode($data, JSON_UNESCAPED_UNICODE);
         $url = $this->server . $this->core . $method;
 
+        $httpHeaders = [
+            'Content-Type: application/json',
+            'Content-Length: ' . strlen($dataStr),
+            'Expect:',
+        ];
+        if(strlen($this->authToken) > 0){
+            $httpHeaders[] = 'Authorization: ' . $this->authToken;
+        }
         $sendRes = Tool::sendCurlReq([
             CURLOPT_URL => $url,
             CURLOPT_CUSTOMREQUEST => "POST",
             CURLOPT_POSTFIELDS => $dataStr,
             CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_HTTPHEADER => [
-                'Content-Type: application/json',
-                'Content-Length: ' . strlen($dataStr),
-                'Expect:',
-            ],
+            CURLOPT_HEADER => false,
+            CURLOPT_HTTPHEADER => $httpHeaders,
         ]);
+
         if($sendRes['res_no'] == 0){
             $resData = Tool::jsonDecode($sendRes['res_content']);
             if(is_array($resData)){
@@ -279,10 +295,18 @@ class SolrSingleton {
             }
         }
 
+        $httpHeaders = [
+            'Content-Type: application/json',
+        ];
+        if(strlen($this->authToken) > 0){
+            $httpHeaders[] = 'Authorization: ' . $this->authToken;
+        }
+
         $sendRes = Tool::sendCurlReq([
             CURLOPT_URL => $url,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_HEADER => false,
+            CURLOPT_HTTPHEADER => $httpHeaders,
         ]);
         if($sendRes['res_no'] == 0){
             $resData = Tool::jsonDecode($sendRes['res_content']);
