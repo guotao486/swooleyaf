@@ -345,7 +345,7 @@ abstract class BaseServer {
      */
     public function killZombies(){
         $ids = [];
-        $commandFind = 'ps -aux|grep ' . SY_MODULE . '|awk \'{if($8 == "Z") print $2}\'';
+        $commandFind = 'ps -A -o pid,ppid,stat,cmd|grep ' . SY_MODULE . '|awk \'{if(($3 == "Z") || ($3 == "z")) print $1}\'';
         exec($commandFind, $ids);
         if(!empty($ids)){
             $commandKill = 'kill -9 ' . implode(' ', $ids);
