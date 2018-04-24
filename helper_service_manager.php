@@ -100,6 +100,15 @@ switch ($command) {
             }
         }
         break;
+    case 'kz-all' :
+        foreach ($projects as $name => $eProject) {
+            if ($eProject['type'] == 'module') {
+                foreach ($eProject['listens'] as $eListen) {
+                    controllerLog($sudo, $name, '-s kz -module ' . $eProject['module_name'] . ' -port ' . $eListen['port']);
+                }
+            }
+        }
+        break;
     case 'commit-all' :
         $message = 'auto commit at ' . date('Y-m-d H:i:s');
         foreach ($projects as $name => $eProject) {

@@ -310,7 +310,7 @@ abstract class BaseServer {
      */
     public function help(){
         print_r('帮助信息' . PHP_EOL);
-        print_r('-s 操作类型: restart-重启 stop-关闭 start-启动' . PHP_EOL);
+        print_r('-s 操作类型: restart-重启 stop-关闭 start-启动 kz-清理僵尸进程' . PHP_EOL);
         print_r('-n 项目名' . PHP_EOL);
         print_r('-module 模块名' . PHP_EOL);
         print_r('-port 端口,取值范围为1001-65535' . PHP_EOL);
@@ -338,6 +338,22 @@ abstract class BaseServer {
         system($str);
 
         exit();
+    }
+
+    /**
+     * 清理僵尸进程
+     */
+    public function killZombies(){
+        $ids = [];
+        $commandFind = 'ps -aux|grep ' . SY_MODULE . '|awk \'{if($8 == "Z") print $2}\'';
+        exec($commandFind, $ids);
+        if(!empty($ids)){
+            $commandKill = 'kill -9 ' . implode(' ', $ids);
+            system($commandKill);
+        }
+
+        $commandTip = 'echo -e "\e[1;36m kill ' . SY_MODULE . ' zombies: \e[0m \e[1;32m \t[success] \e[0m"';
+        system($commandTip);
     }
 
     /**
