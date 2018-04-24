@@ -55,6 +55,9 @@ switch ($action) {
         sleep(1);
         $server->start();
         break;
+    case 'kz' :
+        $server->killZombies();
+        break;
     default :
         $server->help();
 }
