@@ -23,6 +23,7 @@ use Entities\SyBase\UserMoneyHistoryEntity;
 use Entities\SyBase\WithdrawBaseEntity;
 use Entities\SyBase\WithdrawHistoryEntity;
 use Entities\SyBase\WxopenAuthorizerEntity;
+use Entities\SyBase\WxshopConfigEntity;
 use Traits\SimpleTrait;
 
 class SyBaseMysqlFactory {
@@ -123,5 +124,11 @@ class SyBaseMysqlFactory {
      */
     public static function WxopenAuthorizerEntity(){
         return new WxopenAuthorizerEntity();
+    }
+    /**
+     * @return \Entities\SyBase\WxshopConfigEntity
+     */
+    public static function WxshopConfigEntity(){
+        return new WxshopConfigEntity();
     }
 }
