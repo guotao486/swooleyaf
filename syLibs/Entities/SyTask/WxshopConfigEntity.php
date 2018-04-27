@@ -27,6 +27,12 @@ class WxshopConfigEntity extends MysqlEntity {
     public $app_secret = '';
 
     /**
+     * 公众号客户端ip
+     * @var string
+     */
+    public $app_clientip = '';
+
+    /**
      * 公众号模板列表
      * @var string
      */
