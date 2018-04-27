@@ -491,12 +491,20 @@ final class WxUtilShop extends WxUtilBase {
 
         $refundDetail = $refund->getDetail();
         $shopConfig = WxConfigSingleton::getInstance()->getShopConfig($refundDetail['appid']);
+        $tmpKey = tmpfile();
+        fwrite($tmpKey, $shopConfig->getSslKey());
+        $tmpKeyData = stream_get_meta_data($tmpKey);
+        $tmpCert = tmpfile();
+        fwrite($tmpCert, $shopConfig->getSslCert());
+        $tmpCertData = stream_get_meta_data($tmpCert);
         $reqXml = self::arrayToXml($refundDetail);
         $resXml = self::sendPost(self::$urlOrderRefund, $reqXml, [
             'use_cert' => true,
-            'sslcert_path' => $shopConfig->getSslCert(),
-            'sslkey_path' => $shopConfig->getSslKey(),
+            'sslcert_path' => $tmpCertData['uri'],
+            'sslkey_path' => $tmpKeyData['uri'],
         ]);
+        fclose($tmpKey);
+        fclose($tmpCert);
         $resData = self::xmlToArray($resXml);
         if ($resData['return_code'] == 'FAIL') {
             $resArr['code'] = ErrorCode::WX_POST_ERROR;
