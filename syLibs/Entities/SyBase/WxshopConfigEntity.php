@@ -63,13 +63,13 @@ class WxshopConfigEntity extends MysqlEntity {
     public $payurl_notify = '';
 
     /**
-     * 公众号商户证书内容
+     * 公众号商户证书内容，去除证书文件的第一行和最后一行以及所有换行
      * @var string
      */
     public $payssl_cert = '';
 
     /**
-     * 公众号商户密钥内容
+     * 公众号商户密钥内容，去除密钥文件的第一行和最后一行以及所有换行
      * @var string
      */
     public $payssl_key = '';

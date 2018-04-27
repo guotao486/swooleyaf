@@ -91,15 +91,6 @@ class WxConfigSingleton {
     }
 
     /**
-     * 获取商户平台app id
-     * @param string $tag 商户标识
-     * @return string|null
-     */
-    public function getShopAppId(string $tag) {
-        return Tool::getArrayVal($this->shopApps, $tag, null);
-    }
-
-    /**
      * 获取所有的商户平台配置
      * @return array
      */
