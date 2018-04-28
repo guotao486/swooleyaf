@@ -27,6 +27,11 @@ class WxConfigSingleton {
      * @var \Wx\WxConfigOpenCommon
      */
     private $openCommonConfig = null;
+    /**
+     * 商户平台配置清理时间戳
+     * @var int
+     */
+    private $shopClearTime = 0;
 
     /**
      * @return \DesignPatterns\Singletons\WxConfigSingleton
@@ -74,6 +79,12 @@ class WxConfigSingleton {
      * @return \Wx\WxConfigShop|null
      */
     private function getLocalShopConfig(string $appId) {
+        $nowTime = time();
+        if($this->shopClearTime < $nowTime){
+            $this->shopConfigs = [];
+            $this->shopClearTime = $nowTime + Server::TIME_EXPIRE_LOCAL_WXSHOP_CLEAR;
+        }
+        
         return Tool::getArrayVal($this->shopConfigs, $appId, null);
     }
 
