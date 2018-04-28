@@ -7,6 +7,8 @@
  */
 namespace DesignPatterns\Singletons;
 
+use Constant\Server;
+use Factories\SyTaskMysqlFactory;
 use Tool\Tool;
 use Traits\SingletonTrait;
 use Wx\WxConfigOpenCommon;
@@ -20,11 +22,6 @@ class WxConfigSingleton {
      * @var array
      */
     private $shopConfigs = [];
-    /**
-     * 商户平台列表
-     * @var array
-     */
-    private $shopApps = [];
     /**
      * 开放平台公共配置
      * @var WxConfigOpenCommon
@@ -43,37 +40,7 @@ class WxConfigSingleton {
     }
 
     private function __construct(){
-        $this->init();
-    }
-
-    private function __clone(){
-    }
-
-    /**
-     * 初始化配置
-     */
-    private function init(){
         $configs = Tool::getConfig('wx.' . SY_ENV . SY_PROJECT);
-
-        //初始化商户平台配置
-        $shops = Tool::getArrayVal($configs, 'shops', []);
-        foreach ($shops as $eTag => $eShop) {
-            $shopConfig = new WxConfigShop();
-            $shopConfig->setExpireJsTicket((int)Tool::getArrayVal($eShop, 'expire.jsticket', 0, true));
-            $shopConfig->setExpireAccessToken((int)Tool::getArrayVal($eShop,'expire.accesstoken', 0, true));
-            $shopConfig->setClientIp((string)Tool::getArrayVal($eShop, 'clientip', '', true));
-            $shopConfig->setAppId((string)Tool::getArrayVal($eShop, 'appid', '', true));
-            $shopConfig->setSecret((string)Tool::getArrayVal($eShop, 'secret', '', true));
-            $shopConfig->setPayMchId((string)Tool::getArrayVal($eShop, 'pay.mchid', '', true));
-            $shopConfig->setPayKey((string)Tool::getArrayVal($eShop, 'pay.key', '', true));
-            $shopConfig->setPayNotifyUrl((string)Tool::getArrayVal($eShop, 'pay.url.notify', '', true));
-            $shopConfig->setPayAuthUrl((string)Tool::getArrayVal($eShop, 'pay.url.auth', '', true));
-            $shopConfig->setSslCert((string)Tool::getArrayVal($eShop, 'ssl.cert', '', true));
-            $shopConfig->setSslKey((string)Tool::getArrayVal($eShop, 'ssl.key', '', true));
-            $shopConfig->setTemplates((array)Tool::getArrayVal($eShop, 'templates', [], true));
-            $this->shopConfigs[$shopConfig->getAppId()] = $shopConfig;
-            $this->shopApps[$eTag] = $shopConfig->getAppId();
-        }
 
         //初始化开放平台公共配置
         $openCommonConfig = new WxConfigOpenCommon();
@@ -90,6 +57,9 @@ class WxConfigSingleton {
         $this->openCommonConfig = $openCommonConfig;
     }
 
+    private function __clone(){
+    }
+
     /**
      * 获取所有的商户平台配置
      * @return array
@@ -99,20 +69,70 @@ class WxConfigSingleton {
     }
 
     /**
-     * 获取商户平台配置
+     * 获取本地商户平台配置
      * @param string $appId
      * @return \Wx\WxConfigShop|null
      */
-    public function getShopConfig(string $appId){
+    private function getLocalShopConfig(string $appId) {
         return Tool::getArrayVal($this->shopConfigs, $appId, null);
     }
 
     /**
-     * 设置商户平台配置
-     * @param \Wx\WxConfigShop $config
+     * 更新商户平台配置
+     * @param string $appId
+     * @return \Wx\WxConfigShop
      */
-    public function setShopConfig(WxConfigShop $config){
-        $this->shopConfigs[$config->getAppId()] = $config;
+    public function refreshShopConfig(string $appId) {
+        $expireTime = time() + Server::TIME_EXPIRE_LOCAL_WXSHOP_CACHE;
+        $shopConfig = new WxConfigShop();
+        $shopConfig->setAppId($appId);
+        $shopConfig->setExpireTime($expireTime);
+
+        $wxshopConfigEntity = SyTaskMysqlFactory::WxshopConfigEntity();
+        $ormResult1 = $wxshopConfigEntity->getContainer()->getModel()->getOrmDbTable();
+        $ormResult1->where('`app_id`=? AND `status`=?', [$appId, Server::WX_SHOP_STATUS_ENABLE]);
+        $configInfo = $wxshopConfigEntity->getContainer()->getModel()->findOne($ormResult1);
+        if(empty($configInfo)){
+            $shopConfig->setValid(false);
+        } else {
+            $templates = strlen($configInfo['app_templates']) > 0 ? Tool::jsonDecode($configInfo['app_templates']) : [];
+            $shopConfig->setValid(true);
+            $shopConfig->setExpireJsTicket(7000);
+            $shopConfig->setExpireAccessToken(7000);
+            $shopConfig->setClientIp((string)$configInfo['app_clientip']);
+            $shopConfig->setSecret((string)$configInfo['app_secret']);
+            $shopConfig->setPayMchId((string)$configInfo['pay_mchid']);
+            $shopConfig->setPayKey((string)$configInfo['pay_key']);
+            $shopConfig->setPayNotifyUrl((string)$configInfo['payurl_notify']);
+            $shopConfig->setPayAuthUrl((string)$configInfo['payurl_auth']);
+            $shopConfig->setSslCert((string)$configInfo['payssl_cert']);
+            $shopConfig->setSslKey((string)$configInfo['payssl_key']);
+            if (is_array($templates)) {
+                $shopConfig->setTemplates($templates);
+            }
+        }
+        unset($configInfo, $ormResult1, $wxshopConfigEntity);
+
+        $this->shopConfigs[$appId] = $shopConfig;
+
+        return $shopConfig;
+    }
+
+    /**
+     * 获取商户平台配置
+     * @param string $appId
+     * @return \Wx\WxConfigShop|null
+     */
+    public function getShopConfig(string $appId) {
+        $nowTime = time();
+        $shopConfig = $this->getLocalShopConfig($appId);
+        if(is_null($shopConfig)){
+            $shopConfig = $this->refreshShopConfig($appId);
+        } else if($shopConfig->getExpireTime() < $nowTime){
+            $shopConfig = $this->refreshShopConfig($appId);
+        }
+
+        return $shopConfig->isValid() ? $shopConfig : null;
     }
 
     /**
@@ -125,12 +145,12 @@ class WxConfigSingleton {
 
     /**
      * 获取商户模板ID
-     * @param string $name 模板名称
      * @param string $appId
+     * @param string $name 模板名称
      * @return string|null
      */
-    public function getShopTemplateId(string $name,string $appId) {
-        $shopConfig = Tool::getArrayVal($this->shopConfigs, $appId, null);
+    public function getShopTemplateId(string $appId,string $name) {
+        $shopConfig = $this->getShopConfig($appId);
         if (is_null($shopConfig)) {
             return null;
         }
