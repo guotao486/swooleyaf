@@ -227,8 +227,8 @@ class SyTool():
             run('rm -rf freetype-2.6.5/')
             run('rm -rf freetype-2.6.5.tar.bz2')
 
-        php7Local = ''.join([syDicts['path.package.local'], '/resources/php7/php-7.1.16.tar.gz'])
-        php7Remote = ''.join([syDicts['path.package.remote'], '/php-7.1.16.tar.gz'])
+        php7Local = ''.join([syDicts['path.package.local'], '/resources/php7/php-7.1.17.tar.gz'])
+        php7Remote = ''.join([syDicts['path.package.remote'], '/php-7.1.17.tar.gz'])
         put(php7Local, php7Remote)
         with cd(syDicts['path.package.remote']):
             run('mkdir /tmp/swoolyaf')
@@ -237,8 +237,8 @@ class SyTool():
             run('mkdir /home/logs/seaslog-cli')
             run('mkdir /home/logs/seaslog-fpm')
             run('mkdir /usr/local/php7')
-            run('tar -zxvf php-7.1.16.tar.gz')
-            run('cd php-7.1.16/ && ./configure --prefix=/usr/local/php7 --exec-prefix=/usr/local/php7 --bindir=/usr/local/php7/bin --sbindir=/usr/local/php7/sbin --includedir=/usr/local/php7/include --libdir=/usr/local/php7/lib/php --mandir=/usr/local/php7/php/man --with-config-file-path=/usr/local/php7/etc --with-mysql-sock=/usr/local/mysql/mysql.sock --with-zlib=/usr/local/zlib --with-mhash --with-openssl --with-mysqli=shared,mysqlnd --with-pdo-mysql=shared,mysqlnd --with-iconv --enable-zip --enable-inline-optimization --disable-debug --disable-rpath --enable-shared --enable-xml --enable-pcntl --enable-bcmath --enable-mysqlnd --enable-sysvsem --with-mysqli --enable-embedded-mysqli  --with-pdo-mysql --enable-shmop --enable-mbregex --enable-mbstring --enable-ftp --enable-sockets --with-xmlrpc --enable-soap --without-pear --with-gettext --enable-session --with-curl --enable-opcache --enable-fpm --without-gdbm --enable-fileinfo --with-gmp && make && make install')
+            run('tar -zxvf php-7.1.17.tar.gz')
+            run('cd php-7.1.17/ && ./configure --prefix=/usr/local/php7 --exec-prefix=/usr/local/php7 --bindir=/usr/local/php7/bin --sbindir=/usr/local/php7/sbin --includedir=/usr/local/php7/include --libdir=/usr/local/php7/lib/php --mandir=/usr/local/php7/php/man --with-config-file-path=/usr/local/php7/etc --with-mysql-sock=/usr/local/mysql/mysql.sock --with-zlib=/usr/local/zlib --with-mhash --with-openssl --with-mysqli=shared,mysqlnd --with-pdo-mysql=shared,mysqlnd --with-iconv --enable-zip --enable-inline-optimization --disable-debug --disable-rpath --enable-shared --enable-xml --enable-pcntl --enable-bcmath --enable-mysqlnd --enable-sysvsem --with-mysqli --enable-embedded-mysqli  --with-pdo-mysql --enable-shmop --enable-mbregex --enable-mbstring --enable-ftp --enable-sockets --with-xmlrpc --enable-soap --without-pear --with-gettext --enable-session --with-curl --enable-opcache --enable-fpm --without-gdbm --enable-fileinfo --with-gmp && make && make install')
 
         php7CliIniLocal = ''.join([syDicts['path.package.local'], '/configs/swooleyaf/php7/php-cli.ini'])
         php7CliIniRemote = '/usr/local/php7/etc/php-cli.ini'
