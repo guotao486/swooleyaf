@@ -91,6 +91,18 @@ class WxConfigShop {
     private $templates = [];
 
     /**
+     * 配置有效状态
+     * @var bool
+     */
+    private $valid = false;
+
+    /**
+     * 配置过期时间戳
+     * @var int
+     */
+    private $expireTime = 0;
+
+    /**
      * @return int
      */
     public function getExpireJsTicket(): int {
@@ -313,6 +325,34 @@ class WxConfigShop {
         $this->templates = $templates;
     }
 
+    /**
+     * @return bool
+     */
+    public function isValid() : bool {
+        return $this->valid;
+    }
+
+    /**
+     * @param bool $valid
+     */
+    public function setValid(bool $valid){
+        $this->valid = $valid;
+    }
+
+    /**
+     * @return int
+     */
+    public function getExpireTime() : int {
+        return $this->expireTime;
+    }
+
+    /**
+     * @param int $expireTime
+     */
+    public function setExpireTime(int $expireTime){
+        $this->expireTime = $expireTime;
+    }
+
     public function __toString() {
         return Tool::jsonEncode($this->getConfigs(), JSON_UNESCAPED_UNICODE);
     }
@@ -335,6 +375,8 @@ class WxConfigShop {
             'expire.jsticket' => $this->expireJsTicket,
             'expire.accesstoken' => $this->expireAccessToken,
             'templates' => $this->templates,
+            'valid' => $this->valid,
+            'expire.time' => $this->expireTime,
         ];
     }
 }

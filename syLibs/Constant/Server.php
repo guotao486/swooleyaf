@@ -66,6 +66,10 @@ final class Server {
     const WX_COMPONENT_AUTHORIZER_STATUS_CANCEL = 0; //授权公众号状态-取消授权
     const WX_COMPONENT_AUTHORIZER_STATUS_ALLOW = 1; //授权公众号状态-允许授权
 
+    //微信商户号常量
+    const WX_SHOP_STATUS_DISABLE = 0; //授权公众号状态-无效
+    const WX_SHOP_STATUS_ENABLE = 1; //授权公众号状态-有效
+
     //本地缓存标识
     const CACHE_LOCAL_TAG_PREFIX_WX_JS_TICKET = 'a001_'; //前缀-微信公众号js ticket
     const CACHE_LOCAL_TAG_PREFIX_WX_ACCESS_TOKEN = 'a002_'; //前缀-微信公众号access token
@@ -135,4 +139,5 @@ final class Server {
     //时间常量
     const TIME_EXPIRE_LOCAL_USER_CACHE = 300; //超时时间-本地用户缓存,单位为秒
     const TIME_EXPIRE_LOCAL_API_SIGN_CACHE = 300; //超时时间-本地api签名缓存,单位为秒
+    const TIME_EXPIRE_LOCAL_WXSHOP_CACHE = 300; //超时时间-本地微信商户号缓存,单位为秒
 }

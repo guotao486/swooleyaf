@@ -95,10 +95,9 @@ final class WxUtilShop extends WxUtilBase {
      * 发起jsapi支付
      * @param \Wx\UnifiedOrder $order 订单信息
      * @param string $platType 平台类型 shop：公众号 open：第三方平台
-     * @param string $appId 授权者微信号
      * @return array
      */
-    public static function applyJsPay(UnifiedOrder $order,string $platType,string $appId='') : array {
+    public static function applyJsPay(UnifiedOrder $order,string $platType) : array {
         $resArr = [
             'code' => 0,
         ];
@@ -122,7 +121,7 @@ final class WxUtilShop extends WxUtilBase {
             //获取js参数
             $jsConfig = new JsConfig($orderDetail['appid']);
             $resArr['data'] = [
-                'config' => $jsConfig->getDetail($platType, $appId),
+                'config' => $jsConfig->getDetail($platType),
                 'pay' => $payConfig->getDetail(),
             ];
             unset($payConfig, $jsConfig);
@@ -209,12 +208,20 @@ final class WxUtilShop extends WxUtilBase {
 
         $companyDetail = $companyPay->getDetail();
         $shopConfig = WxConfigSingleton::getInstance()->getShopConfig($companyDetail['mch_appid']);
+        $tmpKey = tmpfile();
+        fwrite($tmpKey, $shopConfig->getSslKey());
+        $tmpKeyData = stream_get_meta_data($tmpKey);
+        $tmpCert = tmpfile();
+        fwrite($tmpCert, $shopConfig->getSslCert());
+        $tmpCertData = stream_get_meta_data($tmpCert);
         $reqXml = self::arrayToXml($companyDetail);
         $resXml = self::sendPost(self::$urlCompanyPay, $reqXml, [
             'use_cert' => true,
-            'sslcert_path' => $shopConfig->getSslCert(),
-            'sslkey_path' => $shopConfig->getSslKey(),
+            'sslcert_path' => $tmpCertData['uri'],
+            'sslkey_path' => $tmpKeyData['uri'],
         ]);
+        fclose($tmpKey);
+        fclose($tmpCert);
         $resData = self::xmlToArray($resXml);
         if ($resData['return_code'] == 'FAIL') {
             Log::error($resData['return_msg'], ErrorCode::WX_PARAM_ERROR);
@@ -491,12 +498,20 @@ final class WxUtilShop extends WxUtilBase {
 
         $refundDetail = $refund->getDetail();
         $shopConfig = WxConfigSingleton::getInstance()->getShopConfig($refundDetail['appid']);
+        $tmpKey = tmpfile();
+        fwrite($tmpKey, $shopConfig->getSslKey());
+        $tmpKeyData = stream_get_meta_data($tmpKey);
+        $tmpCert = tmpfile();
+        fwrite($tmpCert, $shopConfig->getSslCert());
+        $tmpCertData = stream_get_meta_data($tmpCert);
         $reqXml = self::arrayToXml($refundDetail);
         $resXml = self::sendPost(self::$urlOrderRefund, $reqXml, [
             'use_cert' => true,
-            'sslcert_path' => $shopConfig->getSslCert(),
-            'sslkey_path' => $shopConfig->getSslKey(),
+            'sslcert_path' => $tmpCertData['uri'],
+            'sslkey_path' => $tmpKeyData['uri'],
         ]);
+        fclose($tmpKey);
+        fclose($tmpCert);
         $resData = self::xmlToArray($resXml);
         if ($resData['return_code'] == 'FAIL') {
             $resArr['code'] = ErrorCode::WX_POST_ERROR;
