@@ -95,10 +95,9 @@ final class WxUtilShop extends WxUtilBase {
      * 发起jsapi支付
      * @param \Wx\UnifiedOrder $order 订单信息
      * @param string $platType 平台类型 shop：公众号 open：第三方平台
-     * @param string $appId 授权者微信号
      * @return array
      */
-    public static function applyJsPay(UnifiedOrder $order,string $platType,string $appId='') : array {
+    public static function applyJsPay(UnifiedOrder $order,string $platType) : array {
         $resArr = [
             'code' => 0,
         ];
@@ -122,7 +121,7 @@ final class WxUtilShop extends WxUtilBase {
             //获取js参数
             $jsConfig = new JsConfig($orderDetail['appid']);
             $resArr['data'] = [
-                'config' => $jsConfig->getDetail($platType, $appId),
+                'config' => $jsConfig->getDetail($platType),
                 'pay' => $payConfig->getDetail(),
             ];
             unset($payConfig, $jsConfig);

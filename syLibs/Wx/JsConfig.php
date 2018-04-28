@@ -33,10 +33,9 @@ class JsConfig {
 
     /**
      * @param string $platType 平台类型 shop：公众号 open：第三方平台
-     * @param string $appId 授权公众号app id
      * @return array
      */
-    public function getDetail(string $platType='shop',string $appId='') : array {
+    public function getDetail(string $platType='shop') : array {
         $resArr = [
             'appId' => $this->appId,
             'timestamp' => $this->timestamp,
@@ -46,7 +45,7 @@ class JsConfig {
         if ($platType == 'shop') { //公众号获取jsapi_ticket
             $ticket = WxUtilShop::getJsTicket($this->appId);
         } else { //第三方平台获取jsapi_ticket
-            $ticket = WxUtilOpen::getAuthorizerJsTicket($appId);
+            $ticket = WxUtilOpen::getAuthorizerJsTicket($this->appId);
         }
 
         $needStr = 'jsapi_ticket=' . $ticket . '&noncestr=' . $this->nonceStr . '&timestamp=' . $this->timestamp . '&url=' . WxConfigSingleton::getInstance()->getShopConfig($this->appId)->getPayAuthUrl();
