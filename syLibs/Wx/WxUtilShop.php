@@ -209,12 +209,20 @@ final class WxUtilShop extends WxUtilBase {
 
         $companyDetail = $companyPay->getDetail();
         $shopConfig = WxConfigSingleton::getInstance()->getShopConfig($companyDetail['mch_appid']);
+        $tmpKey = tmpfile();
+        fwrite($tmpKey, $shopConfig->getSslKey());
+        $tmpKeyData = stream_get_meta_data($tmpKey);
+        $tmpCert = tmpfile();
+        fwrite($tmpCert, $shopConfig->getSslCert());
+        $tmpCertData = stream_get_meta_data($tmpCert);
         $reqXml = self::arrayToXml($companyDetail);
         $resXml = self::sendPost(self::$urlCompanyPay, $reqXml, [
             'use_cert' => true,
-            'sslcert_path' => $shopConfig->getSslCert(),
-            'sslkey_path' => $shopConfig->getSslKey(),
+            'sslcert_path' => $tmpCertData['uri'],
+            'sslkey_path' => $tmpKeyData['uri'],
         ]);
+        fclose($tmpKey);
+        fclose($tmpCert);
         $resData = self::xmlToArray($resXml);
         if ($resData['return_code'] == 'FAIL') {
             Log::error($resData['return_msg'], ErrorCode::WX_PARAM_ERROR);
