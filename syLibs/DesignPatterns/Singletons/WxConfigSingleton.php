@@ -40,16 +40,6 @@ class WxConfigSingleton {
     }
 
     private function __construct(){
-        $this->init();
-    }
-
-    private function __clone(){
-    }
-
-    /**
-     * 初始化配置
-     */
-    private function init(){
         $configs = Tool::getConfig('wx.' . SY_ENV . SY_PROJECT);
 
         //初始化开放平台公共配置
@@ -65,6 +55,9 @@ class WxConfigSingleton {
         $openCommonConfig->setAuthUrlDomain((string)Tool::getArrayVal($configs, 'open.authurl.domain', '', true));
         $openCommonConfig->setAuthUrlCallback((string)Tool::getArrayVal($configs, 'open.authurl.callback', '', true));
         $this->openCommonConfig = $openCommonConfig;
+    }
+
+    private function __clone(){
     }
 
     /**
