@@ -24,7 +24,7 @@ class WxConfigSingleton {
     private $shopConfigs = [];
     /**
      * 开放平台公共配置
-     * @var WxConfigOpenCommon
+     * @var \Wx\WxConfigOpenCommon
      */
     private $openCommonConfig = null;
 
