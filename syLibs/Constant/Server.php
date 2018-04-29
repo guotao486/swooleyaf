@@ -71,8 +71,6 @@ final class Server {
     const WX_SHOP_STATUS_ENABLE = 1; //授权公众号状态-有效
 
     //本地缓存标识
-    const CACHE_LOCAL_TAG_PREFIX_WX_JS_TICKET = 'a001_'; //前缀-微信公众号js ticket
-    const CACHE_LOCAL_TAG_PREFIX_WX_ACCESS_TOKEN = 'a002_'; //前缀-微信公众号access token
     const CACHE_LOCAL_TAG_PREFIX_WX_COMPONENT_ACCESS_TOKEN = 'a101_'; //前缀-微信开放平台access token
 
     //校验器常量

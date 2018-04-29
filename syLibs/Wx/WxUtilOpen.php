@@ -56,7 +56,7 @@ final class WxUtilOpen extends WxUtilBase {
             $localKey = Server::CACHE_LOCAL_TAG_PREFIX_WX_COMPONENT_ACCESS_TOKEN . $openCommonConfig->getAppId();
             BaseServer::setProjectCache($localKey, [
                 'value' => $resArr['component_access_token'],
-                'add_time' => $expireTime,
+                'expire_time' => $expireTime,
             ]);
         } else {
             throw new WxOpenException('获取平台access token失败', ErrorCode::WXOPEN_POST_ERROR);
@@ -81,7 +81,7 @@ final class WxUtilOpen extends WxUtilBase {
         if(isset($redisData['unique_key']) && ($redisData['unique_key'] == $redisKey)){
             BaseServer::setProjectCache($localKey, [
                 'value' => $redisData['access_token'],
-                'add_time' => (int)$redisData['expire_time'],
+                'expire_time' => (int)$redisData['expire_time'],
             ]);
 
             return $redisData['access_token'];
