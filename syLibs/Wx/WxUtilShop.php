@@ -283,20 +283,14 @@ final class WxUtilShop extends WxUtilBase {
      */
     private static function refreshWxAccountCache(string $appId) : array {
         $nowTime = time();
-        $localTagJsTicket = Server::CACHE_LOCAL_TAG_PREFIX_WX_JS_TICKET . $appId;
-        $localTagAccessToken = Server::CACHE_LOCAL_TAG_PREFIX_WX_ACCESS_TOKEN . $appId;
-
         $redisKey = Server::REDIS_PREFIX_WX_ACCOUNT . $appId;
         $redisData = CacheSimpleFactory::getRedisInstance()->hGetAll($redisKey);
         if (isset($redisData['unique_key']) && ($redisData['unique_key'] == $redisKey) && ($redisData['expire_time'] >= $nowTime)) {
             $expireTime = (int)$redisData['expire_time'];
-            BaseServer::setProjectCache($localTagJsTicket, [
-                'value' => $redisData['js_ticket'],
-                'add_time' => $expireTime,
-            ]);
-            BaseServer::setProjectCache($localTagAccessToken, [
-                'value' => $redisData['access_token'],
-                'add_time' => $expireTime,
+            BaseServer::setWxShopTokenCache($appId, [
+                'js_ticket' => $redisData['js_ticket'],
+                'access_token' => $redisData['access_token'],
+                'expire_time' => $expireTime,
             ]);
 
             return [
@@ -316,13 +310,10 @@ final class WxUtilShop extends WxUtilBase {
         ]);
         CacheSimpleFactory::getRedisInstance()->expire($redisKey, 7100);
 
-        BaseServer::setProjectCache($localTagJsTicket, [
-            'value' => $jsTicket,
-            'add_time' => $expireTime,
-        ]);
-        BaseServer::setProjectCache($localTagAccessToken, [
-            'value' => $accessToken,
-            'add_time' => $expireTime,
+        BaseServer::setWxShopTokenCache($appId, [
+            'js_ticket' => $jsTicket,
+            'access_token' => $accessToken,
+            'expire_time' => $expireTime,
         ]);
 
         return [
@@ -338,10 +329,9 @@ final class WxUtilShop extends WxUtilBase {
      */
     public static function getAccessToken(string $appId) : string {
         $nowTime = time();
-        $localTag = Server::CACHE_LOCAL_TAG_PREFIX_WX_ACCESS_TOKEN . $appId;
-        $localCacheData = BaseServer::getProjectCache($localTag, '', []);
-        if (isset($localCacheData['add_time']) && ($localCacheData['add_time'] >= $nowTime)) {
-            return $localCacheData['value'];
+        $localCacheData = BaseServer::getWxShopTokenCache($appId, '', []);
+        if (isset($localCacheData['expire_time']) && ($localCacheData['expire_time'] >= $nowTime)) {
+            return $localCacheData['access_token'];
         }
 
         $cacheData = self::refreshWxAccountCache($appId);
@@ -355,10 +345,9 @@ final class WxUtilShop extends WxUtilBase {
      */
     public static function getJsTicket(string $appId) : string {
         $nowTime = time();
-        $localTag = Server::CACHE_LOCAL_TAG_PREFIX_WX_JS_TICKET . $appId;
-        $localCacheData = BaseServer::getProjectCache($localTag, '', []);
-        if (isset($localCacheData['add_time']) && ($localCacheData['add_time'] >= $nowTime)) {
-            return $localCacheData['value'];
+        $localCacheData = BaseServer::getWxShopTokenCache($appId, '', []);
+        if (isset($localCacheData['expire_time']) && ($localCacheData['expire_time'] >= $nowTime)) {
+            return $localCacheData['js_ticket'];
         }
 
         $cacheData = self::refreshWxAccountCache($appId);
