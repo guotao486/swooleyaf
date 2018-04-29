@@ -56,6 +56,26 @@ abstract class BaseServer {
      */
     private static $_syUserNowNum = 0;
     /**
+     * 最大微信商户号token数量
+     * @var int
+     */
+    private static $_syWxShopTokenMaxNum = 0;
+    /**
+     * 当前微信商户号token数量
+     * @var int
+     */
+    private static $_syWxShopTokenNowNum = 0;
+    /**
+     * 最大微信开放平台授权公众号token数量
+     * @var int
+     */
+    private static $_syWxOpenAuthorizerTokenMaxNum = 0;
+    /**
+     * 当前微信开放平台授权公众号token数量
+     * @var int
+     */
+    private static $_syWxOpenAuthorizerTokenNowNum = 0;
+    /**
      * 用户信息列表
      * @var \swoole_table
      */
@@ -65,6 +85,16 @@ abstract class BaseServer {
      * @var \swoole_table
      */
     protected static $_syProject = null;
+    /**
+     * 项目微信商户号token缓存列表
+     * @var \swoole_table
+     */
+    protected static $_syWxShopToken = null;
+    /**
+     * 项目微信开放平台授权公众号token缓存列表
+     * @var \swoole_table
+     */
+    protected static $_syWxOpenAuthorizerToken = null;
     /**
      * 配置数组
      * @var array
@@ -233,6 +263,20 @@ abstract class BaseServer {
         self::$_syProject->column('value', \swoole_table::TYPE_STRING, 200);
         self::$_syProject->column('add_time', \swoole_table::TYPE_INT, 4);
         self::$_syProject->create();
+
+        self::$_syWxShopToken = new \swoole_table((int)$this->_configs['server']['cachenum']['wxshop']['token']);
+        self::$_syWxShopToken->column('app_id', \swoole_table::TYPE_STRING, 18);
+        self::$_syWxShopToken->column('access_token', \swoole_table::TYPE_STRING, 200);
+        self::$_syWxShopToken->column('js_ticket', \swoole_table::TYPE_STRING, 200);
+        self::$_syWxShopToken->column('expire_time', \swoole_table::TYPE_INT, 4);
+        self::$_syWxShopToken->create();
+
+        self::$_syWxOpenAuthorizerToken = new \swoole_table((int)$this->_configs['server']['cachenum']['wxopen']['authorizertoken']);
+        self::$_syWxOpenAuthorizerToken->column('app_id', \swoole_table::TYPE_STRING, 18);
+        self::$_syWxOpenAuthorizerToken->column('access_token', \swoole_table::TYPE_STRING, 200);
+        self::$_syWxOpenAuthorizerToken->column('js_ticket', \swoole_table::TYPE_STRING, 200);
+        self::$_syWxOpenAuthorizerToken->column('expire_time', \swoole_table::TYPE_INT, 4);
+        self::$_syWxOpenAuthorizerToken->create();
     }
 
     /**
@@ -465,6 +509,80 @@ abstract class BaseServer {
             return true;
         } else {
             return false;
+        }
+    }
+
+    /**
+     * 获取项目微信商户号token缓存
+     * @param string $appId 公众号app id
+     * @param string $field 字段名
+     * @param mixed $default 默认值
+     * @return mixed
+     */
+    public static function getWxShopTokenCache(string $appId,string $field='', $default=null){
+        $data = self::$_syProject->get($appId);
+        if($data === false){
+            return $default;
+        } else if($field === ''){
+            return $data;
+        } else {
+            return $data[$field] ?? $default;
+        }
+    }
+
+    /**
+     * 设置项目微信商户号token缓存
+     * @param string $appId 公众号app id
+     * @param array $data 键值
+     * @return bool
+     */
+    public static function setWxShopTokenCache(string $appId,array $data) : bool {
+        if(empty($data)){
+            return false;
+        } else if(self::$_syWxShopToken->exist($appId) || (self::$_syWxShopTokenNowNum < self::$_syWxShopTokenMaxNum)){
+            self::$_syWxShopToken->set($appId, $data);
+            self::$_syWxShopTokenNowNum++;
+
+            return true;
+        } else {
+            return true;
+        }
+    }
+
+    /**
+     * 获取项目微信开放平台授权公众号token缓存
+     * @param string $appId 公众号app id
+     * @param string $field 字段名
+     * @param mixed $default 默认值
+     * @return mixed
+     */
+    public static function getWxOpenAuthorizerTokenCache(string $appId,string $field='', $default=null){
+        $data = self::$_syProject->get($appId);
+        if($data === false){
+            return $default;
+        } else if($field === ''){
+            return $data;
+        } else {
+            return $data[$field] ?? $default;
+        }
+    }
+
+    /**
+     * 设置项目微信开放平台授权公众号token缓存
+     * @param string $appId 公众号app id
+     * @param array $data 键值
+     * @return bool
+     */
+    public static function setWxOpenAuthorizerTokenCache(string $appId,array $data) : bool {
+        if(empty($data)){
+            return false;
+        } else if(self::$_syWxOpenAuthorizerToken->exist($appId) || (self::$_syWxOpenAuthorizerTokenNowNum < self::$_syWxOpenAuthorizerTokenMaxNum)){
+            self::$_syWxOpenAuthorizerToken->set($appId, $data);
+            self::$_syWxOpenAuthorizerTokenNowNum++;
+
+            return true;
+        } else {
+            return true;
         }
     }
 
