@@ -68,14 +68,3 @@ foreach ($modules as $moduleTag => $eModule) {
     $task = $container->getObj($moduleTag);
     $task->handleTask($taskParams);
 }
-
-$apiDomain = 'http://api3.xxx.cn';
-//发送投票报名通知短信
-$url = $apiDomain . '/Index/VoteSmsUser/sendEnterSmsTask';
-\Request\RequestSign::makeSignUrl($url);
-sendSyGetReq($url);
-
-//检测投票报名通知短信
-$url = $apiDomain . '/Index/VoteSmsUser/checkEnterSmsTask';
-\Request\RequestSign::makeSignUrl($url);
-sendSyGetReq($url);
