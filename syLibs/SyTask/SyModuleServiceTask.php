@@ -24,5 +24,15 @@ class SyModuleServiceTask extends SyModuleTaskBase implements SyModuleTaskInterf
                 'projects' => $data['projects'],
             ], '');
         }
+        if($data['clear_localwxshoptoken']){
+            $this->clearLocalWxshopTokenCache([
+                'projects' => $data['projects'],
+            ], '');
+        }
+        if($data['clear_localwxopenauthorizertoken']){
+            $this->clearLocalWxopenAuthorizerTokenCache([
+                'projects' => $data['projects'],
+            ], '');
+        }
     }
 }

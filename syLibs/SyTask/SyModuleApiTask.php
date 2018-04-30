@@ -47,5 +47,15 @@ class SyModuleApiTask extends SyModuleTaskBase implements SyModuleTaskInterface 
                 'projects' => $data['projects'],
             ], $this->moduleTag);
         }
+        if($data['clear_localwxshoptoken']){
+            $this->clearLocalWxshopTokenCache([
+                'projects' => $data['projects'],
+            ], $this->moduleTag);
+        }
+        if($data['clear_localwxopenauthorizertoken']){
+            $this->clearLocalWxopenAuthorizerTokenCache([
+                'projects' => $data['projects'],
+            ], $this->moduleTag);
+        }
     }
 }
