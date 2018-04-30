@@ -541,7 +541,11 @@ abstract class BaseServer {
     public static function setWxShopTokenCache(string $appId,array $data) : bool {
         if(empty($data)){
             return false;
-        } else if(self::$_syWxShopToken->exist($appId) || (self::$_syWxShopTokenNowNum < self::$_syWxShopTokenMaxNum)){
+        } else if(self::$_syWxShopToken->exist($appId)){
+            self::$_syWxShopToken->set($appId, $data);
+
+            return true;
+        } else if(self::$_syWxShopTokenNowNum < self::$_syWxShopTokenMaxNum){
             self::$_syWxShopToken->set($appId, $data);
             self::$_syWxShopTokenNowNum++;
 
@@ -549,6 +553,20 @@ abstract class BaseServer {
         } else {
             return true;
         }
+    }
+
+    protected function clearLocalWxShopTokens() {
+        $nowTime = time();
+        $delKeys = [];
+        foreach (self::$_syWxShopToken as $eToken) {
+            if($eToken['clear_time'] < $nowTime){
+                $delKeys[] = $eToken['app_id'];
+            }
+        }
+        foreach ($delKeys as $eKey) {
+            self::$_syWxShopToken->del($eKey);
+        }
+        self::$_syWxShopTokenNowNum = count(self::$_syWxShopToken);
     }
 
     /**
@@ -578,7 +596,11 @@ abstract class BaseServer {
     public static function setWxOpenAuthorizerTokenCache(string $appId,array $data) : bool {
         if(empty($data)){
             return false;
-        } else if(self::$_syWxOpenAuthorizerToken->exist($appId) || (self::$_syWxOpenAuthorizerTokenNowNum < self::$_syWxOpenAuthorizerTokenMaxNum)){
+        } else if(self::$_syWxOpenAuthorizerToken->exist($appId)){
+            self::$_syWxOpenAuthorizerToken->set($appId, $data);
+
+            return true;
+        } else if(self::$_syWxOpenAuthorizerTokenNowNum < self::$_syWxOpenAuthorizerTokenMaxNum){
             self::$_syWxOpenAuthorizerToken->set($appId, $data);
             self::$_syWxOpenAuthorizerTokenNowNum++;
 
@@ -586,6 +608,20 @@ abstract class BaseServer {
         } else {
             return true;
         }
+    }
+
+    protected function clearLocalWxOpenAuthorizerTokens() {
+        $nowTime = time();
+        $delKeys = [];
+        foreach (self::$_syWxOpenAuthorizerToken as $eToken) {
+            if($eToken['clear_time'] < $nowTime){
+                $delKeys[] = $eToken['app_id'];
+            }
+        }
+        foreach ($delKeys as $eKey) {
+            self::$_syWxOpenAuthorizerToken->del($eKey);
+        }
+        self::$_syWxOpenAuthorizerTokenNowNum = count(self::$_syWxOpenAuthorizerToken);
     }
 
     protected function basicWorkStart(\swoole_server $server, $workerId){
