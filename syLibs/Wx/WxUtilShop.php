@@ -283,6 +283,7 @@ final class WxUtilShop extends WxUtilBase {
      */
     private static function refreshWxAccountCache(string $appId) : array {
         $nowTime = time();
+        $clearTime = $nowTime + Server::TIME_EXPIRE_LOCAL_WXSHOP_TOKEN_CLEAR;
         $redisKey = Server::REDIS_PREFIX_WX_ACCOUNT . $appId;
         $redisData = CacheSimpleFactory::getRedisInstance()->hGetAll($redisKey);
         if (isset($redisData['unique_key']) && ($redisData['unique_key'] == $redisKey) && ($redisData['expire_time'] >= $nowTime)) {
@@ -291,6 +292,7 @@ final class WxUtilShop extends WxUtilBase {
                 'js_ticket' => $redisData['js_ticket'],
                 'access_token' => $redisData['access_token'],
                 'expire_time' => $expireTime,
+                'clear_time' => $clearTime,
             ]);
 
             return [
@@ -314,6 +316,7 @@ final class WxUtilShop extends WxUtilBase {
             'js_ticket' => $jsTicket,
             'access_token' => $accessToken,
             'expire_time' => $expireTime,
+            'clear_time' => $clearTime,
         ]);
 
         return [
