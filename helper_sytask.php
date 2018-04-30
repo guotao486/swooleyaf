@@ -53,14 +53,14 @@ $minute = (int)$timeArr[1];
 $hour = (int)$timeArr[0];
 
 $needMinute1 = $minute % 5;
-$clearApiSign = $needMinute1 == 1 ? true : false;
-$clearLocalUser = $needMinute1 == 2 ? true : false;
 
 $taskParams = [
     'task_minute' => $minute,
     'task_hour' => $hour,
-    'clear_apisign' => $clearApiSign,
-    'clear_localuser' => $clearLocalUser,
+    'clear_apisign' => $needMinute1 == 1 ? true : false,
+    'clear_localuser' => $needMinute1 == 2 ? true : false,
+    'clear_localwxshoptoken' => $needMinute1 == 0 ? true : false,
+    'clear_localwxopenauthorizertoken' => $needMinute1 == 0 ? true : false,
 ];
 
 foreach ($modules as $moduleTag => $eModule) {
