@@ -96,6 +96,12 @@ class RpcServer extends BaseServer {
             case Server::TASK_TYPE_CLEAR_LOCAL_USER_CACHE:
                 $this->clearLocalUsers();
                 break;
+            case Server::TASK_TYPE_CLEAR_LOCAL_WXSHOP_TOKEN_CACHE:
+                $this->clearLocalWxShopTokens();
+                break;
+            case Server::TASK_TYPE_CLEAR_LOCAL_WXOPEN_AUTHORIZER_TOKEN_CACHE:
+                $this->clearLocalWxOpenAuthorizerTokens();
+                break;
             default:
                 $result = false;
                 break;
