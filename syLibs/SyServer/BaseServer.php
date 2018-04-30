@@ -269,6 +269,7 @@ abstract class BaseServer {
         self::$_syWxShopToken->column('access_token', \swoole_table::TYPE_STRING, 200);
         self::$_syWxShopToken->column('js_ticket', \swoole_table::TYPE_STRING, 200);
         self::$_syWxShopToken->column('expire_time', \swoole_table::TYPE_INT, 4);
+        self::$_syWxShopToken->column('clear_time', \swoole_table::TYPE_INT, 4);
         self::$_syWxShopToken->create();
 
         self::$_syWxOpenAuthorizerToken = new \swoole_table((int)$this->_configs['server']['cachenum']['wxopen']['authorizertoken']);
@@ -276,6 +277,7 @@ abstract class BaseServer {
         self::$_syWxOpenAuthorizerToken->column('access_token', \swoole_table::TYPE_STRING, 200);
         self::$_syWxOpenAuthorizerToken->column('js_ticket', \swoole_table::TYPE_STRING, 200);
         self::$_syWxOpenAuthorizerToken->column('expire_time', \swoole_table::TYPE_INT, 4);
+        self::$_syWxOpenAuthorizerToken->column('clear_time', \swoole_table::TYPE_INT, 4);
         self::$_syWxOpenAuthorizerToken->create();
     }
 

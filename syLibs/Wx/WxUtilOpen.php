@@ -99,6 +99,7 @@ final class WxUtilOpen extends WxUtilBase {
      */
     private static function getAuthorizerCache(string $appId) : array {
         $nowTime = time();
+        $clearTime = $nowTime + Server::TIME_EXPIRE_LOCAL_WXOPEN_AUTHORIZER_TOKEN_CLEAR;
         $cacheData = [];
         $openCommonConfig = WxConfigSingleton::getInstance()->getOpenCommonConfig();
         $redisKey = Server::REDIS_PREFIX_WX_COMPONENT_AUTHORIZER . $appId;
@@ -143,6 +144,7 @@ final class WxUtilOpen extends WxUtilBase {
                     'access_token' => $redisData['access_token'],
                     'js_ticket' => $redisData['js_ticket'],
                     'expire_time' => (int)$redisData['expire_time'],
+                    'clear_time' => $clearTime,
                 ]);
 
                 return [
@@ -185,6 +187,7 @@ final class WxUtilOpen extends WxUtilBase {
             'access_token' => $accessTokenData['authorizer_access_token'],
             'js_ticket' => $jsTicketData['ticket'],
             'expire_time' => $expireTime,
+            'clear_time' => $clearTime,
         ]);
 
         return [
