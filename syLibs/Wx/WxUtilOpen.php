@@ -176,7 +176,7 @@ final class WxUtilOpen extends WxUtilBase {
             throw new WxOpenException($jsTicketData['errmsg'], ErrorCode::WXOPEN_PARAM_ERROR);
         }
 
-        $expireTime = $nowTime + 7000;
+        $expireTime = $nowTime + Server::WX_COMPONENT_AUTHORIZER_EXPIRE_TOKEN;
         $cacheData['js_ticket'] = $jsTicketData['ticket'];
         $cacheData['access_token'] = $accessTokenData['authorizer_access_token'];
         $cacheData['expire_time'] = $expireTime;

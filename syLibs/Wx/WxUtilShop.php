@@ -303,7 +303,7 @@ final class WxUtilShop extends WxUtilBase {
 
         $accessToken = self::refreshAccessToken($appId);
         $jsTicket = self::refreshJsTicket($appId, $accessToken);
-        $expireTime = $nowTime + 7000;
+        $expireTime = $nowTime + Server::WX_SHOP_EXPIRE_TOKEN;
         CacheSimpleFactory::getRedisInstance()->hMset($redisKey, [
             'js_ticket' => $jsTicket,
             'access_token' => $accessToken,
