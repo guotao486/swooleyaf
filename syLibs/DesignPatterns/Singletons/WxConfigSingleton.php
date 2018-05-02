@@ -81,7 +81,16 @@ class WxConfigSingleton {
     private function getLocalShopConfig(string $appId) {
         $nowTime = time();
         if($this->shopClearTime < $nowTime){
-            $this->shopConfigs = [];
+            $delIds = [];
+            foreach ($this->shopConfigs as $eAppId => $shopConfig) {
+                if($shopConfig->getExpireTime() < $nowTime){
+                    $delIds[] = $eAppId;
+                }
+            }
+            foreach ($delIds as $eAppId) {
+                unset($this->shopConfigs[$eAppId]);
+            }
+
             $this->shopClearTime = $nowTime + Server::TIME_EXPIRE_LOCAL_WXSHOP_CLEAR;
         }
 
@@ -94,7 +103,7 @@ class WxConfigSingleton {
      * @return \Wx\WxConfigShop
      */
     public function refreshShopConfig(string $appId) {
-        $expireTime = time() + Server::TIME_EXPIRE_LOCAL_WXSHOP_CACHE;
+        $expireTime = time() + Server::TIME_EXPIRE_LOCAL_WXSHOP_REFRESH;
         $shopConfig = new WxConfigShop();
         $shopConfig->setAppId($appId);
         $shopConfig->setExpireTime($expireTime);
