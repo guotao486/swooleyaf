@@ -18,7 +18,13 @@ class Dir {
      * @return string
      */
     public static function getDirPath(string $dirName) : string {
-        $formatName = str_ireplace("\\", "/", $dirName);
+        $formatName = preg_replace([
+            '/\s+/',
+            '/\/{2,}/',
+        ], [
+            '',
+            '/',
+        ], $dirName);
 
         return substr($formatName, -1) == "/" ? $formatName : $formatName . "/";
     }
@@ -49,25 +55,17 @@ class Dir {
     /**
      * 批量创建目录
      * @param string $dirName 目录名
-     * @param int    $auth    权限
+     * @param int $auth 权限
      * @return bool
      */
     public static function create(string $dirName, $auth=0755) : bool {
         $dirPath = self::getDirPath($dirName);
         if (is_dir($dirPath)) {
             return true;
+        } else if(is_file($dirPath)){
+            return false;
+        } else {
+            return mkdir($dirPath, $auth, true);
         }
-
-        $dirs = explode('/', $dirPath);
-        $dir  = '';
-        foreach ( $dirs as $v ) {
-            $dir .= $v . '/';
-            if (is_dir($dir)) {
-                continue;
-            }
-            mkdir($dir, $auth);
-        }
-
-        return is_dir($dirPath);
     }
 }
