@@ -108,8 +108,6 @@ class WxConfigSingleton {
         } else {
             $templates = strlen($configInfo['app_templates']) > 0 ? Tool::jsonDecode($configInfo['app_templates']) : [];
             $shopConfig->setValid(true);
-            $shopConfig->setExpireJsTicket(7000);
-            $shopConfig->setExpireAccessToken(7000);
             $shopConfig->setClientIp((string)$configInfo['app_clientip']);
             $shopConfig->setSecret((string)$configInfo['app_secret']);
             $shopConfig->setPayMchId((string)$configInfo['pay_mchid']);
