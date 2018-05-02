@@ -65,10 +65,14 @@ final class Server {
     //微信开放平台常量
     const WX_COMPONENT_AUTHORIZER_STATUS_CANCEL = 0; //授权公众号状态-取消授权
     const WX_COMPONENT_AUTHORIZER_STATUS_ALLOW = 1; //授权公众号状态-允许授权
+    const WX_COMPONENT_AUTHORIZER_EXPIRE_ACCESS_TOKEN = 7000; //授权公众号超时时间-access token,单位为秒
+    const WX_COMPONENT_AUTHORIZER_EXPIRE_JS_TICKET = 7000; //授权公众号超时时间-js ticket,单位为秒
 
     //微信商户号常量
-    const WX_SHOP_STATUS_DISABLE = 0; //授权公众号状态-无效
-    const WX_SHOP_STATUS_ENABLE = 1; //授权公众号状态-有效
+    const WX_SHOP_STATUS_DISABLE = 0; //商户号状态-无效
+    const WX_SHOP_STATUS_ENABLE = 1; //商户号状态-有效
+    const WX_SHOP_EXPIRE_ACCESS_TOKEN = 7000; //商户号超时时间-access token,单位为秒
+    const WX_SHOP_EXPIRE_JS_TICKET = 7000; //商户号超时时间-js ticket,单位为秒
 
     //本地缓存标识
     const CACHE_LOCAL_TAG_PREFIX_WX_COMPONENT_ACCESS_TOKEN = 'a101_'; //前缀-微信开放平台access token

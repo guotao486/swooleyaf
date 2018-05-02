@@ -19,18 +19,6 @@ class WxConfigShop {
     }
 
     /**
-     * js ticket超时时间,单位为秒
-     * @var int
-     */
-    private $expireJsTicket = 0;
-
-    /**
-     * access token超时时间,单位为秒
-     * @var int
-     */
-    private $expireAccessToken = 0;
-
-    /**
      * 客户端IP
      * @var string
      */
@@ -101,44 +89,6 @@ class WxConfigShop {
      * @var int
      */
     private $expireTime = 0;
-
-    /**
-     * @return int
-     */
-    public function getExpireJsTicket(): int {
-        return $this->expireJsTicket;
-    }
-
-    /**
-     * @param int $expireJsTicket
-     * @throws \Exception\WX\WxException
-     */
-    public function setExpireJsTicket(int $expireJsTicket) {
-        if(($expireJsTicket > 0) && ($expireJsTicket <= 7200)){
-            $this->expireJsTicket = $expireJsTicket;
-        } else {
-            throw new WxException('js ticket超时时间不合法', ErrorCode::WX_PARAM_ERROR);
-        }
-    }
-
-    /**
-     * @return int
-     */
-    public function getExpireAccessToken(): int {
-        return $this->expireAccessToken;
-    }
-
-    /**
-     * @param int $expireAccessToken
-     * @throws \Exception\WX\WxException
-     */
-    public function setExpireAccessToken(int $expireAccessToken) {
-        if(($expireAccessToken > 0) && ($expireAccessToken <= 7200)){
-            $this->expireAccessToken = $expireAccessToken;
-        } else {
-            throw new WxException('access token超时时间不合法', ErrorCode::WX_PARAM_ERROR);
-        }
-    }
 
     /**
      * @return string
@@ -372,8 +322,6 @@ class WxConfigShop {
             'pay.url.notify' => $this->payNotifyUrl,
             'ssl.key' => $this->sslKey,
             'ssl.cert' => $this->sslCert,
-            'expire.jsticket' => $this->expireJsTicket,
-            'expire.accesstoken' => $this->expireAccessToken,
             'templates' => $this->templates,
             'valid' => $this->valid,
             'expire.time' => $this->expireTime,
