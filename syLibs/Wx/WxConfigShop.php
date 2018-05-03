@@ -159,7 +159,7 @@ class WxConfigShop {
      * @throws \Exception\WX\WxException
      */
     public function setPayMchId(string $payMchId) {
-        if(preg_match('/^\d{10}$/', $payMchId) > 0){
+        if(preg_match('/^\d+$/', $payMchId) > 0){
             $this->payMchId = $payMchId;
         } else {
             throw new WxException('商户号不合法', ErrorCode::WX_PARAM_ERROR);
