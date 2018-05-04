@@ -560,7 +560,7 @@ class Tool {
         if(strpos($release, 'el7') !== false){
             $command = "ifconfig eth0 | grep inet | awk '{print $2}'";
         } else if(strpos($release, 'el6') !== false){
-            $command = "ifconfig eth0 | grep 'inet addr'| awk '{print $2}' | awk -F: '{print $2}'";
+            $command = "ifconfig eth0 | grep 'inet addr' | awk '{print $2}' | awk -F: '{print $2}'";
         } else {
             return '';
         }
