@@ -98,7 +98,7 @@ final class Log {
      * @param string $basePath 基目录
      * @param string $logger 存储目录
      */
-    public static function setPath(string $basePath, string $logger='default/'){
+    public static function setPath(string $basePath, string $logger=''){
         if(!is_dir($basePath . '/' . $logger)){
             Dir::create($basePath . '/' . $logger);
         }
