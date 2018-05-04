@@ -188,7 +188,7 @@ abstract class BaseServer {
             exit('用户信息缓存数量必须是2的指数倍');
         }
 
-        define('SY_INNER_IP', $this->_configs['server']['innerip']);
+        define('SY_SERVER_IP', $this->_configs['server']['host']);
 
         //检测redis服务是否启动
         RedisSingleton::getInstance()->checkConn();
