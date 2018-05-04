@@ -69,6 +69,7 @@
 - SY_ENV //框架环境 dev:测试环境 product:生产环境
 - SY_PROJECT //框架项目名称
 - SY_LOG_PATH //框架日志目录
+- SY_INNER_IP //服务器内网IP
 - SY_VERSION //框架版本号
 - SY_MODULE //框架模块名称
 - SY_API //框架API标识 true: 是对外的API接口 false:不是对外的API接口

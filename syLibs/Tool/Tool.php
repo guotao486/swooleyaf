@@ -550,4 +550,24 @@ class Tool {
             throw new CheckException('请求地址不能为空', ErrorCode::COMMON_PARAM_ERROR);
         }
     }
+
+    /**
+     * 获取服务器内网IP
+     * @return string
+     */
+    public static function getInnerIp(){
+        $release = php_uname('r');
+        if(strpos($release, 'el7') !== false){
+            $command = "ifconfig eth0 | grep inet | awk '{print $2}'";
+        } else if(strpos($release, 'el6') !== false){
+            $command = "ifconfig eth0 | grep 'inet addr'| awk '{print $2}' | awk -F: '{print $2}'";
+        } else {
+            return '';
+        }
+
+        $ip = [];
+        exec($command, $ip);
+
+        return empty($ip) ? '' : $ip[0];
+    }
 }
