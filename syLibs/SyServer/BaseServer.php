@@ -149,14 +149,17 @@ abstract class BaseServer {
      * @param int $port 端口
      */
     public function __construct(int $port) {
-        if(version_compare(PHP_VERSION, '7.0.0', '<')){
-            exit('PHP版本必须大于7.0' . PHP_EOL);
+        $os = php_uname('s');
+        if(version_compare(PHP_VERSION, Server::VERSION_PHP_MIN, '<')){
+            exit('PHP版本必须大于' . Server::VERSION_PHP_MIN . PHP_EOL);
         } else if (!defined('SY_MODULE')) {
             exit('模块名称未定义' . PHP_EOL);
         } else if (($port <= 1000) || ($port > 65535)) {
             exit('端口不合法' . PHP_EOL);
-        } else if(!in_array(SY_ENV, ['dev', 'product'])){
+        } else if(!in_array(SY_ENV, Server::$totalEnvProject)){
             exit('环境类型不合法' . PHP_EOL);
+        } else if(!in_array($os, Server::$totalEnvSystem)){
+            exit('操作系统不支持' . PHP_EOL);
         }
 
         //检查必要的扩展是否存在
