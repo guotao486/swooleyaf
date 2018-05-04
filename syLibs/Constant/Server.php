@@ -26,9 +26,14 @@ final class Server {
         self::MODULE_BASE_SERVICE,
     ];
 
-    public static $totalEnvList = [
-        self::ENV_DEV,
-        self::ENV_PRODUCT,
+    public static $totalEnvProject = [
+        self::ENV_PROJECT_DEV,
+        self::ENV_PROJECT_PRODUCT,
+    ];
+
+    public static $totalEnvSystem = [
+        self::ENV_SYSTEM_BSD,
+        self::ENV_SYSTEM_LINUX,
     ];
 
     //模块常量
@@ -55,8 +60,10 @@ final class Server {
     const SERVER_TIME_REQ_HEALTH_MIN = 4000; //服务端时间-请求健康检查最小时间,单位为毫秒
 
     //环境常量
-    const ENV_DEV = 'dev'; //测试环境
-    const ENV_PRODUCT = 'product'; //生产环境
+    const ENV_PROJECT_DEV = 'dev'; //项目环境-测试
+    const ENV_PROJECT_PRODUCT = 'product'; //项目环境-生产
+    const ENV_SYSTEM_BSD = 'FreeBSD'; //系统环境-bsd
+    const ENV_SYSTEM_LINUX = 'Linux'; //系统环境-linux
 
     //版本常量
     const VERSION_PHP_MIN = '7.0.0'; //最低php版本
