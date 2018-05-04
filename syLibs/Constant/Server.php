@@ -26,6 +26,11 @@ final class Server {
         self::MODULE_BASE_SERVICE,
     ];
 
+    public static $totalEnvList = [
+        self::ENV_DEV,
+        self::ENV_PRODUCT,
+    ];
+
     //模块常量
     //考虑到yac缓存名称长度限制,名称不能超过30个字符串
     const MODULE_BASE_API = 'api';
@@ -48,6 +53,13 @@ final class Server {
     const SERVER_DATA_KEY_TOKEN = '_sytoken'; //服务端内部数据键名-token
     const SERVER_TIME_REQ_HANDLE_MAX = 120; //服务端时间-请求最大执行时间,单位为毫秒
     const SERVER_TIME_REQ_HEALTH_MIN = 4000; //服务端时间-请求健康检查最小时间,单位为毫秒
+
+    //环境常量
+    const ENV_DEV = 'dev'; //测试环境
+    const ENV_PRODUCT = 'product'; //生产环境
+
+    //版本常量
+    const VERSION_PHP_MIN = '7.0.0'; //最低php版本
 
     //REDIS常量 以sy000开头的前缀为框架内部前缀,以sy+3位数字开头的前缀为公共模块前缀
     const REDIS_PREFIX_SESSION = 'sy000001_'; //前缀-session
