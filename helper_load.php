@@ -16,6 +16,3 @@ if(substr($syLogPath, -1) == '/'){
 }
 define('SY_LOG_PATH', $syLogPath);
 unset($syLogPath);
-
-$innerIp = \Tool\Tool::getInnerIp();
-define('SY_INNER_IP', $innerIp);
