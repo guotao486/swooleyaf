@@ -1,6 +1,6 @@
 <?php
-function controllerLog(string $sudo,string $serverPath,string $command) {
-    $phpCommand = $sudo . '/usr/local/php7/bin/php helper_service.php -n ' . $serverPath . ' ' . $command;
+function controllerLog(string $serverPath,string $command) {
+    $phpCommand = 'sudo /usr/local/php7/bin/php helper_service.php -n ' . $serverPath . ' ' . $command;
     system($phpCommand);
 }
 
@@ -15,13 +15,6 @@ function getClientOption(string $key, $default=null) {
     }
 
     return $option ?? $default;
-}
-
-//操作系统
-$unameInfo = php_uname();
-$sudo = '';
-if (strpos($unameInfo, 'Darwin') !== false) {
-    $sudo = 'sudo ';
 }
 
 $projects = [
@@ -77,7 +70,7 @@ switch ($command) {
         foreach ($projects as $name => $eProject) {
             if ($eProject['type'] == 'module') {
                 foreach ($eProject['listens'] as $eListen) {
-                    controllerLog($sudo, $name, '-s start -module ' . $eProject['module_name'] . ' -port ' . $eListen['port']);
+                    controllerLog($name, '-s start -module ' . $eProject['module_name'] . ' -port ' . $eListen['port']);
                 }
             }
         }
@@ -86,7 +79,7 @@ switch ($command) {
         foreach ($projects as $name => $eProject) {
             if ($eProject['type'] == 'module') {
                 foreach ($eProject['listens'] as $eListen) {
-                    controllerLog($sudo, $name, '-s stop -module ' . $eProject['module_name'] . ' -port ' . $eListen['port']);
+                    controllerLog($name, '-s stop -module ' . $eProject['module_name'] . ' -port ' . $eListen['port']);
                 }
             }
         }
@@ -95,7 +88,7 @@ switch ($command) {
         foreach ($projects as $name => $eProject) {
             if ($eProject['type'] == 'module') {
                 foreach ($eProject['listens'] as $eListen) {
-                    controllerLog($sudo, $name, '-s restart -module ' . $eProject['module_name'] . ' -port ' . $eListen['port']);
+                    controllerLog($name, '-s restart -module ' . $eProject['module_name'] . ' -port ' . $eListen['port']);
                 }
             }
         }
@@ -104,7 +97,7 @@ switch ($command) {
         foreach ($projects as $name => $eProject) {
             if ($eProject['type'] == 'module') {
                 foreach ($eProject['listens'] as $eListen) {
-                    controllerLog($sudo, $name, '-s kz -module ' . $eProject['module_name'] . ' -port ' . $eListen['port']);
+                    controllerLog($name, '-s kz -module ' . $eProject['module_name'] . ' -port ' . $eListen['port']);
                 }
             }
         }
