@@ -14,7 +14,7 @@ final class Log {
     use SimpleTrait;
 
     public static function log($msg, $level=SEASLOG_INFO){
-        $log = defined('SY_MODULE') ? SY_MODULE . ' | ' . PHP_EOL : PHP_EOL;
+        $log = SY_SERVER_IP . ' | ' . SY_MODULE . ' | ' . PHP_EOL;
         if (is_string($msg)) {
             $log .= $msg;
         } else {
