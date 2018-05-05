@@ -587,7 +587,6 @@ class HttpServer extends BaseServer {
                     } else {
                         $handleRes = $module->sendApiReq($commandData['api_uri'], $commandData['api_params']);
                     }
-
                     if ($handleRes === false) {
                         $result->setCodeMsg(ErrorCode::COMMON_SERVER_ERROR, '服务处理失败');
                     } else {
@@ -614,7 +613,6 @@ class HttpServer extends BaseServer {
                     } else {
                         $handleRes = $module->sendTaskReq($commandData['task_command'], $commandData['task_params']);
                     }
-
                     if ($handleRes === false) {
                         $result->setCodeMsg(ErrorCode::COMMON_SERVER_ERROR, '服务处理失败');
                     } else {
