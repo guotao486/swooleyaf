@@ -8,6 +8,7 @@
 namespace Wx;
 
 use Constant\ErrorCode;
+use Constant\Server;
 use Exception\Wx\WxException;
 use Tool\Tool;
 
@@ -63,56 +64,51 @@ abstract class WxUtilBase {
 
     /**
      * 发送post请求
-     * @param string|array $data 数据
      * @param string $url 请求地址
-     * @param array $configs 配置数组
-     * @param array $extends 扩展信息数组
+     * @param string $dataType 数据类型
+     * @param string|array $data 数据
+     * @param array $curlConfig curl配置数组
      * @return mixed
      * @throws \Exception\Wx\WxException
      */
-    protected static function sendPost(string $url, $data,array $configs=[],array &$extends=[]) {
-        $dataStr = '';
-        if(is_string($data)){
-            $dataStr = $data;
-        } else if(is_array($data)){
-            $dataType = Tool::getArrayVal($configs, 'data_type', 'query');
-            if($dataType == 'xml'){
-                $dataStr = self::arrayToXml($data);
-            } else if($dataType == 'json'){
+    protected static function sendPostReq(string $url,string $dataType, $data,array $curlConfig=[]) {
+        switch ($dataType) {
+            case 'string' :
+                $dataStr = $data;
+                break;
+            case 'json' :
                 $dataStr = Tool::jsonEncode($data, JSON_UNESCAPED_UNICODE);
-            } else if($dataType == 'query'){
+                break;
+            case 'xml' :
+                $dataStr = self::arrayToXml($data);
+                break;
+            case 'query' :
                 $dataStr = http_build_query($data);
-            }
+                break;
+            default :
+                $dataStr = '';
         }
-        if(strlen($dataStr) == 0){
+        if((!is_string($dataStr)) || (strlen($dataStr) == 0)){
             throw new WxException('数据格式不合法', ErrorCode::WX_PARAM_ERROR);
         }
 
-        $timeout = (int)Tool::getArrayVal($configs, 'timeout', 2000);
-
-        $curlConfigs = [
-            CURLOPT_URL => $url,
-            CURLOPT_POST => true,
-            CURLOPT_POSTFIELDS => $dataStr,
-            CURLOPT_TIMEOUT_MS => $timeout,
-            CURLOPT_HEADER => Tool::getArrayVal($configs, 'headers', false),
-            CURLOPT_RETURNTRANSFER => true,
-        ];
-        if (Tool::getArrayVal($configs, 'ssl_verify', true)) { //是否需要ssl认证，默认需要
-            $curlConfigs[CURLOPT_SSL_VERIFYPEER] = true;
-            $curlConfigs[CURLOPT_SSL_VERIFYHOST] = 2; //严格校验
-        } else {
-            $curlConfigs[CURLOPT_SSL_VERIFYPEER] = false;
-            $curlConfigs[CURLOPT_SSL_VERIFYHOST] = false;
+        $curlConfig[CURLOPT_URL] = $url;
+        $curlConfig[CURLOPT_POST] = true;
+        $curlConfig[CURLOPT_POSTFIELDS] = $dataStr;
+        $curlConfig[CURLOPT_RETURNTRANSFER] = true;
+        if(!isset($curlConfig[CURLOPT_TIMEOUT_MS])){
+            $curlConfig[CURLOPT_TIMEOUT_MS] = 2000;
         }
-
-        if (Tool::getArrayVal($configs, 'use_cert', false)) { //是否需要证书，默认不需要
-            $curlConfigs[CURLOPT_SSLCERTTYPE] = 'PEM';
-            $curlConfigs[CURLOPT_SSLCERT] = Tool::getArrayVal($configs, 'sslcert_path', '');
-            $curlConfigs[CURLOPT_SSLKEYTYPE] = 'PEM';
-            $curlConfigs[CURLOPT_SSLKEY] = Tool::getArrayVal($configs, 'sslkey_path', '');
+        if(!isset($curlConfig[CURLOPT_HEADER])){
+            $curlConfig[CURLOPT_HEADER] = false;
         }
-        $sendRes = Tool::sendCurlReq($curlConfigs);
+        if(!isset($curlConfig[CURLOPT_SSL_VERIFYPEER])){
+            $curlConfig[CURLOPT_SSL_VERIFYPEER] = true;
+        }
+        if(!isset($curlConfig[CURLOPT_SSL_VERIFYHOST])){
+            $curlConfig[CURLOPT_SSL_VERIFYHOST] = 2;
+        }
+        $sendRes = Tool::sendCurlReq($curlConfig);
         if ($sendRes['res_no'] == 0) {
             return $sendRes['res_content'];
         } else {
@@ -123,20 +119,20 @@ abstract class WxUtilBase {
     /**
      * 发送get请求
      * @param string $url 请求地址
-     * @param int $timeout 执行超时时间,单位为毫秒，默认为2s
-     * @param array $extends 扩展信息数组
+     * @param array $curlConfig curl配置数组
      * @return mixed
      * @throws \Exception\Wx\WxException
      */
-    protected static function sendGetReq(string $url,int $timeout=2000,array &$extends=[]) {
-        $sendRes = Tool::sendCurlReq([
-            CURLOPT_URL => $url,
-            CURLOPT_TIMEOUT_MS => $timeout,
-            CURLOPT_SSL_VERIFYPEER => false,
-            CURLOPT_SSL_VERIFYHOST => false,
-            CURLOPT_HEADER => false,
-            CURLOPT_RETURNTRANSFER => true,
-        ]);
+    protected static function sendGetReq(string $url,array $curlConfig=[]) {
+        $curlConfig[CURLOPT_URL] = $url;
+        $curlConfig[CURLOPT_SSL_VERIFYPEER] = false;
+        $curlConfig[CURLOPT_SSL_VERIFYHOST] = false;
+        $curlConfig[CURLOPT_HEADER] = false;
+        $curlConfig[CURLOPT_RETURNTRANSFER] = true;
+        if(!isset($curlConfig[CURLOPT_TIMEOUT_MS])){
+            $curlConfig[CURLOPT_TIMEOUT_MS] = 2000;
+        }
+        $sendRes = Tool::sendCurlReq($curlConfig);
         if ($sendRes['res_no'] == 0) {
             return $sendRes['res_content'];
         } else {

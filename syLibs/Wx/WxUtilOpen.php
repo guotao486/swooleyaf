@@ -12,7 +12,6 @@ use Constant\Server;
 use DesignPatterns\Factories\CacheSimpleFactory;
 use DesignPatterns\Singletons\WxConfigSingleton;
 use Exception\Wx\WxOpenException;
-use Factories\SyBaseMysqlFactory;
 use Factories\SyTaskMysqlFactory;
 use SyServer\BaseServer;
 use Tool\Tool;
@@ -36,12 +35,10 @@ final class WxUtilOpen extends WxUtilBase {
      */
     public static function refreshComponentAccessToken(string $verifyTicket){
         $openCommonConfig = WxConfigSingleton::getInstance()->getOpenCommonConfig();
-        $resData = self::sendPost(self::$urlComponentToken, [
+        $resData = self::sendPostReq(self::$urlComponentToken, 'json', [
             'component_appid' => $openCommonConfig->getAppId(),
             'component_appsecret' => $openCommonConfig->getSecret(),
             'component_verify_ticket' => $verifyTicket,
-        ], [
-            'data_type' => 'json',
         ]);
         $resArr = Tool::jsonDecode($resData);
         if (isset($resArr['component_access_token'])) {
@@ -157,12 +154,10 @@ final class WxUtilOpen extends WxUtilBase {
         }
 
         $urlAccessToken = self::$urlAuthorizerToken . self::getComponentAccessToken($openCommonConfig->getAppId());
-        $accessTokenRes = self::sendPost($urlAccessToken, [
+        $accessTokenRes = self::sendPostReq($urlAccessToken, 'json', [
             'component_appid' => $openCommonConfig->getAppId(),
             'authorizer_appid' => $appId,
             'authorizer_refresh_token' => $refreshToken,
-        ], [
-            'data_type' => 'json',
         ]);
         $accessTokenData = Tool::jsonDecode($accessTokenRes);
         if(!isset($accessTokenData['authorizer_access_token'])){
@@ -204,7 +199,7 @@ final class WxUtilOpen extends WxUtilBase {
      */
     public static function getAuthorizerAccessToken(string $appId) : string {
         $nowTime = time();
-        $cacheData = BaseServer::getWxOpenAuthorizerTokenCache($appId);
+        $cacheData = BaseServer::getWxOpenAuthorizerTokenCache($appId, '', []);
         if(isset($cacheData['expire_time']) && ($cacheData['expire_time'] >= $nowTime)){
             return $cacheData['access_token'];
         }
@@ -221,7 +216,7 @@ final class WxUtilOpen extends WxUtilBase {
      */
     public static function getAuthorizerJsTicket(string $appId) : string {
         $nowTime = time();
-        $cacheData = BaseServer::getWxOpenAuthorizerTokenCache($appId);
+        $cacheData = BaseServer::getWxOpenAuthorizerTokenCache($appId, '', []);
         if(isset($cacheData['expire_time']) && ($cacheData['expire_time'] >= $nowTime)){
             return $cacheData['js_ticket'];
         }
@@ -414,10 +409,8 @@ final class WxUtilOpen extends WxUtilBase {
         $authUrl = '';
         $openCommonConfig = WxConfigSingleton::getInstance()->getOpenCommonConfig();
         $url = self::$urlPreAuthCode . self::getComponentAccessToken($openCommonConfig->getAppId());
-        $resData = self::sendPost($url, [
+        $resData = self::sendPostReq($url, 'json', [
             'component_appid' => $openCommonConfig->getAppId(),
-        ], [
-            'data_type' => 'json',
         ]);
         $resArr = Tool::jsonDecode($resData);
         if (isset($resArr['pre_auth_code'])) {
@@ -441,11 +434,9 @@ final class WxUtilOpen extends WxUtilBase {
         ];
 
         $url = self::$urlAuthorizerAuth . self::getComponentAccessToken($appId);
-        $getRes = self::sendPost($url, [
+        $getRes = self::sendPostReq($url, 'json', [
             'component_appid' => $appId,
             'authorization_code' => $authCode,
-        ], [
-            'data_type' => 'json',
         ]);
         $getData = Tool::jsonDecode($getRes);
         if (isset($getData['authorization_info'])) {
@@ -470,11 +461,10 @@ final class WxUtilOpen extends WxUtilBase {
         ];
 
         $url = self::$urlSendCustom . self::getAuthorizerAccessToken($appId);
-        $sendRes = self::sendPost($url, $data, [
-            'data_type' => 'json',
-            'headers' => [
+        $sendRes = self::sendPostReq($url, 'json', $data, [
+            CURLOPT_HEADER => [
                 'Expect:',
-            ]
+            ],
         ]);
         $resData = Tool::jsonDecode($sendRes);
         if ($resData['errcode'] == 0) {
