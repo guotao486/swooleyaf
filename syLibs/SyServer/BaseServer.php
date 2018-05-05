@@ -26,6 +26,54 @@ abstract class BaseServer {
      */
     protected $_server = null;
     /**
+     * 配置数组
+     * @var array
+     */
+    protected $_configs = [];
+    /**
+     * 请求域名
+     * @var string
+     */
+    protected $_host = '';
+    /**
+     * 请求端口
+     * @var int
+     */
+    protected $_port = 0;
+    /**
+     * @var \Yaf\Application
+     */
+    protected $_app = null;
+    /**
+     * task进程数量
+     * @var int
+     */
+    protected $_taskNum = 0;
+    /**
+     * 最大task进程ID号
+     * @var int
+     */
+    protected $_taskMaxId = -1;
+    /**
+     * pid文件
+     * @var string
+     */
+    protected $_pidFile = '';
+    /**
+     * @var \Tool\SyPack
+     */
+    protected $_syPack = null;
+    /**
+     * 请求ID
+     * @var string
+     */
+    protected static $_reqId = '';
+    /**
+     * 请求开始毫秒级时间戳
+     * @var float
+     */
+    protected static $_reqStartTime = 0.0;
+    /**
      * 服务token码,用于标识不同的服务,每个服务的token不一样
      * @var string
      */
@@ -95,54 +143,6 @@ abstract class BaseServer {
      * @var \swoole_table
      */
     protected static $_syWxOpenAuthorizerToken = null;
-    /**
-     * 配置数组
-     * @var array
-     */
-    protected $_configs = [];
-    /**
-     * 请求域名
-     * @var string
-     */
-    protected $_host = '';
-    /**
-     * 请求端口
-     * @var int
-     */
-    protected $_port = 0;
-    /**
-     * @var \Yaf\Application
-     */
-    protected $_app = null;
-    /**
-     * task进程数量
-     * @var int
-     */
-    protected $_taskNum = 0;
-    /**
-     * 最大task进程ID号
-     * @var int
-     */
-    protected $_taskMaxId = -1;
-    /**
-     * pid文件
-     * @var string
-     */
-    protected $_pidFile = '';
-    /**
-     * @var \Tool\SyPack
-     */
-    protected $_syPack = null;
-    /**
-     * 请求ID
-     * @var string
-     */
-    protected static $_reqId = '';
-    /**
-     * 请求开始毫秒级时间戳
-     * @var float
-     */
-    protected static $_reqStartTime = 0.0;
 
     /**
      * BaseServer constructor.
