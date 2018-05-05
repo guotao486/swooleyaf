@@ -12,14 +12,14 @@ use Traits\SimpleTrait;
 final class Server {
     use SimpleTrait;
 
-    public static $totalModules = [
+    public static $totalModuleName = [
         self::MODULE_NAME_API,
         self::MODULE_NAME_ORDER,
         self::MODULE_NAME_USER,
         self::MODULE_NAME_SERVICE,
     ];
 
-    public static $totalModuleBases = [
+    public static $totalModuleBase = [
         self::MODULE_BASE_API,
         self::MODULE_BASE_ORDER,
         self::MODULE_BASE_USER,

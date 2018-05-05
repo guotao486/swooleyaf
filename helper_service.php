@@ -19,7 +19,7 @@ $moduleName = trim(\Tool\Tool::getClientOption('-module'));
 if (strlen($moduleName) == 0) {
     print_r('module name must exist' . PHP_EOL);
     exit(3);
-} else if (!in_array($moduleName, \Constant\Server::$totalModules)) {
+} else if (!in_array($moduleName, \Constant\Server::$totalModuleName)) {
     print_r('module name error' . PHP_EOL);
     exit(4);
 }
