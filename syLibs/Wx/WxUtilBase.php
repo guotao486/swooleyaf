@@ -8,7 +8,6 @@
 namespace Wx;
 
 use Constant\ErrorCode;
-use Constant\Server;
 use Exception\Wx\WxException;
 use Tool\Tool;
 
