@@ -105,7 +105,7 @@ final class WxUtilShop extends WxUtilBase {
         //发起统一下单
         $orderDetail = $order->getDetail();
         $reqXml = self::arrayToXml($orderDetail);
-        $resXml = self::sendPost(self::$urlUnifiedOrder, $reqXml);
+        $resXml = self::sendPostReq(self::$urlUnifiedOrder, 'string', $reqXml);
         $resData = self::xmlToArray($resXml);
         if($resData['return_code'] == 'FAIL'){
             $resArr['code'] = ErrorCode::WX_PARAM_ERROR;
@@ -143,7 +143,7 @@ final class WxUtilShop extends WxUtilBase {
         //发起统一下单
         $orderDetail = $order->getDetail();
         $reqXml = self::arrayToXml($orderDetail);
-        $resXml = self::sendPost(self::$urlUnifiedOrder, $reqXml);
+        $resXml = self::sendPostReq(self::$urlUnifiedOrder, 'string', $reqXml);
         $resData = self::xmlToArray($resXml);
         if($resData['return_code'] == 'FAIL'){
             $resArr['code'] = ErrorCode::WX_PARAM_ERROR;
@@ -180,7 +180,7 @@ final class WxUtilShop extends WxUtilBase {
         $shortUrl->setLongUrl($codeUrl);
         $urlDetail = $shortUrl->getDetail();
         $reqXml = self::arrayToXml($urlDetail);
-        $resXml = self::sendPost(self::$urlShorturl, $reqXml);
+        $resXml = self::sendPostReq(self::$urlShorturl, 'string', $reqXml);
         $resData = self::xmlToArray($resXml);
         if ($resData['return_code'] == 'FAIL') {
             Log::error($resData['return_msg'], ErrorCode::WX_PARAM_ERROR);
@@ -215,10 +215,11 @@ final class WxUtilShop extends WxUtilBase {
         fwrite($tmpCert, $shopConfig->getSslCert());
         $tmpCertData = stream_get_meta_data($tmpCert);
         $reqXml = self::arrayToXml($companyDetail);
-        $resXml = self::sendPost(self::$urlCompanyPay, $reqXml, [
-            'use_cert' => true,
-            'sslcert_path' => $tmpCertData['uri'],
-            'sslkey_path' => $tmpKeyData['uri'],
+        $resXml = self::sendPostReq(self::$urlCompanyPay, 'string', $reqXml, [
+            CURLOPT_SSLCERTTYPE => 'PEM',
+            CURLOPT_SSLCERT => $tmpCertData['uri'],
+            CURLOPT_SSLKEYTYPE => 'PEM',
+            CURLOPT_SSLKEY => $tmpKeyData['uri'],
         ]);
         fclose($tmpKey);
         fclose($tmpCert);
@@ -252,12 +253,21 @@ final class WxUtilShop extends WxUtilBase {
 
         $queryDetail = $query->getDetail();
         $shopConfig = WxConfigSingleton::getInstance()->getShopConfig($queryDetail['appid']);
+        $tmpKey = tmpfile();
+        fwrite($tmpKey, $shopConfig->getSslKey());
+        $tmpKeyData = stream_get_meta_data($tmpKey);
+        $tmpCert = tmpfile();
+        fwrite($tmpCert, $shopConfig->getSslCert());
+        $tmpCertData = stream_get_meta_data($tmpCert);
         $reqXml = self::arrayToXml($queryDetail);
-        $resXml = self::sendPost(self::$urlQueryCompanyPay, $reqXml, [
-            'use_cert' => true,
-            'sslcert_path' => $shopConfig->getSslCert(),
-            'sslkey_path' => $shopConfig->getSslKey(),
+        $resXml = self::sendPostReq(self::$urlQueryCompanyPay, 'string', $reqXml, [
+            CURLOPT_SSLCERTTYPE => 'PEM',
+            CURLOPT_SSLCERT => $tmpCertData['uri'],
+            CURLOPT_SSLKEYTYPE => 'PEM',
+            CURLOPT_SSLKEY => $tmpKeyData['uri'],
         ]);
+        fclose($tmpKey);
+        fclose($tmpCert);
         $resData = self::xmlToArray($resXml);
         if ($resData['return_code'] == 'FAIL') {
             Log::error($resData['return_msg'], ErrorCode::WX_PARAM_ERROR);
@@ -289,8 +299,8 @@ final class WxUtilShop extends WxUtilBase {
         if (isset($redisData['unique_key']) && ($redisData['unique_key'] == $redisKey) && ($redisData['expire_time'] >= $nowTime)) {
             $expireTime = (int)$redisData['expire_time'];
             BaseServer::setWxShopTokenCache($appId, [
-                'js_ticket' => $redisData['js_ticket'],
                 'access_token' => $redisData['access_token'],
+                'js_ticket' => $redisData['js_ticket'],
                 'expire_time' => $expireTime,
                 'clear_time' => $clearTime,
             ]);
@@ -313,8 +323,8 @@ final class WxUtilShop extends WxUtilBase {
         CacheSimpleFactory::getRedisInstance()->expire($redisKey, 7100);
 
         BaseServer::setWxShopTokenCache($appId, [
-            'js_ticket' => $jsTicket,
             'access_token' => $accessToken,
+            'js_ticket' => $jsTicket,
             'expire_time' => $expireTime,
             'clear_time' => $clearTime,
         ]);
@@ -436,7 +446,7 @@ final class WxUtilShop extends WxUtilBase {
 
         $queryDetail = $query->getDetail();
         $reqXml = self::arrayToXml($queryDetail);
-        $resXml = self::sendPost(self::$urlOrderQuery, $reqXml);
+        $resXml = self::sendPostReq(self::$urlOrderQuery, 'string', $reqXml);
         $resData = self::xmlToArray($resXml);
         if ($resData['return_code'] == 'FAIL') {
             $resArr['code'] = ErrorCode::WX_POST_ERROR;
@@ -463,7 +473,7 @@ final class WxUtilShop extends WxUtilBase {
 
         $queryDetail = $query->getDetail();
         $reqXml = self::arrayToXml($queryDetail);
-        $resXml = self::sendPost(self::$urlRefundQuery, $reqXml);
+        $resXml = self::sendPostReq(self::$urlRefundQuery, 'string', $reqXml);
         $resData = self::xmlToArray($resXml);
         if ($resData['return_code'] == 'FAIL') {
             $resArr['code'] = ErrorCode::WX_POST_ERROR;
@@ -497,10 +507,11 @@ final class WxUtilShop extends WxUtilBase {
         fwrite($tmpCert, $shopConfig->getSslCert());
         $tmpCertData = stream_get_meta_data($tmpCert);
         $reqXml = self::arrayToXml($refundDetail);
-        $resXml = self::sendPost(self::$urlOrderRefund, $reqXml, [
-            'use_cert' => true,
-            'sslcert_path' => $tmpCertData['uri'],
-            'sslkey_path' => $tmpKeyData['uri'],
+        $resXml = self::sendPostReq(self::$urlOrderRefund, 'string', $reqXml, [
+            CURLOPT_SSLCERTTYPE => 'PEM',
+            CURLOPT_SSLCERT => $tmpCertData['uri'],
+            CURLOPT_SSLKEYTYPE => 'PEM',
+            CURLOPT_SSLKEY => $tmpKeyData['uri'],
         ]);
         fclose($tmpKey);
         fclose($tmpCert);
@@ -529,7 +540,7 @@ final class WxUtilShop extends WxUtilBase {
 
         $billDetail = $bill->getDetail();
         $reqXml = self::arrayToXml($billDetail);
-        $resXml = self::sendPost(self::$urlDownloadBill, $reqXml);
+        $resXml = self::sendPostReq(self::$urlDownloadBill, 'string', $reqXml);
         if (substr($resXml, 0, 5) == '<xml>') {
             $resData = self::xmlToArray($resXml);
             $resArr['code'] = ErrorCode::WX_POST_ERROR;
@@ -557,7 +568,7 @@ final class WxUtilShop extends WxUtilBase {
 
         $closeDetail = $close->getDetail();
         $reqXml = self::arrayToXml($closeDetail);
-        $resXml = self::sendPost(self::$urlOrderClose, $reqXml);
+        $resXml = self::sendPostReq(self::$urlOrderClose, 'string', $reqXml);
         $resData = self::xmlToArray($resXml);
         if ($resData['return_code'] == 'FAIL') {
             $resArr['code'] = ErrorCode::WX_POST_ERROR;
@@ -584,7 +595,7 @@ final class WxUtilShop extends WxUtilBase {
 
         $payDetail = $pay->getDetail();
         $reqXml = self::arrayToXml($payDetail);
-        $resXml = self::sendPost(self::$urlMicroPay, $reqXml);
+        $resXml = self::sendPostReq(self::$urlMicroPay, 'string', $reqXml);
         $resData = self::xmlToArray($resXml);
         if ($resData['return_code'] == 'FAIL') {
             $resArr['code'] = ErrorCode::WX_POST_ERROR;
@@ -635,7 +646,9 @@ final class WxUtilShop extends WxUtilBase {
         ];
 
         $url = self::$urlDownloadMedia . self::getAccessToken($appId) . '&media_id=' . $mediaId;
-        $getRes = self::sendGetReq($url, 3000);
+        $getRes = self::sendGetReq($url, [
+            CURLOPT_TIMEOUT_MS => 3000,
+        ]);
         $getData = Tool::jsonDecode($getRes);
         if(is_array($getData) && isset($getData['errcode']) && ($getData['errcode'] == 40001)){ //解决微信缓存刷新导致access token失效的问题
             $url = self::$urlDownloadMedia . self::getAccessToken($appId) . '&media_id=' . $mediaId;
@@ -762,9 +775,7 @@ final class WxUtilShop extends WxUtilBase {
 
         $msgDetail = $msg->getDetail();
         $url = self::$urlSendTemplateMsg . self::getAccessToken($appId);
-        $sendRes = self::sendPost($url, $msgDetail, [
-            'data_type' => 'json',
-        ]);
+        $sendRes = self::sendPostReq($url, 'json', $msgDetail);
         $resData = Tool::jsonDecode($sendRes);
         if ($resData['errcode'] == 0) {
             $resData['data'] = $resData;
@@ -834,9 +845,7 @@ final class WxUtilShop extends WxUtilBase {
         }
 
         $url = self::$urlUserInfoList . self::getAccessToken($appId);
-        $sendRes = self::sendPost($url, $saveArr, [
-            'data_type' => 'json',
-        ]);
+        $sendRes = self::sendPostReq($url, 'json', $saveArr);
         $resData = Tool::jsonDecode($sendRes);
         if (isset($resData['user_info_list'])) {
             $resArr['data'] = $resData['user_info_list'];
@@ -924,9 +933,7 @@ final class WxUtilShop extends WxUtilBase {
         }
 
         $url = self::$urlCreateMenu . self::getAccessToken($appId);
-        $sendRes = self::sendPost($url, $saveArr, [
-            'data_type' => 'json',
-        ]);
+        $sendRes = self::sendPostReq($url, 'json', $saveArr);
         $resData = Tool::jsonDecode($sendRes);
         if ($resData['errcode'] == 0) {
             $resArr['data'] = $resData;
@@ -998,9 +1005,7 @@ final class WxUtilShop extends WxUtilBase {
         ];
 
         $url = self::$urlMiniProgramQrcode . self::getAccessToken($appId);
-        $getRes = self::sendPost($url, $qrcode->getDetail(), [
-            'data_type' => 'json',
-        ]);
+        $getRes = self::sendPostReq($url, 'json', $qrcode->getDetail());
         $getData = Tool::jsonDecode($getRes);
         if(is_array($getData)){
             $resArr['code'] = ErrorCode::WX_PARAM_ERROR;
