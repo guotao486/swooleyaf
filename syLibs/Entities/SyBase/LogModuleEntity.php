@@ -21,6 +21,12 @@ class LogModuleEntity extends MysqlEntity {
     public $log_level = '';
 
     /**
+     * 服务端ip
+     * @var string
+     */
+    public $server_ip = '';
+
+    /**
      * 模块名称
      * @var string
      */
