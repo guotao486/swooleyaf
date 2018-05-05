@@ -377,25 +377,27 @@ final class AliPayUtil {
      * 发送POST请求
      * @param string $url 请求地址
      * @param array $data 请求参数
-     * @param array $configs 配置数组
+     * @param array $curlConfig curl配置数组
      * @return mixed
      * @throws \Exception\Ali\AliPayException
      */
-    private static function sendPostReq(string $url,array $data,array $configs=[]) {
-        $timeout = (int)Tool::getArrayVal($configs, 'timeout', 2000);
-        $sendRes = Tool::sendCurlReq([
-            CURLOPT_URL => $url,
-            CURLOPT_FAILONERROR => false,
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_SSL_VERIFYPEER => false,
-            CURLOPT_POST => true,
-            CURLOPT_POSTFIELDS => http_build_query($data),
-            CURLOPT_TIMEOUT_MS => $timeout,
-            CURLOPT_HTTPHEADER => [
-                'Content-Type: application/x-www-form-urlencoded;charset=utf-8',
-                'Expect:',
-            ],
-        ]);
+    private static function sendPostReq(string $url,array $data,array $curlConfig=[]) {
+        $curlConfig[CURLOPT_URL] = $url;
+        $curlConfig[CURLOPT_FAILONERROR] = false;
+        $curlConfig[CURLOPT_SSL_VERIFYPEER] = false;
+        $curlConfig[CURLOPT_SSL_VERIFYHOST] = false;
+        $curlConfig[CURLOPT_POST] = true;
+        $curlConfig[CURLOPT_POSTFIELDS] = http_build_query($data);
+        $curlConfig[CURLOPT_RETURNTRANSFER] = true;
+        $curlConfig[CURLOPT_HTTPHEADER] = [
+            'Content-Type: application/x-www-form-urlencoded;charset=utf-8',
+            'Expect:',
+        ];
+        if(!isset($curlConfig[CURLOPT_TIMEOUT_MS])){
+            $curlConfig[CURLOPT_TIMEOUT_MS] = 2000;
+        }
+
+        $sendRes = Tool::sendCurlReq($curlConfig);
         if ($sendRes['res_no'] == 0) {
             return $sendRes['res_content'];
         } else {
