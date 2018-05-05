@@ -94,6 +94,26 @@ abstract class BaseServer {
      */
     protected static $_syHealths = null;
     /**
+     * 用户信息列表
+     * @var \swoole_table
+     */
+    protected static $_syUsers = null;
+    /**
+     * 项目缓存列表
+     * @var \swoole_table
+     */
+    protected static $_syProject = null;
+    /**
+     * 项目微信商户号token缓存列表
+     * @var \swoole_table
+     */
+    protected static $_syWxShopToken = null;
+    /**
+     * 项目微信开放平台授权公众号token缓存列表
+     * @var \swoole_table
+     */
+    protected static $_syWxOpenAuthorizerToken = null;
+    /**
      * 最大用户数量
      * @var int
      */
@@ -123,26 +143,6 @@ abstract class BaseServer {
      * @var int
      */
     private static $_syWxOpenAuthorizerTokenNowNum = 0;
-    /**
-     * 用户信息列表
-     * @var \swoole_table
-     */
-    protected static $_syUsers = null;
-    /**
-     * 项目缓存列表
-     * @var \swoole_table
-     */
-    protected static $_syProject = null;
-    /**
-     * 项目微信商户号token缓存列表
-     * @var \swoole_table
-     */
-    protected static $_syWxShopToken = null;
-    /**
-     * 项目微信开放平台授权公众号token缓存列表
-     * @var \swoole_table
-     */
-    protected static $_syWxOpenAuthorizerToken = null;
 
     /**
      * BaseServer constructor.
