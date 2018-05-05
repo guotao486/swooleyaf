@@ -668,7 +668,7 @@ class HttpServer extends BaseServer {
         self::$_response = $response;
         $this->initCommon($request);
         $startTime = microtime(true);
-        $inLog = 'http request start,host:' . $_SERVER['HTTP_HOST'] . ',uri:' . $_SERVER['REQUEST_URI'] . ',memory:' . memory_get_usage();
+        $inLog = SY_SERVER_IP . ' | ' . SY_MODULE . ' | ' . PHP_EOL . 'http request start,host:' . $_SERVER['HTTP_HOST'] . ',uri:' . $_SERVER['REQUEST_URI'] . ',memory:' . memory_get_usage();
         \SeasLog::info($inLog);
         if(is_null(self::$_reqTask)){
             $rspHeaders = [];
@@ -701,7 +701,7 @@ class HttpServer extends BaseServer {
         }
 
         $handleTime = microtime(true) - $startTime;
-        $outLog = 'http request end,host:' . $_SERVER['HTTP_HOST'] . ',uri:' . $_SERVER['REQUEST_URI'] . ',memory:' . memory_get_usage() . ',time:' . $handleTime;
+        $outLog = SY_SERVER_IP . ' | ' . SY_MODULE . ' | ' . PHP_EOL . 'http request end,host:' . $_SERVER['HTTP_HOST'] . ',uri:' . $_SERVER['REQUEST_URI'] . ',memory:' . memory_get_usage() . ',time:' . $handleTime;
         \SeasLog::info($outLog);
         $this->clearRequest();
     }
