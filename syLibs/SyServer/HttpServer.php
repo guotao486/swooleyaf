@@ -15,10 +15,7 @@ use Log\Log;
 use Request\RequestSign;
 use Response\Result;
 use Response\SyResponseHttp;
-use SyModule\SyModuleApi;
-use SyModule\SyModuleOrder;
-use SyModule\SyModuleService;
-use SyModule\SyModuleUser;
+use SyModule\ModuleContainer;
 use Tool\SyPack;
 use Tool\Tool;
 use Yaf\Registry;
@@ -34,6 +31,14 @@ class HttpServer extends BaseServer {
      * @var array
      */
     protected $_cors = [];
+    /**
+     * @var \Tool\SyPack
+     */
+    private $_messagePack = null;
+    /**
+     * @var \SyModule\ModuleContainer
+     */
+    private $_moduleContainer = null;
     /**
      * HTTP响应
      * @var \swoole_http_response
@@ -65,10 +70,6 @@ class HttpServer extends BaseServer {
      */
     private static $_reqTask = null;
     /**
-     * @var \Tool\SyPack
-     */
-    private $_messagePack = null;
-    /**
      * 最大签名缓存数量
      * @var int
      */
@@ -94,6 +95,7 @@ class HttpServer extends BaseServer {
         $this->_cors['allow']['headerStr'] = isset($this->_cors['allow']['headers']) ? implode(', ', $this->_cors['allow']['headers']) : '';
         $this->_cors['allow']['methodStr'] = isset($this->_cors['allow']['methods']) ? implode(', ', $this->_cors['allow']['methods']) : '';
         $this->_messagePack = new SyPack();
+        $this->_moduleContainer = new ModuleContainer();
         self::$_sySignNowNum = 0;
         self::$_sySignMaxNum = (int)$this->_configs['server']['cachenum']['sign'];
     }
@@ -573,21 +575,18 @@ class HttpServer extends BaseServer {
                 $server->push($frame->fd, $result->getJson(), WEBSOCKET_OPCODE_TEXT, true);
                 break;
             case SyPack::COMMAND_TYPE_SOCKET_CLIENT_SEND_API_REQ:
-                try {
-                    if (($commandData['api_module'] == Server::MODULE_NAME_API) && ($commandData['api_method'] == 'GET')) {
-                        $handleRes = SyModuleApi::getInstance()->sendGetReq($commandData['api_uri'], $commandData['api_params']);
-                    } else if ($commandData['api_module'] == Server::MODULE_NAME_API) {
-                        $handleRes = SyModuleApi::getInstance()->sendPostReq($commandData['api_uri'], $commandData['api_params']);
-                    } else if ($commandData['api_module'] == Server::MODULE_NAME_ORDER) {
-                        $handleRes = SyModuleOrder::getInstance()->sendApiReq($commandData['api_uri'], $commandData['api_params']);
-                    } else if ($commandData['api_module'] == Server::MODULE_NAME_USER) {
-                        $handleRes = SyModuleUser::getInstance()->sendApiReq($commandData['api_uri'], $commandData['api_params']);
-                    } else if ($commandData['api_module'] == Server::MODULE_NAME_SERVICE) {
-                        $handleRes = SyModuleService::getInstance()->sendApiReq($commandData['api_uri'], $commandData['api_params']);
-                    } else {
-                        $handleRes = false;
-                    }
+                $module = $this->_moduleContainer->getObj($commandData['api_module']);
 
+                try {
+                    if(is_null($module)){
+                        $handleRes = false;
+                    } else if (($commandData['api_module'] == Server::MODULE_NAME_API) && ($commandData['api_method'] == 'GET')) {
+                        $handleRes = $module->sendGetReq($commandData['api_uri'], $commandData['api_params']);
+                    } else if ($commandData['api_module'] == Server::MODULE_NAME_API) {
+                        $handleRes = $module->sendPostReq($commandData['api_uri'], $commandData['api_params']);
+                    } else {
+                        $handleRes = $module->sendApiReq($commandData['api_uri'], $commandData['api_params']);
+                    }
                     if ($handleRes === false) {
                         $result->setCodeMsg(ErrorCode::COMMON_SERVER_ERROR, '服务处理失败');
                     } else {
@@ -606,17 +605,14 @@ class HttpServer extends BaseServer {
                 }
                 break;
             case SyPack::COMMAND_TYPE_SOCKET_CLIENT_SEND_TASK_REQ:
-                try {
-                    if($commandData['task_module'] == Server::MODULE_NAME_ORDER){
-                        $handleRes = SyModuleOrder::getInstance()->sendTaskReq($commandData['task_command'], $commandData['task_params']);
-                    } else if($commandData['task_module'] == Server::MODULE_NAME_USER){
-                        $handleRes = SyModuleUser::getInstance()->sendTaskReq($commandData['task_command'], $commandData['task_params']);
-                    } else if($commandData['task_module'] == Server::MODULE_NAME_SERVICE){
-                        $handleRes = SyModuleService::getInstance()->sendTaskReq($commandData['task_command'], $commandData['task_params']);
-                    } else {
-                        $handleRes = SyModuleApi::getInstance()->sendTaskReq($commandData['task_command'], $commandData['task_params']);
-                    }
+                $module = $this->_moduleContainer->getObj($commandData['task_module']);
 
+                try {
+                    if(is_null($module)){
+                        $handleRes = false;
+                    } else {
+                        $handleRes = $module->sendTaskReq($commandData['task_command'], $commandData['task_params']);
+                    }
                     if ($handleRes === false) {
                         $result->setCodeMsg(ErrorCode::COMMON_SERVER_ERROR, '服务处理失败');
                     } else {
