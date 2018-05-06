@@ -18,11 +18,6 @@ class AliConfigSingleton {
     use SingletonTrait;
 
     /**
-     * 支付基础配置
-     * @var \AliConfigs\PayBase
-     */
-    private $payBaseConfig = null;
-    /**
      * 支付配置列表
      * @var array
      */
@@ -148,14 +143,6 @@ class AliConfigSingleton {
      */
     public function removeShopConfig(string $appId) {
         unset($this->payConfigs[$appId]);
-    }
-
-    /**
-     * 获取支付基础配置
-     * @return \AliConfigs\PayBase
-     */
-    public function getPayBaseConfig() {
-        return $this->payBaseConfig;
     }
 
     /**
