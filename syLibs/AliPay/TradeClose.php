@@ -12,10 +12,10 @@ use DesignPatterns\Singletons\AliConfigSingleton;
 use Exception\Ali\AliPayException;
 
 class TradeClose extends BaseTrade {
-    public function __construct() {
-        parent::__construct();
+    public function __construct(string $appId) {
+        parent::__construct($appId);
         $this->setMethod('alipay.trade.close');
-        $this->notify_url = AliConfigSingleton::getInstance()->getPayBaseConfig()->getUrlNotify();
+        $this->notify_url = AliConfigSingleton::getInstance()->getPayConfig($appId)->getUrlNotify();
     }
 
     /**

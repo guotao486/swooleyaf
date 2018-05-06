@@ -11,8 +11,8 @@ use Constant\ErrorCode;
 use Exception\Ali\AliPayException;
 
 class TradeRefund extends BaseTrade {
-    public function __construct() {
-        parent::__construct();
+    public function __construct(string $appId) {
+        parent::__construct($appId);
         $this->setMethod('alipay.trade.refund');
     }
 
