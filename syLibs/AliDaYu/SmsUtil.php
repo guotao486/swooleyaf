@@ -13,7 +13,7 @@ use Log\Log;
 use Tool\Tool;
 use Traits\SimpleTrait;
 
-final class DaYuUtil {
+final class SmsUtil {
     use SimpleTrait;
 
     private static $urlHttp = 'http://gw.api.taobao.com/router/rest';
@@ -37,10 +37,10 @@ final class DaYuUtil {
 
     /**
      * 发送短信
-     * @param DaYuSmsSend $smsSend 短信对象
+     * @param \AliDaYu\SmsSend $smsSend 短信对象
      * @return array
      */
-    public static function sendSms(DaYuSmsSend $smsSend) : array {
+    public static function sendSms(SmsSend $smsSend) : array {
         $resArr = [
             'code' => 0
         ];
@@ -62,10 +62,10 @@ final class DaYuUtil {
 
     /**
      * 查询短信
-     * @param \AliDaYu\DaYuSmsQuery $smsQuery
+     * @param \AliDaYu\SmsQuery $smsQuery
      * @return array
      */
-    public static function querySms(DaYuSmsQuery $smsQuery){
+    public static function querySms(SmsQuery $smsQuery){
         $resArr = [
             'code' => 0
         ];

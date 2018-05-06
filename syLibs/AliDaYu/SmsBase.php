@@ -9,7 +9,7 @@ namespace AliDaYu;
 
 use DesignPatterns\Singletons\AliConfigSingleton;
 
-abstract class DaYuSmsBase {
+abstract class SmsBase {
     /**
      * API接口名称
      * @var string

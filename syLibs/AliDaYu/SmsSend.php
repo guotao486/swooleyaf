@@ -12,7 +12,7 @@ use Constant\ErrorCode;
 use Exception\Ali\AliDaYuException;
 use Tool\Tool;
 
-class DaYuSmsSend extends DaYuSmsBase {
+class SmsSend extends SmsBase {
     /**
      * 短信类型
      * @var string
@@ -123,7 +123,7 @@ class DaYuSmsSend extends DaYuSmsBase {
         if (!empty($this->smsParams)) {
             $resArr['sms_param'] = Tool::jsonEncode($this->smsParams, JSON_UNESCAPED_UNICODE);
         }
-        DaYuUtil::createSmsSign($resArr);
+        SmsUtil::createSmsSign($resArr);
 
         return $resArr;
     }

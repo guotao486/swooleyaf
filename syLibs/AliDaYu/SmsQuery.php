@@ -10,7 +10,7 @@ namespace AliDaYu;
 use Constant\ErrorCode;
 use Exception\Ali\AliDaYuException;
 
-class DaYuSmsQuery extends DaYuSmsBase {
+class SmsQuery extends SmsBase {
     /**
      * 流水号
      * @var string
@@ -119,7 +119,7 @@ class DaYuSmsQuery extends DaYuSmsBase {
         if(strlen($this->bizId) > 0){
             $resArr['biz_id'] = $this->bizId;
         }
-        DaYuUtil::createSmsSign($resArr);
+        SmsUtil::createSmsSign($resArr);
 
         return $resArr;
     }

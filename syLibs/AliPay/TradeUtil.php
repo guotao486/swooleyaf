@@ -14,7 +14,7 @@ use Log\Log;
 use Tool\Tool;
 use Traits\SimpleTrait;
 
-final class AliPayUtil {
+final class TradeUtil {
     use SimpleTrait;
 
     const CODE_RESPONSE_SUCCESS = '10000'; //状态码-响应成功
@@ -125,7 +125,7 @@ final class AliPayUtil {
 
     /**
      * 生成网页支付表单
-     * @param PayWap $wap 网页支付对象
+     * @param \AliPay\PayWap $wap 网页支付对象
      * @return string
      */
     public static function createWapPayHtml(PayWap $wap) : string {
@@ -144,7 +144,7 @@ final class AliPayUtil {
 
     /**
      * 发起扫码支付
-     * @param PayQrCode $qrCode 扫码支付对象
+     * @param \AliPay\PayQrCode $qrCode 扫码支付对象
      * @return array
      */
     public static function applyQrCodePay(PayQrCode $qrCode) : array {
@@ -179,7 +179,7 @@ final class AliPayUtil {
 
     /**
      * 发起订单查询
-     * @param TradeQuery $query 查询订单对象
+     * @param \AliPay\TradeQuery $query 查询订单对象
      * @return array
      */
     public static function applyQueryTrade(TradeQuery $query) : array {
@@ -211,7 +211,7 @@ final class AliPayUtil {
 
     /**
      * 发起订单撤销
-     * @param TradeCancel $cancel 撤销订单对象
+     * @param \AliPay\TradeCancel $cancel 撤销订单对象
      * @return array
      */
     public static function applyCancelTrade(TradeCancel $cancel) : array {
@@ -243,7 +243,7 @@ final class AliPayUtil {
 
     /**
      * 发起订单退款
-     * @param TradeRefund $query 退款订单对象
+     * @param \AliPay\TradeRefund $query 退款订单对象
      * @return array
      */
     public static function applyRefundTrade(TradeRefund $refund) : array {
@@ -275,7 +275,7 @@ final class AliPayUtil {
 
     /**
      * 发起订单退款查询
-     * @param TradeRefundQuery $query 退款查询订单对象
+     * @param \AliPay\TradeRefundQuery $query 退款查询订单对象
      * @return array
      */
     public static function applyRefundQueryTrade(TradeRefundQuery $refundQuery) : array {
@@ -307,7 +307,7 @@ final class AliPayUtil {
 
     /**
      * 发起订单关闭
-     * @param TradeClose $close 关闭订单对象
+     * @param \AliPay\TradeClose $close 关闭订单对象
      * @return array
      */
     public static function applyCloseTrade(TradeClose $close) : array {
@@ -339,7 +339,7 @@ final class AliPayUtil {
 
     /**
      * 发起下载订单对账单
-     * @param TradeBillDownload $billDownload 对账单订单对象
+     * @param \AliPay\TradeBillDownload $billDownload 对账单订单对象
      * @return array
      */
     public static function applyDownloadTradeBill(TradeBillDownload $billDownload) : array {
