@@ -84,11 +84,11 @@
 
 ## 性能压测
 系统配置: <br/>
-![](https://github.com/a07061625/swooleyaf/blob/master/static/images/demo_system.png)<br/>
+![](static/images/demo_system.png)<br/>
 nginx配置: <br/>
-![](https://github.com/a07061625/swooleyaf/blob/master/static/images/demo_nginx.png)<br/>
+![](static/images/demo_nginx.png)<br/>
 压测结果: <br/>
-![](https://github.com/a07061625/swooleyaf/blob/master/static/images/demo_httpload.png)<br/>
+![](static/images/demo_httpload.png)<br/>
 
 ## Mongodb文档
     https://docs.mongodb.com/php-library/
