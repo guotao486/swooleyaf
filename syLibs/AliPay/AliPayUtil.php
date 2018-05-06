@@ -84,12 +84,11 @@ final class AliPayUtil {
      */
     public static function createSign(array $data,string $signType='RSA') : string {
         $dataStr = self::getSignContent($data);
-        $priKey = AliConfigSingleton::getInstance()->getPayBaseConfig()->getPriRsaKey();
-        $key = "-----BEGIN RSA PRIVATE KEY-----" . PHP_EOL . wordwrap($priKey, 64, "\n", true) . PHP_EOL . "-----END RSA PRIVATE KEY-----";
+        $priKey = AliConfigSingleton::getInstance()->getPayConfig($data['app_id'])->getPriRsaKeyFull();
         if ("RSA2" == $signType) {
-            openssl_sign($dataStr, $signature, $key, OPENSSL_ALGO_SHA256);
+            openssl_sign($dataStr, $signature, $priKey, OPENSSL_ALGO_SHA256);
         } else {
-            openssl_sign($dataStr, $signature, $key);
+            openssl_sign($dataStr, $signature, $priKey);
         }
 
         return base64_encode($signature);
@@ -111,12 +110,11 @@ final class AliPayUtil {
             }
 
             $dataStr = self::getSignContent($data);
-            $pubKey = AliConfigSingleton::getInstance()->getPayBaseConfig()->getPubAliKey();
-            $key = "-----BEGIN PUBLIC KEY-----" . PHP_EOL . wordwrap($pubKey, 64, "\n", true) . PHP_EOL . "-----END PUBLIC KEY-----";
+            $pubKey = AliConfigSingleton::getInstance()->getPayConfig($data['app_id'])->getPubAliKeyFull();
             if ("RSA2" == $signType) {
-                $result = (bool)openssl_verify($dataStr, base64_decode($sign), $key, OPENSSL_ALGO_SHA256);
+                $result = (bool)openssl_verify($dataStr, base64_decode($sign), $pubKey, OPENSSL_ALGO_SHA256);
             } else {
-                $result = (bool)openssl_verify($dataStr, base64_decode($sign), $key);
+                $result = (bool)openssl_verify($dataStr, base64_decode($sign), $pubKey);
             }
 
             return $result;
