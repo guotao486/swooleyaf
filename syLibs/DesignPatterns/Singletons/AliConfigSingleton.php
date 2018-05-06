@@ -8,7 +8,7 @@
 namespace DesignPatterns\Singletons;
 
 use AliConfigs\DaYu;
-use AliConfigs\PayBase;
+use AliConfigs\Pay;
 use Constant\Server;
 use Factories\SyBaseMysqlFactory;
 use Tool\Tool;
@@ -66,7 +66,7 @@ class AliConfigSingleton {
     /**
      * 获取本地支付配置
      * @param string $appId
-     * @return \AliConfigs\PayBase|null
+     * @return \AliConfigs\Pay|null
      */
     private function getLocalPayConfig(string $appId) {
         $nowTime = time();
@@ -90,11 +90,11 @@ class AliConfigSingleton {
     /**
      * 更新支付配置
      * @param string $appId
-     * @return \AliConfigs\PayBase
+     * @return \AliConfigs\Pay
      */
     public function refreshPayConfig(string $appId) {
         $expireTime = time() + Server::TIME_EXPIRE_LOCAL_ALIPAY_REFRESH;
-        $payConfig = new PayBase();
+        $payConfig = new Pay();
         $payConfig->setAppId($appId);
         $payConfig->setExpireTime($expireTime);
 
@@ -123,7 +123,7 @@ class AliConfigSingleton {
     /**
      * 获取支付配置
      * @param string $appId
-     * @return \AliConfigs\PayBase|null
+     * @return \AliConfigs\Pay|null
      */
     public function getPayConfig(string $appId) {
         $nowTime = time();
