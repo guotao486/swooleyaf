@@ -7,6 +7,7 @@
  */
 namespace Factories;
 
+use Entities\SyBase\AlipayConfigEntity;
 use Entities\SyBase\AttachmentBaseEntity;
 use Entities\SyBase\AttachmentReferEntity;
 use Entities\SyBase\LogModuleEntity;
@@ -130,5 +131,11 @@ class SyBaseMysqlFactory {
      */
     public static function WxshopConfigEntity(){
         return new WxshopConfigEntity();
+    }
+    /**
+     * @return \Entities\SyBase\AlipayConfigEntity
+     */
+    public static function AlipayConfigEntity(){
+        return new AlipayConfigEntity();
     }
 }

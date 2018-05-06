@@ -91,6 +91,10 @@ final class Server {
     const WX_SHOP_STATUS_ENABLE = 1; //商户号状态-有效
     const WX_SHOP_EXPIRE_TOKEN = 7000; //商户号token超时时间,单位为秒
 
+    //支付宝支付常量
+    const ALI_PAY_STATUS_DISABLE = 0; //状态-无效
+    const ALI_PAY_STATUS_ENABLE = 1; //状态-有效
+
     //本地缓存标识
     const CACHE_LOCAL_TAG_PREFIX_WX_COMPONENT_ACCESS_TOKEN = 'a101_'; //前缀-微信开放平台access token
 
@@ -164,4 +168,6 @@ final class Server {
     const TIME_EXPIRE_LOCAL_WXSHOP_CLEAR = 3600; //超时时间-本地微信商户号清理,单位为秒
     const TIME_EXPIRE_LOCAL_WXSHOP_TOKEN_CLEAR = 300; //超时时间-本地微信商户号token清理,单位为秒
     const TIME_EXPIRE_LOCAL_WXOPEN_AUTHORIZER_TOKEN_CLEAR = 300; //超时时间-本地微信开放平台授权者token清理,单位为秒
+    const TIME_EXPIRE_LOCAL_ALIPAY_REFRESH = 600; //超时时间-本地支付宝支付更新,单位为秒
+    const TIME_EXPIRE_LOCAL_ALIPAY_CLEAR = 3600; //超时时间-本地支付宝支付清理,单位为秒
 }
