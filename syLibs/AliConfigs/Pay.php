@@ -11,7 +11,7 @@ use Constant\ErrorCode;
 use Exception\Ali\AliPayException;
 use Tool\Tool;
 
-class PayBase {
+class Pay {
     public function __construct() {
     }
 
