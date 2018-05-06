@@ -79,6 +79,7 @@ class PayDao {
     }
 
     private static function payTypeCheckAliCode(array &$data) {
+        $data['a01_appid'] = Tool::getConfig('project.' . SY_ENV . SY_PROJECT . '.alipay.appid.default');
         $data['a01_timeout'] = (string)SyRequest::getParams('a01_timeout', '');
     }
 
@@ -88,6 +89,7 @@ class PayDao {
             throw new CheckException('同步通知链接不能为空', ErrorCode::COMMON_PARAM_ERROR);
         }
 
+        $data['a01_appid'] = Tool::getConfig('project.' . SY_ENV . SY_PROJECT . '.alipay.appid.default');
         $data['a01_timeout'] = (string)SyRequest::getParams('a01_timeout', '');
         $data['a01_returnurl'] = $returnUrl;
     }
@@ -150,7 +152,7 @@ class PayDao {
     }
 
     private static function payTypeHandleAliCode(array $data) {
-        $pay = new PayQrCode();
+        $pay = new PayQrCode($data['a01_appid']);
         $pay->setSubject($data['content_result']['pay_name']);
         $pay->setTotalAmount($data['content_result']['pay_money']);
         $pay->setAttach($data['content_result']['pay_attach']);
@@ -168,7 +170,7 @@ class PayDao {
     }
 
     private static function payTypeHandleAliWeb(array $data) {
-        $pay = new PayWap();
+        $pay = new PayWap($data['a01_appid']);
         $pay->setReturnUrl($data['a01_returnurl']);
         $pay->setSubject($data['content_result']['pay_name']);
         $pay->setTotalAmount($data['content_result']['pay_money']);
