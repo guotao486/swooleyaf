@@ -37,25 +37,6 @@ class OSSSingleton {
     private $outerClient = null;
 
     private function __construct() {
-        $this->init();
-    }
-
-    /**
-     * @return \DesignPatterns\Singletons\OSSSingleton
-     */
-    public static function getInstance() {
-        if(is_null(self::$instance)) {
-            self::$instance = new self();
-        }
-
-        return self::$instance;
-    }
-
-    /**
-     * 初始化
-     * @throws OSSException
-     */
-    private function init() {
         $configs = Tool::getConfig('oss.' . SY_ENV . SY_PROJECT);
 
         $keyId = (string)Tool::getArrayVal($configs, 'access.key.id', '', true);
@@ -100,6 +81,17 @@ class OSSSingleton {
     }
 
     /**
+     * @return \DesignPatterns\Singletons\OSSSingleton
+     */
+    public static function getInstance() {
+        if(is_null(self::$instance)) {
+            self::$instance = new self();
+        }
+
+        return self::$instance;
+    }
+
+    /**
      * @return string
      */
     public function getBucketName() : string {
@@ -108,7 +100,7 @@ class OSSSingleton {
 
     /**
      * @param string $bucketName
-     * @throws OSSException
+     * @throws \Exception\OSS\OSSException
      */
     public function setBucketName(string $bucketName) {
         if (preg_match('/^[0-9a-zA-Z]{2,50}$/', $bucketName) > 0) {
@@ -127,7 +119,7 @@ class OSSSingleton {
 
     /**
      * @param string $bucketDomain
-     * @throws OSSException
+     * @throws \Exception\OSS\OSSException
      */
     public function setBucketDomain(string $bucketDomain) {
         if(preg_match('/^(http|https)\:\/\/\S+$/', $bucketDomain) > 0){
@@ -142,7 +134,7 @@ class OSSSingleton {
      * @param string $fileName oss上保存的文件名称
      * @param string $file 上传文件路径(包括名称)
      * @return array
-     * @throws OSSException
+     * @throws \Exception\OSS\OSSException
      */
     public function upload($fileName, $file) {
         try {
@@ -161,7 +153,7 @@ class OSSSingleton {
      * 删除上传的文件
      * @param string $fileName 上传文件的文件名称，包括路径和后缀
      * @return mixed
-     * @throws OSSException
+     * @throws \Exception\OSS\OSSException
      */
     public function delFile($fileName) {
         try {
@@ -178,7 +170,7 @@ class OSSSingleton {
     /**
      * 获取bucket中所有文件的文件名称
      * @return array
-     * @throws OSSException
+     * @throws \Exception\OSS\OSSException
      */
     public function getAllFileNames() {
         try {

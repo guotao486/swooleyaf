@@ -30,12 +30,7 @@ class MapTencentSingleton {
     private $key = '';
 
     private function __construct() {
-        $this->init();
-    }
-
-    private function init() {
         $configs = Tool::getConfig('map.' . SY_ENV . SY_PROJECT);
-
         $this->setKey((string)Tool::getArrayVal($configs, 'tencent.key', '', true));
     }
 
@@ -59,7 +54,7 @@ class MapTencentSingleton {
 
     /**
      * @param string $key
-     * @throws TencentMapException
+     * @throws \Exception\Map\TencentMapException
      */
     public function setKey(string $key) {
         if(preg_match('/^[0-9A-Z]{5}(\-[0-9A-Z]{5}){5}$/', $key) > 0){
@@ -102,6 +97,7 @@ class MapTencentSingleton {
             $curlConfigs[CURLOPT_REFERER] = $referer;
         }
         $sendRes = Tool::sendCurlReq($curlConfigs);
+
         if($sendRes['res_no'] == 0){
             $resData = Tool::jsonDecode($sendRes['res_content']);
             if(is_array($resData)){
@@ -135,6 +131,7 @@ class MapTencentSingleton {
         $curlConfigs = [
             CURLOPT_URL => $nowUrl,
             CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_CUSTOMREQUEST => "POST",
             CURLOPT_TIMEOUT_MS => $timeout,
             CURLOPT_HTTPHEADER => $headers,
         ];
@@ -142,6 +139,7 @@ class MapTencentSingleton {
             $curlConfigs[CURLOPT_REFERER] = $referer;
         }
         $sendRes = Tool::sendCurlReq($curlConfigs);
+
         if($sendRes['res_no'] == 0){
             $resData = Tool::jsonDecode($sendRes['res_content']);
             if(is_array($resData)){

@@ -44,21 +44,6 @@ class Etcd3Singleton {
 
     private function __construct() {
         Log::setPath(SY_LOG_PATH);
-        $this->init();
-    }
-
-    /**
-     * @return \DesignPatterns\Singletons\Etcd3Singleton
-     */
-    public static function getInstance() {
-        if(is_null(self::$instance)){
-            self::$instance = new self();
-        }
-
-        return self::$instance;
-    }
-
-    private function init() {
         $this->methods = [
             self::METHOD_GET,
             self::METHOD_POST,
@@ -81,6 +66,17 @@ class Etcd3Singleton {
         $this->baseDomain = $configs['domain'];
         $this->prefixBase = $configs['prefix']['base'];
         $this->prefixProjects = $configs['prefix']['projects'];
+    }
+
+    /**
+     * @return \DesignPatterns\Singletons\Etcd3Singleton
+     */
+    public static function getInstance() {
+        if(is_null(self::$instance)){
+            self::$instance = new self();
+        }
+
+        return self::$instance;
     }
 
     /**
@@ -117,6 +113,7 @@ class Etcd3Singleton {
         if (!in_array($method, $this->methods)) {
             throw new EtcdException('请求方式不支持', ErrorCode::ETCD_PARAM_ERROR);
         }
+
         $timeout = (int)Tool::getArrayVal($extends, 'timeout', 2000);
         if ($timeout <= 0) {
             throw new EtcdException('超时时间必须大于0', ErrorCode::ETCD_PARAM_ERROR);

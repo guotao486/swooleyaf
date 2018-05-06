@@ -93,7 +93,7 @@ class WxConfigSingleton {
 
             $this->shopClearTime = $nowTime + Server::TIME_EXPIRE_LOCAL_WXSHOP_CLEAR;
         }
-        
+
         return Tool::getArrayVal($this->shopConfigs, $appId, null);
     }
 

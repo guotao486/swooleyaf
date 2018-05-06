@@ -30,13 +30,6 @@ class SolrSingleton {
     private $authToken = '';
 
     private function __construct() {
-        $this->init();
-    }
-
-    /**
-     * @throws \Exception\Solr\SolrException
-     */
-    private function init() {
         $configs = Tool::getConfig('solr.' . SY_ENV . SY_PROJECT);
 
         $connectUrl = (string)Tool::getArrayVal($configs, 'connect.url', '', true);

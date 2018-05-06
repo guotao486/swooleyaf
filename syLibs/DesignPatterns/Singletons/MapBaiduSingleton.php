@@ -33,12 +33,7 @@ class MapBaiduSingleton {
     private $ak = '';
 
     private function __construct() {
-        $this->init();
-    }
-
-    private function init() {
         $configs = Tool::getConfig('map.' . SY_ENV . SY_PROJECT);
-
         $this->setAk((string)Tool::getArrayVal($configs, 'baidu.ak', '', true));
     }
 
@@ -62,7 +57,7 @@ class MapBaiduSingleton {
 
     /**
      * @param string $ak
-     * @throws BaiduMapException
+     * @throws \Exception\Map\BaiduMapException
      */
     public function setAk(string $ak) {
         if(preg_match('/^[0-9a-zA-Z]{32}$/', $ak) > 0){
@@ -109,6 +104,7 @@ class MapBaiduSingleton {
             $curlConfigs[CURLOPT_USERAGENT] = $userAgent;
         }
         $sendRes = Tool::sendCurlReq($curlConfigs);
+
         if($sendRes['res_no'] == 0){
             $resData = Tool::jsonDecode($sendRes['res_content']);
             if(is_array($resData)){
@@ -153,6 +149,7 @@ class MapBaiduSingleton {
             $curlConfigs[CURLOPT_USERAGENT] = $userAgent;
         }
         $sendRes = Tool::sendCurlReq($curlConfigs);
+
         if($sendRes['res_no'] == 0){
             $resData = Tool::jsonDecode($sendRes['res_content']);
             if(is_array($resData)){
