@@ -56,7 +56,6 @@
 - 其他目录: 项目模块目录,每一个目录对应一个项目模块
 
 ## 命令
-```
     //前置命令,必须在开启服务之前运行
     nohup etcd --listen-client-urls http://10.27.166.170:2379 --advertise-client-urls http://10.27.166.170:2379 >/dev/null & --启动etcd服务
     //服务命令-启动服务
@@ -64,7 +63,6 @@
     //服务命令-关闭服务
     /usr/local/php7/bin/php helper_service_manager.php -s stop-all
     //必须将helper_sytask.php文件加入到linux系统cron执行任务中
-```
 
 ## 预定义常量
 - SY_ROOT //框架根目录
@@ -79,6 +77,7 @@
 ## 服务管理
 ### 获取框架概览信息
     请求地址: http://api.xxx.com/syinfo
+
 ### 获取php信息
     请求地址: http://api.xxx.com/phpinfo
 
@@ -96,8 +95,8 @@ nginx配置: <br/>
 ## API文档（使用apidoc生成）
 ### 参考链接
     https://github.com/apidoc/apidoc
+
 ### 安装nodejs和apidoc
-```
     tar -xvf node-v6.10.2-linux-x64.tar
     mkdir /usr/local/nodejs
     mv node-v6.10.2-linux-x64/ /usr/local/nodejs
@@ -107,32 +106,31 @@ nginx配置: <br/>
     source /etc/profile
     npm config set registry "http://registry.npm.taobao.org"
     sudo npm install apidoc -g
-```
+
 ### 添加配置
-在项目根目录下添加名称为apidoc.json的文件，文件内容：
-```
-    {
-        "name": "SyApi",
-        "version": "1.0.0",
-        "description": "API文档",
-        "title": "API文档",
-        "url" : "http://localhost:8080/Index"
-    }
-```
+    vim apidoc.json
+        {
+            "name": "SyApi",
+            "version": "1.0.0",
+            "description": "API文档",
+            "title": "API文档",
+            "url" : "http://localhost:8080/Index"
+        }
+
 ### 生成文档
-```
     apidoc -i 项目根目录 -o 文档存放目录
     //如果出现错误 SyntaxError: Use of const in strict mode
     npm cache clean -f
     npm install -g n
     n stable
-```
+
 ## XDebug代码分析
 - 默认关闭了自动堆栈追踪和自动性能分析
 - 开启堆栈追踪,如果是GET请求,必须在url上附带XDEBUG_TRACE参数,如果是POST请求,必须在请求体上附带XDEBUG_TRACE参数
 - 开启性能分析,如果是GET请求,必须在url上附带XDEBUG_PROFILE参数,如果是POST请求,必须在请求体上附带XDEBUG_PROFILE参数
 ### 参考链接
     http://blog.csdn.net/why_2012_gogo/article/details/51170609
+
 ### 可视化工具
 - KCacheGrind(Linux)
 - QCacheGrind(Windows)
