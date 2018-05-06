@@ -115,7 +115,7 @@ class TradeRefund extends BaseTrade {
         }
 
         $resArr = $this->getContentArr();
-        $sign = AliPayUtil::createSign($resArr, $resArr['sign_type']);
+        $sign = TradeUtil::createSign($resArr, $resArr['sign_type']);
         $resArr['sign'] = $sign;
 
         return $resArr;

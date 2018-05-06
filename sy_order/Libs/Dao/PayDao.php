@@ -7,7 +7,7 @@
  */
 namespace Dao;
 
-use AliPay\AliPayUtil;
+use AliPay\TradeUtil;
 use AliPay\PayQrCode;
 use AliPay\PayWap;
 use Constant\ErrorCode;
@@ -158,7 +158,7 @@ class PayDao {
         $pay->setAttach($data['content_result']['pay_attach']);
         $pay->setTimeoutExpress($data['a01_timeout']);
         $pay->setOutTradeNo($data['content_result']['pay_sn']);
-        $payRes = AliPayUtil::applyQrCodePay($pay);
+        $payRes = TradeUtil::applyQrCodePay($pay);
         unset($pay);
         if ($payRes['code'] > 0) {
             throw new CheckException($payRes['message'], ErrorCode::COMMON_PARAM_ERROR);
@@ -177,7 +177,7 @@ class PayDao {
         $pay->setAttach($data['content_result']['pay_attach']);
         $pay->setTimeoutExpress($data['a01_timeout']);
         $pay->setOutTradeNo($data['content_result']['pay_sn']);
-        $html = AliPayUtil::createWapPayHtml($pay);
+        $html = TradeUtil::createWapPayHtml($pay);
         unset($pay);
 
         return [

@@ -129,7 +129,7 @@ class PayQrCode extends BaseTrade {
 
         $resArr = $this->getContentArr();
         $resArr['notify_url'] = $this->notify_url;
-        $sign = AliPayUtil::createSign($resArr, $resArr['sign_type']);
+        $sign = TradeUtil::createSign($resArr, $resArr['sign_type']);
         $resArr['sign'] = $sign;
 
         return $resArr;

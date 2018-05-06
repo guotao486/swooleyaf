@@ -85,7 +85,7 @@ class PayNotifyController extends CommonController {
         $resultMsg = 'fail';
         $allParams = \Request\SyRequest::getParams();
         \Log\Log::log('ali pay data:' . \Tool\Tool::jsonEncode($allParams, JSON_UNESCAPED_UNICODE));
-        if(\AliPay\AliPayUtil::verifyData($allParams, '2', 'RSA2')){
+        if(\AliPay\TradeUtil::verifyData($allParams, '2', 'RSA2')){
             $handleRes = \SyModule\SyModuleOrder::getInstance()->sendApiReq('/Index/Pay/handleAliPayNotify', $allParams);
             $handleData = \Tool\Tool::jsonDecode($handleRes);
             if(is_array($handleData) && isset($handleData['code']) && ($handleData['code'] == \Constant\ErrorCode::COMMON_SUCCESS)){
@@ -139,7 +139,7 @@ class PayNotifyController extends CommonController {
         $resultMsg = 'fail';
         $allParams = \Request\SyRequest::getParams();
         \Log\Log::log('ali refund data:' . \Tool\Tool::jsonEncode($allParams, JSON_UNESCAPED_UNICODE));
-        if(\AliPay\AliPayUtil::verifyData($allParams, '2', 'RSA2')){
+        if(\AliPay\TradeUtil::verifyData($allParams, '2', 'RSA2')){
             $handleRes = \SyModule\SyModuleOrder::getInstance()->sendApiReq('/Index/Pay/handleAliRefundNotify', $allParams);
             $handleData = \Tool\Tool::jsonDecode($handleRes);
             if(is_array($handleData) && isset($handleData['code']) && ($handleData['code'] == \Constant\ErrorCode::COMMON_SUCCESS)){
