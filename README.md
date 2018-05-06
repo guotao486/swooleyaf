@@ -55,14 +55,12 @@
 - 其他目录: 项目模块目录,每一个目录对应一个项目模块
 
 ## 命令
-```
     //前置命令,必须在开启服务之前运行
     nohup etcd --listen-client-urls http://10.27.166.170:2379 --advertise-client-urls http://10.27.166.170:2379 >/dev/null & --启动etcd服务
     //服务命令-启动服务
     /usr/local/php7/bin/php helper_service_manager.php -s start-all
     //服务命令-关闭服务
     /usr/local/php7/bin/php helper_service_manager.php -s stop-all
-```
 
 ## 预定义常量
 - SY_ROOT //框架根目录
@@ -77,6 +75,7 @@
 ## 服务管理
 ### 获取框架概览信息
     请求地址: http://api.xxx.com/syinfo
+
 ### 获取php信息
     请求地址: http://api.xxx.com/phpinfo
         
@@ -86,8 +85,8 @@
 - 一次性定时任务,必须指定任务的执行时间戳
 - 间隔定时任务,必须指定任务的间隔时间,单位为秒
 - cron定时任务,必须指定任务的cron计划时间
+
 ### 命令
-```
     //添加脚本执行权限
     chmod a+x /home/jw/phpspace/swooleyaf/startTaskCron.sh
     chmod a+x /home/jw/phpspace/swooleyaf/startTaskInterval.sh
@@ -100,4 +99,3 @@
     ps -ef | grep startTaskCron.sh |kill -9
     ps -ef | grep startTaskInterval.sh |kill -9
     ps -ef | grep startTaskSingle.sh |kill -9
-```
