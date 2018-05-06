@@ -39,19 +39,19 @@ class AlipayConfigEntity extends MysqlEntity {
     public $url_return = '';
 
     /**
-     * rsa私钥
+     * rsa私钥，去除证书文件的第一行和最后一行以及所有换行
      * @var string
      */
     public $prikey_rsa = '';
 
     /**
-     * rsa公钥
+     * rsa公钥，去除证书文件的第一行和最后一行以及所有换行
      * @var string
      */
     public $pubkey_rsa = '';
 
     /**
-     * 支付宝公钥
+     * 支付宝公钥，去除证书文件的第一行和最后一行以及所有换行
      * @var string
      */
     public $pubkey_ali = '';
