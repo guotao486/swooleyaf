@@ -29,13 +29,6 @@ class MongoSingleton {
     private $conn = null;
 
     private function __construct() {
-        $this->init();
-    }
-
-    /**
-     * @throws MongoException
-     */
-    private function init() {
         $configs = Tool::getConfig('mongo.' . SY_ENV . SY_PROJECT);
         $hostStr = '';
         foreach ($configs['hosts'] as $key => $host) {
@@ -86,7 +79,7 @@ class MongoSingleton {
     /**
      * 切换数据库
      * @param string $dbName 数据库名称
-     * @throws MongoException
+     * @throws \Exception\Mongo\MongoException
      */
     public function changeDb(string $dbName) {
         if ((strlen($dbName) > 0) && ($dbName != $this->dbName)) {
