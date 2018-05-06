@@ -9,6 +9,8 @@ namespace DesignPatterns\Singletons;
 
 use AliConfigs\DaYu;
 use AliConfigs\PayBase;
+use Constant\Server;
+use Factories\SyTaskMysqlFactory;
 use Tool\Tool;
 use Traits\SingletonTrait;
 
@@ -21,31 +23,24 @@ class AliConfigSingleton {
      */
     private $payBaseConfig = null;
     /**
+     * 支付配置列表
+     * @var array
+     */
+    private $payConfigs = [];
+    /**
      * 大鱼配置
      * @var \AliConfigs\DaYu
      */
     private $dayuConfig = null;
 
-    private function __construct() {
-        $this->init();
-    }
-
     /**
-     * 初始化
+     * 支付配置清理时间戳
+     * @var int
      */
-    public function init() {
-        $configs = Tool::getConfig('ali.' . SY_ENV . SY_PROJECT);
+    private $payClearTime = 0;
 
-        //设置支付基础配置
-        $payBaseConfig = new PayBase();
-        $payBaseConfig->setAppId((string)Tool::getArrayVal($configs, 'pay.base.appid', '', true));
-        $payBaseConfig->setSellerId((string)Tool::getArrayVal($configs, 'pay.base.seller.id', '', true));
-        $payBaseConfig->setUrlNotify((string)Tool::getArrayVal($configs, 'pay.base.url.notify', '', true));
-        $payBaseConfig->setUrlReturn((string)Tool::getArrayVal($configs, 'pay.base.url.return', '', true));
-        $payBaseConfig->setPriRsaKey((string)Tool::getArrayVal($configs, 'pay.base.prikey.rsa', '', true));
-        $payBaseConfig->setPubRsaKey((string)Tool::getArrayVal($configs, 'pay.base.pubkey.rsa', '', true));
-        $payBaseConfig->setPubAliKey((string)Tool::getArrayVal($configs, 'pay.base.pubkey.alipay', '', true));
-        $this->payBaseConfig = $payBaseConfig;
+    private function __construct() {
+        $configs = Tool::getConfig('ali.' . SY_ENV . SY_PROJECT);
 
         //设置大鱼配置
         $dayuConfig = new DaYu();
@@ -63,6 +58,96 @@ class AliConfigSingleton {
         }
 
         return self::$instance;
+    }
+
+    /**
+     * 获取所有的支付配置
+     * @return array
+     */
+    public function getPayConfigs(){
+        return $this->payConfigs;
+    }
+
+    /**
+     * 获取本地支付配置
+     * @param string $appId
+     * @return \AliConfigs\PayBase|null
+     */
+    private function getLocalPayConfig(string $appId) {
+        $nowTime = time();
+        if($this->payClearTime < $nowTime){
+            $delIds = [];
+            foreach ($this->payConfigs as $eAppId => $payConfig) {
+                if($payConfig->getExpireTime() < $nowTime){
+                    $delIds[] = $eAppId;
+                }
+            }
+            foreach ($delIds as $eAppId) {
+                unset($this->payConfigs[$eAppId]);
+            }
+
+            $this->payClearTime = $nowTime + Server::TIME_EXPIRE_LOCAL_ALIPAY_CLEAR;
+        }
+
+        return Tool::getArrayVal($this->payConfigs, $appId, null);
+    }
+
+    /**
+     * 更新支付配置
+     * @param string $appId
+     * @return \AliConfigs\PayBase
+     */
+    public function refreshPayConfig(string $appId) {
+        $expireTime = time() + Server::TIME_EXPIRE_LOCAL_ALIPAY_REFRESH;
+        $payConfig = new PayBase();
+        $payConfig->setAppId($appId);
+        $payConfig->setExpireTime($expireTime);
+
+        $alipayConfigEntity = SyTaskMysqlFactory::AlipayConfigEntity();
+        $ormResult1 = $alipayConfigEntity->getContainer()->getModel()->getOrmDbTable();
+        $ormResult1->where('`app_id`=? AND `status`=?', [$appId, Server::ALI_PAY_STATUS_ENABLE]);
+        $configInfo = $alipayConfigEntity->getContainer()->getModel()->findOne($ormResult1);
+        if(empty($configInfo)){
+            $payConfig->setValid(false);
+        } else {
+            $payConfig->setValid(true);
+            $payConfig->setSellerId((string)$configInfo['app_id']);
+            $payConfig->setUrlNotify((string)$configInfo['url_notify']);
+            $payConfig->setUrlReturn((string)$configInfo['url_return']);
+            $payConfig->setPriRsaKey((string)$configInfo['prikey_rsa']);
+            $payConfig->setPubRsaKey((string)$configInfo['pubkey_rsa']);
+            $payConfig->setPubAliKey((string)$configInfo['pubkey_ali']);
+        }
+        unset($configInfo, $ormResult1, $alipayConfigEntity);
+
+        $this->payConfigs[$appId] = $payConfig;
+
+        return $payConfig;
+    }
+
+    /**
+     * 获取支付配置
+     * @param string $appId
+     * @return \AliConfigs\PayBase|null
+     */
+    public function getPayConfig(string $appId) {
+        $nowTime = time();
+        $payConfig = $this->getLocalPayConfig($appId);
+        if(is_null($payConfig)){
+            $payConfig = $this->refreshPayConfig($appId);
+        } else if($payConfig->getExpireTime() < $nowTime){
+            $payConfig = $this->refreshPayConfig($appId);
+        }
+
+        return $payConfig->isValid() ? $payConfig : null;
+    }
+
+    /**
+     * 移除支付配置
+     * @param string $appId
+     */
+    public function removeShopConfig(string $appId) {
+        unset($this->payConfigs[$appId]);
     }
 
     /**

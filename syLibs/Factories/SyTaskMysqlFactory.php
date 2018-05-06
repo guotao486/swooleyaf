@@ -7,6 +7,7 @@
  */
 namespace Factories;
 
+use Entities\SyTask\AlipayConfigEntity;
 use Entities\SyTask\TaskBaseEntity;
 use Entities\SyTask\TaskLogEntity;
 use Entities\SyTask\WxopenAuthorizerEntity;
@@ -39,5 +40,11 @@ class SyTaskMysqlFactory {
      */
     public static function WxshopConfigEntity(){
         return new WxshopConfigEntity();
+    }
+    /**
+     * @return \Entities\SyTask\AlipayConfigEntity
+     */
+    public static function AlipayConfigEntity(){
+        return new AlipayConfigEntity();
     }
 }

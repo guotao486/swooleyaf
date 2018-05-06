@@ -49,6 +49,12 @@ class PayBase {
     private $priRsaKey = '';
 
     /**
+     * 完整rsa私钥
+     * @var string
+     */
+    private $priRsaKeyFull = '';
+
+    /**
      * rsa公钥
      * @var string
      */
@@ -59,6 +65,24 @@ class PayBase {
      * @var string
      */
     private $pubAliKey = '';
+
+    /**
+     * 完整支付宝公钥
+     * @var string
+     */
+    private $pubAliKeyFull = '';
+
+    /**
+     * 配置有效状态
+     * @var bool
+     */
+    private $valid = false;
+
+    /**
+     * 配置过期时间戳
+     * @var int
+     */
+    private $expireTime = 0;
 
     /**
      * @return string
@@ -150,9 +174,17 @@ class PayBase {
     public function setPriRsaKey(string $priRsaKey) {
         if(strlen($priRsaKey) >= 1024){
             $this->priRsaKey = $priRsaKey;
+            $this->priRsaKeyFull = "-----BEGIN RSA PRIVATE KEY-----" . PHP_EOL . wordwrap($priRsaKey, 64, "\n", true) . PHP_EOL . "-----END RSA PRIVATE KEY-----";
         } else {
             throw new AliPayException('rsa私钥不合法', ErrorCode::ALIPAY_PARAM_ERROR);
         }
+    }
+
+    /**
+     * @return string
+     */
+    public function getPriRsaKeyFull() : string {
+        return $this->priRsaKeyFull;
     }
 
     /**
@@ -188,21 +220,49 @@ class PayBase {
     public function setPubAliKey(string $pubAliKey) {
         if(strlen($pubAliKey) >= 256){
             $this->pubAliKey = $pubAliKey;
+            $this->pubAliKeyFull = "-----BEGIN PUBLIC KEY-----" . PHP_EOL . wordwrap($pubAliKey, 64, "\n", true) . PHP_EOL . "-----END PUBLIC KEY-----";
         } else {
             throw new AliPayException('支付宝公钥不合法', ErrorCode::ALIPAY_PARAM_ERROR);
         }
     }
 
+    /**
+     * @return string
+     */
+    public function getPubAliKeyFull() : string {
+        return $this->pubAliKeyFull;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isValid() : bool {
+        return $this->valid;
+    }
+
+    /**
+     * @param bool $valid
+     */
+    public function setValid(bool $valid) {
+        $this->valid = $valid;
+    }
+
+    /**
+     * @return int
+     */
+    public function getExpireTime() : int {
+        return $this->expireTime;
+    }
+
+    /**
+     * @param int $expireTime
+     */
+    public function setExpireTime(int $expireTime) {
+        $this->expireTime = $expireTime;
+    }
+
     public function __toString() {
-        return Tool::jsonEncode([
-            'appid' => $this->appId,
-            'seller.id' => $this->sellerId,
-            'url.notify' => $this->urlNotify,
-            'url.return' => $this->urlReturn,
-            'prikey.rsa' => $this->priRsaKey,
-            'pubkey.rsa' => $this->pubRsaKey,
-            'pubkey.alipay' => $this->pubAliKey,
-        ], JSON_UNESCAPED_UNICODE);
+        return Tool::jsonEncode($this->getConfigs(), JSON_UNESCAPED_UNICODE);
     }
 
     /**
@@ -218,6 +278,8 @@ class PayBase {
             'prikey.rsa' => $this->priRsaKey,
             'pubkey.rsa' => $this->pubRsaKey,
             'pubkey.alipay' => $this->pubAliKey,
+            'valid' => $this->valid,
+            'expire.time' => $this->expireTime,
         ];
     }
 }
