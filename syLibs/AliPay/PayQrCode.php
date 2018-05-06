@@ -12,13 +12,13 @@ use DesignPatterns\Singletons\AliConfigSingleton;
 use Exception\Ali\AliPayException;
 
 class PayQrCode extends BaseTrade {
-    public function __construct() {
-        parent::__construct();
+    public function __construct(string $appId) {
+        parent::__construct($appId);
 
-        $baseConfig = AliConfigSingleton::getInstance()->getPayBaseConfig();
+        $payConfig = AliConfigSingleton::getInstance()->getPayConfig($appId);
         $this->setMethod('alipay.trade.precreate');
-        $this->notify_url = $baseConfig->getUrlNotify();
-        $this->setBizContent('seller_id', $baseConfig->getSellerId());
+        $this->notify_url = $payConfig->getUrlNotify();
+        $this->setBizContent('seller_id', $payConfig->getSellerId());
     }
 
     /**

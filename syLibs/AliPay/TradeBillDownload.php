@@ -16,8 +16,8 @@ class TradeBillDownload extends BaseTrade {
         'signcustomer',
     ];
 
-    public function __construct() {
-        parent::__construct();
+    public function __construct(string $appId) {
+        parent::__construct($appId);
     }
 
     /**

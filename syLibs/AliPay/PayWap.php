@@ -12,25 +12,32 @@ use DesignPatterns\Singletons\AliConfigSingleton;
 use Exception\Ali\AliPayException;
 
 class PayWap extends BaseTrade {
-    public function __construct() {
-        parent::__construct();
+    public function __construct(string $appId) {
+        parent::__construct($appId);
 
-        $baseConfig = AliConfigSingleton::getInstance()->getPayBaseConfig();
+        $payConfig = AliConfigSingleton::getInstance()->getPayConfig($appId);
         $this->setMethod('alipay.trade.wap.pay');
-        $this->notify_url = $baseConfig->getUrlNotify();
-        $this->setBizContent('seller_id', $baseConfig->getSellerId());
+        $this->notify_url = $payConfig->getUrlNotify();
+        $this->return_baseurl = $payConfig->getUrlReturn();
+        $this->setBizContent('seller_id', $payConfig->getSellerId());
         $this->setBizContent('product_code', 'QUICK_WAP_PAY');
         $this->setBizContent('goods_type', '1');
     }
 
     /**
-     * HTTP/HTTPS开头字符串
+     * 跳转url地址
      * @var string
      */
     private $return_url = '';
 
     /**
-     * 支付宝服务器主动通知商户服务器里指定的页面http/https路径
+     * 跳转基础url地址
+     * @var string
+     */
+    private $return_baseurl = '';
+
+    /**
+     * 消息通知url地址
      * @var string
      */
     private $notify_url = '';
@@ -89,7 +96,7 @@ class PayWap extends BaseTrade {
      */
     public function setReturnUrl(string $returnUrl) {
         if(preg_match('/^(http|https)\:\/\/\S+$/', $returnUrl) > 0) {
-            $this->return_url = AliConfigSingleton::getInstance()->getPayBaseConfig()->getUrlReturn() . urlencode($returnUrl);
+            $this->return_url = $this->return_baseurl . urlencode($returnUrl);
         } else {
             throw new AliPayException('同步通知地址不合法', ErrorCode::ALIPAY_PARAM_ERROR);
         }
@@ -154,7 +161,7 @@ class PayWap extends BaseTrade {
     }
 
     public function getDetail() : array {
-        if (strlen($this->return_url . '') == 0) {
+        if (strlen($this->return_url) == 0) {
             throw new AliPayException('同步通知地址不能为空', ErrorCode::ALIPAY_PARAM_ERROR);
         }
 

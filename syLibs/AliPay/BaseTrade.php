@@ -7,12 +7,11 @@
  */
 namespace AliPay;
 
-use DesignPatterns\Singletons\AliConfigSingleton;
 use Tool\Tool;
 
 abstract class BaseTrade {
-    public function __construct() {
-        $this->app_id = AliConfigSingleton::getInstance()->getPayBaseConfig()->getAppId();
+    public function __construct(string $appId) {
+        $this->app_id = $appId;
         $this->format = 'json';
         $this->charset = 'utf-8';
         $this->sign_type = 'RSA2';
@@ -73,6 +72,13 @@ abstract class BaseTrade {
      * @var array
      */
     private $biz_content = [];
+
+    /**
+     * @return string
+     */
+    public function getAppId() : string {
+        return $this->app_id;
+    }
 
     /**
      * @param string $method
