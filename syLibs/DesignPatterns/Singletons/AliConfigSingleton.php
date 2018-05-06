@@ -141,7 +141,7 @@ class AliConfigSingleton {
      * 移除支付配置
      * @param string $appId
      */
-    public function removeShopConfig(string $appId) {
+    public function removePayConfig(string $appId) {
         unset($this->payConfigs[$appId]);
     }
 
