@@ -178,6 +178,9 @@ abstract class SyImageBase {
      * @throws \Exception\Image\ImageException
      */
     protected function checkCropData(int $startX,int $startY,int $width,int $height) {
+        if($this->mimeType == Server::IMAGE_MIME_TYPE_GIF){
+            throw new ImageException('gif图片不允许截图', ErrorCode::IMAGE_UPLOAD_PARAM_ERROR);
+        }
         if($startX < 0){
             throw new ImageException('起始横坐标不合法', ErrorCode::IMAGE_UPLOAD_PARAM_ERROR);
         } else if($startX >= $this->width){
