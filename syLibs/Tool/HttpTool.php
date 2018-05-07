@@ -123,7 +123,7 @@ final class HttpTool {
      * @return string
      */
     public static function getReqHeaderStr(string $method,string $uri,array $headers,array $cookies=[]) : string {
-        $reqHeaderStr = $method . " " . $uri . " HTTP/1.1\r\n";
+        $reqHeaderStr = $method . " " . $uri . " HTTP/1.1\r\n\r\n";
 
         if (!empty($cookies)) {
             $cookieStr = '';
