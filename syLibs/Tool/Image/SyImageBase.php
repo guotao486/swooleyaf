@@ -169,6 +169,42 @@ abstract class SyImageBase {
     }
 
     /**
+     * 检测截图数据
+     * @param int $startX 起始横坐标
+     * @param int $startY 起始纵坐标
+     * @param int $width 截图宽度
+     * @param int $height 截图高度
+     * @return array
+     * @throws \Exception\Image\ImageException
+     */
+    protected function checkCropData(int $startX,int $startY,int $width,int $height) {
+        if($startX < 0){
+            throw new ImageException('起始横坐标不合法', ErrorCode::IMAGE_UPLOAD_PARAM_ERROR);
+        } else if($startX >= $this->width){
+            throw new ImageException('起始横坐标必须小于图片宽度', ErrorCode::IMAGE_UPLOAD_PARAM_ERROR);
+        }
+        if($startY < 0){
+            throw new ImageException('起始纵坐标不合法', ErrorCode::IMAGE_UPLOAD_PARAM_ERROR);
+        } else if($startY >= $this->height){
+            throw new ImageException('起始纵坐标必须小于图片高度', ErrorCode::IMAGE_UPLOAD_PARAM_ERROR);
+        }
+        if($width <= 0){
+            throw new ImageException('截图宽度必须大于0', ErrorCode::IMAGE_UPLOAD_PARAM_ERROR);
+        }
+        if($height <= 0){
+            throw new ImageException('截图高度必须大于0', ErrorCode::IMAGE_UPLOAD_PARAM_ERROR);
+        }
+
+        $totalWidth = $startX + $width;
+        $totalHeight = $startY + $height;
+
+        return [
+            'crop_width' => $totalWidth > $this->width ? ($totalWidth - $this->width) : $width,
+            'crop_height' => $totalHeight > $this->height ? ($totalHeight - $this->height) : $height,
+        ];
+    }
+
+    /**
      * 缩略图片
      * @param int $width 缩略后的宽度
      * @param int $height 缩略后的高度
@@ -203,6 +239,18 @@ abstract class SyImageBase {
      * @throws \Exception\Image\ImageException
      */
     abstract public function addWaterImage(string $filePath,int $startX,int $startY,int $alpha);
+
+    /**
+     * 截取图片
+     * @param int $startX 起始横坐标
+     * @param int $startY 起始纵坐标
+     * @param int $width 宽度
+     * @param int $height 高度
+     * @return $this
+     * @throws \Exception\Image\ImageException
+     */
+    abstract public function cropImage(int $startX,int $startY,int $width,int $height);
+
     /**
      * 写图片文件
      * @param string $path 文件目录

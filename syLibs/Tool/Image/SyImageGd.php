@@ -117,6 +117,18 @@ class SyImageGd extends SyImageBase {
         return $this;
     }
 
+    public function cropImage(int $startX, int $startY, int $width, int $height){
+        $checkRes = $this->checkCropData($startX, $startY, $width, $height);
+        $newImage = imagecreatetruecolor($checkRes['crop_width'], $checkRes['crop_height']);
+        imagecopyresampled($newImage, $this->image, 0, 0, $startX, $startY, $checkRes['crop_width'], $checkRes['crop_height'], $width, $height);
+        imagedestroy($this->image);
+        $this->image = $newImage;
+        $this->width = $checkRes['crop_width'];
+        $this->height = $checkRes['crop_height'];
+
+        return $this;
+    }
+
     public function writeImage(string $path) {
         if(!is_dir($path)){
             throw new ImageException('目录不存在', ErrorCode::IMAGE_UPLOAD_PARAM_ERROR);
