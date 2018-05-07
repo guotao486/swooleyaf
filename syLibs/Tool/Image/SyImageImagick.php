@@ -182,6 +182,15 @@ class SyImageImagick extends SyImageBase {
         return $this;
     }
 
+    public function cropImage(int $startX, int $startY, int $width, int $height){
+        $checkRes = $this->checkCropData($startX, $startY, $width, $height);
+        $this->image->cropImage($width, $height, $startX, $startY);
+        $this->width = $checkRes['crop_width'];
+        $this->height = $checkRes['crop_height'];
+
+        return $this;
+    }
+
     public function writeImage(string $path) {
         if(!is_dir($path)){
             throw new ImageException('目录不存在', ErrorCode::IMAGE_UPLOAD_PARAM_ERROR);
