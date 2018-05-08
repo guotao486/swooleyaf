@@ -11,7 +11,12 @@ use Constant\ErrorCode;
 use Exception\Image\ImageException;
 use Grafika\Grafika;
 
-class GrafikaFilter {
+/**
+ * 图片滤镜处理类
+ * Class SyImageFilter
+ * @package Images
+ */
+class SyImageFilter {
     /**
      * 来源文件全路径
      * @var string
@@ -32,7 +37,6 @@ class GrafikaFilter {
     private $image = null;
 
     /**
-     * GrafikaFilter constructor.
      * @param string $srcFile 来源全路径文件名
      * @throws \Exception\Image\ImageException
      */
@@ -103,7 +107,7 @@ class GrafikaFilter {
      * @return $this
      * @throws \Exception\Image\ImageException
      */
-    public function filterBlur(int $blur) {
+    public function handleBlur(int $blur) {
         if(($blur >= 0) && ($blur <= 100)){
             $filter = Grafika::createFilter('Blur', $blur);
             $this->editor->apply($this->image, $filter);
@@ -120,7 +124,7 @@ class GrafikaFilter {
      * @return $this
      * @throws \Exception\Image\ImageException
      */
-    public function filterBrightness(int $brightness){
+    public function handleBrightness(int $brightness){
         if(($brightness >= -100) && ($brightness <= 100)){
             $filter = Grafika::createFilter('Brightness', $brightness);
             $this->editor->apply($this->image, $filter);
@@ -139,7 +143,7 @@ class GrafikaFilter {
      * @return $this
      * @throws \Exception\Image\ImageException
      */
-    public function filterColorize(int $red,int $green,int $blue){
+    public function handleColorize(int $red,int $green,int $blue){
         if(($red < -100) || ($red > 100)){
             throw new ImageException('红色色值不合法', ErrorCode::IMAGE_UPLOAD_PARAM_ERROR);
         }
@@ -162,7 +166,7 @@ class GrafikaFilter {
      * @return $this
      * @throws \Exception\Image\ImageException
      */
-    public function filterContrast(int $contrast){
+    public function handleContrast(int $contrast){
         if(($contrast >= -100) && ($contrast <= 100)){
             $filter = Grafika::createFilter('Contrast', $contrast);
             $this->editor->apply($this->image, $filter);
@@ -179,7 +183,7 @@ class GrafikaFilter {
      * @return $this
      * @throws \Exception\Image\ImageException
      */
-    public function filterDither(string $ditherType){
+    public function handleDither(string $ditherType){
         if(in_array($ditherType, ['diffusion', 'ordered'])){
             $filter = Grafika::createFilter('Dither', $ditherType);
             $this->editor->apply($this->image, $filter);
@@ -196,7 +200,7 @@ class GrafikaFilter {
      * @return $this
      * @throws \Exception\Image\ImageException
      */
-    public function filterGamma($gamma){
+    public function handleGamma($gamma){
         if(is_numeric($gamma) && ($gamma >= 1.0)){
             $filter = Grafika::createFilter('Gamma', (float)$gamma);
             $this->editor->apply($this->image, $filter);
@@ -211,7 +215,7 @@ class GrafikaFilter {
      * 图片灰度,只保留黑白两种颜色
      * @return $this
      */
-    public function filterGrayscale(){
+    public function handleGrayscale(){
         $filter = Grafika::createFilter('Grayscale');
         $this->editor->apply($this->image, $filter);
 
@@ -222,7 +226,7 @@ class GrafikaFilter {
      * 图像反色处理
      * @return $this
      */
-    public function filterInvert(){
+    public function handleInvert(){
         $filter = Grafika::createFilter('Invert');
         $this->editor->apply($this->image, $filter);
 
@@ -235,7 +239,7 @@ class GrafikaFilter {
      * @return $this
      * @throws \Exception\Image\ImageException
      */
-    public function filterPixelate(int $pixel){
+    public function handlePixelate(int $pixel){
         if($pixel >= 1){
             $filter = Grafika::createFilter('Pixelate', $pixel);
             $this->editor->apply($this->image, $filter);
@@ -252,7 +256,7 @@ class GrafikaFilter {
      * @return $this
      * @throws \Exception\Image\ImageException
      */
-    public function filterSharpen(int $sharpen){
+    public function handleSharpen(int $sharpen){
         if(($sharpen >= 1) && ($sharpen <= 100)){
             $filter = Grafika::createFilter('Sharpen', $sharpen);
             $this->editor->apply($this->image, $filter);
@@ -267,7 +271,7 @@ class GrafikaFilter {
      * 图像查找边缘,检测出图像的边缘
      * @return $this
      */
-    public function filterSobel(){
+    public function handleSobel(){
         $filter = Grafika::createFilter('Sobel');
         $this->editor->apply($this->image, $filter);
 
