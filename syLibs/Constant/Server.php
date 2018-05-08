@@ -36,6 +36,11 @@ final class Server {
         self::ENV_SYSTEM_LINUX,
     ];
 
+    public static $totalImageFilterDither = [
+        self::IMAGE_FILTER_DITHER_ORDERED,
+        self::IMAGE_FILTER_DITHER_DIFFUSION,
+    ];
+
     //模块常量
     //考虑到yac缓存名称长度限制,名称不能超过30个字符串
     const MODULE_BASE_API = 'api';
@@ -140,6 +145,8 @@ final class Server {
     const IMAGE_MIME_TYPE_PNG = 'image/png'; //MIME类型-PNG
     const IMAGE_MIME_TYPE_JPEG = 'image/jpeg'; //MIME类型-JPEG
     const IMAGE_MIME_TYPE_GIF = 'image/gif'; //MIME类型-GIF
+    const IMAGE_FILTER_DITHER_DIFFUSION = 'diffusion'; //噪点滤镜类型-扩散
+    const IMAGE_FILTER_DITHER_ORDERED = 'ordered'; //噪点滤镜类型-规整
 
     //消息队列常量
     const MESSAGE_QUEUE_TOPIC_REDIS_ADD_LOG = 'a000'; //redis主题-添加日志
