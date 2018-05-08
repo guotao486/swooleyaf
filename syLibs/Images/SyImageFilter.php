@@ -8,6 +8,7 @@
 namespace Images;
 
 use Constant\ErrorCode;
+use Constant\Server;
 use Exception\Image\ImageException;
 use Grafika\Grafika;
 
@@ -48,10 +49,10 @@ class SyImageFilter {
             throw new ImageException('图片类型不支持', ErrorCode::IMAGE_UPLOAD_PARAM_ERROR);
         }
 
-        $this->srcFile = $srcFile;
-        $this->dstFile = $srcFile;
         $this->editor = Grafika::createEditor();
         $this->editor->open($this->image, $srcFile);
+        $this->srcFile = $srcFile;
+        $this->dstFile = $srcFile;
     }
 
     private function __clone(){
@@ -184,7 +185,7 @@ class SyImageFilter {
      * @throws \Exception\Image\ImageException
      */
     public function handleDither(string $ditherType){
-        if(in_array($ditherType, ['diffusion', 'ordered'])){
+        if(in_array($ditherType, Server::$totalImageFilterDither)){
             $filter = Grafika::createFilter('Dither', $ditherType);
             $this->editor->apply($this->image, $filter);
         } else {
