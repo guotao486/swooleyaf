@@ -5,7 +5,7 @@
  * Date: 17-11-8
  * Time: 下午11:19
  */
-namespace Tool\Image;
+namespace Images;
 
 use Constant\ErrorCode;
 use Exception\Image\ImageException;

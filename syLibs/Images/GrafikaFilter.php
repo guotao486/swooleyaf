@@ -5,7 +5,7 @@
  * Date: 2018/5/8 0008
  * Time: 10:10
  */
-namespace Tool\Image;
+namespace Images;
 
 use Constant\ErrorCode;
 use Exception\Image\ImageException;

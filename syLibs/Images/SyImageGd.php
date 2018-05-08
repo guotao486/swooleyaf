@@ -5,7 +5,7 @@
  * Date: 17-8-30
  * Time: 下午10:36
  */
-namespace Tool\Image;
+namespace Images;
 
 use Constant\ErrorCode;
 use Constant\Server;
