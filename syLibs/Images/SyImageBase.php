@@ -5,7 +5,7 @@
  * Date: 17-11-4
  * Time: 下午10:32
  */
-namespace Tool\Image;
+namespace Images;
 
 use Constant\ErrorCode;
 use Constant\Server;
@@ -226,7 +226,7 @@ abstract class SyImageBase {
      * @param string $txt 文本内容
      * @param int $startX 文本起始横坐标
      * @param int $startY 文本起始纵坐标
-     * @param \Tool\Image\SyFont $font 字体信息对象
+     * @param \Images\SyFont $font 字体信息对象
      * @return $this
      * @throws \Exception\Image\ImageException
      */
