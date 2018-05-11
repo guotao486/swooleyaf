@@ -62,6 +62,7 @@ final class SyFrameLoader {
     private function preHandleFPdf(string $className) : string {
         if($this->fpdfStatus){
             define('FPDF_VERSION', '1.81');
+            $this->fpdfStatus = false;
         }
 
         return SY_ROOT . '/syLibs/' . $className . '.php';
