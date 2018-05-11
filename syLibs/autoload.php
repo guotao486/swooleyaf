@@ -4,7 +4,10 @@ final class SyFrameLoader {
      * @var \SyFrameLoader
      */
     private static $instance = null;
-    private $classMap = [];
+    /**
+     * @var array
+     */
+    private $preHandleMap = [];
     /**
      * swift mailer未初始化标识 true：未初始化 false：已初始化
      * @var bool
@@ -15,16 +18,25 @@ final class SyFrameLoader {
      * @var bool
      */
     private $smartyStatus = true;
+    /**
+     * @var array
+     */
     private $smartyRootClasses = [];
+    /**
+     * fpdf未初始化标识 true：未初始化 false：已初始化
+     * @var bool
+     */
+    private $fpdfStatus = true;
 
     private function __construct() {
-        $this->classMap = [
-            'Twig' => 'loadTwigFile',
-            'Smarty' => 'loadSmartyFile',
-            'SmartyBC' => 'loadSmartyFile',
-            'PHPExcel' => 'loadPhpExcelFile',
-            'Resque' => 'loadResqueFile',
-            'Swift' => 'loadSwiftMailerFile',
+        $this->preHandleMap = [
+            'FPdf' => 'preHandleFPdf',
+            'Twig' => 'preHandleTwig',
+            'Swift' => 'preHandleSwift',
+            'Resque' => 'preHandleResque',
+            'Smarty' => 'preHandleSmarty',
+            'SmartyBC' => 'preHandleSmarty',
+            'PHPExcel' => 'preHandlePhpExcel',
         ];
 
         $this->smartyRootClasses = [
@@ -47,39 +59,19 @@ final class SyFrameLoader {
         return self::$instance;
     }
 
-    private function loadTwigFile(string $className) : string {
+    private function preHandleFPdf(string $className) : string {
+        if($this->fpdfStatus){
+            define('FPDF_VERSION', '1.81');
+        }
+
+        return SY_ROOT . '/syLibs/' . $className . '.php';
+    }
+
+    private function preHandleTwig(string $className) : string {
         return SY_ROOT . '/syLibs/Template/' . str_replace('_', '/', $className) . '.php';
     }
 
-    private function loadSmartyFile(string $className) : string {
-        if ($this->smartyStatus) {
-            $smartyLibDir = SY_ROOT . '/syLibs/Template/Smarty/libs/';
-            define('SMARTY_DIR', $smartyLibDir);
-            define('SMARTY_SYSPLUGINS_DIR', $smartyLibDir . '/sysplugins/');
-            define('SMARTY_RESOURCE_CHAR_SET', 'UTF-8');
-
-            $this->smartyStatus = false;
-        }
-
-        $lowerClassName = strtolower($className);
-        if(isset($this->smartyRootClasses[$lowerClassName])){
-            $file = SMARTY_DIR . $this->smartyRootClasses[$lowerClassName];
-        } else {
-            $file = SMARTY_SYSPLUGINS_DIR . $lowerClassName . '.php';
-        }
-
-        return $file;
-    }
-
-    private function loadPhpExcelFile(string $className) : string {
-        return SY_ROOT . '/syLibs/Excel/' . str_replace('_', '/', $className) . '.php';
-    }
-
-    private function loadResqueFile(string $className) : string {
-        return SY_ROOT . '/syLibs/Queue/' . str_replace('_', '/', $className) . '.php';
-    }
-
-    private function loadSwiftMailerFile(string $className) : string {
+    private function preHandleSwift(string $className) : string {
         if($this->swiftMailerStatus){ //加载swift mailer依赖文件
             require_once SY_ROOT . '/syLibs/Mailer/Swift/depends/cache_deps.php';
             require_once SY_ROOT . '/syLibs/Mailer/Swift/depends/mime_deps.php';
@@ -93,8 +85,30 @@ final class SyFrameLoader {
         return SY_ROOT . '/syLibs/Mailer/' . str_replace('_', '/', $className) . '.php';
     }
 
-    private function loadSyLibFile(string $className) : string {
-        return SY_ROOT . '/syLibs/' . $className . '.php';
+    private function preHandleResque(string $className) : string {
+        return SY_ROOT . '/syLibs/Queue/' . str_replace('_', '/', $className) . '.php';
+    }
+
+    private function preHandleSmarty(string $className) : string {
+        if ($this->smartyStatus) {
+            $smartyLibDir = SY_ROOT . '/syLibs/Template/Smarty/libs/';
+            define('SMARTY_DIR', $smartyLibDir);
+            define('SMARTY_SYSPLUGINS_DIR', $smartyLibDir . '/sysplugins/');
+            define('SMARTY_RESOURCE_CHAR_SET', 'UTF-8');
+
+            $this->smartyStatus = false;
+        }
+
+        $lowerClassName = strtolower($className);
+        if(isset($this->smartyRootClasses[$lowerClassName])){
+            return SMARTY_DIR . $this->smartyRootClasses[$lowerClassName];
+        } else {
+            return SMARTY_SYSPLUGINS_DIR . $lowerClassName . '.php';
+        }
+    }
+
+    private function preHandlePhpExcel(string $className) : string {
+        return SY_ROOT . '/syLibs/Excel/' . str_replace('_', '/', $className) . '.php';
     }
 
     /**
@@ -103,10 +117,14 @@ final class SyFrameLoader {
      * @return bool
      */
     public function loadFile(string $className) : bool {
-        $pos = strpos($className, '_');
-        $prefix = $pos ? substr($className, 0, $pos) : $className;
-        $funcName = $this->classMap[$prefix] ?? 'loadSyLibFile';
-        $file = $this->$funcName($className);
+        $nameArr = explode('/', $className);
+        $funcName = $this->preHandleMap[$nameArr[0]] ?? null;
+        if(is_null($funcName)){
+            $nameArr = explode('_', $className);
+            $funcName = $this->preHandleMap[$nameArr[0]] ?? null;
+        }
+
+        $file = is_null($funcName) ? SY_ROOT . '/syLibs/' . $className . '.php' : $this->$funcName($className);
         if(is_file($file) && is_readable($file)){
             require_once $file;
             return true;
