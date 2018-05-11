@@ -5,10 +5,9 @@
  * Date: 2018/5/10 0010
  * Time: 11:29
  */
-namespace FPDF;
-require_once 'fpdf.php';
+namespace FPdf;
 
-class SyPdf extends \FPDF {
+class SyPdf extends BasePdf {
     /**
      * @var array
      */

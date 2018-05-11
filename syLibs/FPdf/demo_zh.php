@@ -1,5 +1,5 @@
 <?php
-$pdf = new \FPDF\SyPdf();
+$pdf = new \FPdf\SyPdf();
 $pdf->AddGBFont('simhei', '微软雅黑');
 $pdf->AddPage();
 $pdf->SetFont('simhei', '', 20);
