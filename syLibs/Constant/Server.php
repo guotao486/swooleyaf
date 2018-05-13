@@ -74,6 +74,9 @@ final class Server {
     const REDIS_PREFIX_WX_COMPONENT_AUTHORIZER = 'sy002002_'; //前缀-微信开放平台授权公众号
     const REDIS_PREFIX_WX_NATIVE_PRE = 'sy002003_'; //前缀-微信扫码预支付
 
+    //YAC常量 以0000开头的前缀为框架内部前缀
+    const YAC_PREFIX_FUSE = '0000'; //前缀-熔断器
+
     //微信开放平台常量
     const WX_COMPONENT_AUTHORIZER_STATUS_CANCEL = 0; //授权公众号状态-取消授权
     const WX_COMPONENT_AUTHORIZER_STATUS_ALLOW = 1; //授权公众号状态-允许授权
@@ -90,6 +93,16 @@ final class Server {
 
     //本地缓存标识
     const CACHE_LOCAL_TAG_PREFIX_WX_COMPONENT_ACCESS_TOKEN = 'a101_'; //前缀-微信开放平台access token
+
+    //熔断器常量
+    const FUSE_STATE_OPEN = 'open'; //状态-开启
+    const FUSE_STATE_CLOSED = 'closed'; //状态-关闭
+    const FUSE_STATE_HALF_OPEN = 'half_open'; //状态-半开
+    const FUSE_TIME_ERROR_STAT = 15; //错误统计间隔时间,单位为秒
+    const FUSE_TIME_OPEN_KEEP = 10; //开启状态保持时间,单位为秒
+    const FUSE_NUM_REQUEST_ERROR = 20; //请求出错次数
+    const FUSE_NUM_HALF_REQUEST_SUCCESS = 10; //半开状态请求成功次数
+    const FUSE_MSG_REQUEST_ERROR = '{"code":10001,"data":[],"msg":"服务繁忙,清稍后重试"}'; //请求出错提示消息
 
     //校验器常量
     const VALIDATOR_STRING_TYPE_REQUIRED = 'string_required'; //字符串校验器类型-必填

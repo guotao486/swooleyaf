@@ -16,8 +16,8 @@ class SyModuleApi extends ModuleHttp {
     private static $instance = null;
 
     private function __construct() {
-        $this->init();
         $this->moduleName = Server::MODULE_BASE_API;
+        $this->init();
     }
 
     private function __clone() {
