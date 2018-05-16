@@ -52,7 +52,7 @@ switch ($action) {
         break;
     case 'restart' :
         $server->stop();
-        sleep(1);
+        sleep(3);
         $server->start();
         break;
     case 'kz' :
