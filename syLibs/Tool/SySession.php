@@ -24,7 +24,7 @@ class SySession {
     public static function getSessionId(string $inToken='') : string {
         if (strlen($inToken) > 0) {
             $token = $inToken . '';
-        } else if (isset($_COOKIE[Server::SERVER_DATA_KEY_TOKEN]) && (strlen($_COOKIE[Server::SERVER_DATA_KEY_TOKEN]) > 0)) {
+        } else if (isset($_COOKIE[Server::SERVER_DATA_KEY_TOKEN])) {
             $token = $_COOKIE[Server::SERVER_DATA_KEY_TOKEN];
         } else {
             $token = SyRequest::getParams(Server::SERVER_DATA_KEY_TOKEN, '');
