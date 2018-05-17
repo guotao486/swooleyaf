@@ -55,11 +55,11 @@ class SySession {
             //用于获取session信息时候的校验
             $key['session_id'] = $token;
             CacheSimpleFactory::getRedisInstance()->hMset($redisKey, $key);
-            CacheSimpleFactory::getRedisInstance()->expire($redisKey, 1296000);
+            CacheSimpleFactory::getRedisInstance()->expire($redisKey, Server::TIME_EXPIRE_SESSION);
             return true;
         } else if (is_string($value) || is_numeric($value)) {
             CacheSimpleFactory::getRedisInstance()->hSet($redisKey, $key, $value);
-            CacheSimpleFactory::getRedisInstance()->expire($redisKey, 1296000);
+            CacheSimpleFactory::getRedisInstance()->expire($redisKey, Server::TIME_EXPIRE_SESSION);
             return true;
         }
 
