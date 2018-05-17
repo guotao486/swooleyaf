@@ -635,6 +635,9 @@ abstract class BaseServer {
         set_error_handler('\SyError\ErrorHandler::handleError');
         //设置时区
         date_default_timezone_set('PRC');
+        //设置bc数学函数小数点保留位数
+        $bcConfigs = Tool::getConfig('project.' . SY_ENV . SY_PROJECT . '.bcmath');
+        bcscale($bcConfigs['scale']);
 
         $this->_app = new Application(APP_PATH . '/conf/application.ini', SY_ENV);
         $this->_app->bootstrap()->getDispatcher()->returnResponse(true);

@@ -13,6 +13,7 @@
 - yac2.0+
 - redis3.0+
 - Seaslog1.6+
+- bcmath
 - PDO
 - pcre
 - pcntl
