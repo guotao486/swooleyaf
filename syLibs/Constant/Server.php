@@ -52,6 +52,12 @@ final class Server {
     const SERVER_TIME_REQ_HANDLE_MAX = 120; //服务端时间-请求最大执行时间,单位为毫秒
     const SERVER_TIME_REQ_HEALTH_MIN = 4000; //服务端时间-请求健康检查最小时间,单位为毫秒
 
+    //进程常量
+    const PROCESS_TYPE_TASK = 'Task'; //类型-task
+    const PROCESS_TYPE_WORKER = 'Worker'; //类型-worker
+    const PROCESS_TYPE_MANAGER = 'Manager'; //类型-manager
+    const PROCESS_TYPE_MAIN = 'Main'; //类型-main
+
     //环境常量
     const ENV_PROJECT_DEV = 'dev'; //项目环境-测试
     const ENV_PROJECT_PRODUCT = 'product'; //项目环境-生产

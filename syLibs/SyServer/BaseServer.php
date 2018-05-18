@@ -395,12 +395,28 @@ abstract class BaseServer {
      * 清理僵尸进程
      */
     public function killZombies(){
-        $ids = [];
-        $commandFind = 'ps -A -o pid,ppid,stat,cmd|grep ' . SY_MODULE . '|awk \'{if(($3 == "Z") || ($3 == "z")) print $1}\'';
-        exec($commandFind, $ids);
-        if(!empty($ids)){
-            $commandKill = 'kill -9 ' . implode(' ', $ids);
-            system($commandKill);
+        //清除僵尸进程
+        $zombieIds = [];
+        $commandZombies = 'ps -A -o pid,ppid,stat,cmd|grep ' . SY_MODULE . '|awk \'{if(($3 == "Z") || ($3 == "z")) print $1}\'';
+        exec($commandZombies, $zombieIds);
+        if(!empty($zombieIds)){
+            system('kill -9 ' . implode(' ', $zombieIds));
+        }
+
+        //清除worker中断进程
+        $workerIds = [];
+        $commandWorkers = 'ps -A -o pid,ppid,stat,cmd|grep ' . Server::PROCESS_TYPE_WORKER . SY_MODULE . '|awk \'{if($2 == "1") print $1}\'';
+        exec($commandWorkers, $workerIds);
+        if(!empty($workerIds)){
+            system('kill -9 ' . implode(' ', $workerIds));
+        }
+
+        //清除task中断进程
+        $taskIds = [];
+        $commandTasks = 'ps -A -o pid,ppid,stat,cmd|grep ' . Server::PROCESS_TYPE_TASK . SY_MODULE . '|awk \'{if($2 == "1") print $1}\'';
+        exec($commandTasks, $taskIds);
+        if(!empty($taskIds)){
+            system('kill -9 ' . implode(' ', $taskIds));
         }
 
         $commandTip = 'echo -e "\e[1;36m kill ' . SY_MODULE . ' zombies: \e[0m \e[1;32m \t[success] \e[0m"';
@@ -644,9 +660,9 @@ abstract class BaseServer {
         $this->_app->bootstrap()->getDispatcher()->autoRender(false);
 
         if($workerId >= $server->setting['worker_num']){
-            @cli_set_process_title(SY_MODULE . $this->_port . 'Task');
+            @cli_set_process_title(Server::PROCESS_TYPE_TASK . SY_MODULE . $this->_port);
         } else {
-            @cli_set_process_title(SY_MODULE . $this->_port . 'Worker');
+            @cli_set_process_title(Server::PROCESS_TYPE_WORKER . SY_MODULE . $this->_port);
         }
 
         if($workerId == 0){ //保证每一个服务只执行一次定时任务
@@ -684,7 +700,7 @@ abstract class BaseServer {
      * @param \swoole_server $server
      */
     public function onStart(\swoole_server $server) {
-        @cli_set_process_title(SY_MODULE . $this->_port . 'Main');
+        @cli_set_process_title(Server::PROCESS_TYPE_MAIN . SY_MODULE . $this->_port);
 
         if (file_put_contents($this->_pidFile, $server->master_pid) === false) {
             Log::error('write ' . SY_MODULE . ' pid file error');
@@ -712,7 +728,7 @@ abstract class BaseServer {
      * @param \swoole_server $server
      */
     public function onManagerStart(\swoole_server $server){
-        @cli_set_process_title(SY_MODULE . $this->_port . 'Manager');
+        @cli_set_process_title(Server::PROCESS_TYPE_MANAGER . SY_MODULE . $this->_port);
     }
 
     /**
