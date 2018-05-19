@@ -14,7 +14,7 @@ class ImageController extends CommonController {
      * 生成二维码图片
      * @api {get} /Index/Image/createQrImage 生成二维码图片
      * @apiDescription 生成二维码图片
-     * @apiGroup ServiceImage
+     * @apiGroup File
      * @apiParam {string{1..255}} url 链接地址
      * @apiParam {string} [error_level=L] 容错级别，取值为H L M Q，越在前级别越低
      * @apiParam {number{1-10}} [image_size=5] 图片大小
@@ -48,7 +48,7 @@ class ImageController extends CommonController {
      * 生成验证码图片
      * @api {get} /Index/Image/createCodeImage 生成验证码图片
      * @apiDescription 生成验证码图片
-     * @apiGroup ServiceImage
+     * @apiGroup File
      * @apiParam {string{1..64}} session_id 令牌标识
      * @apiParam {number{50-150}} [image_width=130] 图片宽度
      * @apiParam {number{20-80}} [image_height=45] 图片高度
@@ -108,7 +108,7 @@ class ImageController extends CommonController {
      * 图片上传
      * @api {post} /Index/Image/uploadImage 图片上传
      * @apiDescription 图片上传
-     * @apiGroup ServiceImage
+     * @apiGroup File
      * @apiParam {string} upload_type 上传类型,4位长度字符串
      * @apiParam {string} [image_base64] 图片base64编码
      * @apiParam {string} [image_url] 图片链接
