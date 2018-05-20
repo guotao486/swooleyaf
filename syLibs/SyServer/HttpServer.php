@@ -380,6 +380,9 @@ class HttpServer extends BaseServer {
                 $result = ob_get_contents();
                 ob_end_clean();
                 break;
+            case '/healthcheck' :
+                $result = 'http server is alive';
+                break;
             default:
                 self::$_reqStartTime = microtime(true);
                 self::$_syServer->incr(self::$_serverToken, 'request_times', 1);
