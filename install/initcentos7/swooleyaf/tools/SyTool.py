@@ -147,6 +147,14 @@ class SyTool():
             run('mv lualib/ /home/configs/nginx/lualib')
             run('rm -rf lualib.tar.gz')
 
+        ngxUpstreamCheckLocal = ''.join([syDicts['path.package.local'], '/resources/nginx/nginx_upstream_check_module.tar.gz'])
+        ngxUpstreamCheckRemote = ''.join([syDicts['path.package.remote'], '/nginx_upstream_check_module.tar.gz'])
+        put(ngxUpstreamCheckLocal, ngxUpstreamCheckRemote)
+        with cd(syDicts['path.package.remote']):
+            run('tar -zxvf nginx_upstream_check_module.tar.gz')
+            run('mv nginx_upstream_check_module/ /home/configs/nginx/modules/')
+            run('rm -rf nginx_upstream_check_module.tar.gz')
+
         nginxLocal = ''.join([syDicts['path.package.local'], '/resources/nginx/nginx-1.12.2.tar.gz'])
         nginxRemote = ''.join([syDicts['path.package.remote'], '/nginx-1.12.2.tar.gz'])
         put(nginxLocal, nginxRemote)
@@ -159,7 +167,7 @@ class SyTool():
             run('tar -zxvf pcre-8.39.tar.gz')
             run('tar -zxvf zlib-1.2.11.tar.gz')
             run('tar -zxvf openssl-1.0.2m.tar.gz')
-            run('cd nginx-1.12.2/ && ./configure --prefix=/usr/local/nginx --with-pcre=%s --with-zlib=%s --with-openssl=%s --without-http_autoindex_module --without-http_ssi_module --with-http_ssl_module --with-http_stub_status_module --with-http_realip_module --with-http_gzip_static_module --with-http_v2_module --with-stream --with-stream_realip_module --with-stream_ssl_module --with-google_perftools_module --with-debug --add-module=/home/configs/nginx/modules/ngx_devel_kit --add-module=/home/configs/nginx/modules/lua-nginx-module --with-ld-opt="-Wl,-rpath,$LUAJIT_LIB" && make -j 4 && make install' % (pcreDirRemote, zlibDirRemote, opensslDirRemote))
+            run('cd nginx-1.12.2/ && patch -p1 < /home/configs/nginx/modules/nginx_upstream_check_module/check_1.12.1+.patch && ./configure --prefix=/usr/local/nginx --with-pcre=%s --with-zlib=%s --with-openssl=%s --without-http_autoindex_module --without-http_ssi_module --with-http_ssl_module --with-http_stub_status_module --with-http_realip_module --with-http_gzip_static_module --with-http_v2_module --with-stream --with-stream_realip_module --with-stream_ssl_module --with-google_perftools_module --with-debug --add-module=/home/configs/nginx/modules/ngx_devel_kit --add-module=/home/configs/nginx/modules/lua-nginx-module --add-module=/home/configs/nginx/modules/nginx_upstream_check_module --with-ld-opt="-Wl,-rpath,$LUAJIT_LIB" && make -j 4 && make install' % (pcreDirRemote, zlibDirRemote, opensslDirRemote))
             run('rm -rf nginx-1.12.2/')
             run('rm -rf nginx-1.12.2.tar.gz')
             run('rm -rf pcre-8.39/')
