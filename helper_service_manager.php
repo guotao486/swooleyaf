@@ -18,7 +18,7 @@ function getClientOption(string $key, $default=null) {
 }
 
 $projects = [
-    'syLibs' => [
+    'libs_frame' => [
         'git_branch' => 'master',
         'type' => 'lib',
     ],

@@ -1,10 +1,10 @@
 <?php
-require_once __DIR__ . '/syLibs/autoload.php';
+require_once __DIR__ . '/helper_autoload.php';
 
 ini_set('display_errors', 'On');
 error_reporting(E_ALL);
 date_default_timezone_set('PRC');
-define('SY_VERSION', '3.6');
+define('SY_VERSION', '4.0');
 define('SY_ROOT', __DIR__);
 define('SY_ENV', 'dev');
 define('SY_PROJECT', 'z01');
@@ -16,3 +16,12 @@ if(substr($syLogPath, -1) == '/'){
 }
 define('SY_LOG_PATH', $syLogPath);
 unset($syLogPath);
+
+define('SY_PROJECT_LIBS_ROOT', __DIR__ . '/libs_project/');
+$frameLibsDir = \Yaconf::get('project.' . SY_ENV . SY_PROJECT . '.dir.libs.frame');
+if(substr($frameLibsDir, -1) == '/'){
+    define('SY_FRAME_LIBS_ROOT', $frameLibsDir);
+} else {
+    define('SY_FRAME_LIBS_ROOT', $frameLibsDir . '/');
+}
+unset($frameLibsDir);
