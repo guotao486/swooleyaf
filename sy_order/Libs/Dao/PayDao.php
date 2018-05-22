@@ -11,7 +11,8 @@ use AliPay\TradeUtil;
 use AliPay\PayQrCode;
 use AliPay\PayWap;
 use Constant\ErrorCode;
-use Constant\Server;
+use Constant\Project;
+use Constant\ProjectCode;
 use DesignPatterns\Factories\CacheSimpleFactory;
 use Exception\Common\CheckException;
 use Factories\SyBaseMysqlFactory;
@@ -29,18 +30,18 @@ class PayDao {
     use SimpleDaoTrait;
 
     private static $payTypeCheckMap = [
-        Server::PAY_TYPE_WX_JS => 'payTypeCheckWxJs',
-        Server::PAY_TYPE_WX_NATIVE_DYNAMIC => 'payTypeCheckWxNativeDynamic',
-        Server::PAY_TYPE_WX_NATIVE_STATIC => 'payTypeCheckWxNativeStatic',
-        Server::PAY_TYPE_ALI_CODE => 'payTypeCheckAliCode',
-        Server::PAY_TYPE_ALI_WEB => 'payTypeCheckAliWeb',
+        Project::PAY_TYPE_WX_JS => 'payTypeCheckWxJs',
+        Project::PAY_TYPE_WX_NATIVE_DYNAMIC => 'payTypeCheckWxNativeDynamic',
+        Project::PAY_TYPE_WX_NATIVE_STATIC => 'payTypeCheckWxNativeStatic',
+        Project::PAY_TYPE_ALI_CODE => 'payTypeCheckAliCode',
+        Project::PAY_TYPE_ALI_WEB => 'payTypeCheckAliWeb',
     ];
     private static $payTypeHandleMap = [
-        Server::PAY_TYPE_WX_JS => 'payTypeHandleWxJs',
-        Server::PAY_TYPE_WX_NATIVE_DYNAMIC => 'payTypeHandleWxNativeDynamic',
-        Server::PAY_TYPE_WX_NATIVE_STATIC => 'payTypeHandleWxNativeStatic',
-        Server::PAY_TYPE_ALI_CODE => 'payTypeHandleAliCode',
-        Server::PAY_TYPE_ALI_WEB => 'payTypeHandleAliWeb',
+        Project::PAY_TYPE_WX_JS => 'payTypeHandleWxJs',
+        Project::PAY_TYPE_WX_NATIVE_DYNAMIC => 'payTypeHandleWxNativeDynamic',
+        Project::PAY_TYPE_WX_NATIVE_STATIC => 'payTypeHandleWxNativeStatic',
+        Project::PAY_TYPE_ALI_CODE => 'payTypeHandleAliCode',
+        Project::PAY_TYPE_ALI_WEB => 'payTypeHandleAliWeb',
     ];
 
     /**
@@ -63,7 +64,7 @@ class PayDao {
     private static function payTypeCheckWxJs(array &$data) {
         $wxOpenid = SyUser::getOpenId();
         if (strlen($wxOpenid) == 0) {
-            throw new CheckException('请先微信登录', ErrorCode::USER_NOT_LOGIN_WX_AUTH);
+            throw new CheckException('请先微信登录', ProjectCode::USER_NOT_LOGIN_WX_AUTH);
         }
 
         $data['a00_openid'] = $wxOpenid;
@@ -136,7 +137,7 @@ class PayDao {
         $applyRes = WxUtilShop::applyPreNativePay($prePay);
         unset($prePay);
 
-        $redisKey = Server::REDIS_PREFIX_WX_NATIVE_PRE . $data['content_result']['pay_sn'];
+        $redisKey = Project::REDIS_PREFIX_WX_NATIVE_PRE . $data['content_result']['pay_sn'];
         CacheSimpleFactory::getRedisInstance()->hMset($redisKey, [
             'pay_name' => $data['content_result']['pay_name'],
             'pay_money' => $data['content_result']['pay_money'],

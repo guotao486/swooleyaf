@@ -49,7 +49,8 @@
 - 拉取项目需要安装git和git-lfs,有部分文件是git-lfs上传
 
 ## 目录介绍
-- syLibs: 公共类目录
+- libs_frame: 框架公共类目录
+- libs_project: 项目公共类目录
 - pidfile: 项目进程pid文件存放目录
 - static: 静态文件目录
 - yaconf: 框架配置文件目录,该目录内的配置文件为样例,使用时需要将配置文件移动到php.ini配置文件中yaconf.directory配置对应的目录下
@@ -67,6 +68,8 @@
 
 ## 预定义常量
 - SY_ROOT //框架根目录
+- SY_PROJECT_LIBS_ROOT //项目公共类根目录
+- SY_FRAME_LIBS_ROOT //框架公共类根目录
 - SY_ENV //框架环境 dev:测试环境 product:生产环境
 - SY_PROJECT //框架项目名称
 - SY_LOG_PATH //框架日志目录

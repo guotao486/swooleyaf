@@ -50,7 +50,7 @@ class PayController extends CommonController {
         $wxReturnCode = (string)\Tool\Tool::getArrayVal($allParams, 'return_code', '');
         if (($wxResultCode == 'SUCCESS') && ($wxReturnCode == 'SUCCESS')) { //支付成功
             \Dao\PayDao::completePay([
-                'pay_type' => \Constant\Server::PAY_WAY_WX,
+                'pay_type' => \Constant\Project::PAY_WAY_WX,
                 'pay_tradesn' => $allParams['transaction_id'],
                 'pay_sellersn' => $allParams['out_trade_no'],
                 'pay_appid' => $allParams['appid'],
@@ -79,12 +79,12 @@ class PayController extends CommonController {
         $appId = (string)\Request\SyRequest::getParams('appid');
         $productId = (string)\Request\SyRequest::getParams('product_id', '');
         $returnObj = new \Wx\NativeReturn($appId);
-        $redisKey = \Constant\Server::REDIS_PREFIX_WX_NATIVE_PRE . $productId;
+        $redisKey = \Constant\Project::REDIS_PREFIX_WX_NATIVE_PRE . $productId;
         $cacheData = \DesignPatterns\Factories\CacheSimpleFactory::getRedisInstance()->hGetAll($redisKey);
         if (is_array($cacheData) && isset($cacheData['cache_key']) && ($cacheData['cache_key'] == $redisKey)) {
             $nonceStr = (string)\Request\SyRequest::getParams('nonce_str');
             //生成一条新的单号记录
-            $orderSn = substr($productId, 0, 4) . \Tool\Tool::createUniqueSn();
+            $orderSn = substr($productId, 0, 4) . \Tool\ProjectTool::createUniqueSn();
             //统一下单
             $order = new \Wx\UnifiedOrder(\Wx\UnifiedOrder::TRADE_TYPE_NATIVE, $appId);
             $order->setBody($cacheData['pay_name']);
@@ -166,7 +166,7 @@ class PayController extends CommonController {
             }
 
             \Dao\PayDao::completePay([
-                'pay_type' => \Constant\Server::PAY_WAY_ALI,
+                'pay_type' => \Constant\Project::PAY_WAY_ALI,
                 'pay_tradesn' => $allParams['trade_no'],
                 'pay_sellersn' => $allParams['out_trade_no'],
                 'pay_appid' => $allParams['app_id'],

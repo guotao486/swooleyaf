@@ -7,10 +7,9 @@
  */
 namespace Dao;
 
-use Constant\Server;
-use DesignPatterns\Factories\CacheSimpleFactory;
+use Constant\Project;
 use DesignPatterns\Singletons\WxConfigSingleton;
-use Factories\SyBaseMysqlFactory;
+use Tool\ProjectTool;
 use Tool\Tool;
 use Traits\SimpleDaoTrait;
 use Wx\WxUtilOpen;
@@ -42,32 +41,7 @@ class WxOpenDao {
      * @param array $data
      */
     private static function handleNotifyWxAuthorized(array $data) {
-        $nowTime = time();
-        $openCommonConfig = WxConfigSingleton::getInstance()->getOpenCommonConfig();
-        $entity = SyBaseMysqlFactory::WxopenAuthorizerEntity();
-        $ormResult1 = $entity->getContainer()->getModel()->getOrmDbTable();
-        $entity->getContainer()->getModel()->insertOrUpdate($ormResult1, [
-            'component_appid' => $openCommonConfig->getAppId(),
-            'authorizer_appid' => $data['AuthorizerAppid'],
-        ], [
-            'component_appid' => $openCommonConfig->getAppId(),
-            'authorizer_appid' => $data['AuthorizerAppid'],
-            'authorizer_authcode' => $data['AuthorizationCode'],
-            'authorizer_status' => Server::WX_COMPONENT_AUTHORIZER_STATUS_ALLOW,
-            'created' => $nowTime,
-            'updated' => $nowTime,
-        ], [
-            'authorizer_authcode' => $data['AuthorizationCode'],
-            'authorizer_refreshtoken' => '',
-            'authorizer_allowpower' => '',
-            'authorizer_info' => '',
-            'authorizer_status' => Server::WX_COMPONENT_AUTHORIZER_STATUS_ALLOW,
-            'updated' => $nowTime,
-        ]);
-        unset($ormResult1, $entity);
-
-        $redisKey = Server::REDIS_PREFIX_WX_COMPONENT_AUTHORIZER . $data['AuthorizerAppid'];
-        CacheSimpleFactory::getRedisInstance()->del($redisKey);
+        ProjectTool::handleAppAuthForWxOpen(Project::WX_COMPONENT_AUTHORIZER_OPTION_TYPE_AUTHORIZED, $data);
     }
 
     /**
@@ -75,30 +49,7 @@ class WxOpenDao {
      * @param array $data
      */
     private static function handleNotifyWxUnauthorized(array $data) {
-        $nowTime = time();
-        $openCommonConfig = WxConfigSingleton::getInstance()->getOpenCommonConfig();
-        $entity = SyBaseMysqlFactory::WxopenAuthorizerEntity();
-        $ormResult1 = $entity->getContainer()->getModel()->getOrmDbTable();
-        $entity->getContainer()->getModel()->insertOrUpdate($ormResult1, [
-            'component_appid' => $openCommonConfig->getAppId(),
-            'authorizer_appid' => $data['AuthorizerAppid'],
-        ], [
-            'component_appid' => $openCommonConfig->getAppId(),
-            'authorizer_appid' => $data['AuthorizerAppid'],
-            'authorizer_status' => Server::WX_COMPONENT_AUTHORIZER_STATUS_CANCEL,
-            'created' => $nowTime,
-            'updated' => $nowTime,
-        ], [
-            'authorizer_refreshtoken' => '',
-            'authorizer_allowpower' => '',
-            'authorizer_info' => '',
-            'authorizer_status' => Server::WX_COMPONENT_AUTHORIZER_STATUS_CANCEL,
-            'updated' => $nowTime,
-        ]);
-        unset($ormResult1, $entity);
-
-        $redisKey = Server::REDIS_PREFIX_WX_COMPONENT_AUTHORIZER . $data['AuthorizerAppid'];
-        CacheSimpleFactory::getRedisInstance()->del($redisKey);
+        ProjectTool::handleAppAuthForWxOpen(Project::WX_COMPONENT_AUTHORIZER_OPTION_TYPE_UNAUTHORIZED, $data);
     }
 
     /**
@@ -106,32 +57,7 @@ class WxOpenDao {
      * @param array $data
      */
     private static function handleNotifyWxUpdateAuthorized(array $data) {
-        $nowTime = time();
-        $openCommonConfig = WxConfigSingleton::getInstance()->getOpenCommonConfig();
-        $entity = SyBaseMysqlFactory::WxopenAuthorizerEntity();
-        $ormResult1 = $entity->getContainer()->getModel()->getOrmDbTable();
-        $entity->getContainer()->getModel()->insertOrUpdate($ormResult1, [
-            'component_appid' => $openCommonConfig->getAppId(),
-            'authorizer_appid' => $data['AuthorizerAppid'],
-        ], [
-            'component_appid' => $openCommonConfig->getAppId(),
-            'authorizer_appid' => $data['AuthorizerAppid'],
-            'authorizer_authcode' => $data['AuthorizationCode'],
-            'authorizer_status' => Server::WX_COMPONENT_AUTHORIZER_STATUS_ALLOW,
-            'created' => $nowTime,
-            'updated' => $nowTime,
-        ], [
-            'authorizer_authcode' => $data['AuthorizationCode'],
-            'authorizer_refreshtoken' => '',
-            'authorizer_allowpower' => '',
-            'authorizer_info' => '',
-            'authorizer_status' => Server::WX_COMPONENT_AUTHORIZER_STATUS_ALLOW,
-            'updated' => $nowTime,
-        ]);
-        unset($ormResult1, $entity);
-
-        $redisKey = Server::REDIS_PREFIX_WX_COMPONENT_AUTHORIZER . $data['AuthorizerAppid'];
-        CacheSimpleFactory::getRedisInstance()->del($redisKey);
+        ProjectTool::handleAppAuthForWxOpen(Project::WX_COMPONENT_AUTHORIZER_OPTION_TYPE_AUTHORIZED_UPDATE, $data);
     }
 
     public static function handleNotifyWx(array $data) {

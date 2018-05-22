@@ -94,7 +94,7 @@ class ImageController extends CommonController {
 
         //随机字符串放入redis
         $redis = \DesignPatterns\Factories\CacheSimpleFactory::getRedisInstance();
-        $redisKey = \Constant\Server::REDIS_PREFIX_CODE_IMAGE . \Request\SyRequest::getParams('session_id');
+        $redisKey = \Constant\Project::REDIS_PREFIX_CODE_IMAGE . \Request\SyRequest::getParams('session_id');
         $redis->set($redisKey, $code, 190);
 
         $this->SyResult->setData([
@@ -122,7 +122,7 @@ class ImageController extends CommonController {
      * @apiUse CommonFail
      */
     public function uploadImageAction() {
-        $cacheKey = \Constant\Server::REDIS_PREFIX_IMAGE_DATA . \Request\SyRequest::getParams('_syfile_tag', '');
+        $cacheKey = \Constant\Project::REDIS_PREFIX_IMAGE_DATA . \Request\SyRequest::getParams('_syfile_tag', '');
         $cacheData = \DesignPatterns\Factories\CacheSimpleFactory::getRedisInstance()->get($cacheKey);
         if ($cacheData === false) {
             $this->SyResult->setCodeMsg(\Constant\ErrorCode::COMMON_SERVER_ERROR, '图片缓存内容不存在');
