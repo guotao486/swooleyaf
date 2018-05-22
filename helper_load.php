@@ -17,7 +17,7 @@ if(substr($syLogPath, -1) == '/'){
 define('SY_LOG_PATH', $syLogPath);
 unset($syLogPath);
 
-define('SY_PROJECT_LIBS_ROOT', __DIR__ . '/projectLibs/');
+define('SY_PROJECT_LIBS_ROOT', __DIR__ . '/libs_project/');
 $frameLibsDir = \Yaconf::get('project.' . SY_ENV . SY_PROJECT . '.dir.libs.frame');
 if(substr($frameLibsDir, -1) == '/'){
     define('SY_FRAME_LIBS_ROOT', $frameLibsDir);
