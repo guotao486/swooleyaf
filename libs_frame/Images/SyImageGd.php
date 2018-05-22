@@ -10,6 +10,7 @@ namespace Images;
 use Constant\ErrorCode;
 use Constant\Server;
 use Exception\Image\ImageException;
+use Tool\Tool;
 
 class SyImageGd extends SyImageBase {
     /**
@@ -134,7 +135,7 @@ class SyImageGd extends SyImageBase {
             throw new ImageException('目录不存在', ErrorCode::IMAGE_UPLOAD_PARAM_ERROR);
         }
 
-        $fileName = substr($this->sha1, 0, 8) . '_' . $this->width . '_' . $this->height . '_' . time() . '.' . $this->ext;
+        $fileName = Tool::createNonceStr(6) . time() . '_' . $this->width . '_' . $this->height . '.' . $this->ext;
         $fullFileName = substr($path, -1) == '/' ? $path . $fileName : $path . '/' . $fileName;
         if ($this->mimeType == Server::IMAGE_MIME_TYPE_GIF) {
             $writeRes = imagegif($this->image, $fullFileName);
