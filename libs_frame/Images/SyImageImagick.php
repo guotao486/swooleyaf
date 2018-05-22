@@ -204,7 +204,7 @@ class SyImageImagick extends SyImageBase {
             $this->image->setImageCompression(\Imagick::COMPRESSION_LZW);
         }
 
-        $fileName = substr($this->sha1, 0, 8) . '_' . $this->width . '_' . $this->height . '_' . time() . '.' . $this->ext;
+        $fileName = Tool::createNonceStr(6) . time() . '_' . $this->width . '_' . $this->height . '.' . $this->ext;
         $fullFileName = substr($path, -1) == '/' ? $path . $fileName : $path . '/' . $fileName;
         if($this->mimeType == Server::IMAGE_MIME_TYPE_GIF){
             $writeRes = $this->image->writeImages($fullFileName, true);
