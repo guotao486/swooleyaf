@@ -249,6 +249,15 @@ function module.checkWaf()
 end
 
 function module.checkCookieToken()
+    local httpRefer = ngx.var.http_referer
+    if httpRefer ~= nil and #configs['WhiteHosts'] > 0 then
+        for _, rule in pairs(configs['WhiteHosts']) do
+            if ngxMatch(httpRefer, rule, "isjo") then
+                return
+            end
+        end
+    end
+
     local nowToken = ngx.var.cookie_sywaftoken
     local newToken = tostring(ngx.crc32_short(module.tokenSecret .. ngx.var.remote_addr))
     if nowToken ~= nil then
@@ -259,7 +268,7 @@ function module.checkCookieToken()
         end
     else
         ngx.header['Set-Cookie'] = 'sywaftoken=' .. newToken
-        return ngx.redirect(ngx.var.scheme .. '://' .. ngx.var.host .. ngx.var.uri)
+        return ngx.redirect(ngx.var.scheme .. '://' .. ngx.var.host .. ngx.var.request_uri)
     end
 end
 
