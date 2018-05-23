@@ -13,6 +13,7 @@ use DesignPatterns\Factories\CacheSimpleFactory;
 use Exception\Common\CheckException;
 use Log\Log;
 use Request\SyRequest;
+use SyModule\SyModuleService;
 use Tool\Tool;
 use Traits\SimpleDaoTrait;
 
@@ -25,6 +26,10 @@ class ApiImageDao {
         2 => 'uploadImageBase64',
         3 => 'uploadImageUrl',
         4 => 'uploadImageWxMedia',
+    ];
+    private static $indexUeditorMap = [
+        'config' => 'indexUeditorConfig',
+        'uploadimage' => 'indexUeditorUploadImage',
     ];
 
     private static function uploadImageFile() {
@@ -128,5 +133,46 @@ class ApiImageDao {
         } else {
             throw new CheckException('添加图片内容缓存失败', ErrorCode::COMMON_PARAM_ERROR);
         }
+    }
+
+    private static function indexUeditorUploadImage() {
+        $handleRes = self::uploadImageHandle(1);
+        $uploadRes = SyModuleService::getInstance()->sendApiReq('/Index/Image/uploadImage', $handleRes);
+        $uploadData = Tool::jsonDecode($uploadRes);
+        if(!is_array($uploadData)){
+            return [
+                'rid' => 0,
+                'message' => '上传图片出错',
+            ];
+        } else if($uploadData['code'] > 0){
+            return [
+                'rid' => 0,
+                'message' => $uploadData['msg'],
+            ];
+        } else {
+            $editorRes = $uploadData['data'];
+            $editorRes['state'] = 'SUCCESS';
+            $editorRes['url'] = $uploadData['data']['image_url'];
+            unset($editorRes['image_url']);
+            return $editorRes;
+        }
+    }
+
+    private static function indexUeditorConfig() {
+        $callback = trim(SyRequest::getParams('callback', ''));
+        if(strlen($callback) > 0){
+            return $callback . '(' . Tool::jsonEncode(Tool::getConfig('ueditor.' . SY_ENV . SY_PROJECT)) . ')';
+        } else {
+            throw new CheckException('回调函数名不能为空', ErrorCode::COMMON_PARAM_ERROR);
+        }
+    }
+
+    public static function indexUeditorHandle(string $actionType){
+        $funcName = Tool::getArrayVal(self::$indexUeditorMap, $actionType, null);
+        if(is_null($funcName)){
+            throw new CheckException('动作类型不支持', ErrorCode::COMMON_PARAM_ERROR);
+        }
+
+        return self::$funcName();
     }
 }
