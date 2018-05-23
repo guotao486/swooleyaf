@@ -260,15 +260,13 @@ function module.checkCookieToken()
 
     local nowToken = ngx.var.cookie_sywaftoken
     local newToken = tostring(ngx.crc32_short(module.tokenSecret .. ngx.var.remote_addr))
-    if nowToken ~= nil then
-        if nowToken == newToken then
-            return
-        else
-            ngx.exit(ngx.HTTP_FORBIDDEN)
-        end
-    else
+    if nowToken == nil then
         ngx.header['Set-Cookie'] = 'sywaftoken=' .. newToken
         return ngx.redirect(ngx.var.scheme .. '://' .. ngx.var.host .. ngx.var.request_uri)
+    elseif nowToken == newToken then
+        return
+    else
+        ngx.exit(ngx.HTTP_FORBIDDEN)
     end
 end
 
