@@ -248,20 +248,22 @@ function module.checkWaf()
     checkPost()
 end
 
-function module.checkCookieToken()
+function module.checkCookieToken(tag)
     local httpRefer = ngx.var.http_referer
-    if httpRefer ~= nil and #configs['WhiteHosts'] > 0 then
-        for _, rule in pairs(configs['WhiteHosts']) do
+    local hostTag = 'WhiteHosts' .. tag
+    if httpRefer ~= nil and configs[hostTag] and #configs[hostTag] > 0 then
+        for _, rule in pairs(configs[hostTag]) do
             if ngxMatch(httpRefer, rule, "isjo") then
                 return
             end
         end
     end
 
-    local nowToken = ngx.var.cookie_sywaftoken
+    local wafTag = 'cookie_sywaf' .. tag
+    local nowToken = ngx.var[wafTag]
     local newToken = tostring(ngx.crc32_short(module.tokenSecret .. ngx.var.remote_addr))
     if nowToken == nil then
-        ngx.header['Set-Cookie'] = 'sywaftoken=' .. newToken
+        ngx.header['Set-Cookie'] = 'sywaf' .. tag .. '=' .. newToken
         return ngx.redirect(ngx.var.scheme .. '://' .. ngx.var.host .. ngx.var.request_uri)
     elseif nowToken == newToken then
         return

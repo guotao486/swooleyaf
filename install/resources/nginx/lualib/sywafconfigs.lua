@@ -29,6 +29,6 @@ configs['BlackUserAgents'] = sywaftool.readRule(configs.DirRules .. 'black-usera
 configs['BlackGetArgs'] = sywaftool.readRule(configs.DirRules .. 'black-getargs')
 configs['BlackCookies'] = sywaftool.readRule(configs.DirRules .. 'black-cookies')
 configs['BlackPostArgs'] = sywaftool.readRule(configs.DirRules .. 'black-postargs')
-configs['WhiteHosts'] = sywaftool.readRule(configs.DirRules .. 'white-hosts')
+configs['WhiteHostsa01'] = sywaftool.readRule(configs.DirRules .. 'white-hosts-a01')
 
 return configs
