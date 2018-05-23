@@ -25,39 +25,11 @@ class ImageController extends CommonController {
      */
     public function indexAction() {
         $action = (string)\Request\SyRequest::getParams('action');
-        if($action == 'uploadimage'){
-            $handleRes = \Dao\ApiImageDao::uploadImageHandle(1);
-            $uploadRes = \SyModule\SyModuleService::getInstance()->sendApiReq('/Index/Image/uploadImage', $handleRes);
-            $uploadData = \Tool\Tool::jsonDecode($uploadRes);
-            if(!is_array($uploadData)){
-                $this->sendRsp(\Tool\Tool::jsonEncode([
-                    'rid' => 0,
-                    'message' => '上传图片出错',
-                ]));
-            } else if($uploadData['code'] > 0){
-                $this->sendRsp(\Tool\Tool::jsonEncode([
-                    'rid' => 0,
-                    'message' => $uploadData['msg'],
-                ]));
-            } else {
-                $editorRes = $uploadData['data'];
-                $editorRes['state'] = 'SUCCESS';
-                $editorRes['url'] = $uploadData['data']['image_url'];
-                unset($editorRes['image_url']);
-                $this->sendRsp(\Tool\Tool::jsonEncode($editorRes));
-            }
-        } else if($action == 'config'){
-            $callback = trim(\Request\SyRequest::getParams('callback', ''));
-            if(strlen($callback) > 0){
-                $jsonpStr = $callback . '(' . \Tool\Tool::jsonEncode(\Tool\Tool::getConfig('ueditor.' . SY_ENV . SY_PROJECT)) . ')';
-                $this->sendRsp($jsonpStr);
-            } else {
-                $this->SyResult->setCodeMsg(\Constant\ErrorCode::COMMON_PARAM_ERROR, '回调函数名不能为空');
-                $this->sendRsp();
-            }
+        $handleRes = \Dao\ApiImageDao::indexUeditorHandle($action);
+        if(is_string($handleRes)){
+            $this->sendRsp($handleRes);
         } else {
-            $this->SyResult->setCodeMsg(\Constant\ErrorCode::COMMON_PARAM_ERROR, '动作不支持');
-            $this->sendRsp();
+            $this->sendRsp(\Tool\Tool::jsonEncode($handleRes));
         }
     }
 
