@@ -40,12 +40,12 @@ class OSSSingleton {
         $configs = Tool::getConfig('oss.' . SY_ENV . SY_PROJECT);
 
         $keyId = (string)Tool::getArrayVal($configs, 'access.key.id', '', true);
-        if (strlen($keyId) > 0) {
+        if (strlen($keyId) == 0) {
             throw new OSSException('帐号ID不能为空', ErrorCode::OSS_PARAM_ERROR);
         }
 
         $keySecret = (string)Tool::getArrayVal($configs, 'access.key.secret', '', true);
-        if (strlen($keySecret) > 0) {
+        if (strlen($keySecret) == 0) {
             throw new OSSException('帐号密码不能为空', ErrorCode::OSS_PARAM_ERROR);
         }
 
