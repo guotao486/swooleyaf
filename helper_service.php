@@ -36,7 +36,7 @@ if (strlen($port) == 0) {
     $truePort = (int)$port;
 }
 
-if($moduleName == \Constant\Server::MODULE_NAME_API){
+if($moduleName == \Constant\Project::MODULE_NAME_API){
     $server = new \SyServer\HttpServer($truePort);
 } else {
     $server = new \SyServer\RpcServer($truePort);

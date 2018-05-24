@@ -7,16 +7,16 @@
  */
 namespace SyModule;
 
-use Constant\Server;
+use Constant\Project;
 use Tool\BaseContainer;
 
 class ModuleContainer extends BaseContainer {
     public function __construct(){
         $this->registryMap = [
-            Server::MODULE_NAME_API,
+            Project::MODULE_NAME_API,
         ];
 
-        $this->bind(Server::MODULE_NAME_API, function () {
+        $this->bind(Project::MODULE_NAME_API, function () {
             return SyModuleApi::getInstance();
         });
     }

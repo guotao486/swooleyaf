@@ -8,6 +8,7 @@
 namespace SyServer;
 
 use Constant\ErrorCode;
+use Constant\Project;
 use Constant\Server;
 use Exception\Swoole\HttpServerException;
 use Exception\Validator\ValidatorException;
@@ -324,7 +325,7 @@ class HttpServer extends BaseServer {
      * @return int
      */
     private function handleReqHeader(&$headers) : int {
-        $headers['Access-Control-Allow-Origin'] = '*';
+        $headers['Access-Control-Allow-Origin'] = $_SERVER['ORIGIN'] ?? '*';
         $headers['Access-Control-Allow-Credentials'] = 'true';
 
         if (isset($_SERVER['ACCESS-CONTROL-REQUEST-METHOD'])) { //校验请求方式
@@ -583,9 +584,9 @@ class HttpServer extends BaseServer {
                 try {
                     if(is_null($module)){
                         $handleRes = false;
-                    } else if (($commandData['api_module'] == Server::MODULE_NAME_API) && ($commandData['api_method'] == 'GET')) {
+                    } else if (($commandData['api_module'] == Project::MODULE_NAME_API) && ($commandData['api_method'] == 'GET')) {
                         $handleRes = $module->sendGetReq($commandData['api_uri'], $commandData['api_params']);
-                    } else if ($commandData['api_module'] == Server::MODULE_NAME_API) {
+                    } else if ($commandData['api_module'] == Project::MODULE_NAME_API) {
                         $handleRes = $module->sendPostReq($commandData['api_uri'], $commandData['api_params']);
                     } else {
                         $handleRes = $module->sendApiReq($commandData['api_uri'], $commandData['api_params']);

@@ -7,7 +7,7 @@
  */
 namespace SyModule;
 
-use Constant\Server;
+use Constant\Project;
 
 class SyModuleApi extends ModuleHttp {
     /**
@@ -16,7 +16,7 @@ class SyModuleApi extends ModuleHttp {
     private static $instance = null;
 
     private function __construct() {
-        $this->moduleName = Server::MODULE_BASE_API;
+        $this->moduleName = Project::MODULE_BASE_API;
         $this->init();
     }
 
