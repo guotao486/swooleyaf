@@ -264,7 +264,7 @@ function module.checkCookieToken(tag)
     local newToken = tostring(ngx.crc32_short(module.tokenSecret .. ngx.var.remote_addr))
     if nowToken == nil then
         ngx.header['Set-Cookie'] = 'sywaf' .. tag .. '=' .. newToken
-        return ngx.redirect(ngx.var.scheme .. '://' .. ngx.var.host .. ngx.var.request_uri)
+        return ngx.redirect(ngx.var.scheme .. '://' .. ngx.var.host .. ngx.var.request_uri, 301)
     elseif nowToken == newToken then
         return
     else
