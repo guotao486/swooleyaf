@@ -7,28 +7,28 @@
  */
 namespace SyModule;
 
-use Constant\Server;
+use Constant\Project;
 use Tool\BaseContainer;
 
 class ModuleContainer extends BaseContainer {
     public function __construct(){
         $this->registryMap = [
-            Server::MODULE_NAME_API,
-            Server::MODULE_NAME_USER,
-            Server::MODULE_NAME_ORDER,
-            Server::MODULE_NAME_SERVICE,
+            Project::MODULE_NAME_API,
+            Project::MODULE_NAME_USER,
+            Project::MODULE_NAME_ORDER,
+            Project::MODULE_NAME_SERVICE,
         ];
 
-        $this->bind(Server::MODULE_NAME_API, function () {
+        $this->bind(Project::MODULE_NAME_API, function () {
             return SyModuleApi::getInstance();
         });
-        $this->bind(Server::MODULE_NAME_USER, function () {
+        $this->bind(Project::MODULE_NAME_USER, function () {
             return SyModuleUser::getInstance();
         });
-        $this->bind(Server::MODULE_NAME_ORDER, function () {
+        $this->bind(Project::MODULE_NAME_ORDER, function () {
             return SyModuleOrder::getInstance();
         });
-        $this->bind(Server::MODULE_NAME_SERVICE, function () {
+        $this->bind(Project::MODULE_NAME_SERVICE, function () {
             return SyModuleService::getInstance();
         });
     }

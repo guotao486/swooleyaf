@@ -12,6 +12,28 @@ use Traits\SimpleTrait;
 final class Project {
     use SimpleTrait;
 
+    //模块常量
+    public static $totalModuleName = [
+        self::MODULE_NAME_API,
+        self::MODULE_NAME_ORDER,
+        self::MODULE_NAME_USER,
+        self::MODULE_NAME_SERVICE,
+    ];
+    public static $totalModuleBase = [
+        self::MODULE_BASE_API,
+        self::MODULE_BASE_ORDER,
+        self::MODULE_BASE_USER,
+        self::MODULE_BASE_SERVICE,
+    ];
+    const MODULE_BASE_API = 'api';
+    const MODULE_BASE_ORDER = 'order';
+    const MODULE_BASE_USER = 'user';
+    const MODULE_BASE_SERVICE = 'services';
+    const MODULE_NAME_API = SY_PROJECT . self::MODULE_BASE_API;
+    const MODULE_NAME_ORDER = SY_PROJECT . self::MODULE_BASE_ORDER;
+    const MODULE_NAME_USER = SY_PROJECT . self::MODULE_BASE_USER;
+    const MODULE_NAME_SERVICE = SY_PROJECT . self::MODULE_BASE_SERVICE;
+
     //公共常量
     const COMMON_PAGE_DEFAULT = 1; //默认页数
     const COMMON_LIMIT_DEFAULT = 10; //默认分页限制

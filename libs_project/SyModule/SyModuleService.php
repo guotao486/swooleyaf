@@ -7,7 +7,7 @@
  */
 namespace SyModule;
 
-use Constant\Server;
+use Constant\Project;
 
 class SyModuleService extends ModuleRpc {
     /**
@@ -16,7 +16,7 @@ class SyModuleService extends ModuleRpc {
     private static $instance = null;
 
     private function __construct() {
-        $this->moduleName = Server::MODULE_BASE_SERVICE;
+        $this->moduleName = Project::MODULE_BASE_SERVICE;
         parent::init();
     }
 

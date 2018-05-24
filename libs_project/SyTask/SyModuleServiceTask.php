@@ -7,12 +7,12 @@
  */
 namespace SyTask;
 
-use Constant\Server;
+use Constant\Project;
 
 class SyModuleServiceTask extends SyModuleTaskBase implements SyModuleTaskInterface {
     public function __construct() {
         parent::__construct();
-        $this->moduleTag = Server::MODULE_NAME_SERVICE;
+        $this->moduleTag = Project::MODULE_NAME_SERVICE;
     }
 
     private function __clone() {

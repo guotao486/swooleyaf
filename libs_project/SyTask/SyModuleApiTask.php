@@ -7,6 +7,7 @@
  */
 namespace SyTask;
 
+use Constant\Project;
 use Constant\Server;
 use MessageQueue\Consumer\Redis\AddJsLogService;
 use MessageQueue\Consumer\Redis\AddMysqlLogService;
@@ -15,7 +16,7 @@ use Tool\SyPack;
 class SyModuleApiTask extends SyModuleTaskBase implements SyModuleTaskInterface {
     public function __construct() {
         parent::__construct();
-        $this->moduleTag = Server::MODULE_NAME_API;
+        $this->moduleTag = Project::MODULE_NAME_API;
     }
 
     private function __clone() {

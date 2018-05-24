@@ -12,20 +12,6 @@ use Traits\SimpleTrait;
 final class Server {
     use SimpleTrait;
 
-    public static $totalModuleName = [
-        self::MODULE_NAME_API,
-        self::MODULE_NAME_ORDER,
-        self::MODULE_NAME_USER,
-        self::MODULE_NAME_SERVICE,
-    ];
-
-    public static $totalModuleBase = [
-        self::MODULE_BASE_API,
-        self::MODULE_BASE_ORDER,
-        self::MODULE_BASE_USER,
-        self::MODULE_BASE_SERVICE,
-    ];
-
     public static $totalEnvProject = [
         self::ENV_PROJECT_DEV,
         self::ENV_PROJECT_PRODUCT,
@@ -43,14 +29,7 @@ final class Server {
 
     //模块常量
     //考虑到yac缓存名称长度限制,名称不能超过30个字符串
-    const MODULE_BASE_API = 'api';
-    const MODULE_BASE_ORDER = 'order';
-    const MODULE_BASE_USER = 'user';
     const MODULE_BASE_SERVICE = 'services';
-    const MODULE_NAME_API = SY_PROJECT . self::MODULE_BASE_API;
-    const MODULE_NAME_ORDER = SY_PROJECT . self::MODULE_BASE_ORDER;
-    const MODULE_NAME_USER = SY_PROJECT . self::MODULE_BASE_USER;
-    const MODULE_NAME_SERVICE = SY_PROJECT . self::MODULE_BASE_SERVICE;
 
     //服务常量
     const SERVER_PACKAGE_MAX_LENGTH = 12582912; //服务端消息最大长度-12M

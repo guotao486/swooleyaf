@@ -19,7 +19,7 @@ $moduleName = trim(\Tool\Tool::getClientOption('-module'));
 if (strlen($moduleName) == 0) {
     print_r('module name must exist' . PHP_EOL);
     exit(3);
-} else if (!in_array($moduleName, \Constant\Server::$totalModuleName)) {
+} else if (!in_array($moduleName, \Constant\Project::$totalModuleName)) {
     print_r('module name error' . PHP_EOL);
     exit(4);
 }
@@ -36,7 +36,7 @@ if (strlen($port) == 0) {
     $truePort = (int)$port;
 }
 
-if($moduleName == \Constant\Server::MODULE_NAME_API){
+if($moduleName == \Constant\Project::MODULE_NAME_API){
     $server = new \SyServer\HttpServer($truePort);
 } else {
     $server = new \SyServer\RpcServer($truePort);

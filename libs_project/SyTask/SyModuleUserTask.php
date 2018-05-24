@@ -7,12 +7,12 @@
  */
 namespace SyTask;
 
-use Constant\Server;
+use Constant\Project;
 
-class SyModuleOrderTask extends SyModuleTaskBase implements SyModuleTaskInterface {
+class SyModuleUserTask extends SyModuleTaskBase implements SyModuleTaskInterface {
     public function __construct() {
         parent::__construct();
-        $this->moduleTag = Server::MODULE_NAME_ORDER;
+        $this->moduleTag = Project::MODULE_NAME_USER;
     }
 
     private function __clone() {

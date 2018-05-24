@@ -7,21 +7,21 @@
  */
 namespace SyModule;
 
-use Constant\Server;
+use Constant\Project;
 
-class SyModuleUser extends ModuleRpc {
+class SyModuleOrder extends ModuleRpc {
     /**
-     * @var \SyModule\SyModuleUser
+     * @var \SyModule\SyModuleOrder
      */
     private static $instance = null;
 
     private function __construct() {
-        $this->moduleName = Server::MODULE_BASE_USER;
+        $this->moduleName = Project::MODULE_BASE_ORDER;
         parent::init();
     }
 
     /**
-     * @return \SyModule\SyModuleUser
+     * @return \SyModule\SyModuleOrder
      */
     public static function getInstance() {
         if (is_null(self::$instance)) {

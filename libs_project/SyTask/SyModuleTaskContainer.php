@@ -7,28 +7,28 @@
  */
 namespace SyTask;
 
-use Constant\Server;
+use Constant\Project;
 use Tool\BaseContainer;
 
 class SyModuleTaskContainer extends BaseContainer {
     public function __construct(){
         $this->registryMap = [
-            Server::MODULE_NAME_API,
-            Server::MODULE_NAME_ORDER,
-            Server::MODULE_NAME_SERVICE,
-            Server::MODULE_NAME_USER,
+            Project::MODULE_NAME_API,
+            Project::MODULE_NAME_ORDER,
+            Project::MODULE_NAME_SERVICE,
+            Project::MODULE_NAME_USER,
         ];
 
-        $this->bind(Server::MODULE_NAME_API, function() {
+        $this->bind(Project::MODULE_NAME_API, function() {
             return new SyModuleApiTask();
         });
-        $this->bind(Server::MODULE_NAME_ORDER, function() {
+        $this->bind(Project::MODULE_NAME_ORDER, function() {
             return new SyModuleOrderTask();
         });
-        $this->bind(Server::MODULE_NAME_SERVICE, function() {
+        $this->bind(Project::MODULE_NAME_SERVICE, function() {
             return new SyModuleServiceTask();
         });
-        $this->bind(Server::MODULE_NAME_USER, function() {
+        $this->bind(Project::MODULE_NAME_USER, function() {
             return new SyModuleUserTask();
         });
     }

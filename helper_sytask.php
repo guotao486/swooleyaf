@@ -14,7 +14,7 @@ function sendSyGetReq(string $url) {
 
 $container = new \SyTask\SyModuleTaskContainer();
 $modules = [
-    \Constant\Server::MODULE_NAME_API => [
+    \Constant\Project::MODULE_NAME_API => [
         'projects' => [
             0 => [
                 'host' => '127.0.0.1',
@@ -22,7 +22,7 @@ $modules = [
             ],
         ],
     ],
-    \Constant\Server::MODULE_NAME_ORDER => [
+    \Constant\Project::MODULE_NAME_ORDER => [
         'projects' => [
             0 => [
                 'host' => '127.0.0.1',
@@ -30,7 +30,7 @@ $modules = [
             ],
         ],
     ],
-    \Constant\Server::MODULE_NAME_USER => [
+    \Constant\Project::MODULE_NAME_USER => [
         'projects' => [
             0 => [
                 'host' => '127.0.0.1',
@@ -38,7 +38,7 @@ $modules = [
             ],
         ],
     ],
-    \Constant\Server::MODULE_NAME_SERVICE => [
+    \Constant\Project::MODULE_NAME_SERVICE => [
         'projects' => [
             0 => [
                 'host' => '127.0.0.1',
