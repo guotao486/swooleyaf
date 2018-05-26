@@ -73,23 +73,6 @@ local function checkIp()
     end
 end
 
-local function checkCCDeny()
-    if configs.StatusCCDeny then
-        local token = ngx.md5(sytool.getClientIp() .. ngx.var.uri)
-        local cachecc = ngx.shared.sywafcachecc
-        local reqNum,_ = cachecc:get(token)
-        if reqNum then
-            if reqNum < configs.CCCount then
-                cachecc:incr(token, 1)
-            else
-                sendErrorRsp(ngx.HTTP_OK, 'json')
-            end
-        else
-            cachecc:set(token, 1, configs.CCSeconds)
-        end
-    end
-end
-
 local function checkUri()
     local nowUri = ngx.var.uri
     if configs.StatusWhiteUri and #configs['WhiteUris'] > 0 then
@@ -240,7 +223,6 @@ module.tokenSecret = 'jb6hNP'
 function module.checkWaf()
     checkHeader()
     checkIp()
-    checkCCDeny()
     checkUri()
     checkUserAgent()
     checkGetArgs()
@@ -248,27 +230,23 @@ function module.checkWaf()
     checkPost()
 end
 
-function module.checkCookieToken(tag)
-    local httpRefer = ngx.var.http_referer
-    local hostTag = 'WhiteHosts' .. tag
-    if httpRefer ~= nil and configs[hostTag] and #configs[hostTag] > 0 then
-        for _, rule in pairs(configs[hostTag]) do
-            if ngxMatch(httpRefer, rule, "isjo") then
-                return
+function module.checkCCDeny(tag)
+    local ccCacheTag = 'sywafcc' .. tag
+    local ccCache = ngx.shared[ccCacheTag]
+    local ccCountTag = 'CCCount' .. tag
+    local ccSecondsTag = 'CCSeconds' .. tag
+    if ccCache ~= nil and configs[ccCountTag] and configs[ccSecondsTag] then
+        local token = tostring(ngx.crc32_short(ngx.var.remote_addr))
+        local reqNum,_ = cachecc:get(token)
+        if reqNum then
+            if reqNum < configs[ccCountTag] then
+                ccCache:incr(token, 1)
+            else
+                sendErrorRsp(ngx.HTTP_OK, 'json')
             end
+        else
+            ccCache:set(token, 1, configs[ccSecondsTag])
         end
-    end
-
-    local wafTag = 'cookie_sywaf' .. tag
-    local nowToken = ngx.var[wafTag]
-    local newToken = tostring(ngx.crc32_short(module.tokenSecret .. ngx.var.remote_addr))
-    if nowToken == nil then
-        ngx.header['Set-Cookie'] = 'sywaf' .. tag .. '=' .. newToken
-        return ngx.redirect(ngx.var.scheme .. '://' .. ngx.var.host .. ngx.var.request_uri, 301)
-    elseif nowToken == newToken then
-        return
-    else
-        ngx.exit(ngx.HTTP_FORBIDDEN)
     end
 end
 
