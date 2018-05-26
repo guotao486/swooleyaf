@@ -237,7 +237,7 @@ function module.checkCCDeny(tag)
     local ccSecondsTag = 'CCSeconds' .. tag
     if ccCache ~= nil and configs[ccCountTag] and configs[ccSecondsTag] then
         local token = tostring(ngx.crc32_short(ngx.var.remote_addr))
-        local reqNum,_ = cachecc:get(token)
+        local reqNum,_ = ccCache:get(token)
         if reqNum then
             if reqNum < configs[ccCountTag] then
                 ccCache:incr(token, 1)
