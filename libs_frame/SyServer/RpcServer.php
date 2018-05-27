@@ -8,6 +8,7 @@
 namespace SyServer;
 
 use Constant\ErrorCode;
+use Constant\Project;
 use Constant\Server;
 use Exception\Validator\ValidatorException;
 use Log\Log;
@@ -93,13 +94,13 @@ class RpcServer extends BaseServer {
         $result = true;
         $taskCommand = Tool::getArrayVal($data, 'task_command', '');
         switch ($taskCommand) {
-            case Server::TASK_TYPE_CLEAR_LOCAL_USER_CACHE:
+            case Project::TASK_TYPE_CLEAR_LOCAL_USER_CACHE:
                 $this->clearLocalUsers();
                 break;
-            case Server::TASK_TYPE_CLEAR_LOCAL_WXSHOP_TOKEN_CACHE:
+            case Project::TASK_TYPE_CLEAR_LOCAL_WXSHOP_TOKEN_CACHE:
                 $this->clearLocalWxShopTokens();
                 break;
-            case Server::TASK_TYPE_CLEAR_LOCAL_WXOPEN_AUTHORIZER_TOKEN_CACHE:
+            case Project::TASK_TYPE_CLEAR_LOCAL_WXOPEN_AUTHORIZER_TOKEN_CACHE:
                 $this->clearLocalWxOpenAuthorizerTokens();
                 break;
             default:

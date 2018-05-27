@@ -431,16 +431,16 @@ class HttpServer extends BaseServer {
 
         $taskCommand = Tool::getArrayVal($data, 'task_command', '');
         switch ($taskCommand) {
-            case Server::TASK_TYPE_CLEAR_API_SIGN_CACHE:
+            case Project::TASK_TYPE_CLEAR_API_SIGN_CACHE:
                 $this->clearApiSign();
                 break;
-            case Server::TASK_TYPE_CLEAR_LOCAL_USER_CACHE:
+            case Project::TASK_TYPE_CLEAR_LOCAL_USER_CACHE:
                 $this->clearLocalUsers();
                 break;
-            case Server::TASK_TYPE_CLEAR_LOCAL_WXSHOP_TOKEN_CACHE:
+            case Project::TASK_TYPE_CLEAR_LOCAL_WXSHOP_TOKEN_CACHE:
                 $this->clearLocalWxShopTokens();
                 break;
-            case Server::TASK_TYPE_CLEAR_LOCAL_WXOPEN_AUTHORIZER_TOKEN_CACHE:
+            case Project::TASK_TYPE_CLEAR_LOCAL_WXOPEN_AUTHORIZER_TOKEN_CACHE:
                 $this->clearLocalWxOpenAuthorizerTokens();
                 break;
             default:
