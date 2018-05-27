@@ -9,7 +9,6 @@ namespace Wx;
 
 use Constant\ErrorCode;
 use Constant\Project;
-use Constant\Server;
 use DesignPatterns\Factories\CacheSimpleFactory;
 use DesignPatterns\Singletons\WxConfigSingleton;
 use Exception\Wx\WxException;
@@ -294,7 +293,7 @@ final class WxUtilShop extends WxUtilBase {
      */
     private static function refreshWxAccountCache(string $appId) : array {
         $nowTime = time();
-        $clearTime = $nowTime + Server::TIME_EXPIRE_LOCAL_WXSHOP_TOKEN_CLEAR;
+        $clearTime = $nowTime + Project::TIME_EXPIRE_LOCAL_WXSHOP_TOKEN_CLEAR;
         $redisKey = Project::REDIS_PREFIX_WX_ACCOUNT . $appId;
         $redisData = CacheSimpleFactory::getRedisInstance()->hGetAll($redisKey);
         if (isset($redisData['unique_key']) && ($redisData['unique_key'] == $redisKey) && ($redisData['expire_time'] >= $nowTime)) {

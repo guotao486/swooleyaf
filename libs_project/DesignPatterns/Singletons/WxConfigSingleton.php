@@ -8,7 +8,6 @@
 namespace DesignPatterns\Singletons;
 
 use Constant\Project;
-use Constant\Server;
 use Factories\SyTaskMysqlFactory;
 use Tool\Tool;
 use Traits\SingletonTrait;
@@ -92,7 +91,7 @@ class WxConfigSingleton {
                 unset($this->shopConfigs[$eAppId]);
             }
 
-            $this->shopClearTime = $nowTime + Server::TIME_EXPIRE_LOCAL_WXSHOP_CLEAR;
+            $this->shopClearTime = $nowTime + Project::TIME_EXPIRE_LOCAL_WXSHOP_CLEAR;
         }
 
         return Tool::getArrayVal($this->shopConfigs, $appId, null);
@@ -104,7 +103,7 @@ class WxConfigSingleton {
      * @return \Wx\WxConfigShop
      */
     public function refreshShopConfig(string $appId) {
-        $expireTime = time() + Server::TIME_EXPIRE_LOCAL_WXSHOP_REFRESH;
+        $expireTime = time() + Project::TIME_EXPIRE_LOCAL_WXSHOP_REFRESH;
         $shopConfig = new WxConfigShop();
         $shopConfig->setAppId($appId);
         $shopConfig->setExpireTime($expireTime);
