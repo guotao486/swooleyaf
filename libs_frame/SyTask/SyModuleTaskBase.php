@@ -7,7 +7,7 @@
  */
 namespace SyTask;
 
-use Constant\Server;
+use Constant\Project;
 use Tool\SyPack;
 use Tool\Tool;
 
@@ -62,7 +62,7 @@ abstract class SyModuleTaskBase {
     protected function clearLocalUserCache(array $data,string $moduleTag) {
         if(strlen($moduleTag) == 0){
             $this->syPack->setCommandAndData(SyPack::COMMAND_TYPE_RPC_CLIENT_SEND_TASK_REQ, [
-                'task_command' => Server::TASK_TYPE_CLEAR_LOCAL_USER_CACHE,
+                'task_command' => Project::TASK_TYPE_CLEAR_LOCAL_USER_CACHE,
                 'task_params' => [],
             ]);
             $apiTaskStr = $this->syPack->packData();
@@ -73,7 +73,7 @@ abstract class SyModuleTaskBase {
         } else {
             $this->syPack->setCommandAndData(SyPack::COMMAND_TYPE_SOCKET_CLIENT_SEND_TASK_REQ, [
                 'task_module' => $moduleTag,
-                'task_command' => Server::TASK_TYPE_CLEAR_LOCAL_USER_CACHE,
+                'task_command' => Project::TASK_TYPE_CLEAR_LOCAL_USER_CACHE,
                 'task_params' => [],
             ]);
             $apiTaskStr = $this->syPack->packData();
@@ -87,7 +87,7 @@ abstract class SyModuleTaskBase {
     protected function clearLocalWxshopTokenCache(array $data,string $moduleTag) {
         if(strlen($moduleTag) == 0){
             $this->syPack->setCommandAndData(SyPack::COMMAND_TYPE_RPC_CLIENT_SEND_TASK_REQ, [
-                'task_command' => Server::TASK_TYPE_CLEAR_LOCAL_WXSHOP_TOKEN_CACHE,
+                'task_command' => Project::TASK_TYPE_CLEAR_LOCAL_WXSHOP_TOKEN_CACHE,
                 'task_params' => [],
             ]);
             $apiTaskStr = $this->syPack->packData();
@@ -98,7 +98,7 @@ abstract class SyModuleTaskBase {
         } else {
             $this->syPack->setCommandAndData(SyPack::COMMAND_TYPE_SOCKET_CLIENT_SEND_TASK_REQ, [
                 'task_module' => $moduleTag,
-                'task_command' => Server::TASK_TYPE_CLEAR_LOCAL_WXSHOP_TOKEN_CACHE,
+                'task_command' => Project::TASK_TYPE_CLEAR_LOCAL_WXSHOP_TOKEN_CACHE,
                 'task_params' => [],
             ]);
             $apiTaskStr = $this->syPack->packData();
@@ -112,7 +112,7 @@ abstract class SyModuleTaskBase {
     protected function clearLocalWxopenAuthorizerTokenCache(array $data,string $moduleTag) {
         if(strlen($moduleTag) == 0){
             $this->syPack->setCommandAndData(SyPack::COMMAND_TYPE_RPC_CLIENT_SEND_TASK_REQ, [
-                'task_command' => Server::TASK_TYPE_CLEAR_LOCAL_WXOPEN_AUTHORIZER_TOKEN_CACHE,
+                'task_command' => Project::TASK_TYPE_CLEAR_LOCAL_WXOPEN_AUTHORIZER_TOKEN_CACHE,
                 'task_params' => [],
             ]);
             $apiTaskStr = $this->syPack->packData();
@@ -123,7 +123,7 @@ abstract class SyModuleTaskBase {
         } else {
             $this->syPack->setCommandAndData(SyPack::COMMAND_TYPE_SOCKET_CLIENT_SEND_TASK_REQ, [
                 'task_module' => $moduleTag,
-                'task_command' => Server::TASK_TYPE_CLEAR_LOCAL_WXOPEN_AUTHORIZER_TOKEN_CACHE,
+                'task_command' => Project::TASK_TYPE_CLEAR_LOCAL_WXOPEN_AUTHORIZER_TOKEN_CACHE,
                 'task_params' => [],
             ]);
             $apiTaskStr = $this->syPack->packData();

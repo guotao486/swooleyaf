@@ -34,7 +34,7 @@ class SyModuleApiTask extends SyModuleTaskBase implements SyModuleTaskInterface 
         if($data['clear_apisign']){ //清理api签名
             $this->syPack->setCommandAndData(SyPack::COMMAND_TYPE_SOCKET_CLIENT_SEND_TASK_REQ, [
                 'task_module' => $this->moduleTag,
-                'task_command' => Server::TASK_TYPE_CLEAR_API_SIGN_CACHE,
+                'task_command' => Project::TASK_TYPE_CLEAR_API_SIGN_CACHE,
                 'task_params' => [],
             ]);
             $apiTaskStr = $this->syPack->packData();
