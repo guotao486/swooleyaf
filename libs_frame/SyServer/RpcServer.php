@@ -8,18 +8,19 @@
 namespace SyServer;
 
 use Constant\ErrorCode;
-use Constant\Project;
 use Constant\Server;
 use Exception\Validator\ValidatorException;
 use Log\Log;
 use Request\RequestSign;
 use Response\Result;
 use Tool\SyPack;
-use Tool\Tool;
+use Traits\RpcServerTrait;
 use Yaf\Registry;
 use Yaf\Request\Http;
 
 class RpcServer extends BaseServer {
+    use RpcServerTrait;
+
     /**
      * @var \Tool\SyPack
      */
@@ -68,7 +69,7 @@ class RpcServer extends BaseServer {
     }
 
     public function start() {
-        $this->initStartBase();
+        $this->initTableByStart();
         //初始化swoole服务
         $this->_server = new \swoole_server($this->_host, $this->_port);
         $this->_server->set($this->_configs['swoole']);
@@ -88,27 +89,6 @@ class RpcServer extends BaseServer {
 
         //启动服务
         $this->_server->start();
-    }
-
-    private function handleTaskClient(array $data) : bool {
-        $result = true;
-        $taskCommand = Tool::getArrayVal($data, 'task_command', '');
-        switch ($taskCommand) {
-            case Project::TASK_TYPE_CLEAR_LOCAL_USER_CACHE:
-                $this->clearLocalUsers();
-                break;
-            case Project::TASK_TYPE_CLEAR_LOCAL_WXSHOP_TOKEN_CACHE:
-                $this->clearLocalWxShopTokens();
-                break;
-            case Project::TASK_TYPE_CLEAR_LOCAL_WXOPEN_AUTHORIZER_TOKEN_CACHE:
-                $this->clearLocalWxOpenAuthorizerTokens();
-                break;
-            default:
-                $result = false;
-                break;
-        }
-
-        return $result;
     }
 
     private function handleApiReceive(array $data) {
@@ -187,23 +167,12 @@ class RpcServer extends BaseServer {
     }
 
     public function onTask(\swoole_server $server, int $taskId, int $fromId, string $data){
-        $handleRes = $this->handleTaskBase($server, $taskId, $fromId, $data);
-        if(is_string($handleRes)){
-            return $handleRes;
+        $baseTaskRes = $this->handleBaseTask($server, $taskId, $fromId, $data);
+        if(is_array($baseTaskRes)){
+            return $this->handleRpcTask($baseTaskRes['params']);
         }
 
-        $result = new Result();
-        if(($handleRes['command'] == SyPack::COMMAND_TYPE_RPC_CLIENT_SEND_TASK_REQ) && $this->handleTaskClient($handleRes['params'])){
-            $result->setData([
-                'result' => 'success',
-            ]);
-        } else {
-            $result->setData([
-                'result' => 'fail',
-            ]);
-        }
-
-        return $result->getJson();
+        return $baseTaskRes;
     }
 
     /**

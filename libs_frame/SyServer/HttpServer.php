@@ -19,10 +19,13 @@ use Response\SyResponseHttp;
 use SyModule\ModuleContainer;
 use Tool\SyPack;
 use Tool\Tool;
+use Traits\HttpServerTrait;
 use Yaf\Registry;
 use Yaf\Request\Http;
 
 class HttpServer extends BaseServer {
+    use HttpServerTrait;
+
     const RESPONSE_RESULT_TYPE_FORBIDDEN = 0; //响应结果类型-拒绝请求
     const RESPONSE_RESULT_TYPE_ACCEPT = 1; //响应结果类型-允许请求执行业务
     const RESPONSE_RESULT_TYPE_ALLOW = 2; //响应结果类型-不执行业务，直接返回响应
@@ -70,21 +73,6 @@ class HttpServer extends BaseServer {
      * @var string
      */
     private static $_reqTask = null;
-    /**
-     * 最大签名缓存数量
-     * @var int
-     */
-    private static $_sySignMaxNum = 0;
-    /**
-     * 当前签名缓存数量
-     * @var int
-     */
-    private static $_sySignNowNum = 0;
-    /**
-     * 接口签名缓存列表
-     * @var \swoole_table
-     */
-    private static $_sySigns = null;
 
     public function __construct(int $port) {
         parent::__construct($port);
@@ -97,58 +85,18 @@ class HttpServer extends BaseServer {
         $this->_cors['allow']['methodStr'] = isset($this->_cors['allow']['methods']) ? implode(', ', $this->_cors['allow']['methods']) : '';
         $this->_messagePack = new SyPack();
         $this->_moduleContainer = new ModuleContainer();
-        self::$_sySignNowNum = 0;
-        self::$_sySignMaxNum = (int)$this->_configs['server']['cachenum']['sign'];
+
+        $this->checkHttpServer([
+            'cachenum_sign' => (int)$this->_configs['server']['cachenum']['sign']
+        ]);
     }
 
     private function __clone() {
     }
 
-    /**
-     * 添加签名缓存
-     * @param string $sign 签名信息
-     * @return bool
-     */
-    public static function addApiSign(string $sign) : bool {
-        $needSign = substr($sign, 16);
-        if (self::$_sySigns->exist($needSign)) {
-            return false;
-        } else if (self::$_sySignNowNum < self::$_sySignMaxNum) {
-            self::$_sySigns->set($needSign, [
-                'sign' => $needSign,
-                'time' => time(),
-            ]);
-            self::$_sySignNowNum++;
-
-            return true;
-        } else {
-            return true;
-        }
-    }
-
-    /**
-     * 清理签名缓存
-     */
-    private function clearApiSign() {
-        $time = time() - Project::TIME_EXPIRE_LOCAL_API_SIGN_CACHE;
-        $delKeys = [];
-        foreach (self::$_sySigns as $eSign) {
-            if($eSign['time'] <= $time){
-                $delKeys[] = $eSign['sign'];
-            }
-        }
-        foreach ($delKeys as $eKey) {
-            self::$_sySigns->del($eKey);
-        }
-        self::$_sySignNowNum = count(self::$_sySigns);
-    }
-
     public function start() {
-        $this->initStartBase();
-        self::$_sySigns = new \swoole_table(self::$_sySignMaxNum);
-        self::$_sySigns->column('sign', \swoole_table::TYPE_STRING, 32);
-        self::$_sySigns->column('time', \swoole_table::TYPE_INT, 4);
-        self::$_sySigns->create();
+        $this->initTableByStart();
+        $this->initTableByHttpStart();
 
         //初始化swoole服务
         $this->_server = new \swoole_websocket_server($this->_host, $this->_port);
@@ -426,31 +374,6 @@ class HttpServer extends BaseServer {
         return $result;
     }
 
-    private function handleTaskClient(array $data) : bool {
-        $result = true;
-
-        $taskCommand = Tool::getArrayVal($data, 'task_command', '');
-        switch ($taskCommand) {
-            case Project::TASK_TYPE_CLEAR_API_SIGN_CACHE:
-                $this->clearApiSign();
-                break;
-            case Project::TASK_TYPE_CLEAR_LOCAL_USER_CACHE:
-                $this->clearLocalUsers();
-                break;
-            case Project::TASK_TYPE_CLEAR_LOCAL_WXSHOP_TOKEN_CACHE:
-                $this->clearLocalWxShopTokens();
-                break;
-            case Project::TASK_TYPE_CLEAR_LOCAL_WXOPEN_AUTHORIZER_TOKEN_CACHE:
-                $this->clearLocalWxOpenAuthorizerTokens();
-                break;
-            default:
-                $result = false;
-                break;
-        }
-
-        return $result;
-    }
-
     public function onWorkerStart(\swoole_server $server, $workerId){
         $this->basicWorkStart($server, $workerId);
     }
@@ -640,23 +563,12 @@ class HttpServer extends BaseServer {
     }
 
     public function onTask(\swoole_server $server, int $taskId, int $fromId, string $data){
-        $handleRes = $this->handleTaskBase($server, $taskId, $fromId, $data);
-        if(is_string($handleRes)){
-            return $handleRes;
+        $baseTaskRes = $this->handleBaseTask($server, $taskId, $fromId, $data);
+        if(is_array($baseTaskRes)){
+            return $this->handleHttpTask($baseTaskRes['params']);
         }
 
-        $result = new Result();
-        if(($handleRes['command'] == SyPack::COMMAND_TYPE_SOCKET_CLIENT_SEND_TASK_REQ) && $this->handleTaskClient($handleRes['params'])){
-            $result->setData([
-                'result' => 'success',
-            ]);
-        } else {
-            $result->setData([
-                'result' => 'fail',
-            ]);
-        }
-
-        return $result->getJson();
+        return $baseTaskRes;
     }
 
     /**
