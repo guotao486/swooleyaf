@@ -97,7 +97,7 @@ final class WxUtilOpen extends WxUtilBase {
      */
     private static function getAuthorizerCache(string $appId) : array {
         $nowTime = time();
-        $clearTime = $nowTime + Server::TIME_EXPIRE_LOCAL_WXOPEN_AUTHORIZER_TOKEN_CLEAR;
+        $clearTime = $nowTime + Project::TIME_EXPIRE_LOCAL_WXOPEN_AUTHORIZER_TOKEN_CLEAR;
         $cacheData = [];
         $openCommonConfig = WxConfigSingleton::getInstance()->getOpenCommonConfig();
         $redisKey = Project::REDIS_PREFIX_WX_COMPONENT_AUTHORIZER . $appId;

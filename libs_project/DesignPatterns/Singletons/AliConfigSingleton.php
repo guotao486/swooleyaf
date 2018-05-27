@@ -10,7 +10,6 @@ namespace DesignPatterns\Singletons;
 use AliConfigs\DaYu;
 use AliConfigs\Pay;
 use Constant\Project;
-use Constant\Server;
 use Factories\SyBaseMysqlFactory;
 use Tool\Tool;
 use Traits\SingletonTrait;
@@ -82,7 +81,7 @@ class AliConfigSingleton {
                 unset($this->payConfigs[$eAppId]);
             }
 
-            $this->payClearTime = $nowTime + Server::TIME_EXPIRE_LOCAL_ALIPAY_CLEAR;
+            $this->payClearTime = $nowTime + Project::TIME_EXPIRE_LOCAL_ALIPAY_CLEAR;
         }
 
         return Tool::getArrayVal($this->payConfigs, $appId, null);
@@ -94,7 +93,7 @@ class AliConfigSingleton {
      * @return \AliConfigs\Pay
      */
     public function refreshPayConfig(string $appId) {
-        $expireTime = time() + Server::TIME_EXPIRE_LOCAL_ALIPAY_REFRESH;
+        $expireTime = time() + Project::TIME_EXPIRE_LOCAL_ALIPAY_REFRESH;
         $payConfig = new Pay();
         $payConfig->setAppId($appId);
         $payConfig->setExpireTime($expireTime);
