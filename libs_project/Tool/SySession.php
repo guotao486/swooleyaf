@@ -8,7 +8,6 @@
 namespace Tool;
 
 use Constant\Project;
-use Constant\Server;
 use DesignPatterns\Factories\CacheSimpleFactory;
 use Request\SyRequest;
 use SyServer\BaseServer;
@@ -25,10 +24,10 @@ class SySession {
     public static function getSessionId(string $inToken='') : string {
         if (strlen($inToken) > 0) {
             $token = $inToken;
-        } else if (isset($_COOKIE[Server::SERVER_DATA_KEY_TOKEN])) {
-            $token = $_COOKIE[Server::SERVER_DATA_KEY_TOKEN];
+        } else if (isset($_COOKIE[Project::DATA_KEY_SESSION_TOKEN])) {
+            $token = $_COOKIE[Project::DATA_KEY_SESSION_TOKEN];
         } else {
-            $token = SyRequest::getParams(Server::SERVER_DATA_KEY_TOKEN, '');
+            $token = SyRequest::getParams(Project::DATA_KEY_SESSION_TOKEN, '');
         }
 
         if (strlen($token) != 16) {

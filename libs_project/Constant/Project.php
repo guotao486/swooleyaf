@@ -34,6 +34,9 @@ final class Project {
     const MODULE_NAME_USER = SY_PROJECT . self::MODULE_BASE_USER;
     const MODULE_NAME_SERVICE = SY_PROJECT . self::MODULE_BASE_SERVICE;
 
+    //数据常量
+    const DATA_KEY_SESSION_TOKEN = '_sytoken'; //键名-session标识
+
     //公共常量
     const COMMON_PAGE_DEFAULT = 1; //默认页数
     const COMMON_LIMIT_DEFAULT = 10; //默认分页限制

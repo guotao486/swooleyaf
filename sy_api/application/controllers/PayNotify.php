@@ -117,7 +117,7 @@ class PayNotifyController extends CommonController {
         $expireTime = time() + 604800;
         $sessionId = \Tool\SySession::getSessionId();
         $redirectUrl = \Request\SyRequest::getParams('url');
-        \Response\SyResponseHttp::cookie(\Constant\Server::SERVER_DATA_KEY_TOKEN, $sessionId, $expireTime, '/', \SyServer\HttpServer::getServerConfig('cookiedomain_base', ''));
+        \Response\SyResponseHttp::cookie(\Constant\Project::DATA_KEY_SESSION_TOKEN, $sessionId, $expireTime, '/', \SyServer\HttpServer::getServerConfig('cookiedomain_base', ''));
         \Response\SyResponseHttp::redirect($redirectUrl);
 
         $this->sendRsp();

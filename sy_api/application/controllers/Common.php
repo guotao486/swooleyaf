@@ -11,12 +11,12 @@ class CommonController extends \SyFrame\BaseController {
     public function init() {
         parent::init();
         $this->signStatus = true;
-        $view = $this->initView();
+        $this->initView();
 
         $token = \Tool\SySession::getSessionId();
-        $_COOKIE[\Constant\Server::SERVER_DATA_KEY_TOKEN] = $token;
+        $_COOKIE[\Constant\Project::DATA_KEY_SESSION_TOKEN] = $token;
         $expireTime = time() + 604800;
         $domain = \SyServer\HttpServer::getServerConfig('cookiedomain_base', '');
-        \Response\SyResponseHttp::cookie(\Constant\Server::SERVER_DATA_KEY_TOKEN, $token, $expireTime, '/', $domain);
+        \Response\SyResponseHttp::cookie(\Constant\Project::DATA_KEY_SESSION_TOKEN, $token, $expireTime, '/', $domain);
     }
 }
