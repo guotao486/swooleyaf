@@ -231,6 +231,16 @@ function module.checkWaf()
 end
 
 function module.checkCCDeny(tag)
+    local httpRefer = ngx.var.http_referer
+    local hostTag = 'WhiteHosts' .. tag
+    if httpRefer ~= nil and configs[hostTag] and #configs[hostTag] > 0 then
+        for _, rule in pairs(configs[hostTag]) do
+            if ngxMatch(httpRefer, rule, "isjo") then
+                return
+            end
+        end
+    end
+
     local ccCacheTag = 'sywafcc' .. tag
     local ccCache = ngx.shared[ccCacheTag]
     local ccCountTag = 'CCCount' .. tag
