@@ -12,21 +12,6 @@ use Traits\SimpleTrait;
 final class Server {
     use SimpleTrait;
 
-    public static $totalEnvProject = [
-        self::ENV_PROJECT_DEV,
-        self::ENV_PROJECT_PRODUCT,
-    ];
-
-    public static $totalEnvSystem = [
-        self::ENV_SYSTEM_BSD,
-        self::ENV_SYSTEM_LINUX,
-    ];
-
-    public static $totalImageFilterDither = [
-        self::IMAGE_FILTER_DITHER_ORDERED,
-        self::IMAGE_FILTER_DITHER_DIFFUSION,
-    ];
-
     //模块常量
     //考虑到yac缓存名称长度限制,名称不能超过30个字符串
     const MODULE_BASE_SERVICE = 'services';
@@ -50,6 +35,14 @@ final class Server {
     const PROCESS_TYPE_MAIN = 'Main'; //类型-main
 
     //环境常量
+    public static $totalEnvProject = [
+        self::ENV_PROJECT_DEV,
+        self::ENV_PROJECT_PRODUCT,
+    ];
+    public static $totalEnvSystem = [
+        self::ENV_SYSTEM_BSD,
+        self::ENV_SYSTEM_LINUX,
+    ];
     const ENV_PROJECT_DEV = 'dev'; //项目环境-测试
     const ENV_PROJECT_PRODUCT = 'product'; //项目环境-生产
     const ENV_SYSTEM_BSD = 'FreeBSD'; //系统环境-bsd
@@ -113,6 +106,10 @@ final class Server {
     const REGISTRY_NAME_RESPONSE_COOKIE = 'RESPONSE_COOKIE'; //名称-响应cookie
 
     //图片常量
+    public static $totalImageFilterDither = [
+        self::IMAGE_FILTER_DITHER_ORDERED,
+        self::IMAGE_FILTER_DITHER_DIFFUSION,
+    ];
     const IMAGE_MIME_TYPE_PNG = 'image/png'; //MIME类型-PNG
     const IMAGE_MIME_TYPE_JPEG = 'image/jpeg'; //MIME类型-JPEG
     const IMAGE_MIME_TYPE_GIF = 'image/gif'; //MIME类型-GIF
