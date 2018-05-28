@@ -37,6 +37,10 @@ class Bootstrap extends \Yaf\Bootstrap_Abstract {
             }
 
             $twigView = new \DesignPatterns\Adapters\TwigAdapter(APP_PATH . '/application/views/', $twigConfig);
+            $funcList = \TemplateExtension\Twig\ProjectFunction::getInstance()->getFunction();
+            foreach ($funcList as $eTag => $eFunc) {
+                $twigView->addFunction($eTag, $eFunc);
+            }
             $dispatcher->setView($twigView);
 
 //            $smartyConfig = \SyFrame\BaseBootstarp::getAppConfigs('smarty');
