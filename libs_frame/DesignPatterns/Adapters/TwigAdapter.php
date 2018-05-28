@@ -57,6 +57,10 @@ class TwigAdapter implements View_Interface {
         $this->_twig->addFunction($name, $function);
     }
 
+    public function addExtension(\Twig_ExtensionInterface $extension) {
+        $this->_twig->addExtension($extension);
+    }
+
     public function addGlobal($name, $value) {
         $this->_twig->addGlobal($name, $value);
     }
