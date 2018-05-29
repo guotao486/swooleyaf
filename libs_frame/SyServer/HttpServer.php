@@ -579,9 +579,6 @@ class HttpServer extends BaseServer {
     public function onRequest(\swoole_http_request $request,\swoole_http_response $response){
         self::$_response = $response;
         $this->initCommon($request);
-        $startTime = microtime(true);
-        $inLog = SY_SERVER_IP . ' | ' . SY_MODULE . ' | ' . PHP_EOL . 'http request start,host:' . $_SERVER['HTTP_HOST'] . ',uri:' . $_SERVER['REQUEST_URI'] . ',memory:' . memory_get_usage();
-        \SeasLog::info($inLog);
         if(is_null(self::$_reqTask)){
             $rspHeaders = [];
             $handleHeaderRes = $this->handleReqHeader($rspHeaders);
@@ -612,9 +609,6 @@ class HttpServer extends BaseServer {
             $response->end(self::$_rspMsg . Server::SERVER_HTTP_TAG_RESPONSE_EOF);
         }
 
-        $handleTime = microtime(true) - $startTime;
-        $outLog = SY_SERVER_IP . ' | ' . SY_MODULE . ' | ' . PHP_EOL . 'http request end,host:' . $_SERVER['HTTP_HOST'] . ',uri:' . $_SERVER['REQUEST_URI'] . ',memory:' . memory_get_usage() . ',time:' . $handleTime;
-        \SeasLog::info($outLog);
         $this->clearRequest();
     }
 }

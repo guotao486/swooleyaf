@@ -26,6 +26,7 @@ class Bootstrap extends \Yaf\Bootstrap_Abstract {
             $dispatcher->registerPlugin(new \SyFrame\Plugins\CheckConnectPlugin());
             $dispatcher->registerPlugin(new \SyFrame\Plugins\ValidatorPlugin());
             $dispatcher->registerPlugin(new \SyFrame\Plugins\FinishServicePlugin());
+            $dispatcher->registerPlugin(new \SyFrame\Plugins\ActionLogPlugin());
 
             self::$firstTag = false;
         }
