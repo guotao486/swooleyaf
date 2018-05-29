@@ -284,18 +284,12 @@ class HttpServer extends BaseServer {
         }
 
         if (isset($_SERVER['ACCESS-CONTROL-REQUEST-HEADERS'])) { //校验请求头
-            $checkRes = true;
             $controlReqHeaders = explode(',', strtolower($_SERVER['ACCESS-CONTROL-REQUEST-HEADERS']));
             foreach ($controlReqHeaders as $eHeader) {
                 $headerName = trim($eHeader);
-                if ((strlen($headerName) > 0) && (!in_array($headerName, $this->_cors['allow']['headers']))) {
-                    $checkRes = false;
-                    break;
+                if ((strlen($headerName) > 0) && !in_array($headerName, $this->_cors['allow']['headers'])) {
+                    return HttpServer::RESPONSE_RESULT_TYPE_FORBIDDEN;
                 }
-            }
-
-            if (!$checkRes) {
-                return HttpServer::RESPONSE_RESULT_TYPE_FORBIDDEN;
             }
         }
 
