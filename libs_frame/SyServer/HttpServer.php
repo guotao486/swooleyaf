@@ -278,7 +278,7 @@ class HttpServer extends BaseServer {
 
         if (isset($_SERVER['ACCESS-CONTROL-REQUEST-METHOD'])) { //校验请求方式
             $methodStr = ', ' . strtoupper(trim($_SERVER['ACCESS-CONTROL-REQUEST-METHOD']));
-            if ( strpos(', ' . $this->_cors['allow']['methodStr'], $methodStr) === false) {
+            if (strpos(', ' . $this->_cors['allow']['methodStr'], $methodStr) === false) {
                 return HttpServer::RESPONSE_RESULT_TYPE_FORBIDDEN;
             }
         }
