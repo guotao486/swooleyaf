@@ -16,7 +16,8 @@ class SyModuleApi extends ModuleHttp {
     private static $instance = null;
 
     private function __construct() {
-        $this->moduleName = Project::MODULE_BASE_API;
+        $this->moduleBase = Project::MODULE_BASE_API;
+        $this->moduleName = Project::MODULE_NAME_API;
         $this->init();
     }
 
