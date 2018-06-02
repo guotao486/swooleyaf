@@ -16,7 +16,8 @@ class SyModuleOrder extends ModuleRpc {
     private static $instance = null;
 
     private function __construct() {
-        $this->moduleName = Project::MODULE_BASE_ORDER;
+        $this->moduleBase = Project::MODULE_BASE_ORDER;
+        $this->moduleName = Project::MODULE_NAME_ORDER;
         parent::init();
     }
 

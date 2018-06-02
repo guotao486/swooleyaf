@@ -19,6 +19,11 @@ abstract class ModuleBase {
     const NODE_TYPE_RPC = 'rpc';
 
     /**
+     * 模块标识
+     * @var string
+     */
+    protected $moduleBase = '';
+    /**
      * 模块名称
      * @var string
      */
@@ -45,7 +50,7 @@ abstract class ModuleBase {
      * @throws \Exception\Swoole\ServerException
      */
     private function getNodeServerInfo(string $nodeType) {
-        $serviceInfo = BaseServer::getServiceInfo($this->moduleName);
+        $serviceInfo = BaseServer::getServiceInfo($this->moduleBase);
         if (empty($serviceInfo)) {
             throw new ServerException('服务不存在', ErrorCode::SWOOLE_SERVER_NOT_EXIST_ERROR);
         }
