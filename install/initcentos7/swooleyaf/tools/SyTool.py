@@ -235,8 +235,8 @@ class SyTool():
             run('rm -rf freetype-2.6.5/')
             run('rm -rf freetype-2.6.5.tar.bz2')
 
-        php7Local = ''.join([syDicts['path.package.local'], '/resources/php7/php-7.1.17.tar.gz'])
-        php7Remote = ''.join([syDicts['path.package.remote'], '/php-7.1.17.tar.gz'])
+        php7Local = ''.join([syDicts['path.package.local'], '/resources/php7/php-7.1.18.tar.gz'])
+        php7Remote = ''.join([syDicts['path.package.remote'], '/php-7.1.18.tar.gz'])
         put(php7Local, php7Remote)
         with cd(syDicts['path.package.remote']):
             run('mkdir /tmp/swoolyaf')
@@ -245,8 +245,8 @@ class SyTool():
             run('mkdir /home/logs/seaslog-cli')
             run('mkdir /home/logs/seaslog-fpm')
             run('mkdir /usr/local/php7')
-            run('tar -zxvf php-7.1.17.tar.gz')
-            run('cd php-7.1.17/ && ./configure --prefix=/usr/local/php7 --exec-prefix=/usr/local/php7 --bindir=/usr/local/php7/bin --sbindir=/usr/local/php7/sbin --includedir=/usr/local/php7/include --libdir=/usr/local/php7/lib/php --mandir=/usr/local/php7/php/man --with-config-file-path=/usr/local/php7/etc --with-mysql-sock=/usr/local/mysql/mysql.sock --with-zlib=/usr/local/zlib --with-mhash --with-openssl --with-mysqli=shared,mysqlnd --with-pdo-mysql=shared,mysqlnd --with-iconv --enable-zip --enable-inline-optimization --disable-debug --disable-rpath --enable-shared --enable-xml --enable-pcntl --enable-bcmath --enable-mysqlnd --enable-sysvsem --with-mysqli --enable-embedded-mysqli  --with-pdo-mysql --enable-shmop --enable-mbregex --enable-mbstring --enable-ftp --enable-sockets --with-xmlrpc --enable-soap --without-pear --with-gettext --enable-session --with-curl --enable-opcache --enable-fpm --without-gdbm --enable-fileinfo --with-gmp && make && make install')
+            run('tar -zxvf php-7.1.18.tar.gz')
+            run('cd php-7.1.18/ && ./configure --prefix=/usr/local/php7 --exec-prefix=/usr/local/php7 --bindir=/usr/local/php7/bin --sbindir=/usr/local/php7/sbin --includedir=/usr/local/php7/include --libdir=/usr/local/php7/lib/php --mandir=/usr/local/php7/php/man --with-config-file-path=/usr/local/php7/etc --with-mysql-sock=/usr/local/mysql/mysql.sock --with-zlib=/usr/local/zlib --with-mhash --with-openssl --with-mysqli=shared,mysqlnd --with-pdo-mysql=shared,mysqlnd --with-iconv --enable-zip --enable-inline-optimization --disable-debug --disable-rpath --enable-shared --enable-xml --enable-pcntl --enable-bcmath --enable-mysqlnd --enable-sysvsem --with-mysqli --enable-embedded-mysqli  --with-pdo-mysql --enable-shmop --enable-mbregex --enable-mbstring --enable-ftp --enable-sockets --with-xmlrpc --enable-soap --without-pear --with-gettext --enable-session --with-curl --enable-opcache --enable-fpm --without-gdbm --enable-fileinfo --with-gmp && make && make install')
 
         php7CliIniLocal = ''.join([syDicts['path.package.local'], '/configs/swooleyaf/php7/php-cli.ini'])
         php7CliIniRemote = '/usr/local/php7/etc/php-cli.ini'
@@ -263,7 +263,7 @@ class SyTool():
         run('chmod 754 /lib/systemd/system/php7-fpm.service')
         run('systemctl enable php7-fpm.service')
 
-        php7DirRemote = ''.join([syDicts['path.package.remote'], '/php-7.1.16'])
+        php7DirRemote = ''.join([syDicts['path.package.remote'], '/php-7.1.18'])
         with cd(php7DirRemote):
             run('groupadd www')
             run('useradd -g www www -s /sbin/nologin')
@@ -308,14 +308,14 @@ class SyTool():
             run('rm -rf imagick-3.4.3.tgz')
 
         # 扩展SeasLog
-        extSeasLogLocal = ''.join([syDicts['path.package.local'], '/resources/php7/SeasLog-1.7.6.tgz'])
-        extSeasLogRemote = ''.join([syDicts['path.package.remote'], '/SeasLog-1.7.6.tgz'])
+        extSeasLogLocal = ''.join([syDicts['path.package.local'], '/resources/php7/SeasLog-1.8.4.tgz'])
+        extSeasLogRemote = ''.join([syDicts['path.package.remote'], '/SeasLog-1.8.4.tgz'])
         put(extSeasLogLocal, extSeasLogRemote)
         with cd(syDicts['path.package.remote']):
-            run('tar -zxvf SeasLog-1.7.6.tgz')
-            run('cd SeasLog-1.7.6/ && /usr/local/php7/bin/phpize && ./configure --with-php-config=/usr/local/php7/bin/php-config && make && make install')
-            run('rm -rf SeasLog-1.7.6/')
-            run('rm -rf SeasLog-1.7.6.tgz')
+            run('tar -zxvf SeasLog-1.8.4.tgz')
+            run('cd SeasLog-1.8.4/ && /usr/local/php7/bin/phpize && ./configure --with-php-config=/usr/local/php7/bin/php-config && make && make install')
+            run('rm -rf SeasLog-1.8.4/')
+            run('rm -rf SeasLog-1.8.4.tgz')
 
         # 扩展mongodb
         extMongodbLocal = ''.join([syDicts['path.package.local'], '/resources/php7/mongodb-1.3.4.tgz'])
@@ -385,14 +385,14 @@ class SyTool():
             run('mv nghttp2-1.26.0/ /usr/local/nghttp2')
             run('cd /usr/local/nghttp2 && ./configure && make libdir=/usr/lib64 && make libdir=/usr/lib64 install')
             run('rm -rf nghttp2-1.26.0.tar.bz2')
-        extSwooleLocal = ''.join([syDicts['path.package.local'], '/resources/php7/swoole-1.10.4.tgz'])
-        extSwooleRemote = ''.join([syDicts['path.package.remote'], '/swoole-1.10.4.tgz'])
+        extSwooleLocal = ''.join([syDicts['path.package.local'], '/resources/php7/swoole-1.10.5.tgz'])
+        extSwooleRemote = ''.join([syDicts['path.package.remote'], '/swoole-1.10.5.tgz'])
         put(extSwooleLocal, extSwooleRemote)
         with cd(syDicts['path.package.remote']):
-            run('tar -zxvf swoole-1.10.4.tgz')
-            run('cd swoole-1.10.4/ && /usr/local/php7/bin/phpize && ./configure --with-php-config=/usr/local/php7/bin/php-config --with-jemalloc-dir=/usr/local/jemalloc --enable-openssl --enable-http2 && make && make install')
-            run('rm -rf swoole-1.10.4/')
-            run('rm -rf swoole-1.10.4.tgz')
+            run('tar -zxvf swoole-1.10.5.tgz')
+            run('cd swoole-1.10.5/ && /usr/local/php7/bin/phpize && ./configure --with-php-config=/usr/local/php7/bin/php-config --with-jemalloc-dir=/usr/local/jemalloc --enable-openssl --enable-http2 && make && make install')
+            run('rm -rf swoole-1.10.5/')
+            run('rm -rf swoole-1.10.5.tgz')
 
     # 配置java环境
     @staticmethod
