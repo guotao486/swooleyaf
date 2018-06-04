@@ -239,11 +239,11 @@ function module.checkWaf(tag)
 end
 
 function module.checkCCDeny(tag, randStr)
-    local httpRefer = ngx.var.http_referer
-    local whiteHostTag = tag .. 'WhiteHosts'
-    if httpRefer ~= nil and #configs[whiteHostTag] > 0 then
-        for _, rule in pairs(configs[whiteHostTag]) do
-            if ngxMatch(httpRefer, rule, "isjo") then
+    local nowUri = ngx.var.uri
+    local whiteUriTag = tag .. 'WhiteUris'
+    if #configs[whiteUriTag] > 0 then
+        for _, rule in pairs(configs[whiteUriTag]) do
+            if ngxMatch(nowUri, rule, "isjo") then
                 return
             end
         end

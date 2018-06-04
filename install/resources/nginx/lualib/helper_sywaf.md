@@ -61,7 +61,6 @@
 - black-uris: uri黑名单
 - black-useragents: user-agent黑名单
 - deny-cc: cc攻击防御,配置格式为 120/60,120为最大请求次数,60为统计周期,单位为秒
-- white-hosts: host白名单
 - white-ip: ip白名单
 - white-uris: uri白名单
 

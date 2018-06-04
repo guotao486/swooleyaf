@@ -65,10 +65,6 @@ for _, tag in pairs(configs['TotalTags']) do
     needTag = tag .. 'BlackPostArgs'
     configs[needTag] = sywaftool.readRule(configs.DirRules .. tag .. '/black-postargs')
 
-    -- 白名单-hosts
-    needTag = tag .. 'WhiteHosts'
-    configs[needTag] = sywaftool.readRule(configs.DirRules .. tag .. '/white-hosts')
-
     -- CC攻击
     needContent = sywaftool.readRule(configs.DirRules .. tag .. '/deny-cc')
     for _, ccconfig in pairs(needContent) do
