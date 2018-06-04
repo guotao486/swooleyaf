@@ -239,14 +239,9 @@ function module.checkWaf(tag)
 end
 
 function module.checkCCDeny(tag, randStr)
-    local nowUri = ngx.var.uri
-    local whiteUriTag = tag .. 'WhiteUris'
-    if #configs[whiteUriTag] > 0 then
-        for _, rule in pairs(configs[whiteUriTag]) do
-            if ngxMatch(nowUri, rule, "isjo") then
-                return
-            end
-        end
+    local getWafTag = ngx.var.arg__sywaf
+    if getWafTag ~= nil then
+        return
     end
 
     local wafTag = 'cookie_sywaf' .. tag
