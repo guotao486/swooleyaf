@@ -72,8 +72,8 @@ for _, tag in pairs(configs['TotalTags']) do
     -- CC攻击
     needContent = sywaftool.readRule(configs.DirRules .. tag .. '/deny-cc')
     for _, ccconfig in pairs(needContent) do
-        local ccCount = tointeger(string.match(ccconfig,'(\d+)/'))
-        local ccSeconds = tointeger(string.match(ccconfig,'/(\d+)'))
+        local ccCount = tonumber(string.match(ccconfig,'(\\d+)/'))
+        local ccSeconds = tonumber(string.match(ccconfig,'/(\\d+)'))
         if ccCount ~= nil and ccSeconds ~= nil and ccCount > 0 and ccSeconds > 0 then
             needTag = tag .. 'CCCount'
             configs[needTag] = ccCount
