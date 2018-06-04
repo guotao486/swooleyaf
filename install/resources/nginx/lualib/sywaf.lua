@@ -37,17 +37,19 @@ local function sendErrorRsp(status, msgType)
     ngx.exit(ngx.status)
 end
 
-local function checkFileExt(ext)
+local function checkFileExt(tag, ext)
     local extStr = string.lower(ext)
-    if configs.BlackFileExts[extStr] ~= nil then
+    local extTag = tag .. 'BlackFileExts'
+    if configs[extTag][extStr] ~= nil then
         writeWafLog('File-Ext', 'invalid file ext', extStr)
         sendErrorRsp(ngx.HTTP_FORBIDDEN, 'html')
     end
 end
 
-local function checkPostArgs(data)
-    if data ~= "" and #configs['BlackPostArgs'] > 0 then
-        for _, rule in pairs(configs['BlackPostArgs']) do
+local function checkPostArgs(tag, data)
+    local postArgTag = tag .. 'BlackPostArgs'
+    if data ~= "" and #configs[postArgTag] > 0 then
+        for _, rule in pairs(configs[postArgTag]) do
             if ngxMatch(ngxUnescapeUri(data), rule, "isjo") then
                 writeWafLog('Post-Args', data, rule)
                 sendErrorRsp(ngx.HTTP_FORBIDDEN, 'html')
@@ -62,29 +64,33 @@ local function checkHeader()
     end
 end
 
-local function checkIp()
+local function checkIp(tag)
     local ip = sytool.getClientIp()
-    if configs.WhiteIps[ip] ~= nil then
+    local whiteIpTag = tag .. 'WhiteIps'
+    if configs[whiteIpTag][ip] ~= nil then
         return
     end
 
-    if configs.BlackIps[ip] ~= nil then
+    local blackIpTag = tag .. 'BlackIps'
+    if configs[blackIpTag][ip] ~= nil then
         sendErrorRsp(ngx.HTTP_FORBIDDEN, 'html')
     end
 end
 
-local function checkUri()
+local function checkUri(tag)
     local nowUri = ngx.var.uri
-    if configs.StatusWhiteUri and #configs['WhiteUris'] > 0 then
-        for _, rule in pairs(configs['WhiteUris']) do
+    local whiteUriTag = tag .. 'WhiteUris'
+    if #configs[whiteUriTag] > 0 then
+        for _, rule in pairs(configs[whiteUriTag]) do
             if ngxMatch(nowUri, rule, "isjo") then
                 return
             end
         end
     end
 
-    if configs.StatusBlackUri and #configs['BlackUris'] > 0 then
-        for _, rule in pairs(configs['BlackUris']) do
+    local blackUriTag = tag .. 'BlackUris'
+    if #configs[blackUriTag] > 0 then
+        for _, rule in pairs(configs[blackUriTag]) do
             if ngxMatch(nowUri, rule, "isjo") then
                 writeWafLog('Uri', nowUri, rule)
                 sendErrorRsp(ngx.HTTP_FORBIDDEN, 'html')
@@ -93,11 +99,12 @@ local function checkUri()
     end
 end
 
-local function checkUserAgent()
-    if #configs['BlackUserAgents'] > 0 then
+local function checkUserAgent(tag)
+    local blackUserAgentTag = tag .. 'BlackUserAgents'
+    if #configs[blackUserAgentTag] > 0 then
         local ua = ngx.var.http_user_agent
         if ua ~= nil then
-            for _, rule in pairs(configs['BlackUserAgents']) do
+            for _, rule in pairs(configs[blackUserAgentTag]) do
                 if ngxMatch(ua, rule, "isjo") then
                     writeWafLog('User-Agent', ua, rule)
                     sendErrorRsp(ngx.HTTP_FORBIDDEN, 'html')
@@ -107,8 +114,9 @@ local function checkUserAgent()
     end
 end
 
-local function checkGetArgs()
-    if #configs['BlackGetArgs'] > 0 then
+local function checkGetArgs(tag)
+    local blackGetArgTag = tag .. 'BlackGetArgs'
+    if #configs[blackGetArgTag] > 0 then
         local nowTable = {}
         local nowArgs = ngx.req.get_uri_args()
         for key, val in pairs(nowArgs) do
@@ -130,7 +138,7 @@ local function checkGetArgs()
         end
 
         for eKey, eVal in pairs(nowTable) do
-            for _, rule in pairs(configs['BlackGetArgs']) do
+            for _, rule in pairs(configs[blackGetArgTag]) do
                 if ngxMatch(ngxUnescapeUri(eVal), rule, "isjo") then
                     writeWafLog('Get-Args', eVal, rule)
                     sendErrorRsp(ngx.HTTP_FORBIDDEN, 'html')
@@ -140,10 +148,11 @@ local function checkGetArgs()
     end
 end
 
-local function checkCookie()
+local function checkCookie(tag)
     local ck = ngx.var.http_cookie
-    if configs.StatusCookie and #configs['BlackCookies'] > 0 and ck then
-        for _, rule in pairs(configs['BlackCookies']) do
+    local blackCookie = tag .. 'BlackCookies'
+    if #configs[blackCookie] > 0 and ck then
+        for _, rule in pairs(configs[blackCookie]) do
             if ngxMatch(ck, rule, "isjo") then
                 writeWafLog('Cookie', ck, rule)
                 sendErrorRsp(ngx.HTTP_FORBIDDEN, 'html')
@@ -152,9 +161,9 @@ local function checkCookie()
     end
 end
 
-local function checkPost()
+local function checkPost(tag)
     local ngxReqMethod = ngx.req.get_method()
-    if configs.StatusPost and ngxReqMethod == "POST" then
+    if ngxReqMethod == "POST" then
         local reqBoundary = sywaftool.getReqBoundary()
         if reqBoundary then
             local sock, err = ngx.req.socket()
@@ -178,14 +187,14 @@ local function checkPost()
                     return
                 end
                 ngx.req.append_body(eData)
-                checkPostArgs(eData)
+                checkPostArgs(tag, eData)
 
                 contentSize = contentSize + string.len(eData)
                 local fileInfo = ngxMatch(eData, [[Content-Disposition: form-data;(.+)filename="(.+)\\.(.*)"]], 'ijo')
                 if fileInfo then
-                    checkFileExt(fileInfo[3])
+                    checkFileExt(tag, fileInfo[3])
                 elseif ngxMatch(eData, "Content-Disposition:", 'isjo') then
-                    checkPostArgs(eData)
+                    checkPostArgs(tag, eData)
                 end
 
                 local leftSize = contentLength - contentSize
@@ -209,8 +218,8 @@ local function checkPost()
                     eData = table.concat(val, ", ")
                 end
                 if eData and type(eData) ~= "boolean" then
-                    checkPostArgs(eData)
-                    checkPostArgs(key)
+                    checkPostArgs(tag, eData)
+                    checkPostArgs(tag, key)
                 end
             end
         end
@@ -218,44 +227,50 @@ local function checkPost()
 end
 
 local module = {}
-module.tokenSecret = 'jb6hNP'
 
-function module.checkWaf()
+function module.checkWaf(tag)
     checkHeader()
-    checkIp()
-    checkUri()
-    checkUserAgent()
-    checkGetArgs()
-    checkCookie()
-    checkPost()
+    checkIp(tag)
+    checkUri(tag)
+    checkUserAgent(tag)
+    checkGetArgs(tag)
+    checkCookie(tag)
+    checkPost(tag)
 end
 
-function module.checkCCDeny(tag)
+function module.checkCCDeny(tag, randStr)
     local httpRefer = ngx.var.http_referer
-    local hostTag = 'WhiteHosts' .. tag
-    if httpRefer ~= nil and configs[hostTag] and #configs[hostTag] > 0 then
-        for _, rule in pairs(configs[hostTag]) do
+    local whiteHostTag = tag .. 'WhiteHosts'
+    if httpRefer ~= nil and #configs[whiteHostTag] > 0 then
+        for _, rule in pairs(configs[whiteHostTag]) do
             if ngxMatch(httpRefer, rule, "isjo") then
                 return
             end
         end
     end
 
+    local wafTag = 'cookie_sywaf' .. tag
+    local nowToken = ngx.var[wafTag]
+    local newToken = tostring(ngx.crc32_short(randStr .. ngx.var.remote_addr))
+    if nowToken == nil then
+        ngx.header['Set-Cookie'] = 'sywaf' .. tag .. '=' .. newToken
+        return ngx.redirect(ngx.var.scheme .. '://' .. ngx.var.host .. ngx.var.request_uri, 301)
+    elseif nowToken ~= newToken then
+        ngx.exit(ngx.HTTP_FORBIDDEN)
+    end
+
     local ccCacheTag = 'sywafcc' .. tag
     local ccCache = ngx.shared[ccCacheTag]
-    local ccCountTag = 'CCCount' .. tag
-    local ccSecondsTag = 'CCSeconds' .. tag
-    if ccCache ~= nil and configs[ccCountTag] and configs[ccSecondsTag] then
-        local token = tostring(ngx.crc32_short(ngx.var.remote_addr))
-        local reqNum,_ = ccCache:get(token)
-        if reqNum then
-            if reqNum < configs[ccCountTag] then
-                ccCache:incr(token, 1)
-            else
-                sendErrorRsp(ngx.HTTP_OK, 'json')
-            end
+    local ccCountTag = tag .. 'CCCount'
+    local ccSecondsTag = tag .. 'CCSeconds'
+    if ccCache ~= nil and configs[ccCountTag] then
+        local reqNum,_ = ccCache:get(newToken)
+        if reqNum == nil then
+            ccCache:set(newToken, 1, configs[ccSecondsTag])
+        elseif reqNum < configs[ccCountTag] then
+            ccCache:incr(newToken, 1)
         else
-            ccCache:set(token, 1, configs[ccSecondsTag])
+            sendErrorRsp(ngx.HTTP_OK, 'json')
         end
     end
 end

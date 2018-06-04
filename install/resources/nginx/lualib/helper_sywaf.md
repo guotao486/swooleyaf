@@ -20,9 +20,9 @@
         http {
             ...
             lua_code_cache on;
+            lua_need_request_body on;
             lua_package_path "/home/configs/nginx/lualib/?.lua";
             lua_package_cpath "/home/configs/nginx/lualib/?.so";
-            lua_need_request_body on;
             init_by_lua_file /home/configs/nginx/lualib/init.lua;
             ...
         }
@@ -31,9 +31,9 @@
         server {
             ...
             # 开启防火墙
-            access_by_lua 'symodules.waf.checkWaf()';
+            access_by_lua 'symodules.waf.checkWaf("a01")';
             # 开启前端防攻击
-            access_by_lua 'symodules.waf.checkCCDeny("a01")';
+            access_by_lua 'symodules.waf.checkCCDeny("a01", "jb6hNP")';
             ...
         }
 
@@ -42,29 +42,28 @@
     /home/configs/nginx/lualib/sywafconfigs.lua
 
 ## 配置详解
+### 公共配置
 - DirRules: 过滤规则存放目录,以/结尾
 - DirLog: 日志存储目录,以/结尾
-- StatusWhiteUri: uri白名单过滤状态 true:开启 false:关闭
-- StatusBlackUri: uri黑名单过滤状态 true:开启 false:关闭
-- StatusCookie: cookie过滤状态 true:开启 false:关闭
-- StatusPost: post过滤状态 true:开启 false:关闭
-- BlackFileExts: 文件后缀黑名单列表
-- WhiteIps: ip白名单列表
-- BlackIps: ip黑名单列表
-- CCCounta01: a01标志对应域名CC攻击次数限制
-- CCSecondsa01: a01标志对应域名CC攻击频率时间限制,单位为秒
+- TotalTags: 全体标识集合
 - ErrRspContentHtml: html格式错误响应内容,必须用```[[```和```]]```包容
 - ErrRspContentJson: json格式错误响应内容,必须用```[[```和```]]```包容
 
-## 过滤规则介绍
-    攻击日志格式: 日期_attack.log
-
-- white-uris: uri白名单
+### 过滤规则配置
+规则文件目录: DirRules/标识/<br/>
+攻击日志格式: 日期_attack.log<br/>
+规则文件介绍: <br/>
+- black-cookies: cookie黑名单
+- black-exts: 文件后缀黑名单
+- black-getargs: get参数黑名单
+- black-ip: ip黑名单
+- black-postargs: post参数黑名单
 - black-uris: uri黑名单
 - black-useragents: user-agent黑名单
-- black-getargs: get参数黑名单
-- black-cookies: cookie黑名单
-- black-postargs: post参数黑名单
+- deny-cc: cc攻击防御,配置格式为 120/60,120为最大请求次数,60为统计周期,单位为秒
+- white-hosts: host白名单
+- white-ip: ip白名单
+- white-uris: uri白名单
 
 # 鸣谢
 - 此WAF扩展基于loveshell的ngx_lua_waf开发
