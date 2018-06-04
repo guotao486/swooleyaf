@@ -25,10 +25,10 @@ final class ProjectTool {
     public static function createUniqueSn() : string {
         $redis = CacheSimpleFactory::getRedisInstance();
         $needStr = date('YmdHis');
-        $uniqueSn = $needStr . mt_rand(10000000, 99999999);
+        $uniqueSn = $needStr . random_int(10000000, 99999999);
         $redisKey = Project::REDIS_PREFIX_ORDER_SN . $uniqueSn;
         while($redis->exists($redisKey)) {
-            $uniqueSn = $needStr . mt_rand(10000000, 99999999);
+            $uniqueSn = $needStr . random_int(10000000, 99999999);
             $redisKey = Project::REDIS_PREFIX_ORDER_SN . $uniqueSn;
         }
         $redis->set($redisKey, '1', 10);

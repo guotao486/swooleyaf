@@ -119,7 +119,7 @@ class RpcServer extends BaseServer {
     }
 
     private function handleTaskReceive(\swoole_server $server,string $data) {
-        $server->task($data, mt_rand(1, $this->_taskMaxId));
+        $server->task($data, random_int(1, $this->_taskMaxId));
         $result = new Result();
         $result->setData([
             'msg' => 'task received',

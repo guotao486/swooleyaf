@@ -589,7 +589,7 @@ class HttpServer extends BaseServer {
             }
         } else {
             self::$_syServer->incr(self::$_serverToken, 'request_times', 1);
-            $this->_server->task(self::$_reqTask, mt_rand(1, $this->_taskMaxId));
+            $this->_server->task(self::$_reqTask, random_int(1, $this->_taskMaxId));
             $result = new Result();
             $result->setData([
                 'msg' => 'task received',
