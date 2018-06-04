@@ -147,7 +147,7 @@ abstract class WxUtilBase {
     public static function createNonceStr(int $length=32) : string {
         $resStr = '';
         for ($i = 0; $i < $length; $i++) {
-            $resStr .= self::$chars[mt_rand(0, 31)];
+            $resStr .= self::$chars[random_int(0, 31)];
         }
 
         return $resStr;

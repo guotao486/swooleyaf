@@ -300,7 +300,7 @@ class Tool {
     public static function createNonceStr(int $length) : string {
         $resStr = '';
         for ($i = 0; $i < $length; $i++) {
-            $resStr .= self::$chars[mt_rand(0, 61)];
+            $resStr .= self::$chars[random_int(0, 61)];
         }
 
         return $resStr;
