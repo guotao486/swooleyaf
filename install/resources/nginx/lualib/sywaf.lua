@@ -239,21 +239,7 @@ function module.checkWaf(tag)
 end
 
 function module.checkCCDeny(tag, randStr)
-    local getWafTag = ngx.var.arg__sywaf
-    if getWafTag ~= nil then
-        return
-    end
-
-    local wafTag = 'cookie_sywaf' .. tag
-    local nowToken = ngx.var[wafTag]
     local newToken = tostring(ngx.crc32_short(randStr .. ngx.var.remote_addr))
-    if nowToken == nil then
-        ngx.header['Set-Cookie'] = 'sywaf' .. tag .. '=' .. newToken
-        return ngx.redirect(ngx.var.scheme .. '://' .. ngx.var.host .. ngx.var.request_uri, 301)
-    elseif nowToken ~= newToken then
-        ngx.exit(ngx.HTTP_FORBIDDEN)
-    end
-
     local ccCacheTag = 'sywafcc' .. tag
     local ccCache = ngx.shared[ccCacheTag]
     local ccCountTag = tag .. 'CCCount'
