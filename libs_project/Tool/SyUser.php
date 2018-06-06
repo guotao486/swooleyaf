@@ -23,7 +23,7 @@ class SyUser {
      */
     public static function getUserInfo($force=false){
         if($force || is_null(self::$info)){
-            self::$info = SySession::get(null, []);
+            self::$info = SySession::refreshLocalCache();
         }
 
         return self::$info;

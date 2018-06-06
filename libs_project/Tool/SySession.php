@@ -38,6 +38,28 @@ class SySession {
     }
 
     /**
+     * 更新本地缓存
+     * @param string $inToken 外部输入的token值
+     * @return array
+     */
+    public static function refreshLocalCache(string $inToken=''){
+        $token = self::getSessionId($inToken);
+        $redisKey = Project::REDIS_PREFIX_SESSION . $token;
+        $cacheData = CacheSimpleFactory::getRedisInstance()->hGetAll($redisKey);
+        if (isset($cacheData['session_id']) && ($cacheData['session_id'] == $token)) {
+            BaseServer::addLocalUserInfo($token, $cacheData);
+
+            return $cacheData;
+        } else if(empty($cacheData)){
+            BaseServer::delLocalUserInfo($token);
+
+            return [];
+        } else {
+            return [];
+        }
+    }
+
+    /**
      * 设置session值
      * @param string|array $key hash键名
      * @param mixed $value hash键值

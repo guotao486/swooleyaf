@@ -161,6 +161,20 @@ trait BaseServerTrait {
     }
 
     /**
+     * 删除本地用户信息
+     * @param string $sessionId 会话ID
+     * @return bool
+     */
+    public static function delLocalUserInfo(string $sessionId) {
+        $delRes = self::$_syUsers->del($sessionId);
+        if($delRes){
+            self::$_syUserNowNum--;
+        }
+
+        return $delRes;
+    }
+
+    /**
      * 清理本地用户信息缓存
      */
     protected function clearLocalUsers() {
