@@ -26,7 +26,7 @@ class MysqlContainer extends BaseContainer {
      * 修改数据
      * @param \DB\Models\NotORM\NotORM_Result $result
      * @param array $data
-     * @param object $obj 观察者对象
+     * @param object|array $obj 观察者对象
      * @return mixed
      */
     public function update($result,array $data, $obj){
@@ -42,7 +42,7 @@ class MysqlContainer extends BaseContainer {
     /**
      * 插入数据
      * @param array $data
-     * @param object $obj 观察者对象
+     * @param object|array $obj 观察者对象
      * @return int|string
      */
     public function insert(array $data, $obj){
@@ -61,7 +61,7 @@ class MysqlContainer extends BaseContainer {
      * @param array $unique
      * @param array $insert
      * @param array $update
-     * @param object $obj 观察者对象
+     * @param object|array $obj 观察者对象
      * @return mixed
      */
     public function insertOrUpdate($result,array $unique,array $insert,array $update, $obj) {
@@ -77,7 +77,7 @@ class MysqlContainer extends BaseContainer {
     /**
      * 删除数据
      * @param \DB\Models\NotORM\NotORM_Result $result
-     * @param object $obj 观察者对象
+     * @param object|array $obj 观察者对象
      * @return mixed
      */
     public function delete($result, $obj) {
