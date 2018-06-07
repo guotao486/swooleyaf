@@ -21,7 +21,7 @@ abstract class BaseContainer implements \SplSubject {
 
     /**
      * 设置观察者模式中被观察者的标识对象
-     * @param object $subjectObj
+     * @param object|array $subjectObj
      */
     public function setSubjectObj($subjectObj) {
         $this->_subjectObj = $subjectObj;
