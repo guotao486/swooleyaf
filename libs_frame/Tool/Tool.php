@@ -192,6 +192,37 @@ class Tool {
     }
 
     /**
+     * 加密
+     * @param string $content 待加密内容
+     * @param string $key 密钥
+     * @return string
+     */
+    public static function encrypt(string $content,string $key){
+        $iv = self::createNonceStr(16);
+        $data = [
+            'iv' => $iv,
+            'value' => openssl_encrypt($content, 'AES-256-CBC', $key, 0, $iv),
+        ];
+
+        return base64_encode(self::jsonEncode($data));
+    }
+
+    /**
+     * 解密
+     * @param string $content 密文
+     * @param string $key 密钥
+     * @return bool|string
+     */
+    public static function decrypt(string $content,string $key){
+        $data = self::jsonDecode(base64_decode($content));
+        if(is_array($data) && (!empty($data))){
+            return openssl_decrypt($data['value'], 'AES-256-CBC', $key, 0, $data['iv']);
+        }
+
+        return false;
+    }
+
+    /**
      * 获取命令行输入
      * @param string|int $key 键名
      * @param bool $isIndexKey 键名是否为索引 true:是索引 false:不是索引
