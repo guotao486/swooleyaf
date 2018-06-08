@@ -11,7 +11,6 @@ use Constant\ErrorCode;
 use Constant\Project;
 use DesignPatterns\Factories\CacheSimpleFactory;
 use DesignPatterns\Singletons\WxConfigSingleton;
-use Exception\Common\CheckException;
 use Exception\Wx\WxOpenException;
 use Factories\SyBaseMysqlFactory;
 use Traits\SimpleTrait;
@@ -159,19 +158,9 @@ final class ProjectTool {
      * @param string $pwd 密码明文
      * @param string $salt 加密盐
      * @return string
-     * @throws \Exception\Common\CheckException
      */
     public static function encryptPassword(string $pwd,string $salt) : string {
-        $length1 = strlen($pwd . '');
-        $length2 = strlen($salt . '');
-        if (($length1 > 0) && ($length2 > 0)) {
-            return hash('sha256', $pwd . $salt);
-        } else if ($length1 > 0) {
-            throw new CheckException('加密盐不能为空', ErrorCode::COMMON_PARAM_ERROR);
-        } else {
-            throw new CheckException('密码不能为空', ErrorCode::COMMON_PARAM_ERROR);
-        }
-
+        return hash('sha256', $pwd . $salt);
     }
 
     /**
@@ -183,7 +172,7 @@ final class ProjectTool {
      */
     public static function checkPassword(string $pwd,string $salt,string $sign){
         $nowSign = hash('sha256', $pwd . $salt);
-        return $nowSign === $sign ? true : false;
+        return $nowSign === $sign;
     }
 
     /**
