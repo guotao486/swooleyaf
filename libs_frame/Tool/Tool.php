@@ -118,11 +118,11 @@ class Tool {
 
     /**
      * RSA签名
-     * @param array $data 待签名数据
+     * @param string $data 待签名数据
      * @param string $private_key_path 商户私钥文件路径
      * @return string 签名结果
      */
-    public static function rsaSign(array $data,string $private_key_path) : string {
+    public static function rsaSign(string $data,string $private_key_path) : string {
         $priKey = file_get_contents($private_key_path);
         $res = openssl_get_privatekey($priKey);
         openssl_sign($data, $sign, $res);
