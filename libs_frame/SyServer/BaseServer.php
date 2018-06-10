@@ -189,7 +189,7 @@ abstract class BaseServer {
      * 创建请求ID
      */
     protected function createReqId() {
-        self::$_reqId = hash('md4', time() . Tool::createNonceStr(4));
+        self::$_reqId = hash('md4', Tool::getNowTime() . Tool::createNonceStr(4));
     }
 
     /**
@@ -224,7 +224,7 @@ abstract class BaseServer {
      * @return string
      */
     protected function createCheckTag() : string {
-        return self::$_serverToken . time() . Tool::createNonceStr(6);
+        return self::$_serverToken . Tool::getNowTime() . Tool::createNonceStr(6);
     }
 
     /**

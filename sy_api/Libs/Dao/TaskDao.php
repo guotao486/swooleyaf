@@ -69,7 +69,7 @@ class TaskDao {
     ];
 
     private static function getSingleTasks() {
-        $nowTime = time();
+        $nowTime = Tool::getNowTime();
         if (($nowTime - self::$singleRefreshTime) >= 180) {
             $taskBase = new TaskBaseEntity();
             $ormResult1 = $taskBase->getContainer()->getModel()->getOrmDbTable();
@@ -96,7 +96,7 @@ class TaskDao {
     }
 
     private static function getIntervalTasks() {
-        $nowTime = time();
+        $nowTime = Tool::getNowTime();
         if (($nowTime - self::$intervalRefreshTime) >= 300) {
             $taskBase = new TaskBaseEntity();
             $ormResult1 = $taskBase->getContainer()->getModel()->getOrmDbTable();
@@ -122,7 +122,7 @@ class TaskDao {
     }
 
     private static function getCronTasks() {
-        $nowTime = time();
+        $nowTime = Tool::getNowTime();
         if (($nowTime - self::$cronRefreshTime) >= 300) {
             $taskBase = new TaskBaseEntity();
             $ormResult1 = $taskBase->getContainer()->getModel()->getOrmDbTable();
@@ -153,7 +153,7 @@ class TaskDao {
             throw new CheckException('任务时间不合法', ErrorCode::COMMON_PARAM_ERROR);
         }
 
-        $nowTime = time();
+        $nowTime = Tool::getNowTime();
         $taskTime = (int)$time;
         if ($taskTime <= $nowTime) {
             throw new CheckException('执行时间必须大于当前时间', ErrorCode::COMMON_PARAM_ERROR);
@@ -192,7 +192,7 @@ class TaskDao {
         CronTool::analyseCron($timeStr);
 
         $data['task_time'] = $timeStr;
-        $data['start_time'] = time();
+        $data['start_time'] = Tool::getNowTime();
     }
 
     public static function addTask(array $data) {
@@ -202,7 +202,7 @@ class TaskDao {
         }
         self::$funcName($data);
 
-        $nowTime = time();
+        $nowTime = Tool::getNowTime();
         $taskTag = Tool::createNonceStr(6) . $nowTime;
         $taskBase = new TaskBaseEntity();
         $taskBase->tag = $taskTag;
@@ -234,7 +234,7 @@ class TaskDao {
         $ormResult1->where('`tag`=?', [$data['task_tag']]);
         $effectNum = $taskBase->getContainer()->getModel()->update($ormResult1, [
             'status' => Project::TASK_STATUS_DELETE,
-            'updated' => time(),
+            'updated' => Tool::getNowTime(),
         ]);
         unset($ormResult1, $taskBase);
 
@@ -273,7 +273,7 @@ class TaskDao {
     }
 
     public static function handleSingleTask(array $data) {
-        $nowTime = time();
+        $nowTime = Tool::getNowTime();
         $taskBase = new TaskBaseEntity();
         $taskLog = new TaskLogEntity();
         $tasks = self::getSingleTasks();
@@ -303,7 +303,7 @@ class TaskDao {
     }
 
     public static function handlePersistIntervalTask(array $data) {
-        $nowTime = time();
+        $nowTime = Tool::getNowTime();
         $taskLog = new TaskLogEntity();
         $tasks = self::getIntervalTasks();
         foreach ($tasks as $taskTag => $task) {
@@ -323,7 +323,7 @@ class TaskDao {
     }
 
     public static function handlePersistCronTask(array $data) {
-        $nowTime = time();
+        $nowTime = Tool::getNowTime();
         $timeData = explode('-', date('s-i-G-j-n-w', $nowTime));
         $timeArr = [
             'second' => (int)$timeData[0],

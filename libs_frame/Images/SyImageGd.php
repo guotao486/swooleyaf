@@ -135,7 +135,7 @@ class SyImageGd extends SyImageBase {
             throw new ImageException('目录不存在', ErrorCode::IMAGE_UPLOAD_PARAM_ERROR);
         }
 
-        $fileName = Tool::createNonceStr(6) . time() . '_' . $this->width . '_' . $this->height . '.' . $this->ext;
+        $fileName = Tool::createNonceStr(6) . Tool::getNowTime() . '_' . $this->width . '_' . $this->height . '.' . $this->ext;
         $fullFileName = substr($path, -1) == '/' ? $path . $fileName : $path . '/' . $fileName;
         if ($this->mimeType == Server::IMAGE_MIME_TYPE_GIF) {
             $writeRes = imagegif($this->image, $fullFileName);

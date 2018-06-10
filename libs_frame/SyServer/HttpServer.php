@@ -235,6 +235,7 @@ class HttpServer extends BaseServer {
         if(!isset($_SERVER['REQUEST_URI'])){
             $_SERVER['REQUEST_URI'] = '/';
         }
+        $_SERVER[Server::SERVER_DATA_KEY_TIMESTAMP] = time();
     }
 
     /**

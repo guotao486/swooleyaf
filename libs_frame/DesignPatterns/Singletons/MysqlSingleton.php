@@ -67,7 +67,7 @@ class MysqlSingleton {
             ]);
 
             $this->dbName = $db;
-            $this->connTime = time();
+            $this->connTime = Tool::getNowTime();
         } catch (\Exception $e) {
             Log::error($e->getMessage(), $e->getCode(), $e->getTraceAsString());
 
@@ -186,7 +186,7 @@ class MysqlSingleton {
      * @throws \Exception\Mysql\MysqlException
      */
     public function reConnect() {
-        $nowTime = time();
+        $nowTime = Tool::getNowTime();
         if(is_null($this->conn)){
             $this->init();
         } else if($nowTime - $this->connTime >= 30){

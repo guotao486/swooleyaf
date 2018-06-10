@@ -17,7 +17,7 @@ class PayNativePre {
         $shopConfig = WxConfigSingleton::getInstance()->getShopConfig($appId);
         $this->appid = $shopConfig->getAppId();
         $this->mch_id = $shopConfig->getPayMchId();
-        $this->time_stamp = time();
+        $this->time_stamp = Tool::getNowTime();
         $this->nonce_str = Tool::createNonceStr(32);
     }
 

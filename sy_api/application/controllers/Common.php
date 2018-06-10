@@ -14,7 +14,7 @@ class CommonController extends \SyFrame\BaseController {
 
         $token = \Tool\SySession::getSessionId();
         $_COOKIE[\Constant\Project::DATA_KEY_SESSION_TOKEN] = $token;
-        $expireTime = time() + 604800;
+        $expireTime = \Tool\Tool::getNowTime() + 604800;
         $domain = \SyServer\HttpServer::getServerConfig('cookiedomain_base', '');
         \Response\SyResponseHttp::cookie(\Constant\Project::DATA_KEY_SESSION_TOKEN, $token, $expireTime, '/', $domain);
     }

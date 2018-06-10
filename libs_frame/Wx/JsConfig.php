@@ -8,11 +8,12 @@
 namespace Wx;
 
 use DesignPatterns\Singletons\WxConfigSingleton;
+use Tool\Tool;
 
 class JsConfig {
     public function __construct(string $appId) {
         $this->appId = $appId;
-        $this->timestamp = time();
+        $this->timestamp = Tool::getNowTime();
         $this->nonceStr = WxUtilShop::createNonceStr();
     }
 
