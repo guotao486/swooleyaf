@@ -216,7 +216,7 @@ class PayDao {
         $payHistory->attach = $data['pay_attach'];
         $payHistory->content = Tool::jsonEncode($data['pay_data'], JSON_UNESCAPED_UNICODE);
         $payHistory->status = $data['pay_status'];
-        $payHistory->created = time();
+        $payHistory->created = Tool::getNowTime();
         $ormResult1 = $payHistory->getContainer()->getModel()->getOrmDbTable();
         $ormResult1->where('`seller_sn`=?', [$data['pay_sellersn']]);
         $historyInfo = $payHistory->getContainer()->getModel()->findOne($ormResult1);

@@ -43,7 +43,7 @@ final class ProjectTool {
      * @throws \Exception\Wx\WxOpenException
      */
     public static function handleAppAuthForWxOpen(int $optionType,array $data) {
-        $nowTime = time();
+        $nowTime = Tool::getNowTime();
         $openCommonConfig = WxConfigSingleton::getInstance()->getOpenCommonConfig();
         $entity = SyBaseMysqlFactory::WxopenAuthorizerEntity();
         $ormResult1 = $entity->getContainer()->getModel()->getOrmDbTable();
@@ -149,7 +149,7 @@ final class ProjectTool {
             'authorizer_refreshtoken' => $data['authorizer_refreshtoken'],
             'authorizer_allowpower' => Tool::jsonEncode($data['authorizer_allowpower'], JSON_UNESCAPED_UNICODE),
             'authorizer_info' => Tool::jsonEncode($data['authorizer_info'], JSON_UNESCAPED_UNICODE),
-            'updated' => time(),
+            'updated' => Tool::getNowTime(),
         ]);
     }
 

@@ -28,7 +28,7 @@ class Result {
 
     public function getJson(){
         if (is_array($this->result)) {
-            $this->result['_nowtime'] = time();
+            $this->result['_nowtime'] = Tool::getNowTime();
             return Tool::jsonEncode($this->result);
         }
 

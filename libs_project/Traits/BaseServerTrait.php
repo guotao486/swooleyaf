@@ -136,12 +136,12 @@ trait BaseServerTrait {
     public static function addLocalUserInfo(string $sessionId,array $userData) : bool {
         if (self::$_syUsers->exist($sessionId)) {
             $userData['session_id'] = $sessionId;
-            $userData['add_time'] = time();
+            $userData['add_time'] = Tool::getNowTime();
             self::$_syUsers->set($sessionId, $userData);
             return true;
         } else if (self::$_syUserNowNum < self::$_syUserMaxNum) {
             $userData['session_id'] = $sessionId;
-            $userData['add_time'] = time();
+            $userData['add_time'] = Tool::getNowTime();
             self::$_syUsers->set($sessionId, $userData);
             self::$_syUserNowNum++;
             return true;
@@ -178,7 +178,7 @@ trait BaseServerTrait {
      * 清理本地用户信息缓存
      */
     protected function clearLocalUsers() {
-        $time = time() - Project::TIME_EXPIRE_LOCAL_USER_CACHE;
+        $time = Tool::getNowTime() - Project::TIME_EXPIRE_LOCAL_USER_CACHE;
         $delKeys = [];
         foreach (self::$_syUsers as $eUser) {
             if($eUser['add_time'] <= $time){
@@ -233,7 +233,7 @@ trait BaseServerTrait {
     }
 
     protected function clearLocalWxShopTokens() {
-        $nowTime = time();
+        $nowTime = Tool::getNowTime();
         $delKeys = [];
         foreach (self::$_syWxShopToken as $eToken) {
             if($eToken['clear_time'] < $nowTime){
@@ -288,7 +288,7 @@ trait BaseServerTrait {
     }
 
     protected function clearLocalWxOpenAuthorizerTokens() {
-        $nowTime = time();
+        $nowTime = Tool::getNowTime();
         $delKeys = [];
         foreach (self::$_syWxOpenAuthorizerToken as $eToken) {
             if($eToken['clear_time'] < $nowTime){

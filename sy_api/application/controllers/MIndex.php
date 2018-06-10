@@ -13,7 +13,7 @@ class MIndexController extends CommonController {
     public function indexAction() {
         $this->SyResult->setData([
             'xxx' => 111,
-            'aaa' => time(),
+            'aaa' => \Tool\Tool::getNowTime(),
         ]);
 
         $this->sendRsp();
@@ -22,7 +22,7 @@ class MIndexController extends CommonController {
     public function getMPingAction() {
         $this->SyResult->setData([
             'xxx' => 222,
-            'aaa' => time(),
+            'aaa' => \Tool\Tool::getNowTime(),
         ]);
         \Log\Log::info('mi222');
 

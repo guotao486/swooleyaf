@@ -116,7 +116,7 @@ final class WxUtilShop extends WxUtilBase {
         } else {
             //获取支付参数
             $payConfig = new JsPayConfig($orderDetail['appid']);
-            $payConfig->setTimeStamp(time() . '');
+            $payConfig->setTimeStamp(Tool::getNowTime() . '');
             $payConfig->setPackage($resData['prepay_id']);
             //获取js参数
             $jsConfig = new JsConfig($orderDetail['appid']);
@@ -292,7 +292,7 @@ final class WxUtilShop extends WxUtilBase {
      * @return array
      */
     private static function refreshWxAccountCache(string $appId) : array {
-        $nowTime = time();
+        $nowTime = Tool::getNowTime();
         $clearTime = $nowTime + Project::TIME_EXPIRE_LOCAL_WXSHOP_TOKEN_CLEAR;
         $redisKey = Project::REDIS_PREFIX_WX_ACCOUNT . $appId;
         $redisData = CacheSimpleFactory::getRedisInstance()->hGetAll($redisKey);
@@ -341,7 +341,7 @@ final class WxUtilShop extends WxUtilBase {
      * @return string
      */
     public static function getAccessToken(string $appId) : string {
-        $nowTime = time();
+        $nowTime = Tool::getNowTime();
         $localCacheData = BaseServer::getWxShopTokenCache($appId, '', []);
         if (isset($localCacheData['expire_time']) && ($localCacheData['expire_time'] >= $nowTime)) {
             return $localCacheData['access_token'];
@@ -357,7 +357,7 @@ final class WxUtilShop extends WxUtilBase {
      * @return string
      */
     public static function getJsTicket(string $appId) : string {
-        $nowTime = time();
+        $nowTime = Tool::getNowTime();
         $localCacheData = BaseServer::getWxShopTokenCache($appId, '', []);
         if (isset($localCacheData['expire_time']) && ($localCacheData['expire_time'] >= $nowTime)) {
             return $localCacheData['js_ticket'];
@@ -979,7 +979,7 @@ final class WxUtilShop extends WxUtilBase {
     public static function getJsShareConfig(string $appId,string $url,string $timestamp='',string $nonceStr=''){
         $ticket = self::getJsTicket($appId);
         if(strlen($ticket) > 0){
-            $nowTime = preg_match('/^[1-4][0-9]{9}$/', $timestamp) > 0 ? $timestamp : time() . '';
+            $nowTime = preg_match('/^[1-4][0-9]{9}$/', $timestamp) > 0 ? $timestamp : Tool::getNowTime() . '';
             $nonce = strlen($nonceStr) >= 16 ? $nonceStr : self::createNonceStr();
             $needStr = 'jsapi_ticket=' . $ticket . '&noncestr=' . $nonce . '&timestamp=' . $nowTime . '&url=' . $url;
             return [

@@ -66,7 +66,7 @@ final class RequestSign {
      */
     public static function createSign(array $data=[]) {
         if(empty($data)){
-            $signTime = time();
+            $signTime = Tool::getNowTime();
             $signNonce = Tool::createNonceStr(6);
         } else {
             $signTime = $data['sign_time'];

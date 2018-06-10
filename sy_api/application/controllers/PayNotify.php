@@ -114,7 +114,7 @@ class PayNotifyController extends CommonController {
      * @SyFilter-{"field": "url","explain": "同步回跳URL地址","type": "string","rules": {"required": 1,"url": 1}}
      */
     public function handleAliWebRedirectAction() {
-        $expireTime = time() + 604800;
+        $expireTime = \Tool\Tool::getNowTime() + 604800;
         $sessionId = \Tool\SySession::getSessionId();
         $redirectUrl = \Request\SyRequest::getParams('url');
         \Response\SyResponseHttp::cookie(\Constant\Project::DATA_KEY_SESSION_TOKEN, $sessionId, $expireTime, '/', \SyServer\HttpServer::getServerConfig('cookiedomain_base', ''));

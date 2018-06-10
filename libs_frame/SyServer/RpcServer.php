@@ -91,6 +91,12 @@ class RpcServer extends BaseServer {
         $this->_server->start();
     }
 
+    private function initCommon(\swoole_server $server) {
+        $this->createReqId();
+        self::$_syServer->incr(self::$_serverToken, 'request_times', 1);
+        $_SERVER[Server::SERVER_DATA_KEY_TIMESTAMP] = time();
+    }
+
     private function handleApiReceive(array $data) {
         self::$_reqStartTime = microtime(true);
         $healthTag = $this->sendReqHealthCheckTask($data['api_uri']);
@@ -183,8 +189,7 @@ class RpcServer extends BaseServer {
      * @param string $data 收到的数据内容
      */
     public function onReceive(\swoole_server $server,int $fd,int $reactor_id,string $data) {
-        $this->createReqId();
-        self::$_syServer->incr(self::$_serverToken, 'request_times', 1);
+        $this->initCommon($server);
         $result = $this->handleReceive($server, $data);
         $this->_receivePack->setCommandAndData(SyPack::COMMAND_TYPE_RPC_SERVER_SEND_RSP, [
             'rsp_data' => $result,

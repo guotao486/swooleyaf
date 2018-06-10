@@ -69,7 +69,7 @@ class AliConfigSingleton {
      * @return \AliConfigs\Pay|null
      */
     private function getLocalPayConfig(string $appId) {
-        $nowTime = time();
+        $nowTime = Tool::getNowTime();
         if($this->payClearTime < $nowTime){
             $delIds = [];
             foreach ($this->payConfigs as $eAppId => $payConfig) {
@@ -93,7 +93,7 @@ class AliConfigSingleton {
      * @return \AliConfigs\Pay
      */
     public function refreshPayConfig(string $appId) {
-        $expireTime = time() + Project::TIME_EXPIRE_LOCAL_ALIPAY_REFRESH;
+        $expireTime = Tool::getNowTime() + Project::TIME_EXPIRE_LOCAL_ALIPAY_REFRESH;
         $payConfig = new Pay();
         $payConfig->setAppId($appId);
         $payConfig->setExpireTime($expireTime);
@@ -126,7 +126,7 @@ class AliConfigSingleton {
      * @return \AliConfigs\Pay|null
      */
     public function getPayConfig(string $appId) {
-        $nowTime = time();
+        $nowTime = Tool::getNowTime();
         $payConfig = $this->getLocalPayConfig($appId);
         if(is_null($payConfig)){
             $payConfig = $this->refreshPayConfig($appId);

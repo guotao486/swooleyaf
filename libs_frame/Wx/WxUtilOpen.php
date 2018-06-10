@@ -43,7 +43,7 @@ final class WxUtilOpen extends WxUtilBase {
         ]);
         $resArr = Tool::jsonDecode($resData);
         if (isset($resArr['component_access_token'])) {
-            $expireTime = time() + 7000;
+            $expireTime = Tool::getNowTime() + 7000;
             $redisKey = Project::REDIS_PREFIX_WX_COMPONENT_ACCOUNT . $openCommonConfig->getAppId();
             CacheSimpleFactory::getRedisInstance()->hMset($redisKey, [
                 'access_token' => $resArr['component_access_token'],
@@ -96,7 +96,7 @@ final class WxUtilOpen extends WxUtilBase {
      * @throws \Exception\Wx\WxOpenException
      */
     private static function getAuthorizerCache(string $appId) : array {
-        $nowTime = time();
+        $nowTime = Tool::getNowTime();
         $clearTime = $nowTime + Project::TIME_EXPIRE_LOCAL_WXOPEN_AUTHORIZER_TOKEN_CLEAR;
         $cacheData = [];
         $openCommonConfig = WxConfigSingleton::getInstance()->getOpenCommonConfig();
@@ -189,7 +189,7 @@ final class WxUtilOpen extends WxUtilBase {
      * @throws \Exception\Wx\WxOpenException
      */
     public static function getAuthorizerAccessToken(string $appId) : string {
-        $nowTime = time();
+        $nowTime = Tool::getNowTime();
         $cacheData = BaseServer::getWxOpenAuthorizerTokenCache($appId, '', []);
         if(isset($cacheData['expire_time']) && ($cacheData['expire_time'] >= $nowTime)){
             return $cacheData['access_token'];
@@ -206,7 +206,7 @@ final class WxUtilOpen extends WxUtilBase {
      * @throws \Exception\Wx\WxOpenException
      */
     public static function getAuthorizerJsTicket(string $appId) : string {
-        $nowTime = time();
+        $nowTime = Tool::getNowTime();
         $cacheData = BaseServer::getWxOpenAuthorizerTokenCache($appId, '', []);
         if(isset($cacheData['expire_time']) && ($cacheData['expire_time'] >= $nowTime)){
             return $cacheData['js_ticket'];
@@ -336,7 +336,7 @@ final class WxUtilOpen extends WxUtilBase {
         if ($timestamp) {
             $nowTime = $timestamp . '';
         } else {
-            $nowTime = time() . '';
+            $nowTime = Tool::getNowTime() . '';
         }
 
         $signature = self::getSha1Val($appToken, $nowTime, $nonceStr, $encryptXml);
@@ -384,7 +384,7 @@ final class WxUtilOpen extends WxUtilBase {
      */
     public static function encryptMsg(string $replyMsg,string $appId,string $appToken,string $aesKey) : string {
         $nonceStr = Tool::createNonceStr(16);
-        $nowTime = time() . '';
+        $nowTime = Tool::getNowTime() . '';
         $encryptMsg = self::encrypt($replyMsg, $appId, $aesKey, $nonceStr);
         $signature = self::getSha1Val($appToken, $nowTime, $nonceStr, $encryptMsg);
         $format = "<xml><Encrypt><![CDATA[%s]]></Encrypt><MsgSignature><![CDATA[%s]]></MsgSignature><TimeStamp>%s</TimeStamp><Nonce><![CDATA[%s]]></Nonce></xml>";

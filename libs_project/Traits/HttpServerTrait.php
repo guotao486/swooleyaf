@@ -45,7 +45,7 @@ trait HttpServerTrait {
         } else if (self::$_sySignNowNum < self::$_sySignMaxNum) {
             self::$_sySigns->set($needSign, [
                 'sign' => $needSign,
-                'time' => time(),
+                'time' => Tool::getNowTime(),
             ]);
             self::$_sySignNowNum++;
 
@@ -59,7 +59,7 @@ trait HttpServerTrait {
      * 清理签名缓存
      */
     private function clearApiSign() {
-        $time = time() - Project::TIME_EXPIRE_LOCAL_API_SIGN_CACHE;
+        $time = Tool::getNowTime() - Project::TIME_EXPIRE_LOCAL_API_SIGN_CACHE;
         $delKeys = [];
         foreach (self::$_sySigns as $eSign) {
             if($eSign['time'] <= $time){

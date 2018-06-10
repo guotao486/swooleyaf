@@ -124,7 +124,7 @@ class ApiImageDao {
             throw new CheckException('图片内容大小不能超过5M', ErrorCode::COMMON_PARAM_ERROR);
         }
 
-        $cacheTag = time() . Tool::createNonceStr(6);
+        $cacheTag = Tool::getNowTime() . Tool::createNonceStr(6);
         if (CacheSimpleFactory::getRedisInstance()->set(Project::REDIS_PREFIX_IMAGE_DATA . $cacheTag, $handleRes['_syfile_content'], 1800)) {
             unset($handleRes['_syfile_content']);
             $handleRes['_syfile_tag'] = $cacheTag;

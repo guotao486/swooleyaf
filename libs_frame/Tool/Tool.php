@@ -493,4 +493,12 @@ class Tool {
             throw new CheckException('请求地址不能为空', ErrorCode::COMMON_PARAM_ERROR);
         }
     }
+
+    /**
+     * 获取当前时间戳
+     * @return int
+     */
+    public static function getNowTime(){
+        return $_SERVER[Server::SERVER_DATA_KEY_TIMESTAMP] ?? time();
+    }
 }
