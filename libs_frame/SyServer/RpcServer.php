@@ -9,7 +9,6 @@ namespace SyServer;
 
 use Constant\ErrorCode;
 use Constant\Server;
-use Exception\Swoole\RpcServerException;
 use Exception\Validator\ValidatorException;
 use Log\Log;
 use Request\RequestSign;
@@ -103,11 +102,7 @@ class RpcServer extends BaseServer {
         $healthTag = $this->sendReqHealthCheckTask($data['api_uri']);
         $this->init($data['api_params']);
         try {
-            self::$_syReqHandlingNum++;
-            if(self::$_syReqHandlingNum > SY_REQUEST_MAX_HANDLING){
-                throw new RpcServerException('服务繁忙', ErrorCode::COMMON_SERVER_BUSY);
-            }
-
+            self::checkRequestCurrentLimit();
             $result = $this->_app->bootstrap()->getDispatcher()->dispatch(new Http($data['api_uri']))->getBody();
         } catch (\Exception $e) {
             Log::error($e->getMessage(), $e->getCode(), $e->getTraceAsString());
@@ -122,7 +117,7 @@ class RpcServer extends BaseServer {
                 $result->setCodeMsg(ErrorCode::COMMON_SERVER_ERROR, '服务出错');
             }
         } finally {
-            self::$_syReqHandlingNum--;
+            self::$_syServer->decr(self::$_serverToken, 'request_handling', 1);
             $this->clear();
             $this->reportLongTimeReq($data['api_uri'], $data['api_params']);
             self::$_syHealths->del($healthTag);

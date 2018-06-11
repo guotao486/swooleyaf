@@ -7,8 +7,10 @@
  */
 namespace SyServer;
 
+use Constant\ErrorCode;
 use Constant\Project;
 use Constant\Server;
+use Exception\Swoole\ServerException;
 use Log\Log;
 use MessageQueue\Producer\RedisProducer;
 use Tool\Dir;
@@ -83,11 +85,6 @@ abstract class BaseServer {
      * @var \swoole_table
      */
     protected static $_syHealths = null;
-    /**
-     * 同时处理的请求数量
-     * @var int
-     */
-    protected static $_syReqHandlingNum = 0;
 
     /**
      * BaseServer constructor.
@@ -167,6 +164,7 @@ abstract class BaseServer {
         self::$_syServer = new \swoole_table(1);
         self::$_syServer->column('memory_usage', \swoole_table::TYPE_INT, 4);
         self::$_syServer->column('request_times', \swoole_table::TYPE_INT, 4);
+        self::$_syServer->column('request_handling', \swoole_table::TYPE_INT, 4);
         self::$_syServer->column('host_local', \swoole_table::TYPE_STRING, 20);
         self::$_syServer->column('storepath_image', \swoole_table::TYPE_STRING, 150);
         self::$_syServer->column('storepath_music', \swoole_table::TYPE_STRING, 150);
@@ -203,6 +201,19 @@ abstract class BaseServer {
      */
     public static function getReqId() : string {
         return self::$_reqId;
+    }
+
+    /**
+     * 检查请求限流
+     * @throws \Exception\Swoole\ServerException
+     */
+    protected static function checkRequestCurrentLimit() {
+        $nowHandlingNum = (int)self::$_syServer->get(self::$_serverToken, 'request_handling');
+        if($nowHandlingNum >= SY_REQUEST_MAX_HANDLING){
+            throw new ServerException('服务繁忙', ErrorCode::COMMON_SERVER_BUSY);
+        }
+
+        self::$_syServer->incr(self::$_serverToken, 'request_handling', 1);
     }
 
     /**
@@ -423,6 +434,7 @@ abstract class BaseServer {
         self::$_syServer->set(self::$_serverToken, [
             'memory_usage' => memory_get_usage(),
             'request_times' => 0,
+            'request_handling' => 0,
             'host_local' => $this->_host,
             'storepath_image' => $config['dir']['store']['image'],
             'storepath_music' => $config['dir']['store']['music'],
