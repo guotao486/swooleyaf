@@ -209,7 +209,7 @@ class HttpServer extends BaseServer {
      * 初始化公共数据
      * @param \swoole_http_request $request
      */
-    private function initCommon(\swoole_http_request $request) {
+    private function initReceive(\swoole_http_request $request) {
         Registry::del(Server::REGISTRY_NAME_SERVICE_ERROR);
         $_POST = $request->post ?? [];
         $_SESSION = [];
@@ -236,6 +236,22 @@ class HttpServer extends BaseServer {
             $_SERVER['REQUEST_URI'] = '/';
         }
         $_SERVER[Server::SERVER_DATA_KEY_TIMESTAMP] = time();
+    }
+
+    private function initRequest(\swoole_http_request $request,array $rspHeaders) {
+        self::$_reqStartTime = microtime(true);
+        self::$_syServer->incr(self::$_serverToken, 'request_times', 1);
+        $_GET = $request->get ?? [];
+        $_FILES = $request->files ?? [];
+        $_COOKIE = $request->cookie ?? [];
+        $GLOBALS['HTTP_RAW_POST_DATA'] = $request->rawContent();
+        $_POST[RequestSign::KEY_SIGN] = $_GET[RequestSign::KEY_SIGN] ?? '';
+        unset($_GET[RequestSign::KEY_SIGN]);
+        //注册全局信息
+        Registry::set(Server::REGISTRY_NAME_REQUEST_HEADER, self::$_reqHeaders);
+        Registry::set(Server::REGISTRY_NAME_REQUEST_SERVER, self::$_reqServers);
+        Registry::set(Server::REGISTRY_NAME_RESPONSE_HEADER, $rspHeaders);
+        Registry::set(Server::REGISTRY_NAME_RESPONSE_COOKIE, []);
     }
 
     /**
@@ -328,20 +344,8 @@ class HttpServer extends BaseServer {
                 $result = 'http server is alive';
                 break;
             default:
-                self::$_reqStartTime = microtime(true);
-                self::$_syServer->incr(self::$_serverToken, 'request_times', 1);
                 $healthTag = $this->sendReqHealthCheckTask($uri);
-                $_GET = $request->get ?? [];
-                $_FILES = $request->files ?? [];
-                $_COOKIE = $request->cookie ?? [];
-                $GLOBALS['HTTP_RAW_POST_DATA'] = $request->rawContent();
-                $_POST[RequestSign::KEY_SIGN] = $_GET[RequestSign::KEY_SIGN] ?? '';
-                unset($_GET[RequestSign::KEY_SIGN]);
-                //注册全局信息
-                Registry::set(Server::REGISTRY_NAME_REQUEST_HEADER, self::$_reqHeaders);
-                Registry::set(Server::REGISTRY_NAME_REQUEST_SERVER, self::$_reqServers);
-                Registry::set(Server::REGISTRY_NAME_RESPONSE_HEADER, $initRspHeaders);
-                Registry::set(Server::REGISTRY_NAME_RESPONSE_COOKIE, []);
+                $this->initRequest($request, $initRspHeaders);
 
                 try {
                     self::checkRequestCurrentLimit();
@@ -576,7 +580,7 @@ class HttpServer extends BaseServer {
      */
     public function onRequest(\swoole_http_request $request,\swoole_http_response $response){
         self::$_response = $response;
-        $this->initCommon($request);
+        $this->initReceive($request);
         if(is_null(self::$_reqTask)){
             $rspHeaders = [];
             $handleHeaderRes = $this->handleReqHeader($rspHeaders);
