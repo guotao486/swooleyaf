@@ -434,6 +434,7 @@ abstract class BaseServer {
         self::$_syServer->set(self::$_serverToken, [
             'memory_usage' => memory_get_usage(),
             'request_times' => 0,
+            'request_handling' => 0,
             'host_local' => $this->_host,
             'storepath_image' => $config['dir']['store']['image'],
             'storepath_music' => $config['dir']['store']['music'],
