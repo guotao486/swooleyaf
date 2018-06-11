@@ -344,11 +344,7 @@ class HttpServer extends BaseServer {
                 Registry::set(Server::REGISTRY_NAME_RESPONSE_COOKIE, []);
 
                 try {
-                    self::$_syReqHandlingNum++;
-                    if(self::$_syReqHandlingNum > SY_REQUEST_MAX_HANDLING){
-                        throw new HttpServerException('服务繁忙', ErrorCode::COMMON_SERVER_BUSY);
-                    }
-
+                    self::checkRequestCurrentLimit();
                     $result = $this->_app->bootstrap()->getDispatcher()->dispatch(new Http($uri))->getBody();
                 } catch (\Exception $e){
                     SyResponseHttp::header('Content-Type', 'application/json; charset=utf-8');
@@ -365,7 +361,7 @@ class HttpServer extends BaseServer {
 
                     $result = $error->getJson();
                 } finally {
-                    self::$_syReqHandlingNum--;
+                    self::$_syServer->decr(self::$_serverToken, 'request_handling', 1);
                     $this->reportLongTimeReq($uri, array_merge($_GET, $_POST));
                     self::$_syHealths->del($healthTag);
                 }
