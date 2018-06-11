@@ -324,6 +324,7 @@ class HttpServer extends BaseServer {
 
     /**
      * 处理请求业务
+     * @param \swoole_http_request $request
      * @param array $initRspHeaders 初始化响应头
      * @return string
      */
