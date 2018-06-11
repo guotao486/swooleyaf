@@ -5,7 +5,8 @@ use DB\Entities\MysqlEntity;
 
 class WxshopConfigEntity extends MysqlEntity {
     public function __construct() {
-        parent::__construct('sy_base', 'wxshop_config','id');
+        $this->_dbName = 'sy_base';
+        parent::__construct($this->_dbName, 'wxshop_config','id');
     }
 
     /**

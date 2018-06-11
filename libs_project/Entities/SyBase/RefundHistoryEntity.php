@@ -5,7 +5,8 @@ use DB\Entities\MysqlEntity;
 
 class RefundHistoryEntity extends MysqlEntity {
     public function __construct() {
-        parent::__construct('sy_base', 'refund_history','id');
+        $this->_dbName = 'sy_base';
+        parent::__construct($this->_dbName, 'refund_history','id');
     }
 
     /**

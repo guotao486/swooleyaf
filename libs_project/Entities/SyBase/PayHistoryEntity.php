@@ -5,7 +5,8 @@ use DB\Entities\MysqlEntity;
 
 class PayHistoryEntity extends MysqlEntity {
     public function __construct() {
-        parent::__construct('sy_base', 'pay_history','id');
+        $this->_dbName = 'sy_base';
+        parent::__construct($this->_dbName, 'pay_history','id');
     }
 
     /**

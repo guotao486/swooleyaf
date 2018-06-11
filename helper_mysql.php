@@ -17,11 +17,22 @@ class MysqlTool {
         $length = strlen($needStr3);
         if($length == 0){
             $path = '';
+        } else if(substr($needStr3, ($length - 1), 1) == '/'){
+            $path = $needStr3;
         } else {
-            $path = substr($needStr3, ($length - 1), 1) == '/' ? $needStr3 : $needStr3 . '/';
+            $path = $needStr3 . '/';
         }
 
         return $path;
+    }
+
+    private static function handleNamespace() {
+        $namespace = \Tool\Tool::getClientOption('-namespace', false, '');
+        if((strlen($namespace) > 0) && (!ctype_alnum($namespace))){
+            exit('命名空间不合法' . PHP_EOL);
+        }
+
+        return $namespace;
     }
 
     /**
@@ -50,6 +61,7 @@ class MysqlTool {
                 self::createDbEntities([
                     'db' => trim(\Tool\Tool::getClientOption('-db', false, '')),
                     'path' => self::handlePath(),
+                    'namespace' => self::handleNamespace(),
                     'prefix' => trim(\Tool\Tool::getClientOption('-prefix', false, '')),
                     'suffix' => trim(\Tool\Tool::getClientOption('-suffix', false, '')),
                 ]);
@@ -59,6 +71,7 @@ class MysqlTool {
                     'db' => trim(\Tool\Tool::getClientOption('-db', false, '')),
                     'table' => trim(\Tool\Tool::getClientOption('-table', false, '')),
                     'path' => self::handlePath(),
+                    'namespace' => self::handleNamespace(),
                     'prefix' => trim(\Tool\Tool::getClientOption('-prefix', false, '')),
                     'suffix' => trim(\Tool\Tool::getClientOption('-suffix', false, '')),
                 ]);
@@ -71,15 +84,17 @@ class MysqlTool {
 
     private static function help(){
         echo '显示帮助: php helper_mysql.php -h' . PHP_EOL;
-        echo '生成数据库下所有的实体类: php helper_mysql.php entities -db xxx -path /xxx -prefix xxx -suffix xxx' . PHP_EOL;
+        echo '生成数据库下所有的实体类: php helper_mysql.php entities -db xxx -path /xxx -namespace xxx -prefix xxx -suffix xxx' . PHP_EOL;
         echo '    -db:数据库名' . PHP_EOL;
         echo '    -path:存放实体类文件的目录' . PHP_EOL;
+        echo '    -namespace:命名空间' . PHP_EOL;
         echo '    -prefix:实体类文件前缀' . PHP_EOL;
         echo '    -suffix:实体类文件后缀' . PHP_EOL;
-        echo '生成数据库下指定的实体类: php helper_mysql.php entity -db xxx -table xxx -path /xxx -prefix xxx -suffix xxx' . PHP_EOL;
+        echo '生成数据库下指定的实体类: php helper_mysql.php entity -db xxx -table xxx -path /xxx -namespace xxx -prefix xxx -suffix xxx' . PHP_EOL;
         echo '    -db:数据库名' . PHP_EOL;
         echo '    -table:表名' . PHP_EOL;
         echo '    -path:存放实体类文件的目录' . PHP_EOL;
+        echo '    -namespace:命名空间' . PHP_EOL;
         echo '    -prefix:实体类文件前缀' . PHP_EOL;
         echo '    -suffix:实体类文件后缀' . PHP_EOL;
     }
@@ -98,6 +113,7 @@ class MysqlTool {
                 'db' => $configs['db'],
                 'table' => $eTable,
                 'path' => $configs['path'],
+                'namespace' => $configs['namespace'],
                 'prefix' => $configs['prefix'],
                 'suffix' => $configs['suffix'],
             ]);
@@ -191,11 +207,16 @@ class MysqlTool {
             $filedStr .= '     */' . PHP_EOL;
             $filedStr .= '    public $' . $eField['Field'] . ' = ' . $default . ';' . PHP_EOL;
         }
-        $content = '<?php' . PHP_EOL . 'namespace Entities\\' . self::transferName($configs['db']) . ';' . PHP_EOL . PHP_EOL;
+        if(strlen($configs['namespace']) > 0){
+            $content = '<?php' . PHP_EOL . 'namespace Entities\\' . $configs['namespace'] . ';' . PHP_EOL . PHP_EOL;
+        } else {
+            $content = '<?php' . PHP_EOL . 'namespace Entities\\' . self::transferName($configs['db']) . ';' . PHP_EOL . PHP_EOL;
+        }
         $content .= 'use DB\\Entities\\MysqlEntity;' . PHP_EOL . PHP_EOL;
         $content .= 'class ' . $fileName . ' extends MysqlEntity {' . PHP_EOL;
         $content .= '    public function __construct() {' . PHP_EOL;
-        $content .= '        parent::__construct(\'' . $configs['db'] . '\', \'' . $configs['table'] . '\', \'' . $primaryKey . '\');' . PHP_EOL;
+        $content .= '        $this->_dbName = \'' . $configs['db'] . '\';' . PHP_EOL;
+        $content .= '        parent::__construct($this->_dbName, \'' . $configs['table'] . '\', \'' . $primaryKey . '\');' . PHP_EOL;
         $content .= '    }' . PHP_EOL;
         $content .= $filedStr;
         $content .= '}' . PHP_EOL;

@@ -5,7 +5,8 @@ use DB\Entities\MysqlEntity;
 
 class AttachmentBaseEntity extends MysqlEntity {
     public function __construct() {
-        parent::__construct('sy_base', 'attachment_base','id');
+        $this->_dbName = 'sy_base';
+        parent::__construct($this->_dbName, 'attachment_base','id');
     }
 
     /**

@@ -5,7 +5,8 @@ use DB\Entities\MysqlEntity;
 
 class AttachmentReferEntity extends MysqlEntity {
     public function __construct() {
-        parent::__construct('sy_base', 'attachment_refer','id');
+        $this->_dbName = 'sy_base';
+        parent::__construct($this->_dbName, 'attachment_refer','id');
     }
 
     /**

@@ -5,7 +5,8 @@ use DB\Entities\MysqlEntity;
 
 class UserBaseEntity extends MysqlEntity {
     public function __construct() {
-        parent::__construct('sy_base', 'user_base','uid');
+        $this->_dbName = 'sy_base';
+        parent::__construct($this->_dbName, 'user_base','uid');
     }
 
     /**

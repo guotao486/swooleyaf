@@ -5,7 +5,8 @@ use DB\Entities\MysqlEntity;
 
 class SmsRecordEntity extends MysqlEntity {
     public function __construct() {
-        parent::__construct('sy_base', 'sms_record','id');
+        $this->_dbName = 'sy_base';
+        parent::__construct($this->_dbName, 'sms_record','id');
     }
 
     /**

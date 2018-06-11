@@ -5,7 +5,8 @@ use DB\Entities\MysqlEntity;
 
 class WithdrawBaseEntity extends MysqlEntity {
     public function __construct() {
-        parent::__construct('sy_base', 'withdraw_base','id');
+        $this->_dbName = 'sy_base';
+        parent::__construct($this->_dbName, 'withdraw_base','id');
     }
 
     /**

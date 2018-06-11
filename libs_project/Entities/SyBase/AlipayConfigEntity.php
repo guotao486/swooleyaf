@@ -5,7 +5,8 @@ use DB\Entities\MysqlEntity;
 
 class AlipayConfigEntity extends MysqlEntity {
     public function __construct() {
-        parent::__construct('sy_base', 'alipay_config','id');
+        $this->_dbName = 'sy_base';
+        parent::__construct($this->_dbName, 'alipay_config','id');
     }
 
     /**

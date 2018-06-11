@@ -13,7 +13,7 @@ class MongoEntity extends BaseEntity {
     public function __construct(string $dbName,string $tableName) {
         parent::__construct();
         $this->_container = new MongoContainer($dbName, $tableName);
-        $this->_dbtype = BaseEntity::DBTYPE_MONGO;
+        $this->_dbType = BaseEntity::DB_TYPE_MONGO;
         $this->_container->getModel()->setEntityProperties($this->getEntityProperties());
     }
 

@@ -5,7 +5,8 @@ use DB\Entities\MysqlEntity;
 
 class LogModuleEntity extends MysqlEntity {
     public function __construct() {
-        parent::__construct('sy_base', 'log_module','id');
+        $this->_dbName = 'sy_base';
+        parent::__construct($this->_dbName, 'log_module','id');
     }
 
     /**

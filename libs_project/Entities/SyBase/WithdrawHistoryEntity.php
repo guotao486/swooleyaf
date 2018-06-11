@@ -5,7 +5,8 @@ use DB\Entities\MysqlEntity;
 
 class WithdrawHistoryEntity extends MysqlEntity {
     public function __construct() {
-        parent::__construct('sy_base', 'withdraw_history','id');
+        $this->_dbName = 'sy_base';
+        parent::__construct($this->_dbName, 'withdraw_history','id');
     }
 
     /**
