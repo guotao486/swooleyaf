@@ -44,7 +44,7 @@ class RpcServer extends BaseServer {
      * 初始化请求数据
      * @param array $data
      */
-    private function init(array $data) {
+    private function initRequest(array $data) {
         $_GET = [];
         $_POST = $data;
         $_COOKIE = [];
@@ -58,7 +58,7 @@ class RpcServer extends BaseServer {
     /**
      * 清理
      */
-    private function clear() {
+    private function clearRequest() {
         $_GET = [];
         $_POST = [];
         $_COOKIE = [];
@@ -91,7 +91,7 @@ class RpcServer extends BaseServer {
         $this->_server->start();
     }
 
-    private function initCommon(\swoole_server $server) {
+    private function initReceive(\swoole_server $server) {
         $this->createReqId();
         self::$_syServer->incr(self::$_serverToken, 'request_times', 1);
         $_SERVER[Server::SERVER_DATA_KEY_TIMESTAMP] = time();
@@ -100,7 +100,7 @@ class RpcServer extends BaseServer {
     private function handleApiReceive(array $data) {
         self::$_reqStartTime = microtime(true);
         $healthTag = $this->sendReqHealthCheckTask($data['api_uri']);
-        $this->init($data['api_params']);
+        $this->initRequest($data['api_params']);
         try {
             self::checkRequestCurrentLimit();
             $result = $this->_app->bootstrap()->getDispatcher()->dispatch(new Http($data['api_uri']))->getBody();
@@ -118,7 +118,7 @@ class RpcServer extends BaseServer {
             }
         } finally {
             self::$_syServer->decr(self::$_serverToken, 'request_handling', 1);
-            $this->clear();
+            $this->clearRequest();
             $this->reportLongTimeReq($data['api_uri'], $data['api_params']);
             self::$_syHealths->del($healthTag);
         }
@@ -191,7 +191,7 @@ class RpcServer extends BaseServer {
      * @param string $data 收到的数据内容
      */
     public function onReceive(\swoole_server $server,int $fd,int $reactor_id,string $data) {
-        $this->initCommon($server);
+        $this->initReceive($server);
         $result = $this->handleReceive($server, $data);
         $this->_receivePack->setCommandAndData(SyPack::COMMAND_TYPE_RPC_SERVER_SEND_RSP, [
             'rsp_data' => $result,
