@@ -13,7 +13,7 @@ class MysqlEntity extends BaseEntity {
     public function __construct(string $dbName,string $tableName,string $primaryKey='id') {
         parent::__construct();
         $this->_container = new MysqlContainer($dbName, $tableName, $primaryKey);
-        $this->_dbtype = BaseEntity::DBTYPE_MYSQL;
+        $this->_dbType = BaseEntity::DB_TYPE_MYSQL;
         $this->_container->getModel()->setEntityProperties($this->getEntityProperties());
     }
 

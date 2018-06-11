@@ -5,7 +5,8 @@ use DB\Entities\MysqlEntity;
 
 class WxopenAuthorizerEntity extends MysqlEntity {
     public function __construct() {
-        parent::__construct('sy_task', 'wxopen_authorizer','id');
+        $this->_dbName = 'sy_task';
+        parent::__construct($this->_dbName, 'wxopen_authorizer','id');
     }
 
     /**

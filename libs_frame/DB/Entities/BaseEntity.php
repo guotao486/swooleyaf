@@ -12,10 +12,11 @@ use Exception\Validator\ValidatorException;
 use Tool\Tool;
 
 abstract class BaseEntity {
-    const DBTYPE_MYSQL = 'mysql';
-    const DBTYPE_MONGO = 'mongo';
+    const DB_TYPE_MYSQL = 'mysql';
+    const DB_TYPE_MONGO = 'mongo';
 
-    protected $_dbtype = '';
+    protected $_dbType = '';
+    protected $_dbName = '';
     protected $_container = null;
 
     private static $_properties = [];
@@ -54,7 +55,7 @@ abstract class BaseEntity {
                 }
             }
 
-            if($this->_dbtype == self::DBTYPE_MONGO){
+            if($this->_dbType == self::DB_TYPE_MONGO){
                 self::$_properties[$className]['_id'] = 'string';
             }
         }

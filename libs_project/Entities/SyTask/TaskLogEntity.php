@@ -11,7 +11,8 @@ use DB\Entities\MysqlEntity;
 
 class TaskLogEntity extends MysqlEntity {
     public function __construct() {
-        parent::__construct('sy_task', 'task_log');
+        $this->_dbName = 'sy_task';
+        parent::__construct($this->_dbName, 'task_log');
     }
 
     /**
