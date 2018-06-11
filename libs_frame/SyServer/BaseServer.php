@@ -83,6 +83,11 @@ abstract class BaseServer {
      * @var \swoole_table
      */
     protected static $_syHealths = null;
+    /**
+     * 同时处理的请求数量
+     * @var int
+     */
+    protected static $_syReqHandlingNum = 0;
 
     /**
      * BaseServer constructor.
@@ -123,6 +128,7 @@ abstract class BaseServer {
         $this->checkBaseServer();
 
         define('SY_SERVER_IP', $this->_configs['server']['host']);
+        define('SY_REQUEST_MAX_HANDLING', (int)$this->_configs['server']['request']['maxnum']['handling']);
 
         $this->_configs['server']['port'] = $port;
         //开启TCP快速握手特性,可以提升TCP短连接的响应速度
