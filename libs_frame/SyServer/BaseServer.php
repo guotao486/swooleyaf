@@ -208,12 +208,10 @@ abstract class BaseServer {
      * @throws \Exception\Swoole\ServerException
      */
     protected static function checkRequestCurrentLimit() {
-        $nowHandlingNum = (int)self::$_syServer->get(self::$_serverToken, 'request_handling');
-        if($nowHandlingNum >= SY_REQUEST_MAX_HANDLING){
+        $nowHandlingNum = self::$_syServer->incr(self::$_serverToken, 'request_handling', 1);
+        if($nowHandlingNum > SY_REQUEST_MAX_HANDLING){
             throw new ServerException('服务繁忙', ErrorCode::COMMON_SERVER_BUSY);
         }
-
-        self::$_syServer->incr(self::$_serverToken, 'request_handling', 1);
     }
 
     /**
