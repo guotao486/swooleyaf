@@ -20,31 +20,31 @@ class SyTaskMysqlFactory {
     /**
      * @return \Entities\SyTask\TaskBaseEntity
      */
-    public static function TaskBaseEntity(){
-        return new TaskBaseEntity();
+    public static function TaskBaseEntity(string $dbName=''){
+        return new TaskBaseEntity($dbName);
     }
     /**
      * @return \Entities\SyTask\TaskLogEntity
      */
-    public static function TaskLogEntity(){
-        return new TaskLogEntity();
+    public static function TaskLogEntity(string $dbName=''){
+        return new TaskLogEntity($dbName);
     }
     /**
      * @return \Entities\SyTask\WxopenAuthorizerEntity
      */
-    public static function WxopenAuthorizerEntity(){
-        return new WxopenAuthorizerEntity();
+    public static function WxopenAuthorizerEntity(string $dbName=''){
+        return new WxopenAuthorizerEntity($dbName);
     }
     /**
      * @return \Entities\SyTask\WxshopConfigEntity
      */
-    public static function WxshopConfigEntity(){
-        return new WxshopConfigEntity();
+    public static function WxshopConfigEntity(string $dbName=''){
+        return new WxshopConfigEntity($dbName);
     }
     /**
      * @return \Entities\SyTask\AlipayConfigEntity
      */
-    public static function AlipayConfigEntity(){
-        return new AlipayConfigEntity();
+    public static function AlipayConfigEntity(string $dbName=''){
+        return new AlipayConfigEntity($dbName);
     }
 }

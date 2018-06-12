@@ -10,8 +10,8 @@ namespace Entities\SyTask;
 use DB\Entities\MysqlEntity;
 
 class TaskBaseEntity extends MysqlEntity {
-    public function __construct() {
-        $this->_dbName = 'sy_task';
+    public function __construct(string $dbName='') {
+        $this->_dbName = isset($dbName{0}) ? $dbName : 'sy_task';
         parent::__construct($this->_dbName, 'task_base');
     }
 
