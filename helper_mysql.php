@@ -214,8 +214,8 @@ class MysqlTool {
         }
         $content .= 'use DB\\Entities\\MysqlEntity;' . PHP_EOL . PHP_EOL;
         $content .= 'class ' . $fileName . ' extends MysqlEntity {' . PHP_EOL;
-        $content .= '    public function __construct() {' . PHP_EOL;
-        $content .= '        $this->_dbName = \'' . $configs['db'] . '\';' . PHP_EOL;
+        $content .= '    public function __construct(string $dbName=\'\') {' . PHP_EOL;
+        $content .= '        $this->_dbName = isset($dbName{0}) ? $dbName : \'' . $configs['db'] . '\';' . PHP_EOL;
         $content .= '        parent::__construct($this->_dbName, \'' . $configs['table'] . '\', \'' . $primaryKey . '\');' . PHP_EOL;
         $content .= '    }' . PHP_EOL;
         $content .= $filedStr;

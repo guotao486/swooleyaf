@@ -33,109 +33,109 @@ class SyBaseMysqlFactory {
     /**
      * @return \Entities\SyBase\AttachmentBaseEntity
      */
-    public static function AttachmentBaseEntity(){
-        return new AttachmentBaseEntity();
+    public static function AttachmentBaseEntity(string $dbName=''){
+        return new AttachmentBaseEntity($dbName);
     }
     /**
      * @return \Entities\SyBase\AttachmentReferEntity
      */
-    public static function AttachmentReferEntity(){
-        return new AttachmentReferEntity();
+    public static function AttachmentReferEntity(string $dbName=''){
+        return new AttachmentReferEntity($dbName);
     }
     /**
      * @return \Entities\SyBase\LogModuleEntity
      */
-    public static function LogModuleEntity(){
-        return new LogModuleEntity();
+    public static function LogModuleEntity(string $dbName=''){
+        return new LogModuleEntity($dbName);
     }
     /**
      * @return \Entities\SyBase\PayHistoryEntity
      */
-    public static function PayHistoryEntity(){
-        return new PayHistoryEntity();
+    public static function PayHistoryEntity(string $dbName=''){
+        return new PayHistoryEntity($dbName);
     }
     /**
      * @return \Entities\SyBase\RefundBaseEntity
      */
-    public static function RefundBaseEntity(){
-        return new RefundBaseEntity();
+    public static function RefundBaseEntity(string $dbName=''){
+        return new RefundBaseEntity($dbName);
     }
     /**
      * @return \Entities\SyBase\RefundHistoryEntity
      */
-    public static function RefundHistoryEntity(){
-        return new RefundHistoryEntity();
+    public static function RefundHistoryEntity(string $dbName=''){
+        return new RefundHistoryEntity($dbName);
     }
     /**
      * @return \Entities\SyBase\RegionsEntity
      */
-    public static function RegionsEntity(){
-        return new RegionsEntity();
+    public static function RegionsEntity(string $dbName=''){
+        return new RegionsEntity($dbName);
     }
     /**
      * @return \Entities\SyBase\SmsRecordEntity
      */
-    public static function SmsRecordEntity(){
-        return new SmsRecordEntity();
+    public static function SmsRecordEntity(string $dbName=''){
+        return new SmsRecordEntity($dbName);
     }
     /**
      * @return \Entities\SyBase\TimedTaskEntity
      */
-    public static function TimedTaskEntity(){
-        return new TimedTaskEntity();
+    public static function TimedTaskEntity(string $dbName=''){
+        return new TimedTaskEntity($dbName);
     }
     /**
      * @return \Entities\SyBase\UserBaseEntity
      */
-    public static function UserBaseEntity(){
-        return new UserBaseEntity();
+    public static function UserBaseEntity(string $dbName=''){
+        return new UserBaseEntity($dbName);
     }
     /**
      * @return \Entities\SyBase\UserLoginHistoryEntity
      */
-    public static function UserLoginHistoryEntity(){
-        return new UserLoginHistoryEntity();
+    public static function UserLoginHistoryEntity(string $dbName=''){
+        return new UserLoginHistoryEntity($dbName);
     }
     /**
      * @return \Entities\SyBase\UserMoneyEntity
      */
-    public static function UserMoneyEntity(){
-        return new UserMoneyEntity();
+    public static function UserMoneyEntity(string $dbName=''){
+        return new UserMoneyEntity($dbName);
     }
     /**
      * @return \Entities\SyBase\UserMoneyHistoryEntity
      */
-    public static function UserMoneyHistoryEntity(){
-        return new UserMoneyHistoryEntity();
+    public static function UserMoneyHistoryEntity(string $dbName=''){
+        return new UserMoneyHistoryEntity($dbName);
     }
     /**
      * @return \Entities\SyBase\WithdrawBaseEntity
      */
-    public static function WithdrawBaseEntity(){
-        return new WithdrawBaseEntity();
+    public static function WithdrawBaseEntity(string $dbName=''){
+        return new WithdrawBaseEntity($dbName);
     }
     /**
      * @return \Entities\SyBase\WithdrawHistoryEntity
      */
-    public static function WithdrawHistoryEntity(){
-        return new WithdrawHistoryEntity();
+    public static function WithdrawHistoryEntity(string $dbName=''){
+        return new WithdrawHistoryEntity($dbName);
     }
     /**
      * @return \Entities\SyBase\WxopenAuthorizerEntity
      */
-    public static function WxopenAuthorizerEntity(){
-        return new WxopenAuthorizerEntity();
+    public static function WxopenAuthorizerEntity(string $dbName=''){
+        return new WxopenAuthorizerEntity($dbName);
     }
     /**
      * @return \Entities\SyBase\WxshopConfigEntity
      */
-    public static function WxshopConfigEntity(){
-        return new WxshopConfigEntity();
+    public static function WxshopConfigEntity(string $dbName=''){
+        return new WxshopConfigEntity($dbName);
     }
     /**
      * @return \Entities\SyBase\AlipayConfigEntity
      */
-    public static function AlipayConfigEntity(){
-        return new AlipayConfigEntity();
+    public static function AlipayConfigEntity(string $dbName=''){
+        return new AlipayConfigEntity($dbName);
     }
 }
