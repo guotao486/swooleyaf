@@ -98,7 +98,7 @@ class ImageController extends CommonController {
         $redis->set($redisKey, $code, 190);
 
         $this->SyResult->setData([
-            'image' => 'data:image/png;base64,' . $imageContent,
+            'image' => 'data:image/png;base64,' . base64_encode($imageContent),
         ]);
 
         $this->sendRsp();
