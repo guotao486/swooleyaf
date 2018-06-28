@@ -27,9 +27,9 @@ class ImageController extends CommonController {
      * @SyFilter-{"field": "margin_size","explain": "外边框间隙","type": "int","rules": {"min": 0,"max": 200}}
      */
     public function createQrImageAction() {
-        $allParams = \Request\SyRequest::getParams();
+        $url = (string)\Request\SyRequest::getParams('url');
         ob_start();
-        \Qrcode\SyQrCode::createImage($allParams['url'], [
+        \Qrcode\SyQrCode::createImage($url, [
             'error_level' => \Request\SyRequest::getParams('error_level', \Qrcode\SyQrCode::QR_ERROR_LEVEL_ONE),
             'image_size' => (int)\Request\SyRequest::getParams('image_size', 5),
             'margin_size' => (int)\Request\SyRequest::getParams('margin_size', 2),
