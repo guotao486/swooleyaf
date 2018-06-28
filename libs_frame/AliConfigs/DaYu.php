@@ -41,7 +41,7 @@ class DaYu {
      * @throws AliDaYuException
      */
     public function setAppKey(string $appKey) {
-        if (preg_match('/^\d{8}$/', $appKey) > 0) {
+        if (ctype_alnum($appKey)) {
             $this->appKey = $appKey;
         } else {
             throw new AliDaYuException('app key不合法', ErrorCode::ALIDAYU_PARAM_ERROR);
@@ -60,7 +60,7 @@ class DaYu {
      * @throws AliDaYuException
      */
     public function setAppSecret(string $appSecret) {
-        if (preg_match('/^[0-9a-z]{32}$/', $appSecret) > 0) {
+        if (ctype_alnum($appSecret)) {
             $this->appSecret = $appSecret;
         } else {
             throw new AliDaYuException('app secret不合法', ErrorCode::ALIDAYU_PARAM_ERROR);
