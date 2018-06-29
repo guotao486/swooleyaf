@@ -5,13 +5,13 @@
  * Date: 2017/6/17 0017
  * Time: 11:00
  */
-namespace AliConfigs;
+namespace AliPay;
 
 use Constant\ErrorCode;
 use Exception\Ali\AliPayException;
 use Tool\Tool;
 
-class Pay {
+class PayConfig {
     public function __construct() {
     }
 
