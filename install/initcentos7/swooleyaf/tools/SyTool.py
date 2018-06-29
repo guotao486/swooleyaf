@@ -56,6 +56,8 @@ class SyTool():
         run('mkdir /home/logs/nginx')
         run('mkdir /home/configs/nginx')
         run('mkdir /home/configs/nginx/certs')
+        run('mkdir /home/configs/nginx/cache')
+        run('mkdir /home/configs/nginx/temp')
         run('mkdir /home/configs/nginx/modules')
         run('mkdir /home/configs/nginx/servers')
         run('mkdir /home/configs/nginx/streams')
