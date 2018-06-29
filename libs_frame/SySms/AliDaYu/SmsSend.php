@@ -6,10 +6,10 @@
  * Time: 11:34
  */
 
-namespace AliDaYu;
+namespace SySms\AliDaYu;
 
 use Constant\ErrorCode;
-use Exception\Ali\AliDaYuException;
+use Exception\Sms\AliDaYuException;
 use Tool\Tool;
 
 class SmsSend extends SmsBase {
@@ -61,25 +61,25 @@ class SmsSend extends SmsBase {
 
     /**
      * @param string $recNum
-     * @throws \Exception\Ali\AliDaYuException
+     * @throws \Exception\Sms\AliDaYuException
      */
     public function setRecNum(string $recNum) {
         if (preg_match('/^(\,1\d{10}){1,200}$/', ',' . $recNum) > 0) {
             $this->recNum = $recNum;
         } else {
-            throw new AliDaYuException('接收号码不合法', ErrorCode::ALIDAYU_PARAM_ERROR);
+            throw new AliDaYuException('接收号码不合法', ErrorCode::SMS_PARAM_ERROR);
         }
     }
 
     /**
      * @param string $signName
-     * @throws \Exception\Ali\AliDaYuException
+     * @throws \Exception\Sms\AliDaYuException
      */
     public function setSignName(string $signName) {
         if (strlen($signName) == 0) {
-            throw new AliDaYuException('签名名称不能为空', ErrorCode::ALIDAYU_PARAM_ERROR);
+            throw new AliDaYuException('签名名称不能为空', ErrorCode::SMS_PARAM_ERROR);
         } else if (in_array($signName, $this->badSmsSignNames)) {
-            throw new AliDaYuException('签名名称不能为系统默认签名', ErrorCode::ALIDAYU_PARAM_ERROR);
+            throw new AliDaYuException('签名名称不能为系统默认签名', ErrorCode::SMS_PARAM_ERROR);
         }
 
         $this->signName = $signName;
@@ -87,13 +87,13 @@ class SmsSend extends SmsBase {
 
     /**
      * @param string $templateId
-     * @throws \Exception\Ali\AliDaYuException
+     * @throws \Exception\Sms\AliDaYuException
      */
     public function setTemplateId(string $templateId) {
         if (strlen($templateId) > 0) {
             $this->templateCode = $templateId;
         } else {
-            throw new AliDaYuException('模板ID不能为空', ErrorCode::ALIDAYU_PARAM_ERROR);
+            throw new AliDaYuException('模板ID不能为空', ErrorCode::SMS_PARAM_ERROR);
         }
     }
 
@@ -106,13 +106,13 @@ class SmsSend extends SmsBase {
 
     public function getDetail() : array {
         if (strlen($this->recNum) == 0) {
-            throw new AliDaYuException('接收号码不能为空', ErrorCode::ALIDAYU_PARAM_ERROR);
+            throw new AliDaYuException('接收号码不能为空', ErrorCode::SMS_PARAM_ERROR);
         }
         if (strlen($this->signName) == 0) {
-            throw new AliDaYuException('签名名称不能为空', ErrorCode::ALIDAYU_PARAM_ERROR);
+            throw new AliDaYuException('签名名称不能为空', ErrorCode::SMS_PARAM_ERROR);
         }
         if (strlen($this->templateCode) == 0) {
-            throw new AliDaYuException('模板ID不能为空', ErrorCode::ALIDAYU_PARAM_ERROR);
+            throw new AliDaYuException('模板ID不能为空', ErrorCode::SMS_PARAM_ERROR);
         }
 
         $resArr = $this->getBaseDetail();

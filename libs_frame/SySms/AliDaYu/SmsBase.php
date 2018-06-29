@@ -5,9 +5,9 @@
  * Date: 2017-04-16
  * Time: 2:16
  */
-namespace AliDaYu;
+namespace SySms\AliDaYu;
 
-use DesignPatterns\Singletons\AliConfigSingleton;
+use DesignPatterns\Singletons\SmsConfigSingleton;
 
 abstract class SmsBase {
     /**
@@ -43,7 +43,7 @@ abstract class SmsBase {
 
     public function __construct(string $method){
         $this->method = $method;
-        $this->appKey = AliConfigSingleton::getInstance()->getDaYuConfig()->getAppKey();
+        $this->appKey = SmsConfigSingleton::getInstance()->getDaYuConfig()->getAppKey();
         $this->signMethod = 'md5';
         $this->format = 'json';
         $this->version = '2.0';

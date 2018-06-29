@@ -78,10 +78,10 @@ class ErrorCode {
     const ALIPAY_POST_ERROR = 101801;
     const ALIPAY_GET_ERROR = 101802;
 
-    //阿里大于错误,取值范围:102000-102199
-    const ALIDAYU_PARAM_ERROR = 102000;
-    const ALIDAYU_POST_ERROR = 102001;
-    const ALIDAYU_GET_ERROR = 102002;
+    //邮件错误,取值范围:102000-102199
+    const SMS_PARAM_ERROR = 102000;
+    const SMS_POST_ERROR = 102001;
+    const SMS_GET_ERROR = 102002;
 
     //图片错误,取值范围:102200-102399
     const IMAGE_UPLOAD_PARAM_ERROR = 102200;
@@ -195,9 +195,9 @@ class ErrorCode {
         self::ALIPAY_PARAM_ERROR => '支付宝支付参数错误',
         self::ALIPAY_POST_ERROR => '支付宝支付发送POST请求出错',
         self::ALIPAY_GET_ERROR => '支付宝支付发送GET请求出错',
-        self::ALIDAYU_PARAM_ERROR => '阿里大于参数错误',
-        self::ALIDAYU_POST_ERROR => '阿里大于发送POST请求出错',
-        self::ALIDAYU_GET_ERROR => '阿里大于发送GET请求出错',
+        self::SMS_PARAM_ERROR => '邮件参数错误',
+        self::SMS_POST_ERROR => '邮件发送POST请求出错',
+        self::SMS_GET_ERROR => '邮件发送GET请求出错',
         self::IMAGE_UPLOAD_PARAM_ERROR => '图片上传参数错误',
         self::IMAGE_UPLOAD_FAIL => '图片上传失败',
         self::SIGN_ERROR => '签名值错误',
