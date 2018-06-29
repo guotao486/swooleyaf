@@ -5,7 +5,7 @@
  * Date: 2017-04-16
  * Time: 2:25
  */
-namespace Exception\Ali;
+namespace Exception\Sms;
 
 use Exception\BaseException;
 
