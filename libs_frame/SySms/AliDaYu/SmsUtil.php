@@ -5,10 +5,10 @@
  * Date: 2017-04-16
  * Time: 2:08
  */
-namespace AliDaYu;
+namespace SySms\AliDaYu;
 
 use Constant\ErrorCode;
-use DesignPatterns\Singletons\AliConfigSingleton;
+use DesignPatterns\Singletons\SmsConfigSingleton;
 use Log\Log;
 use Tool\Tool;
 use Traits\SimpleTrait;
@@ -24,7 +24,7 @@ final class SmsUtil {
      * @return void
      */
     public static function createSmsSign(array &$data){
-        $appSecret = AliConfigSingleton::getInstance()->getDaYuConfig()->getAppSecret();
+        $appSecret = SmsConfigSingleton::getInstance()->getDaYuConfig()->getAppSecret();
         unset($data['sign']);
         ksort($data);
         $needStr = $appSecret;
@@ -37,7 +37,7 @@ final class SmsUtil {
 
     /**
      * 发送短信
-     * @param \AliDaYu\SmsSend $smsSend 短信对象
+     * @param \SySms\AliDaYu\SmsSend $smsSend 短信对象
      * @return array
      */
     public static function sendSms(SmsSend $smsSend) : array {
@@ -52,8 +52,8 @@ final class SmsUtil {
             $resArr['data'] = $resData['alibaba_aliqin_fc_sms_num_send_response'];
         } else {
             $errorStr = Tool::jsonEncode($resData['error_response'], JSON_UNESCAPED_UNICODE);
-            Log::error($errorStr, ErrorCode::ALIDAYU_POST_ERROR);
-            $resArr['code'] = ErrorCode::ALIDAYU_POST_ERROR;
+            Log::error($errorStr, ErrorCode::SMS_POST_ERROR);
+            $resArr['code'] = ErrorCode::SMS_POST_ERROR;
             $resArr['msg'] = $errorStr;
         }
 
@@ -62,7 +62,7 @@ final class SmsUtil {
 
     /**
      * 查询短信
-     * @param \AliDaYu\SmsQuery $smsQuery
+     * @param \SySms\AliDaYu\SmsQuery $smsQuery
      * @return array
      */
     public static function querySms(SmsQuery $smsQuery){
@@ -77,8 +77,8 @@ final class SmsUtil {
             $resArr['data'] = $resData['alibaba_aliqin_fc_sms_num_query_response'];
         } else {
             $errorStr = Tool::jsonEncode($resData['error_response'], JSON_UNESCAPED_UNICODE);
-            Log::error($errorStr, ErrorCode::ALIDAYU_POST_ERROR);
-            $resArr['code'] = ErrorCode::ALIDAYU_POST_ERROR;
+            Log::error($errorStr, ErrorCode::SMS_POST_ERROR);
+            $resArr['code'] = ErrorCode::SMS_POST_ERROR;
             $resArr['msg'] = $errorStr;
         }
 
@@ -108,7 +108,7 @@ final class SmsUtil {
         }
         $sendRes = Tool::sendCurlReq($curlConfig);
         if($sendRes['res_no'] > 0){
-            Log::error('短信请求失败,curl错误码为' . $sendRes['res_no'], ErrorCode::ALIDAYU_POST_ERROR);
+            Log::error('短信请求失败,curl错误码为' . $sendRes['res_no'], ErrorCode::SMS_POST_ERROR);
         }
 
         return $sendRes['res_content'];

@@ -5,13 +5,13 @@
  * Date: 2017-06-18
  * Time: 15:32
  */
-namespace AliConfigs;
+namespace SySms\AliDaYu;
 
 use Constant\ErrorCode;
-use Exception\Ali\AliDaYuException;
+use Exception\Sms\AliDaYuException;
 use Tool\Tool;
 
-class DaYu {
+class SmsConfig {
     public function __construct() {
     }
 
@@ -38,13 +38,13 @@ class DaYu {
 
     /**
      * @param string $appKey
-     * @throws AliDaYuException
+     * @throws \Exception\Sms\AliDaYuException
      */
     public function setAppKey(string $appKey) {
         if (ctype_alnum($appKey)) {
             $this->appKey = $appKey;
         } else {
-            throw new AliDaYuException('app key不合法', ErrorCode::ALIDAYU_PARAM_ERROR);
+            throw new AliDaYuException('app key不合法', ErrorCode::SMS_PARAM_ERROR);
         }
     }
 
@@ -57,13 +57,13 @@ class DaYu {
 
     /**
      * @param string $appSecret
-     * @throws AliDaYuException
+     * @throws \Exception\Sms\AliDaYuException
      */
     public function setAppSecret(string $appSecret) {
         if (ctype_alnum($appSecret)) {
             $this->appSecret = $appSecret;
         } else {
-            throw new AliDaYuException('app secret不合法', ErrorCode::ALIDAYU_PARAM_ERROR);
+            throw new AliDaYuException('app secret不合法', ErrorCode::SMS_PARAM_ERROR);
         }
     }
 

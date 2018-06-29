@@ -9,9 +9,9 @@ namespace Exception\Sms;
 
 use Exception\BaseException;
 
-class AliDaYuException extends BaseException {
+class Yun253Exception extends BaseException {
     public function __construct($message, $code) {
         parent::__construct($message, $code);
-        $this->tipName = '阿里大于异常';
+        $this->tipName = '253云异常';
     }
 }

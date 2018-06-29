@@ -7,7 +7,6 @@
  */
 namespace DesignPatterns\Singletons;
 
-use AliConfigs\DaYu;
 use AliConfigs\Pay;
 use Constant\Project;
 use Factories\SyBaseMysqlFactory;
@@ -22,11 +21,6 @@ class AliConfigSingleton {
      * @var array
      */
     private $payConfigs = [];
-    /**
-     * 大鱼配置
-     * @var \AliConfigs\DaYu
-     */
-    private $dayuConfig = null;
 
     /**
      * 支付配置清理时间戳
@@ -35,13 +29,6 @@ class AliConfigSingleton {
     private $payClearTime = 0;
 
     private function __construct() {
-        $configs = Tool::getConfig('ali.' . SY_ENV . SY_PROJECT);
-
-        //设置大鱼配置
-        $dayuConfig = new DaYu();
-        $dayuConfig->setAppKey((string)Tool::getArrayVal($configs, 'dayu.app.key', '', true));
-        $dayuConfig->setAppSecret((string)Tool::getArrayVal($configs, 'dayu.app.secret', '', true));
-        $this->dayuConfig = $dayuConfig;
     }
 
     /**
@@ -143,13 +130,5 @@ class AliConfigSingleton {
      */
     public function removePayConfig(string $appId) {
         unset($this->payConfigs[$appId]);
-    }
-
-    /**
-     * 获取大鱼配置
-     * @return \AliConfigs\DaYu
-     */
-    public function getDaYuConfig() {
-        return $this->dayuConfig;
     }
 }
