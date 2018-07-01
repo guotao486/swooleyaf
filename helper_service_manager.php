@@ -22,28 +22,28 @@ $projects = include(__DIR__ . '/helper_projects.php');
 $command = getClientOption('-s');
 switch ($command) {
     case 'start-all' :
-        foreach ($projects as $name => $eProject) {
+        foreach ($projects as $eProject) {
             foreach ($eProject['listens'] as $eListen) {
                 controllerLog($eProject['module_path'], '-s start -module ' . $eProject['module_name'] . ' -port ' . $eListen['port']);
             }
         }
         break;
     case 'stop-all' :
-        foreach ($projects as $name => $eProject) {
+        foreach ($projects as $eProject) {
             foreach ($eProject['listens'] as $eListen) {
                 controllerLog($eProject['module_path'], '-s stop -module ' . $eProject['module_name'] . ' -port ' . $eListen['port']);
             }
         }
         break;
     case 'restart-all' :
-        foreach ($projects as $name => $eProject) {
+        foreach ($projects as $eProject) {
             foreach ($eProject['listens'] as $eListen) {
                 controllerLog($eProject['module_path'], '-s restart -module ' . $eProject['module_name'] . ' -port ' . $eListen['port']);
             }
         }
         break;
     case 'kz-all' :
-        foreach ($projects as $name => $eProject) {
+        foreach ($projects as $eProject) {
             foreach ($eProject['listens'] as $eListen) {
                 controllerLog($eProject['module_path'], '-s kz -module ' . $eProject['module_name'] . ' -port ' . $eListen['port']);
             }
