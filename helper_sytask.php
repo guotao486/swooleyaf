@@ -12,41 +12,8 @@ function sendSyGetReq(string $url) {
     ]);
 }
 
+$projects = include(__DIR__ . '/helper_projects.php');
 $container = new \SyTask\SyModuleTaskContainer();
-$modules = [
-    \Constant\Project::MODULE_NAME_API => [
-        'projects' => [
-            0 => [
-                'host' => '127.0.0.1',
-                'port' => 7100,
-            ],
-        ],
-    ],
-    \Constant\Project::MODULE_NAME_ORDER => [
-        'projects' => [
-            0 => [
-                'host' => '127.0.0.1',
-                'port' => 7120,
-            ],
-        ],
-    ],
-    \Constant\Project::MODULE_NAME_USER => [
-        'projects' => [
-            0 => [
-                'host' => '127.0.0.1',
-                'port' => 7140,
-            ],
-        ],
-    ],
-    \Constant\Project::MODULE_NAME_SERVICE => [
-        'projects' => [
-            0 => [
-                'host' => '127.0.0.1',
-                'port' => 7160,
-            ],
-        ],
-    ],
-];
 
 $timeArr = explode('-', date('H-i'));
 $minute = (int)$timeArr[1];
@@ -62,9 +29,8 @@ $taskParams = [
     'clear_localwxshoptoken' => $needMinute1 == 0 ? true : false,
     'clear_localwxopenauthorizertoken' => $needMinute1 == 0 ? true : false,
 ];
-
-foreach ($modules as $moduleTag => $eModule) {
-    $taskParams['projects'] = $eModule['projects'];
-    $task = $container->getObj($moduleTag);
+foreach ($projects as $eProject) {
+    $taskParams['projects'] = $eProject['listens'];
+    $task = $container->getObj($eProject['module_name']);
     $task->handleTask($taskParams);
 }
