@@ -78,6 +78,7 @@
 - SY_MODULE //框架模块名称
 - SY_API //框架API标识 true: 是对外的API接口 false:不是对外的API接口
 - SY_REQUEST_MAX_HANDLING //服务同时处理的最大请求数量
+- SY_RECONNECT_DB //框架数据库重连标识 true: 检测重连 false:不检测重连
 
 ## 服务管理
 ### 获取框架概览信息
