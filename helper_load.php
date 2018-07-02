@@ -8,6 +8,7 @@ define('SY_VERSION', '4.0');
 define('SY_ROOT', __DIR__);
 define('SY_ENV', 'dev');
 define('SY_PROJECT', 'z01');
+define('SY_RECONNECT_DB', true);
 $syLogPath = ini_get('seaslog.default_basepath');
 if(substr($syLogPath, -1) == '/'){
     $syLogPath .= 'sy' . SY_PROJECT;

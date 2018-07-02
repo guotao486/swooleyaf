@@ -344,7 +344,9 @@ trait BaseServerTrait {
         }
 
         RedisSingleton::getInstance()->reConnect();
-        MysqlSingleton::getInstance()->reConnect();
+        if(SY_RECONNECT_DB){
+            MysqlSingleton::getInstance()->reConnect();
+        }
 
         $command = $this->_syPack->getCommand();
         $commandData = $this->_syPack->getData();
