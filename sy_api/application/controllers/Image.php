@@ -38,6 +38,13 @@ class ImageController extends CommonController {
         $this->sendRsp($res);
     }
 
+    public function createCodeImageAction() {
+        $data = $_GET;
+        $data['session_id'] = \Tool\SySession::getSessionId();
+        $res = \SyModule\SyModuleService::getInstance()->sendApiReq('/Index/Image/createCodeImage', $data);
+        $this->sendRsp($res);
+    }
+
     /**
      * 上传图片
      * @SyFilter-{"field": "upload_type","explain": "上传类型","type": "int","rules": {"required": 1,"min": 1}}
