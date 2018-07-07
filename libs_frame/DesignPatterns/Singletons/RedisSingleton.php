@@ -77,7 +77,7 @@ class RedisSingleton {
             }
 
             $this->conn = $redis;
-            $this->connTime = time();
+            $this->connTime = Tool::getNowTime();
         } catch (RedisException $e) {
             throw $e;
         } catch (\Exception $e) {
@@ -179,7 +179,7 @@ class RedisSingleton {
     public function reConnect() {
         if (is_null($this->conn)) {
             $this->init();
-        } else if (time() - $this->connTime >= 15) {
+        } else if (Tool::getNowTime() - $this->connTime >= 15) {
             $this->conn->close();
             $this->init();
         }

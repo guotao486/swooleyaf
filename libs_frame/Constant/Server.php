@@ -12,10 +12,6 @@ use Traits\SimpleTrait;
 final class Server {
     use SimpleTrait;
 
-    //模块常量
-    //考虑到yac缓存名称长度限制,名称不能超过30个字符串
-    const MODULE_BASE_SERVICE = 'services';
-
     //服务常量
     const SERVER_PACKAGE_MAX_LENGTH = 12582912; //服务端消息最大长度-12M
     const SERVER_OUTPUT_MAX_LENGTH = 5242880; //服务端输出内容最大长度-5M

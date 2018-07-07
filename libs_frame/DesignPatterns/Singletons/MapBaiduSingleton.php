@@ -190,7 +190,7 @@ class MapBaiduSingleton {
             'page_size' => $search->getPageSize(),
             'page_num' => $search->getPageIndex() - 1,
             'ak' => $this->ak,
-            'timestamp' => time(),
+            'timestamp' => Tool::getNowTime(),
         ];
         if(!empty($search->getTags())){
             $data['tag'] = implode(',', $search->getTags());
@@ -240,7 +240,7 @@ class MapBaiduSingleton {
             'output' => $detail->getOutput(),
             'scope' => $detail->getScope(),
             'ak' => $this->ak,
-            'timestamp' => time(),
+            'timestamp' => Tool::getNowTime(),
         ]);
         $reqCheck->setReqUrl($this->urlPlaceDetail);
         $reqCheck->checkReq();

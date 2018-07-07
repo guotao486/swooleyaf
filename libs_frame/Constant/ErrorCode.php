@@ -151,6 +151,10 @@ class ErrorCode {
     //Smarty错误,取值范围:104100-104199
     const SMARTY_PARAM_ERROR = 104100;
 
+    //IM错误,取值范围:104200-104299
+    const IM_PARAM_ERROR = 104200;
+    const IM_SIGN_ERROR = 104201;
+
     protected static $msgArr = [
         self::COMMON_SUCCESS => '成功',
         self::COMMON_PARAM_ERROR => '参数错误',
@@ -242,6 +246,8 @@ class ErrorCode {
         self::ETCD_SEND_REQ_ERROR => 'ETCD发送请求出错',
         self::ETCD_GET_DATA_ERROR => 'ETCD获取数据出错',
         self::SMARTY_PARAM_ERROR => 'Smarty参数错误',
+        self::IM_PARAM_ERROR => '即时通讯参数错误',
+        self::IM_SIGN_ERROR => '即时通讯签名错误',
     ];
 
     /**
