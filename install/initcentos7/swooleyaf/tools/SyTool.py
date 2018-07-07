@@ -220,6 +220,14 @@ class SyTool():
         nginxFrontConfRemote = '/home/configs/nginx/servers/demofront.conf'
         put(nginxFrontConfLocal, nginxFrontConfRemote)
 
+        nginxFrontStaticConfLocal = ''.join([syDicts['path.package.local'], '/configs/swooleyaf/nginx/demofrontstatic.conf'])
+        nginxFrontStaticConfRemote = '/home/configs/nginx/servers/demofrontstatic.conf'
+        put(nginxFrontStaticConfLocal, nginxFrontStaticConfRemote)
+
+        nginxDefaultServerConfLocal = ''.join([syDicts['path.package.local'], '/configs/swooleyaf/nginx/defaultserver.conf'])
+        nginxDefaultServerConfRemote = '/home/configs/nginx/servers/defaultserver.conf'
+        put(nginxDefaultServerConfLocal, nginxDefaultServerConfRemote)
+
         nginxServiceLocal = ''.join([syDicts['path.package.local'], '/configs/swooleyaf/nginx/nginx.service'])
         nginxServiceRemote = '/lib/systemd/system/nginx.service'
         put(nginxServiceLocal, nginxServiceRemote)
