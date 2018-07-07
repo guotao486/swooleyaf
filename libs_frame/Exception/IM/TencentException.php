@@ -2,16 +2,16 @@
 /**
  * Created by PhpStorm.
  * User: Administrator
- * Date: 2017-04-16
- * Time: 2:25
+ * Date: 2017-04-09
+ * Time: 0:42
  */
-namespace Exception\Sms;
+namespace Exception\IM;
 
 use Exception\BaseException;
 
-class AliDaYuException extends BaseException {
+class TencentException extends BaseException {
     public function __construct($message, $code) {
         parent::__construct($message, $code);
-        $this->tipName = '阿里大于短信异常';
+        $this->tipName = '腾讯即时通讯异常';
     }
 }

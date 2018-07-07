@@ -12,6 +12,6 @@ use Exception\BaseException;
 class Yun253Exception extends BaseException {
     public function __construct($message, $code) {
         parent::__construct($message, $code);
-        $this->tipName = '253云异常';
+        $this->tipName = '253云短信异常';
     }
 }

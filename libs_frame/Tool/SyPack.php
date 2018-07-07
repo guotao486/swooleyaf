@@ -8,7 +8,7 @@
 namespace Tool;
 
 use Constant\ErrorCode;
-use Constant\Server;
+use Constant\Project;
 use Exception\Common\CheckException;
 
 class SyPack {
@@ -98,7 +98,7 @@ class SyPack {
         $module = Tool::getArrayVal($data, 'api_module', '');
         if(!is_string($module)){
             throw new CheckException('模块名称必须是字符串', ErrorCode::COMMON_PARAM_ERROR);
-        } else if(!in_array($module, Server::$totalModuleName)){
+        } else if(!in_array($module, Project::$totalModuleName)){
             throw new CheckException('模块不支持', ErrorCode::COMMON_PARAM_ERROR);
         }
 
@@ -133,7 +133,7 @@ class SyPack {
         $module = Tool::getArrayVal($data, 'task_module', '');
         if(!is_string($module)){
             throw new CheckException('模块名称必须是字符串', ErrorCode::COMMON_PARAM_ERROR);
-        } else if(!in_array($module, Server::$totalModuleName)){
+        } else if(!in_array($module, Project::$totalModuleName)){
             throw new CheckException('模块不支持', ErrorCode::COMMON_PARAM_ERROR);
         }
 

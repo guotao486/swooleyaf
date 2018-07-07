@@ -78,7 +78,7 @@ class ErrorCode {
     const ALIPAY_POST_ERROR = 101801;
     const ALIPAY_GET_ERROR = 101802;
 
-    //邮件错误,取值范围:102000-102199
+    //短信错误,取值范围:102000-102199
     const SMS_PARAM_ERROR = 102000;
     const SMS_POST_ERROR = 102001;
     const SMS_GET_ERROR = 102002;
@@ -151,6 +151,10 @@ class ErrorCode {
     //Smarty错误,取值范围:104100-104199
     const SMARTY_PARAM_ERROR = 104100;
 
+    //IM错误,取值范围:104200-104299
+    const IM_PARAM_ERROR = 104200;
+    const IM_SIGN_ERROR = 104201;
+
     protected static $msgArr = [
         self::COMMON_SUCCESS => '成功',
         self::COMMON_PARAM_ERROR => '参数错误',
@@ -195,9 +199,9 @@ class ErrorCode {
         self::ALIPAY_PARAM_ERROR => '支付宝支付参数错误',
         self::ALIPAY_POST_ERROR => '支付宝支付发送POST请求出错',
         self::ALIPAY_GET_ERROR => '支付宝支付发送GET请求出错',
-        self::SMS_PARAM_ERROR => '邮件参数错误',
-        self::SMS_POST_ERROR => '邮件发送POST请求出错',
-        self::SMS_GET_ERROR => '邮件发送GET请求出错',
+        self::SMS_PARAM_ERROR => '短信参数错误',
+        self::SMS_POST_ERROR => '短信发送POST请求出错',
+        self::SMS_GET_ERROR => '短信发送GET请求出错',
         self::IMAGE_UPLOAD_PARAM_ERROR => '图片上传参数错误',
         self::IMAGE_UPLOAD_FAIL => '图片上传失败',
         self::SIGN_ERROR => '签名值错误',
@@ -242,6 +246,8 @@ class ErrorCode {
         self::ETCD_SEND_REQ_ERROR => 'ETCD发送请求出错',
         self::ETCD_GET_DATA_ERROR => 'ETCD获取数据出错',
         self::SMARTY_PARAM_ERROR => 'Smarty参数错误',
+        self::IM_PARAM_ERROR => '即时通讯参数错误',
+        self::IM_SIGN_ERROR => '即时通讯签名错误',
     ];
 
     /**

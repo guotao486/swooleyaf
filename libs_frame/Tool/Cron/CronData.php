@@ -187,9 +187,14 @@ class CronData {
 
     /**
      * @param string $cron
+     * @throws \Exception\Cron\CronException
      */
     public function setCron(string $cron) {
-        $this->cron = $cron;
+        if(preg_match('/^(\s{1}(\*|\d+(\,\d+)*|\d+\-\d+(\,\d+\-\d+)*)(\/\d+){0,1}){6}$/', ' ' . $cron) == 0){
+            throw new CronException('cron格式不合法', ErrorCode::CRON_FORMAT_ERROR);
+        }
+
+        $this->cron = preg_replace('/\s+/', ' ', $cron);
     }
 
     /**
@@ -257,16 +262,7 @@ class CronData {
 
     /**
      * 校验时间戳是否满足cron计划
-     * @param array $timeArr 时间数组
-     *   格式如下：
-     *   [
-     *     'second' => 1,
-     *     'minute' => 1,
-     *     'hour' => 1,
-     *     'day' => 1,
-     *     'month' => 1,
-     *     'week' => 1,
-     *   ]
+     * @param array $timeArr
      * @return bool
      */
     public function checkTime(array $timeArr) : bool {
