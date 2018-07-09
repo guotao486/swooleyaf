@@ -478,7 +478,7 @@ class SyTool():
             redisConfLocal = ''.join([syDicts['path.package.local'], '/configs/swooleyaf/redis/6379.conf'])
             redisConfRemote = '/etc/redis/6379.conf'
             put(redisConfLocal, redisConfRemote)
-            run('echo "bind 127.0.0.1 %s" >> %s' % (env.host, redisConfRemote), False)
+            run('echo -e "\nbind 127.0.0.1 %s" >> %s' % (env.host, redisConfRemote), False)
             run('rm -rf redis-3.2.11.tar.gz')
             run('systemctl daemon-reload')
             run('chkconfig redis on')
