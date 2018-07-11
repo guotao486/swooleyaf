@@ -128,12 +128,14 @@ final class WxUtilOpen extends WxUtilBase {
             if($uniqueKey != $redisKey){
                 throw new WxOpenException('获取缓存失败', ErrorCode::WXOPEN_PARAM_ERROR);
             } else if($redisData['expire_time'] >= $nowTime){
-                BaseServer::setWxOpenAuthorizerTokenCache($appId, [
-                    'access_token' => $redisData['access_token'],
-                    'js_ticket' => $redisData['js_ticket'],
-                    'expire_time' => (int)$redisData['expire_time'],
-                    'clear_time' => $clearTime,
-                ]);
+                if(SY_CACHE_WXOPEN){
+                    BaseServer::setWxOpenAuthorizerTokenCache($appId, [
+                        'access_token' => $redisData['access_token'],
+                        'js_ticket' => $redisData['js_ticket'],
+                        'expire_time' => (int)$redisData['expire_time'],
+                        'clear_time' => $clearTime,
+                    ]);
+                }
 
                 return [
                     'js_ticket' => $redisData['js_ticket'],
@@ -169,12 +171,14 @@ final class WxUtilOpen extends WxUtilBase {
         CacheSimpleFactory::getRedisInstance()->hMset($redisKey, $cacheData);
         CacheSimpleFactory::getRedisInstance()->expire($redisKey, 86400);
 
-        BaseServer::setWxOpenAuthorizerTokenCache($appId, [
-            'access_token' => $accessTokenData['authorizer_access_token'],
-            'js_ticket' => $jsTicketData['ticket'],
-            'expire_time' => $expireTime,
-            'clear_time' => $clearTime,
-        ]);
+        if(SY_CACHE_WXOPEN){
+            BaseServer::setWxOpenAuthorizerTokenCache($appId, [
+                'access_token' => $accessTokenData['authorizer_access_token'],
+                'js_ticket' => $jsTicketData['ticket'],
+                'expire_time' => $expireTime,
+                'clear_time' => $clearTime,
+            ]);
+        }
 
         return [
             'js_ticket' => $jsTicketData['ticket'],
@@ -189,10 +193,12 @@ final class WxUtilOpen extends WxUtilBase {
      * @throws \Exception\Wx\WxOpenException
      */
     public static function getAuthorizerAccessToken(string $appId) : string {
-        $nowTime = Tool::getNowTime();
-        $cacheData = BaseServer::getWxOpenAuthorizerTokenCache($appId, '', []);
-        if(isset($cacheData['expire_time']) && ($cacheData['expire_time'] >= $nowTime)){
-            return $cacheData['access_token'];
+        if(SY_CACHE_WXOPEN){
+            $nowTime = Tool::getNowTime();
+            $cacheData = BaseServer::getWxOpenAuthorizerTokenCache($appId, '', []);
+            if(isset($cacheData['expire_time']) && ($cacheData['expire_time'] >= $nowTime)){
+                return $cacheData['access_token'];
+            }
         }
 
         $cacheData = self::getAuthorizerCache($appId);
@@ -206,10 +212,12 @@ final class WxUtilOpen extends WxUtilBase {
      * @throws \Exception\Wx\WxOpenException
      */
     public static function getAuthorizerJsTicket(string $appId) : string {
-        $nowTime = Tool::getNowTime();
-        $cacheData = BaseServer::getWxOpenAuthorizerTokenCache($appId, '', []);
-        if(isset($cacheData['expire_time']) && ($cacheData['expire_time'] >= $nowTime)){
-            return $cacheData['js_ticket'];
+        if(SY_CACHE_WXOPEN){
+            $nowTime = Tool::getNowTime();
+            $cacheData = BaseServer::getWxOpenAuthorizerTokenCache($appId, '', []);
+            if(isset($cacheData['expire_time']) && ($cacheData['expire_time'] >= $nowTime)){
+                return $cacheData['js_ticket'];
+            }
         }
 
         $cacheData = self::getAuthorizerCache($appId);
