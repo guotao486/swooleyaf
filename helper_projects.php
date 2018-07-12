@@ -10,6 +10,7 @@ $serverHost = \Yaconf::get('syserver.base.server.host');
 return [
     0 => [
         'git_branch' => 'master',
+        'module_type' => 'api',
         'module_path' => 'sy_api',
         'module_name' => 'a01api',
         'listens' => [
@@ -21,6 +22,7 @@ return [
     ],
     1 => [
         'git_branch' => 'master',
+        'module_type' => 'rpc',
         'module_path' => 'sy_order',
         'module_name' => 'a01order',
         'listens' => [
@@ -32,6 +34,7 @@ return [
     ],
     2 => [
         'git_branch' => 'master',
+        'module_type' => 'rpc',
         'module_path' => 'sy_user',
         'module_name' => 'a01user',
         'listens' => [
@@ -43,6 +46,7 @@ return [
     ],
     3 => [
         'git_branch' => 'master',
+        'module_type' => 'rpc',
         'module_path' => 'sy_services',
         'module_name' => 'a01services',
         'listens' => [

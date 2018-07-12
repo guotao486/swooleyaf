@@ -28,6 +28,10 @@ final class WxUtilOpen extends WxUtilBase {
     private static $urlAuthUrl = 'https://mp.weixin.qq.com/cgi-bin/componentloginpage?component_appid=';
     private static $urlAuthorizerAuth = 'https://api.weixin.qq.com/cgi-bin/component/api_query_auth?component_access_token=';
     private static $urlSendCustom = 'https://api.weixin.qq.com/cgi-bin/message/custom/send?access_token=';
+    private static $urlGetDraftCodeList = 'https://api.weixin.qq.com/wxa/gettemplatedraftlist?access_token=';
+    private static $urlGetTemplateCodeList = 'https://api.weixin.qq.com/wxa/gettemplatelist?access_token=';
+    private static $urlAddTemplateCode = 'https://api.weixin.qq.com/wxa/addtotemplate?access_token=';
+    private static $urlDeleteTemplateCode = 'https://api.weixin.qq.com/wxa/deletetemplate?access_token=';
 
     /**
      * 更新平台access token
@@ -471,6 +475,106 @@ final class WxUtilOpen extends WxUtilBase {
         } else {
             $resArr['code'] = ErrorCode::WXOPEN_POST_ERROR;
             $resArr['message'] = $resData['errmsg'];
+        }
+
+        return $resArr;
+    }
+
+    /**
+     * 获取草稿代码列表
+     * @return array
+     */
+    public static function getDraftCodeList() : array {
+        $resArr = [
+            'code' => 0,
+        ];
+
+        $url = self::$urlGetDraftCodeList . self::getComponentAccessToken(WxConfigSingleton::getInstance()->getOpenCommonConfig()->getAppId());
+        $getRes = self::sendGetReq($url);
+        $getData = Tool::jsonDecode($getRes);
+        if($getData['errcode'] == 0){
+            $resArr['data'] = $getData;
+        } else {
+            $resArr['code'] = ErrorCode::WXOPEN_GET_ERROR;
+            $resArr['message'] = $getData['errmsg'];
+        }
+
+        return $resArr;
+    }
+
+    /**
+     * 获取模板代码列表
+     * @return array
+     */
+    public static function getTemplateCodeList() : array {
+        $resArr = [
+            'code' => 0,
+        ];
+
+        $url = self::$urlGetTemplateCodeList . self::getComponentAccessToken(WxConfigSingleton::getInstance()->getOpenCommonConfig()->getAppId());
+        $getRes = self::sendGetReq($url);
+        $getData = Tool::jsonDecode($getRes);
+        if($getData['errcode'] == 0){
+            $resArr['data'] = $getData;
+        } else {
+            $resArr['code'] = ErrorCode::WXOPEN_GET_ERROR;
+            $resArr['message'] = $getData['errmsg'];
+        }
+
+        return $resArr;
+    }
+
+    /**
+     * 添加模板代码
+     * @param string $draftId 草稿ID
+     * @return array
+     */
+    public static function addTemplateCode(string $draftId) : array {
+        $resArr = [
+            'code' => 0,
+        ];
+
+        $url = self::$urlAddTemplateCode . self::getComponentAccessToken(WxConfigSingleton::getInstance()->getOpenCommonConfig()->getAppId());
+        $addRes = self::sendPostReq($url, 'json', [
+            'draft_id' => $draftId,
+        ], [
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYHOST => false,
+        ]);
+        $addData = Tool::jsonDecode($addRes);
+        if($addData['errcode'] == 0){
+            $resArr['data'] = $addData;
+        } else {
+            $resArr['code'] = ErrorCode::WXOPEN_POST_ERROR;
+            $resArr['message'] = $addData['errmsg'];
+        }
+
+        return $resArr;
+    }
+
+    /**
+     * 删除模板代码
+     * @param string $templateId 模板ID
+     * @return array
+     */
+    public static function deleteTemplateCode(string $templateId) : array {
+        $resArr = [
+            'code' => 0,
+        ];
+
+        $url = self::$urlDeleteTemplateCode . self::getComponentAccessToken(WxConfigSingleton::getInstance()->getOpenCommonConfig()->getAppId());
+        $delRes = self::sendPostReq($url, 'json', [
+            'template_id' => $templateId,
+        ], [
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYHOST => false,
+        ]);
+        $delData = Tool::jsonDecode($delRes);
+        if($delData['errcode'] == 0){
+            $resArr['data'] = $delData;
+        } else {
+            $resArr['code'] = ErrorCode::WXOPEN_POST_ERROR;
+            $resArr['message'] = $delData['errmsg'];
         }
 
         return $resArr;
