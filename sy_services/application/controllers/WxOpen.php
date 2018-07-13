@@ -21,10 +21,10 @@ class WxOpenController extends CommonController {
      * @apiSuccessExample fail:
      *     fail
      * @SyFilter-{"field": "wx_xml","explain": "微信xml消息","type": "string","rules": {"required": 1,"min": 1}}
-     * @SyFilter-{"field": "nonce","explain": "随机字符串","type": "string","rules": {"required": 1,"regex": "/^[a-zA-Z0-9]{1,32}$/"}}
+     * @SyFilter-{"field": "nonce","explain": "随机字符串","type": "string","rules": {"required": 1,"min": 1}}
      * @SyFilter-{"field": "msg_signature","explain": "消息签名","type": "string","rules": {"required": 1,"min": 1}}
-     * @SyFilter-{"field": "encrypt_type","explain": "加密方式","type": "string","rules": {"required": 1,"regex": "/^aes$/"}}
-     * @SyFilter-{"field": "timestamp","explain": "时间戳","type": "string","rules": {"required": 1,"regex": "/^[1-4]\d{9}$/"}}
+     * @SyFilter-{"field": "encrypt_type","explain": "加密方式","type": "string","rules": {"required": 1,"min": 1}}
+     * @SyFilter-{"field": "timestamp","explain": "时间戳","type": "string","rules": {"required": 1,"min": 1}}
      */
     public function handleWxNotifyAction() {
         $needParams = \Request\SyRequest::getParams();
@@ -56,11 +56,11 @@ class WxOpenController extends CommonController {
      *     fail
      * @SyFilter-{"field": "wx_xml","explain": "微信xml消息","type": "string","rules": {"required": 1,"min": 1}}
      * @SyFilter-{"field": "appid","explain": "授权者公众号id","type": "string","rules": {"required": 1,"min": 1}}
-     * @SyFilter-{"field": "openid","explain": "用户openid","type": "string","rules": {"required": 1,"regex": "/^[0-9a-zA-Z\-\_]{28}$/"}}
-     * @SyFilter-{"field": "nonce","explain": "随机字符串","type": "string","rules": {"required": 1,"regex": "/^[a-zA-Z0-9]{1,32}$/"}}
+     * @SyFilter-{"field": "openid","explain": "用户openid","type": "string","rules": {"required": 1,"min": 1}}
+     * @SyFilter-{"field": "nonce","explain": "随机字符串","type": "string","rules": {"required": 1,"min": 1}}
      * @SyFilter-{"field": "msg_signature","explain": "消息签名","type": "string","rules": {"required": 1,"min": 1}}
-     * @SyFilter-{"field": "encrypt_type","explain": "加密方式","type": "string","rules": {"required": 1,"regex": "/^aes$/"}}
-     * @SyFilter-{"field": "timestamp","explain": "时间戳","type": "string","rules": {"required": 1,"regex": "/^[1-4]\d{9}$/"}}
+     * @SyFilter-{"field": "encrypt_type","explain": "加密方式","type": "string","rules": {"required": 1,"min": 1}}
+     * @SyFilter-{"field": "timestamp","explain": "时间戳","type": "string","rules": {"required": 1,"min": 1}}
      */
     public function handleAuthorizerNotifyAction() {
         $needParams = \Request\SyRequest::getParams();
