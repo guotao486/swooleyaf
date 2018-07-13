@@ -57,6 +57,9 @@ final class ProjectTool {
                     'component_appid' => $openCommonConfig->getAppId(),
                     'authorizer_appid' => $data['AuthorizerAppid'],
                     'authorizer_authcode' => $data['AuthorizationCode'],
+                    'authorizer_refreshtoken' => '',
+                    'authorizer_allowpower' => '',
+                    'authorizer_info' => '',
                     'authorizer_status' => Project::WX_COMPONENT_AUTHORIZER_STATUS_ALLOW,
                     'created' => $nowTime,
                     'updated' => $nowTime,
@@ -76,16 +79,19 @@ final class ProjectTool {
                 ], [
                     'component_appid' => $openCommonConfig->getAppId(),
                     'authorizer_appid' => $data['AuthorizerAppid'],
-                    'authorizer_authcode' => $data['AuthorizationCode'],
-                    'authorizer_status' => Project::WX_COMPONENT_AUTHORIZER_STATUS_ALLOW,
-                    'created' => $nowTime,
-                    'updated' => $nowTime,
-                ], [
-                    'authorizer_authcode' => $data['AuthorizationCode'],
+                    'authorizer_authcode' => '',
                     'authorizer_refreshtoken' => '',
                     'authorizer_allowpower' => '',
                     'authorizer_info' => '',
-                    'authorizer_status' => Project::WX_COMPONENT_AUTHORIZER_STATUS_ALLOW,
+                    'authorizer_status' => Project::WX_COMPONENT_AUTHORIZER_STATUS_CANCEL,
+                    'created' => $nowTime,
+                    'updated' => $nowTime,
+                ], [
+                    'authorizer_authcode' => '',
+                    'authorizer_refreshtoken' => '',
+                    'authorizer_allowpower' => '',
+                    'authorizer_info' => '',
+                    'authorizer_status' => Project::WX_COMPONENT_AUTHORIZER_STATUS_CANCEL,
                     'updated' => $nowTime,
                 ]);
                 break;
@@ -96,14 +102,19 @@ final class ProjectTool {
                 ], [
                     'component_appid' => $openCommonConfig->getAppId(),
                     'authorizer_appid' => $data['AuthorizerAppid'],
-                    'authorizer_status' => Project::WX_COMPONENT_AUTHORIZER_STATUS_CANCEL,
-                    'created' => $nowTime,
-                    'updated' => $nowTime,
-                ], [
+                    'authorizer_authcode' => $data['AuthorizationCode'],
                     'authorizer_refreshtoken' => '',
                     'authorizer_allowpower' => '',
                     'authorizer_info' => '',
-                    'authorizer_status' => Project::WX_COMPONENT_AUTHORIZER_STATUS_CANCEL,
+                    'authorizer_status' => Project::WX_COMPONENT_AUTHORIZER_STATUS_ALLOW,
+                    'created' => $nowTime,
+                    'updated' => $nowTime,
+                ], [
+                    'authorizer_authcode' => $data['AuthorizationCode'],
+                    'authorizer_refreshtoken' => '',
+                    'authorizer_allowpower' => '',
+                    'authorizer_info' => '',
+                    'authorizer_status' => Project::WX_COMPONENT_AUTHORIZER_STATUS_ALLOW,
                     'updated' => $nowTime,
                 ]);
                 break;
