@@ -5,10 +5,11 @@
  * Date: 17-4-1
  * Time: 上午12:08
  */
-namespace Wx;
+namespace Wx\Shop;
 
 use Constant\ErrorCode;
 use Exception\Wx\WxException;
+use Wx\WxUtilShop;
 
 class JsPayConfig {
     public function __construct(string $appId) {

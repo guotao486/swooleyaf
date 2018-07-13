@@ -5,11 +5,12 @@
  * Date: 17-4-14
  * Time: 下午11:30
  */
-namespace Wx;
+namespace Wx\Shop;
 
 use Constant\ErrorCode;
 use DesignPatterns\Singletons\WxConfigSingleton;
 use Exception\Wx\WxException;
+use Wx\WxUtilShop;
 
 class PayCompanyQuery {
     public function __construct(string $appId) {

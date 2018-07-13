@@ -5,7 +5,7 @@
  * Date: 2017-04-04
  * Time: 16:34
  */
-namespace Wx;
+namespace Wx\Shop;
 
 use Constant\ErrorCode;
 use Exception\Wx\WxException;

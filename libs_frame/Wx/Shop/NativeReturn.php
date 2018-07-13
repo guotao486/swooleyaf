@@ -5,11 +5,12 @@
  * Date: 2017-04-03
  * Time: 2:53
  */
-namespace Wx;
+namespace Wx\Shop;
 
 use Constant\ErrorCode;
 use DesignPatterns\Singletons\WxConfigSingleton;
 use Exception\Wx\WxException;
+use Wx\WxUtilShop;
 
 class NativeReturn {
     public function __construct(string $appId) {

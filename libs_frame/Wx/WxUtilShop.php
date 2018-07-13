@@ -16,6 +16,23 @@ use Log\Log;
 use SyServer\BaseServer;
 use Tool\Tool;
 use Traits\SimpleTrait;
+use Wx\Shop\JsConfig;
+use Wx\Shop\JsPayConfig;
+use Wx\Shop\Menu;
+use Wx\Shop\MiniProgramQrcode;
+use Wx\Shop\OrderBill;
+use Wx\Shop\OrderClose;
+use Wx\Shop\OrderQuery;
+use Wx\Shop\OrderRefund;
+use Wx\Shop\PayCompany;
+use Wx\Shop\PayCompanyQuery;
+use Wx\Shop\PayMicro;
+use Wx\Shop\PayNativePre;
+use Wx\Shop\RefundQuery;
+use Wx\Shop\ShortUrl;
+use Wx\Shop\TemplateMsg;
+use Wx\Shop\UnifiedOrder;
+use Wx\Shop\UserInfo;
 
 final class WxUtilShop extends WxUtilBase {
     use SimpleTrait;
@@ -93,7 +110,7 @@ final class WxUtilShop extends WxUtilBase {
 
     /**
      * 发起jsapi支付
-     * @param \Wx\UnifiedOrder $order 订单信息
+     * @param \Wx\Shop\UnifiedOrder $order 订单信息
      * @param string $platType 平台类型 shop：公众号 open：第三方平台
      * @return array
      */
@@ -132,7 +149,7 @@ final class WxUtilShop extends WxUtilBase {
 
     /**
      * 发起扫码支付
-     * @param \Wx\UnifiedOrder $order 订单信息
+     * @param \Wx\Shop\UnifiedOrder $order 订单信息
      * @return array
      */
     public static function applyNativePay(UnifiedOrder $order) : array {
@@ -163,7 +180,7 @@ final class WxUtilShop extends WxUtilBase {
 
     /**
      * 发起扫码支付模式一的预支付请求
-     * @param \Wx\PayNativePre $prePay 预支付信息
+     * @param \Wx\Shop\PayNativePre $prePay 预支付信息
      * @return string
      */
     public static function applyPreNativePay(PayNativePre $prePay) : string {
@@ -198,7 +215,7 @@ final class WxUtilShop extends WxUtilBase {
 
     /**
      * 发起企业付款
-     * @param \Wx\PayCompany $companyPay 企业付款对象
+     * @param \Wx\Shop\PayCompany $companyPay 企业付款对象
      * @return array
      */
     public static function applyCompanyPay(PayCompany $companyPay) : array {
@@ -243,7 +260,7 @@ final class WxUtilShop extends WxUtilBase {
 
     /**
      * 发起企业付款查询
-     * @param \Wx\PayCompanyQuery $query 企业付款查询对象
+     * @param \Wx\Shop\PayCompanyQuery $query 企业付款查询对象
      * @return array
      */
     public static function applyCompanyPayQuery(PayCompanyQuery $query) : array {
@@ -444,7 +461,7 @@ final class WxUtilShop extends WxUtilBase {
 
     /**
      * 查询订单详情
-     * @param \Wx\OrderQuery $query 查询对象
+     * @param \Wx\Shop\OrderQuery $query 查询对象
      * @return array
      */
     public static function queryOrder(OrderQuery $query) : array {
@@ -471,7 +488,7 @@ final class WxUtilShop extends WxUtilBase {
 
     /**
      * 查询退款详情
-     * @param \Wx\RefundQuery $query 查询对象
+     * @param \Wx\Shop\RefundQuery $query 查询对象
      * @return array
      */
     public static function queryRefund(RefundQuery $query) : array {
@@ -498,7 +515,7 @@ final class WxUtilShop extends WxUtilBase {
 
     /**
      * 申请订单退款
-     * @param \Wx\OrderRefund $refund 退款对象
+     * @param \Wx\Shop\OrderRefund $refund 退款对象
      * @return array
      */
     public static function applyOrderRefund(OrderRefund $refund) : array {
@@ -538,7 +555,7 @@ final class WxUtilShop extends WxUtilBase {
 
     /**
      * 下载对账单
-     * @param \Wx\OrderBill $bill 对账单对象
+     * @param \Wx\Shop\OrderBill $bill 对账单对象
      * @return array
      */
     public static function downloadBill(OrderBill $bill) : array {
@@ -566,7 +583,7 @@ final class WxUtilShop extends WxUtilBase {
 
     /**
      * 关闭订单
-     * @param \Wx\OrderClose $close
+     * @param \Wx\Shop\OrderClose $close
      * @return array
      */
     public static function closeOrder(OrderClose $close) : array {
@@ -593,7 +610,7 @@ final class WxUtilShop extends WxUtilBase {
 
     /**
      * 发起刷卡支付
-     * @param \Wx\PayMicro $pay
+     * @param \Wx\Shop\PayMicro $pay
      * @return array
      */
     public static function applyMicroPay(PayMicro $pay) : array {
@@ -772,7 +789,7 @@ final class WxUtilShop extends WxUtilBase {
 
     /**
      * 发送模版消息
-     * @param \Wx\TemplateMsg $msg
+     * @param \Wx\Shop\TemplateMsg $msg
      * @param string $appId
      * @return array
      */
@@ -797,7 +814,7 @@ final class WxUtilShop extends WxUtilBase {
 
     /**
      * 获取单个用户信息详情
-     * @param \Wx\UserInfo $userInfo
+     * @param \Wx\Shop\UserInfo $userInfo
      * @param string $appId
      * @return array
      */

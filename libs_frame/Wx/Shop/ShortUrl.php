@@ -5,12 +5,13 @@
  * Date: 17-4-2
  * Time: 上午11:00
  */
-namespace Wx;
+namespace Wx\Shop;
 
 use Constant\ErrorCode;
 use DesignPatterns\Singletons\WxConfigSingleton;
 use Exception\Wx\WxException;
 use Tool\Tool;
+use Wx\WxUtilShop;
 
 class ShortUrl {
     public function __construct(string $appId) {

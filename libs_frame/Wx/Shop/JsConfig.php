@@ -5,10 +5,12 @@
  * Date: 17-4-1
  * Time: 上午7:39
  */
-namespace Wx;
+namespace Wx\Shop;
 
 use DesignPatterns\Singletons\WxConfigSingleton;
 use Tool\Tool;
+use Wx\WxUtilOpen;
+use Wx\WxUtilShop;
 
 class JsConfig {
     public function __construct(string $appId) {

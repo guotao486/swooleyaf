@@ -22,8 +22,8 @@ use Request\SyRequest;
 use Tool\SyUser;
 use Tool\Tool;
 use Traits\SimpleDaoTrait;
-use Wx\PayNativePre;
-use Wx\UnifiedOrder;
+use Wx\Shop\PayNativePre;
+use Wx\Shop\UnifiedOrder;
 use Wx\WxUtilShop;
 
 class PayDao {
