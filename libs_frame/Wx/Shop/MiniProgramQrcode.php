@@ -5,7 +5,7 @@
  * Date: 2018/1/26 0026
  * Time: 18:07
  */
-namespace Wx;
+namespace Wx\Shop;
 
 use Constant\ErrorCode;
 use Exception\Wx\WxException;

@@ -5,11 +5,12 @@
  * Date: 2017-04-04
  * Time: 1:17
  */
-namespace Wx;
+namespace Wx\Shop;
 
 use Constant\ErrorCode;
 use DesignPatterns\Singletons\WxConfigSingleton;
 use Exception\Wx\WxException;
+use Wx\WxUtilShop;
 
 class OrderClose {
     public function __construct(string $appId) {

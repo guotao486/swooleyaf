@@ -5,12 +5,13 @@
  * Date: 17-3-31
  * Time: 上午7:42
  */
-namespace Wx;
+namespace Wx\Shop;
 
 use Constant\ErrorCode;
 use DesignPatterns\Singletons\WxConfigSingleton;
 use Exception\Wx\WxException;
 use Tool\Tool;
+use Wx\WxUtilShop;
 
 class UnifiedOrder {
     const TRADE_TYPE_JSAPI = 'JSAPI'; //支付方式-jsapi

@@ -5,12 +5,13 @@
  * Date: 17-4-2
  * Time: 上午10:13
  */
-namespace Wx;
+namespace Wx\Shop;
 
 use Constant\ErrorCode;
 use DesignPatterns\Singletons\WxConfigSingleton;
 use Exception\Wx\WxException;
 use Tool\Tool;
+use Wx\WxUtilShop;
 
 class PayNativePre {
     public function __construct(string $appId) {

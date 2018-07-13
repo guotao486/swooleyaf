@@ -2,26 +2,29 @@
 /**
  * Created by PhpStorm.
  * User: Administrator
- * Date: 2017-04-03
- * Time: 22:34
+ * Date: 2017-04-04
+ * Time: 0:50
  */
-namespace Wx;
+namespace Wx\Shop;
 
 use Constant\ErrorCode;
 use DesignPatterns\Singletons\WxConfigSingleton;
 use Exception\Wx\WxException;
+use Wx\WxUtilShop;
 
-class OrderQuery {
+class OrderBill {
     public function __construct(string $appId) {
         $shopConfig = WxConfigSingleton::getInstance()->getShopConfig($appId);
         $this->appid = $shopConfig->getAppId();
         $this->mch_id = $shopConfig->getPayMchId();
         $this->sign_type = 'MD5';
         $this->nonce_str = WxUtilShop::createNonceStr();
+        $this->tar_type = 'GZIP';
+        $this->bill_type = 'ALL';
     }
 
     /**
-     * 公众账号ID
+     * 公众号ID
      * @var string
      */
     private $appid = '';
@@ -33,16 +36,10 @@ class OrderQuery {
     private $mch_id = '';
 
     /**
-     * 微信订单号
+     * 设备号
      * @var string
      */
-    private $transaction_id = '';
-
-    /**
-     * 商户订单号
-     * @var string
-     */
-    private $out_trade_no = '';
+    private $device_info = '';
 
     /**
      * 随机字符串
@@ -63,26 +60,44 @@ class OrderQuery {
     private $sign_type = '';
 
     /**
-     * @param string $transactionId
+     * 对账单日期
+     * @var string
+     */
+    private $bill_date = '';
+
+    /**
+     * 账单类型
+     * @var string
+     */
+    private $bill_type = '';
+
+    /**
+     * 压缩账单
+     * @var string
+     */
+    private $tar_type = '';
+
+    /**
+     * @param string $billDate
      * @throws \Exception\Wx\WxException
      */
-    public function setTransactionId(string $transactionId) {
-        if (preg_match('/^4[0-9]{27}$/', $transactionId . '') > 0) {
-            $this->transaction_id = $transactionId . '';
+    public function setBillDate(string $billDate) {
+        if (preg_match('/^[0-9]{8}$/', $billDate . '') > 0) {
+            $this->bill_date = $billDate . '';
         } else {
-            throw new WxException('微信订单号不合法', ErrorCode::WX_PARAM_ERROR);
+            throw new WxException('对账单日期不合法', ErrorCode::WX_PARAM_ERROR);
         }
     }
 
     /**
-     * @param string $outTradeNo
+     * @param string $billType
      * @throws \Exception\Wx\WxException
      */
-    public function setOutTradeNo(string $outTradeNo) {
-        if (preg_match('/^[a-zA-Z0-9]{1,32}$/', $outTradeNo . '') > 0) {
-            $this->out_trade_no = $outTradeNo . '';
+    public function setBillType(string $billType) {
+        if (in_array($billType, ['ALL', 'SUCCESS', 'REFUND', 'RECHARGE_REFUND'])) {
+            $this->bill_type = $billType;
         } else {
-            throw new WxException('商户订单号不合法', ErrorCode::WX_PARAM_ERROR);
+            throw new WxException('账单类型不合法', ErrorCode::WX_PARAM_ERROR);
         }
     }
 
@@ -95,12 +110,8 @@ class OrderQuery {
             }
         }
 
-        if (isset($resArr['transaction_id'])) {
-            unset($resArr['out_trade_no']);
-        } else if (isset($resArr['out_trade_no'])) {
-            unset($resArr['transaction_id']);
-        } else {
-            throw new WxException('微信订单号与商户订单号不能同时为空', ErrorCode::WX_PARAM_ERROR);
+        if (!isset($resArr['bill_date'])) {
+            throw new WxException('对账单日期不能为空', ErrorCode::WX_PARAM_ERROR);
         }
 
         $resArr['sign'] = WxUtilShop::createSign($resArr, $this->appid);

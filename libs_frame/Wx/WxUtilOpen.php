@@ -17,6 +17,7 @@ use SyServer\BaseServer;
 use Tool\ProjectTool;
 use Tool\Tool;
 use Traits\SimpleTrait;
+use Wx\Open\MiniCodeUpload;
 
 final class WxUtilOpen extends WxUtilBase {
     use SimpleTrait;
@@ -32,6 +33,17 @@ final class WxUtilOpen extends WxUtilBase {
     private static $urlGetTemplateCodeList = 'https://api.weixin.qq.com/wxa/gettemplatelist?access_token=';
     private static $urlAddTemplateCode = 'https://api.weixin.qq.com/wxa/addtotemplate?access_token=';
     private static $urlDeleteTemplateCode = 'https://api.weixin.qq.com/wxa/deletetemplate?access_token=';
+    private static $urlUploadMiniCode = 'https://api.weixin.qq.com/wxa/commit?access_token=';
+    private static $urlGetMiniPageConfig = 'https://api.weixin.qq.com/wxa/get_page?access_token=';
+    private static $urlAuditMiniCode = 'https://api.weixin.qq.com/wxa/submit_audit?access_token=';
+    private static $urlGetMiniAuditStatus = 'https://api.weixin.qq.com/wxa/get_auditstatus?access_token=';
+    private static $urlReleaseMiniCode = 'https://api.weixin.qq.com/wxa/release?access_token=';
+    private static $urlChangeMiniVisitStatus = 'https://api.weixin.qq.com/wxa/change_visitstatus?access_token=';
+    private static $urlRollbackMiniCode = 'https://api.weixin.qq.com/wxa/revertcoderelease?access_token=';
+    private static $urlUnAuditMiniCode = 'https://api.weixin.qq.com/wxa/undocodeaudit?access_token=';
+    private static $urlGrayReleaseMiniCode = 'https://api.weixin.qq.com/wxa/grayrelease?access_token=';
+    private static $urlRevertGrayReleaseMiniCode = 'https://api.weixin.qq.com/wxa/revertgrayrelease?access_token=';
+    private static $urlGetGrayReleasePlan = 'https://api.weixin.qq.com/wxa/getgrayreleaseplan?access_token=';
 
     /**
      * 更新平台access token
@@ -575,6 +587,34 @@ final class WxUtilOpen extends WxUtilBase {
         } else {
             $resArr['code'] = ErrorCode::WXOPEN_POST_ERROR;
             $resArr['message'] = $delData['errmsg'];
+        }
+
+        return $resArr;
+    }
+
+    /**
+     * 上传小程序代码
+     * @param string $appId 小程序app id
+     * @param \Wx\Open\MiniCodeUpload $codeUpload
+     * @return array
+     */
+    public static function UploadMiniCode(string $appId,MiniCodeUpload $codeUpload){
+        $resArr = [
+            'code' => 0,
+        ];
+
+        $uploadData = $codeUpload->getDetail();
+        $url = self::$urlUploadMiniCode . self::getAuthorizerAccessToken($appId);
+        $uploadRes = self::sendPostReq($url, 'json', $uploadData, [
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYHOST => false,
+        ]);
+        $uploadData = Tool::jsonDecode($uploadRes);
+        if($uploadData['errcode'] == 0){
+            $resArr['data'] = $uploadData;
+        } else {
+            $resArr['code'] = ErrorCode::WXOPEN_POST_ERROR;
+            $resArr['message'] = $uploadData['errmsg'];
         }
 
         return $resArr;

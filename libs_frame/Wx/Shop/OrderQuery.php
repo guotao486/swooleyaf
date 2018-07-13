@@ -3,15 +3,16 @@
  * Created by PhpStorm.
  * User: Administrator
  * Date: 2017-04-03
- * Time: 23:08
+ * Time: 22:34
  */
-namespace Wx;
+namespace Wx\Shop;
 
 use Constant\ErrorCode;
 use DesignPatterns\Singletons\WxConfigSingleton;
 use Exception\Wx\WxException;
+use Wx\WxUtilShop;
 
-class RefundQuery {
+class OrderQuery {
     public function __construct(string $appId) {
         $shopConfig = WxConfigSingleton::getInstance()->getShopConfig($appId);
         $this->appid = $shopConfig->getAppId();
@@ -33,10 +34,16 @@ class RefundQuery {
     private $mch_id = '';
 
     /**
-     * 设备号
+     * 微信订单号
      * @var string
      */
-    private $device_info = '';
+    private $transaction_id = '';
+
+    /**
+     * 商户订单号
+     * @var string
+     */
+    private $out_trade_no = '';
 
     /**
      * 随机字符串
@@ -55,30 +62,6 @@ class RefundQuery {
      * @var string
      */
     private $sign_type = '';
-
-    /**
-     * 微信订单号
-     * @var string
-     */
-    private $transaction_id = '';
-
-    /**
-     * 商户订单号
-     * @var string
-     */
-    private $out_trade_no = '';
-
-    /**
-     * 微信退款单号
-     * @var string
-     */
-    private $refund_id = '';
-
-    /**
-     * 商户退款单号
-     * @var string
-     */
-    private $out_refund_no = '';
 
     /**
      * @param string $transactionId
@@ -104,30 +87,6 @@ class RefundQuery {
         }
     }
 
-    /**
-     * @param string $refundId
-     * @throws \Exception\Wx\WxException
-     */
-    public function setRefundId(string $refundId) {
-        if (preg_match('/^[0-9]{28}$/', $refundId . '') > 0) {
-            $this->refund_id = $refundId . '';
-        } else {
-            throw new WxException('微信退款单号不合法', ErrorCode::WX_PARAM_ERROR);
-        }
-    }
-
-    /**
-     * @param string $outRefundNo
-     * @throws \Exception\Wx\WxException
-     */
-    public function setOutRefundNo(string $outRefundNo) {
-        if (preg_match('/^[a-zA-Z0-9]{1,32}$/', $outRefundNo . '') > 0) {
-            $this->out_refund_no = $outRefundNo . '';
-        } else {
-            throw new WxException('商户退款单号不合法', ErrorCode::WX_PARAM_ERROR);
-        }
-    }
-
     public function getDetail() : array {
         $resArr = [];
         $saveArr = get_object_vars($this);
@@ -138,15 +97,11 @@ class RefundQuery {
         }
 
         if (isset($resArr['transaction_id'])) {
-            unset($resArr['out_trade_no'], $resArr['refund_id'], $resArr['out_refund_no']);
+            unset($resArr['out_trade_no']);
         } else if (isset($resArr['out_trade_no'])) {
-            unset($resArr['transaction_id'], $resArr['refund_id'], $resArr['out_refund_no']);
-        } else if (isset($resArr['refund_id'])) {
-            unset($resArr['transaction_id'], $resArr['out_trade_no'], $resArr['out_refund_no']);
-        } else if (isset($resArr['out_refund_no'])) {
-            unset($resArr['transaction_id'], $resArr['out_trade_no'], $resArr['refund_id']);
+            unset($resArr['transaction_id']);
         } else {
-            throw new WxException('微信订单号,商户订单号,微信退款单号,商户退款单号必须设置其中一个', ErrorCode::WX_PARAM_ERROR);
+            throw new WxException('微信订单号与商户订单号不能同时为空', ErrorCode::WX_PARAM_ERROR);
         }
 
         $resArr['sign'] = WxUtilShop::createSign($resArr, $this->appid);
