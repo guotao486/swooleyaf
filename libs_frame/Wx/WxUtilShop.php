@@ -1045,14 +1045,14 @@ final class WxUtilShop extends WxUtilBase {
     }
 
     /**
-     * 解密小程序用户数据
+     * 解密小程序数据
      * @param string $encryptedData 加密数据
      * @param string $iv 初始向量
      * @param string $sessionKey 会话密钥
      * @param string $appId 小程序应用ID
      * @return array
      */
-    public static function decryptMiniProgramUserData(string $encryptedData,string $iv,string $sessionKey,string $appId) {
+    public static function decryptMiniProgramData(string $encryptedData,string $iv,string $sessionKey,string $appId) {
         $resArr = [
             'code' => 0
         ];
