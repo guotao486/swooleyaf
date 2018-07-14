@@ -69,6 +69,11 @@ class WxConfigOpenCommon {
      */
     private $urlAuthCallback = '';
     /**
+     * 开放平台换绑小程序管理员回跳地址
+     * @var string
+     */
+    private $urlMiniRebindAdmin = '';
+    /**
      * 开放平台小程序服务域名列表
      * @var array
      */
@@ -270,6 +275,25 @@ class WxConfigOpenCommon {
     }
 
     /**
+     * @return string
+     */
+    public function getUrlMiniRebindAdmin() : string {
+        return $this->urlMiniRebindAdmin;
+    }
+
+    /**
+     * @param string $urlMiniRebindAdmin
+     * @throws \Exception\Wx\WxOpenException
+     */
+    public function setUrlMiniRebindAdmin(string $urlMiniRebindAdmin){
+        if(preg_match('/^(http|https)\:\/\/\S+$/', $urlMiniRebindAdmin) > 0){
+            $this->urlMiniRebindAdmin = $urlMiniRebindAdmin;
+        } else {
+            throw new WxOpenException('换绑小程序管理员回跳URL不合法', ErrorCode::WXOPEN_PARAM_ERROR);
+        }
+    }
+
+    /**
      * @return array
      */
     public function getDomainMiniServers() : array {
@@ -310,6 +334,7 @@ class WxConfigOpenCommon {
             'aeskey.before' => $this->aesKeyBefore,
             'url.auth' => $this->urlAuth,
             'url.authcallback' => $this->urlAuthCallback,
+            'url.mini.rebindadmin' => $this->urlMiniRebindAdmin,
             'domain.mini.server' => $this->domainMiniServers,
             'domain.mini.webview' => $this->domainMiniWebViews,
             'expire.component.accesstoken' => $this->expireComponentAccessToken,
