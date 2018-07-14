@@ -33,6 +33,8 @@ final class WxUtilOpen extends WxUtilBase {
     private static $urlGetTemplateCodeList = 'https://api.weixin.qq.com/wxa/gettemplatelist?access_token=';
     private static $urlAddTemplateCode = 'https://api.weixin.qq.com/wxa/addtotemplate?access_token=';
     private static $urlDeleteTemplateCode = 'https://api.weixin.qq.com/wxa/deletetemplate?access_token=';
+    private static $urlModifyMiniServerDomain = 'https://api.weixin.qq.com/wxa/modify_domain?access_token=';
+    private static $urlSetMiniWebViewDomain = 'https://api.weixin.qq.com/wxa/setwebviewdomain?access_token=';
     private static $urlUploadMiniCode = 'https://api.weixin.qq.com/wxa/commit?access_token=';
     private static $urlGetMiniPageConfig = 'https://api.weixin.qq.com/wxa/get_page?access_token=';
     private static $urlAuditMiniCode = 'https://api.weixin.qq.com/wxa/submit_audit?access_token=';
@@ -587,6 +589,112 @@ final class WxUtilOpen extends WxUtilBase {
         } else {
             $resArr['code'] = ErrorCode::WXOPEN_POST_ERROR;
             $resArr['message'] = $delData['errmsg'];
+        }
+
+        return $resArr;
+    }
+
+    /**
+     * 设置小程序服务器域名
+     * @param string $appId 小程序app id
+     * @param string $action 操作类型 add:添加 delete:删除 set:覆盖 get:获取
+     * @param array $domains 域名列表
+     * @return array
+     * @throws \Exception\Wx\WxOpenException
+     */
+    public static function modifyMiniServerDomain(string $appId,string $action,array $domains=[]){
+        $modifyData = [
+            'action' => $action,
+        ];
+
+        $existDomains = WxConfigSingleton::getInstance()->getOpenCommonConfig()->getDomainMiniServers();
+        if(empty($existDomains)){
+            throw new WxOpenException('可用服务域名不能为空', ErrorCode::COMMON_PARAM_ERROR);
+        } else if(!in_array($action, ['add', 'delete', 'set', 'get'])){
+            throw new WxOpenException('操作类型不支持', ErrorCode::COMMON_PARAM_ERROR);
+        } else if(($action != 'get')){
+            if(empty($domains)){
+                throw new WxOpenException('域名不能为空', ErrorCode::COMMON_PARAM_ERROR);
+            }
+
+            $diffDomains = array_diff($domains, $existDomains);
+            if(!empty($diffDomains)){
+                throw new WxOpenException('域名' . implode(',', $diffDomains) . '不合法', ErrorCode::COMMON_PARAM_ERROR);
+            }
+
+            foreach ($domains as $eDomain) {
+                $modifyData['requestdomain'][] = 'https://' . $eDomain;
+                $modifyData['wsrequestdomain'][] = 'wss://' . $eDomain;
+                $modifyData['uploaddomain'][] = 'https://' . $eDomain;
+                $modifyData['downloaddomain'][] = 'https://' . $eDomain;
+            }
+        }
+
+
+        $resArr = [
+            'code' => 0,
+        ];
+
+        $url = self::$urlModifyMiniServerDomain . self::getAuthorizerAccessToken($appId);
+        $modifyRes = self::sendPostReq($url, 'json', $modifyData, [
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYHOST => false,
+        ]);
+        $modifyData = Tool::jsonDecode($modifyRes);
+        if($modifyData['errcode'] == 0){
+            $resArr['data'] = $modifyData;
+        } else {
+            $resArr['code'] = ErrorCode::WXOPEN_POST_ERROR;
+            $resArr['message'] = $modifyData['errmsg'];
+        }
+
+        return $resArr;
+    }
+
+    /**
+     * 设置小程序业务域名
+     * @param string $appId 小程序app id
+     * @param string $action 操作类型 add:添加 delete:删除 set:覆盖 get:获取
+     * @param array $domains 域名列表
+     * @return array
+     * @throws \Exception\Wx\WxOpenException
+     */
+    public static function setMiniWebViewDomain(string $appId,string $action,array $domains=[]){
+        $data = [
+            'action' => $action,
+        ];
+
+        $existDomains = WxConfigSingleton::getInstance()->getOpenCommonConfig()->getDomainMiniServers();
+        if(empty($existDomains)){
+            throw new WxOpenException('可用服务域名不能为空', ErrorCode::COMMON_PARAM_ERROR);
+        } else if(!in_array($action, ['add', 'delete', 'set', 'get'])){
+            throw new WxOpenException('操作类型不支持', ErrorCode::COMMON_PARAM_ERROR);
+        } else if(($action != 'get')){
+            if(empty($domains)){
+                throw new WxOpenException('域名不能为空', ErrorCode::COMMON_PARAM_ERROR);
+            }
+
+            foreach ($domains as $eDomain) {
+                $data['webviewdomain'][] = 'https://' . $eDomain;
+            }
+        }
+
+
+        $resArr = [
+            'code' => 0,
+        ];
+
+        $url = self::$urlSetMiniWebViewDomain . self::getAuthorizerAccessToken($appId);
+        $setRes = self::sendPostReq($url, 'json', $data, [
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYHOST => false,
+        ]);
+        $setData = Tool::jsonDecode($setRes);
+        if($setData['errcode'] == 0){
+            $resArr['data'] = $setData;
+        } else {
+            $resArr['code'] = ErrorCode::WXOPEN_POST_ERROR;
+            $resArr['message'] = $setData['errmsg'];
         }
 
         return $resArr;
