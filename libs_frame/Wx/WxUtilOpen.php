@@ -35,6 +35,7 @@ final class WxUtilOpen extends WxUtilBase {
     private static $urlDeleteTemplateCode = 'https://api.weixin.qq.com/wxa/deletetemplate?access_token=';
     private static $urlModifyMiniServerDomain = 'https://api.weixin.qq.com/wxa/modify_domain?access_token=';
     private static $urlSetMiniWebViewDomain = 'https://api.weixin.qq.com/wxa/setwebviewdomain?access_token=';
+    private static $urlRebindMiniAdmin = 'https://api.weixin.qq.com/cgi-bin/account/componentrebindadmin?access_token=';
     private static $urlUploadMiniCode = 'https://api.weixin.qq.com/wxa/commit?access_token=';
     private static $urlGetMiniPageConfig = 'https://api.weixin.qq.com/wxa/get_page?access_token=';
     private static $urlAuditMiniCode = 'https://api.weixin.qq.com/wxa/submit_audit?access_token=';
@@ -695,6 +696,45 @@ final class WxUtilOpen extends WxUtilBase {
         } else {
             $resArr['code'] = ErrorCode::WXOPEN_POST_ERROR;
             $resArr['message'] = $setData['errmsg'];
+        }
+
+        return $resArr;
+    }
+
+    /**
+     * 获取小程序换绑管理员地址
+     * @param string $appId 小程序app id
+     * @return string
+     */
+    public static function getMiniRebindAdminUrl(string $appId){
+        return 'https://mp.weixin.qq.com/wxopen/componentrebindadmin?appid=' . $appId . '&component_appid='
+               . WxConfigSingleton::getInstance()->getOpenCommonConfig()->getAppId() . '&redirect_uri='
+               . urlencode(WxConfigSingleton::getInstance()->getOpenCommonConfig()->getUrlMiniRebindAdmin());
+    }
+
+    /**
+     * 换绑小程序管理员
+     * @param string $taskId
+     * @return array
+     */
+    public static function rebindMiniAdmin(string $taskId){
+        $resArr = [
+            'code' => 0,
+        ];
+
+        $url = self::$urlRebindMiniAdmin . self::getComponentAccessToken(WxConfigSingleton::getInstance()->getOpenCommonConfig()->getAppId());
+        $rebindRes = self::sendPostReq($url, 'json', [
+            'taskid' => $taskId,
+        ], [
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYHOST => false,
+        ]);
+        $rebindData = Tool::jsonDecode($rebindRes);
+        if($rebindData['errcode'] == 0){
+            $resArr['data'] = $rebindData;
+        } else {
+            $resArr['code'] = ErrorCode::WXOPEN_POST_ERROR;
+            $resArr['message'] = $rebindData['errmsg'];
         }
 
         return $resArr;
