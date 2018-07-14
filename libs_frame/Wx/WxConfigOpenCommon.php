@@ -23,60 +23,61 @@ class WxConfigOpenCommon {
      * @var int
      */
     private $expireComponentAccessToken = 0;
-
     /**
      * 授权者access token超时时间,单位为秒
      * @var int
      */
     private $expireAuthorizerAccessToken = 0;
-
     /**
      * 授权者js ticket超时时间,单位为秒
      * @var int
      */
     private $expireAuthorizerJsTicket = 0;
-
     /**
      * 开放平台微信号
      * @var string
      */
     private $appId = '';
-
     /**
      * 开放平台随机密钥
      * @var string
      */
     private $secret = '';
-
     /**
      * 开放平台消息校验token
      * @var string
      */
     private $token = '';
-
     /**
      * 开放平台旧消息加解密key
      * @var string
      */
     private $aesKeyBefore = '';
-
     /**
      * 开放平台新消息加解密key
      * @var string
      */
     private $aesKeyNow = '';
-
     /**
      * 开放平台授权页面域名
      * @var string
      */
-    private $authUrlDomain = '';
-
+    private $urlAuth = '';
     /**
      * 开放平台授权页面回跳地址
      * @var string
      */
-    private $authUrlCallback = '';
+    private $urlAuthCallback = '';
+    /**
+     * 开放平台小程序服务域名列表
+     * @var array
+     */
+    private $domainMiniServers = [];
+    /**
+     * 开放平台小程序业务域名列表
+     * @var array
+     */
+    private $domainMiniWebViews = [];
 
     /**
      * @return int
@@ -87,7 +88,7 @@ class WxConfigOpenCommon {
 
     /**
      * @param int $expireComponentAccessToken
-     * @throws WxOpenException
+     * @throws \Exception\Wx\WxOpenException
      */
     public function setExpireComponentAccessToken(int $expireComponentAccessToken) {
         if(($expireComponentAccessToken > 0) && ($expireComponentAccessToken <= 7200)){
@@ -106,7 +107,7 @@ class WxConfigOpenCommon {
 
     /**
      * @param int $expireAuthorizerAccessToken
-     * @throws WxOpenException
+     * @throws \Exception\Wx\WxOpenException
      */
     public function setExpireAuthorizerAccessToken(int $expireAuthorizerAccessToken) {
         if(($expireAuthorizerAccessToken > 0) && ($expireAuthorizerAccessToken <= 7200)){
@@ -125,7 +126,7 @@ class WxConfigOpenCommon {
 
     /**
      * @param int $expireAuthorizerJsTicket
-     * @throws WxOpenException
+     * @throws \Exception\Wx\WxOpenException
      */
     public function setExpireAuthorizerJsTicket(int $expireAuthorizerJsTicket) {
         if(($expireAuthorizerJsTicket > 0) && ($expireAuthorizerJsTicket <= 7200)){
@@ -144,7 +145,7 @@ class WxConfigOpenCommon {
 
     /**
      * @param string $appId
-     * @throws WxOpenException
+     * @throws \Exception\Wx\WxOpenException
      */
     public function setAppId(string $appId) {
         if(preg_match('/^[0-9a-z]{18}$/', $appId) > 0){
@@ -163,7 +164,7 @@ class WxConfigOpenCommon {
 
     /**
      * @param string $secret
-     * @throws WxOpenException
+     * @throws \Exception\Wx\WxOpenException
      */
     public function setSecret(string $secret) {
         if(preg_match('/^[0-9a-z]{32}$/', $secret) > 0){
@@ -182,7 +183,7 @@ class WxConfigOpenCommon {
 
     /**
      * @param string $token
-     * @throws WxOpenException
+     * @throws \Exception\Wx\WxOpenException
      */
     public function setToken(string $token) {
         if(preg_match('/^[0-9a-zA-Z]{1,32}$/', $token) > 0){
@@ -201,7 +202,7 @@ class WxConfigOpenCommon {
 
     /**
      * @param string $aesKeyBefore
-     * @throws WxOpenException
+     * @throws \Exception\Wx\WxOpenException
      */
     public function setAesKeyBefore(string $aesKeyBefore) {
         if(preg_match('/^[0-9a-zA-Z]{43}$/', $aesKeyBefore) > 0){
@@ -220,7 +221,7 @@ class WxConfigOpenCommon {
 
     /**
      * @param string $aesKeyNow
-     * @throws WxOpenException
+     * @throws \Exception\Wx\WxOpenException
      */
     public function setAesKeyNow(string $aesKeyNow) {
         if(preg_match('/^[0-9a-zA-Z]{43}$/', $aesKeyNow) > 0){
@@ -233,17 +234,17 @@ class WxConfigOpenCommon {
     /**
      * @return string
      */
-    public function getAuthUrlDomain(): string {
-        return $this->authUrlDomain;
+    public function getUrlAuth() : string {
+        return $this->urlAuth;
     }
 
     /**
-     * @param string $authUrlDomain
-     * @throws WxOpenException
+     * @param string $urlAuth
+     * @throws \Exception\Wx\WxOpenException
      */
-    public function setAuthUrlDomain(string $authUrlDomain) {
-        if(preg_match('/^(http|https)\:\/\/\S+$/', $authUrlDomain) > 0){
-            $this->authUrlDomain = $authUrlDomain;
+    public function setUrlAuth(string $urlAuth) {
+        if(preg_match('/^(http|https)\:\/\/\S+$/', $urlAuth) > 0){
+            $this->urlAuth = $urlAuth;
         } else {
             throw new WxOpenException('授权页面URL不合法', ErrorCode::WXOPEN_PARAM_ERROR);
         }
@@ -252,35 +253,52 @@ class WxConfigOpenCommon {
     /**
      * @return string
      */
-    public function getAuthUrlCallback(): string {
-        return $this->authUrlCallback;
+    public function getUrlAuthCallback() : string {
+        return $this->urlAuthCallback;
     }
 
     /**
-     * @param string $authUrlCallback
-     * @throws WxOpenException
+     * @param string $urlAuthCallback
+     * @throws \Exception\Wx\WxOpenException
      */
-    public function setAuthUrlCallback(string $authUrlCallback) {
-        if(preg_match('/^(http|https)\:\/\/\S+$/', $authUrlCallback) > 0){
-            $this->authUrlCallback = $authUrlCallback;
+    public function setUrlAuthCallback(string $urlAuthCallback){
+        if(preg_match('/^(http|https)\:\/\/\S+$/', $urlAuthCallback) > 0){
+            $this->urlAuthCallback = $urlAuthCallback;
         } else {
             throw new WxOpenException('授权页面回跳URL不合法', ErrorCode::WXOPEN_PARAM_ERROR);
         }
     }
 
+    /**
+     * @return array
+     */
+    public function getDomainMiniServers() : array {
+        return $this->domainMiniServers;
+    }
+
+    /**
+     * @param array $domainMiniServers
+     */
+    public function setDomainMiniServers(array $domainMiniServers){
+        $this->domainMiniServers = $domainMiniServers;
+    }
+
+    /**
+     * @return array
+     */
+    public function getDomainMiniWebViews() : array {
+        return $this->domainMiniWebViews;
+    }
+
+    /**
+     * @param array $domainMiniWebViews
+     */
+    public function setDomainMiniWebViews(array $domainMiniWebViews){
+        $this->domainMiniWebViews = $domainMiniWebViews;
+    }
+
     public function __toString(){
-        return Tool::jsonEncode([
-            'appid' => $this->appId,
-            'token' => $this->token,
-            'secret' => $this->secret,
-            'aeskey.now' => $this->aesKeyNow,
-            'aeskey.before' => $this->aesKeyBefore,
-            'authurl.domain' => $this->authUrlDomain,
-            'authurl.callback' => $this->authUrlCallback,
-            'expire.component.accesstoken' => $this->expireComponentAccessToken,
-            'expire.authorizer.jsticket' => $this->expireAuthorizerJsTicket,
-            'expire.authorizer.accesstoken' => $this->expireAuthorizerAccessToken,
-        ], JSON_UNESCAPED_UNICODE);
+        return Tool::jsonEncode($this->getConfigs(), JSON_UNESCAPED_UNICODE);
     }
 
     public function getConfigs() : array {
@@ -290,8 +308,10 @@ class WxConfigOpenCommon {
             'secret' => $this->secret,
             'aeskey.now' => $this->aesKeyNow,
             'aeskey.before' => $this->aesKeyBefore,
-            'authurl.domain' => $this->authUrlDomain,
-            'authurl.callback' => $this->authUrlCallback,
+            'url.auth' => $this->urlAuth,
+            'url.authcallback' => $this->urlAuthCallback,
+            'domain.mini.server' => $this->domainMiniServers,
+            'domain.mini.webview' => $this->domainMiniWebViews,
             'expire.component.accesstoken' => $this->expireComponentAccessToken,
             'expire.authorizer.jsticket' => $this->expireAuthorizerJsTicket,
             'expire.authorizer.accesstoken' => $this->expireAuthorizerAccessToken,
