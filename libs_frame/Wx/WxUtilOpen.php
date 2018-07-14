@@ -431,7 +431,7 @@ final class WxUtilOpen extends WxUtilBase {
         if (isset($resArr['pre_auth_code'])) {
             $authUrl = self::$urlAuthUrl . $openCommonConfig->getAppId()
                 . '&pre_auth_code=' . $resArr['pre_auth_code']
-                . '&redirect_uri=' . urlencode($openCommonConfig->getAuthUrlCallback());
+                . '&redirect_uri=' . urlencode($openCommonConfig->getUrlAuthCallback());
         }
 
         return $authUrl;

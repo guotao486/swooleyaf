@@ -57,8 +57,10 @@ class WxConfigSingleton {
         $openCommonConfig->setToken((string)Tool::getArrayVal($configs, 'open.token', '', true));
         $openCommonConfig->setAesKeyBefore((string)Tool::getArrayVal($configs, 'open.aeskey.before', '', true));
         $openCommonConfig->setAesKeyNow((string)Tool::getArrayVal($configs, 'open.aeskey.now', '', true));
-        $openCommonConfig->setAuthUrlDomain((string)Tool::getArrayVal($configs, 'open.authurl.domain', '', true));
-        $openCommonConfig->setAuthUrlCallback((string)Tool::getArrayVal($configs, 'open.authurl.callback', '', true));
+        $openCommonConfig->setUrlAuth((string)Tool::getArrayVal($configs, 'open.url.auth', '', true));
+        $openCommonConfig->setUrlAuthCallback((string)Tool::getArrayVal($configs, 'open.url.authcallback', '', true));
+        $openCommonConfig->setDomainMiniServers((array)Tool::getArrayVal($configs, 'open.domain.mini.server', [], true));
+        $openCommonConfig->setDomainMiniWebViews((array)Tool::getArrayVal($configs, 'open.domain.mini.webview', [], true));
         $this->openCommonConfig = $openCommonConfig;
     }
 
