@@ -37,6 +37,8 @@ final class WxUtilOpenMini extends WxUtilOpenBase {
     private static $urlGrayReleaseMiniCode = 'https://api.weixin.qq.com/wxa/grayrelease?access_token=';
     private static $urlRevertGrayReleaseMiniCode = 'https://api.weixin.qq.com/wxa/revertgrayrelease?access_token=';
     private static $urlGetMiniCodeReleasePlan = 'https://api.weixin.qq.com/wxa/getgrayreleaseplan?access_token=';
+    private static $urlChangeMiniSearchStatus = 'https://api.weixin.qq.com/wxa/changewxasearchstatus?access_token=';
+    private static $urlGetMiniSearchStatus = 'https://api.weixin.qq.com/wxa/getwxasearchstatus?access_token=';
 
     /**
      * 获取草稿代码列表
@@ -626,6 +628,63 @@ final class WxUtilOpenMini extends WxUtilOpenBase {
         ];
 
         $url = self::$urlGetMiniCodeReleasePlan . self::getAuthorizerAccessToken($appId);
+        $getRes = self::sendGetReq($url);
+        $getData = Tool::jsonDecode($getRes);
+        if($getData['errcode'] == 0){
+            $resArr['data'] = $getData;
+        } else {
+            $resArr['code'] = ErrorCode::WXOPEN_GET_ERROR;
+            $resArr['message'] = $getData['errmsg'];
+        }
+
+        return $resArr;
+    }
+
+    /**
+     * 设置小程序搜索状态
+     * @param string $appId 小程序app id
+     * @param int $searchStatus 搜索状态,0:可搜索 1:不可搜索，
+     * @return array
+     * @throws \Exception\Wx\WxOpenException
+     */
+    public static function changeMiniSearchStatus(string $appId,int $searchStatus){
+        if(!in_array($searchStatus, [0, 1])){
+            throw new WxOpenException('搜索状态不合法', ErrorCode::WXOPEN_PARAM_ERROR);
+        }
+
+        $resArr = [
+            'code' => 0,
+        ];
+
+        $url = self::$urlChangeMiniSearchStatus . self::getAuthorizerAccessToken($appId);
+        $changeRes = self::sendPostReq($url, 'json', [
+            'status' => $searchStatus,
+        ], [
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYHOST => false,
+        ]);
+        $changeData = Tool::jsonDecode($changeRes);
+        if($changeData['errcode'] == 0){
+            $resArr['data'] = $changeData;
+        } else {
+            $resArr['code'] = ErrorCode::WXOPEN_POST_ERROR;
+            $resArr['message'] = $changeData['errmsg'];
+        }
+
+        return $resArr;
+    }
+
+    /**
+     * 获取小程序搜索状态
+     * @param string $appId 小程序app id
+     * @return array
+     */
+    public static function getMiniSearchStatus(string $appId){
+        $resArr = [
+            'code' => 0,
+        ];
+
+        $url = self::$urlGetMiniSearchStatus . self::getAuthorizerAccessToken($appId);
         $getRes = self::sendGetReq($url);
         $getData = Tool::jsonDecode($getRes);
         if($getData['errcode'] == 0){
