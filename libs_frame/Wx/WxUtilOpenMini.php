@@ -39,6 +39,7 @@ final class WxUtilOpenMini extends WxUtilOpenBase {
     private static $urlGetMiniCodeReleasePlan = 'https://api.weixin.qq.com/wxa/getgrayreleaseplan?access_token=';
     private static $urlChangeMiniSearchStatus = 'https://api.weixin.qq.com/wxa/changewxasearchstatus?access_token=';
     private static $urlGetMiniSearchStatus = 'https://api.weixin.qq.com/wxa/getwxasearchstatus?access_token=';
+    private static $urlMiniPlugin = 'https://api.weixin.qq.com/wxa/plugin?access_token=';
 
     /**
      * 获取草稿代码列表
@@ -692,6 +693,94 @@ final class WxUtilOpenMini extends WxUtilOpenBase {
         } else {
             $resArr['code'] = ErrorCode::WXOPEN_GET_ERROR;
             $resArr['message'] = $getData['errmsg'];
+        }
+
+        return $resArr;
+    }
+
+    /**
+     * 添加小程序插件
+     * @param string $appId 小程序app id
+     * @param string $pluginAppId 插件appid
+     * @return array
+     */
+    public static function addMiniPlugin(string $appId,string $pluginAppId){
+        $resArr = [
+            'code' => 0,
+        ];
+
+        $url = self::$urlMiniPlugin . self::getAuthorizerAccessToken($appId);
+        $addRes = self::sendPostReq($url, 'json', [
+            'action' => 'apply',
+            'plugin_appid' => $pluginAppId,
+        ], [
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYHOST => false,
+        ]);
+        $addData = Tool::jsonDecode($addRes);
+        if($addData['errcode'] == 0){
+            $resArr['data'] = $addData;
+        } else {
+            $resArr['code'] = ErrorCode::WXOPEN_POST_ERROR;
+            $resArr['message'] = $addData['errmsg'];
+        }
+
+        return $resArr;
+    }
+
+    /**
+     * 查询小程序的插件列表
+     * @param string $appId 小程序app id
+     * @return array
+     */
+    public static function getMiniPluginList(string $appId){
+        $resArr = [
+            'code' => 0,
+        ];
+
+        $url = self::$urlMiniPlugin . self::getAuthorizerAccessToken($appId);
+        $getRes = self::sendPostReq($url, 'json', [
+            'action' => 'list',
+        ], [
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYHOST => false,
+        ]);
+        $getData = Tool::jsonDecode($getRes);
+        if($getData['errcode'] == 0){
+            $resArr['data'] = $getData;
+        } else {
+            $resArr['code'] = ErrorCode::WXOPEN_POST_ERROR;
+            $resArr['message'] = $getData['errmsg'];
+        }
+
+        return $resArr;
+    }
+
+    /**
+     * 删除小程序的插件
+     * @param string $appId 小程序app id
+     * @param string $pluginAppId 插件appid
+     * @return array
+     */
+    public static function delMiniPlugin(string $appId,string $pluginAppId){
+        $resArr = [
+            'code' => 0,
+        ];
+
+        $url = self::$urlMiniPlugin . self::getAuthorizerAccessToken($appId);
+        $delRes = self::sendPostReq($url, 'json', [
+            'action' => 'unbind',
+            'plugin_appid' => $pluginAppId,
+        ], [
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYHOST => false,
+        ]);
+        $delData = Tool::jsonDecode($delRes);
+        if($delData['errcode'] == 0){
+            $resArr['data'] = $delData;
+        } else {
+            $resArr['code'] = ErrorCode::WXOPEN_POST_ERROR;
+            $resArr['message'] = $delData['errmsg'];
         }
 
         return $resArr;
