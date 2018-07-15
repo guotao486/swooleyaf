@@ -13,14 +13,15 @@ use Exception\Wx\WxOpenException;
 use Tool\Tool;
 use Traits\SimpleTrait;
 use Wx\Open\MiniCodeUpload;
+use Wx\Open\MiniTemplateMsg;
 
 final class WxUtilOpenMini extends WxUtilOpenBase {
     use SimpleTrait;
 
-    private static $urlGetDraftCodeList = 'https://api.weixin.qq.com/wxa/gettemplatedraftlist?access_token=';
-    private static $urlGetTemplateCodeList = 'https://api.weixin.qq.com/wxa/gettemplatelist?access_token=';
-    private static $urlAddTemplateCode = 'https://api.weixin.qq.com/wxa/addtotemplate?access_token=';
-    private static $urlDeleteTemplateCode = 'https://api.weixin.qq.com/wxa/deletetemplate?access_token=';
+    private static $urlGetMiniDraftCodeList = 'https://api.weixin.qq.com/wxa/gettemplatedraftlist?access_token=';
+    private static $urlGetMiniTemplateCodeList = 'https://api.weixin.qq.com/wxa/gettemplatelist?access_token=';
+    private static $urlAddMiniTemplateCode = 'https://api.weixin.qq.com/wxa/addtotemplate?access_token=';
+    private static $urlDelMiniTemplateCode = 'https://api.weixin.qq.com/wxa/deletetemplate?access_token=';
     private static $urlModifyMiniServerDomain = 'https://api.weixin.qq.com/wxa/modify_domain?access_token=';
     private static $urlSetMiniWebViewDomain = 'https://api.weixin.qq.com/wxa/setwebviewdomain?access_token=';
     private static $urlRebindMiniAdmin = 'https://api.weixin.qq.com/cgi-bin/account/componentrebindadmin?access_token=';
@@ -40,6 +41,9 @@ final class WxUtilOpenMini extends WxUtilOpenBase {
     private static $urlChangeMiniSearchStatus = 'https://api.weixin.qq.com/wxa/changewxasearchstatus?access_token=';
     private static $urlGetMiniSearchStatus = 'https://api.weixin.qq.com/wxa/getwxasearchstatus?access_token=';
     private static $urlMiniPlugin = 'https://api.weixin.qq.com/wxa/plugin?access_token=';
+    private static $urlGetMiniTemplateMsgList = 'https://api.weixin.qq.com/cgi-bin/wxopen/template/list?access_token=';
+    private static $urlDelMiniTemplateMsg = 'https://api.weixin.qq.com/cgi-bin/wxopen/template/del?access_token=';
+    private static $urlSendMiniTemplateMsg = 'https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=';
 
     /**
      * 获取草稿代码列表
@@ -50,7 +54,7 @@ final class WxUtilOpenMini extends WxUtilOpenBase {
             'code' => 0,
         ];
 
-        $url = self::$urlGetDraftCodeList . self::getComponentAccessToken(WxConfigSingleton::getInstance()->getOpenCommonConfig()->getAppId());
+        $url = self::$urlGetMiniDraftCodeList . self::getComponentAccessToken(WxConfigSingleton::getInstance()->getOpenCommonConfig()->getAppId());
         $getRes = self::sendGetReq($url);
         $getData = Tool::jsonDecode($getRes);
         if($getData['errcode'] == 0){
@@ -72,7 +76,7 @@ final class WxUtilOpenMini extends WxUtilOpenBase {
             'code' => 0,
         ];
 
-        $url = self::$urlGetTemplateCodeList . self::getComponentAccessToken(WxConfigSingleton::getInstance()->getOpenCommonConfig()->getAppId());
+        $url = self::$urlGetMiniTemplateCodeList . self::getComponentAccessToken(WxConfigSingleton::getInstance()->getOpenCommonConfig()->getAppId());
         $getRes = self::sendGetReq($url);
         $getData = Tool::jsonDecode($getRes);
         if($getData['errcode'] == 0){
@@ -95,7 +99,7 @@ final class WxUtilOpenMini extends WxUtilOpenBase {
             'code' => 0,
         ];
 
-        $url = self::$urlAddTemplateCode . self::getComponentAccessToken(WxConfigSingleton::getInstance()->getOpenCommonConfig()->getAppId());
+        $url = self::$urlAddMiniTemplateCode . self::getComponentAccessToken(WxConfigSingleton::getInstance()->getOpenCommonConfig()->getAppId());
         $addRes = self::sendPostReq($url, 'json', [
             'draft_id' => $draftId,
         ], [
@@ -123,7 +127,7 @@ final class WxUtilOpenMini extends WxUtilOpenBase {
             'code' => 0,
         ];
 
-        $url = self::$urlDeleteTemplateCode . self::getComponentAccessToken(WxConfigSingleton::getInstance()->getOpenCommonConfig()->getAppId());
+        $url = self::$urlDelMiniTemplateCode . self::getComponentAccessToken(WxConfigSingleton::getInstance()->getOpenCommonConfig()->getAppId());
         $delRes = self::sendPostReq($url, 'json', [
             'template_id' => $templateId,
         ], [
@@ -781,6 +785,94 @@ final class WxUtilOpenMini extends WxUtilOpenBase {
         } else {
             $resArr['code'] = ErrorCode::WXOPEN_POST_ERROR;
             $resArr['message'] = $delData['errmsg'];
+        }
+
+        return $resArr;
+    }
+
+    /**
+     * 获取小程序的模板消息列表
+     * @param string $appId 小程序app id
+     * @param int $page 页数
+     * @param int $limit 分页限制
+     * @return array
+     */
+    public static function getMiniTemplateMsgList(string $appId,int $page,int $limit){
+        $resArr = [
+            'code' => 0,
+        ];
+
+        $offset = ($page - 1) * $limit;
+        $url = self::$urlGetMiniTemplateMsgList . self::getAuthorizerAccessToken($appId);
+        $getRes = self::sendPostReq($url, 'json', [
+            'offset' => $offset,
+            'count' => $limit,
+        ], [
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYHOST => false,
+        ]);
+        $getData = Tool::jsonDecode($getRes);
+        if($getData['errcode'] == 0){
+            $resArr['data'] = $getData;
+        } else {
+            $resArr['code'] = ErrorCode::WXOPEN_POST_ERROR;
+            $resArr['message'] = $getData['errmsg'];
+        }
+
+        return $resArr;
+    }
+
+    /**
+     * 删除小程序的模板消息
+     * @param string $appId 小程序app id
+     * @param string $templateId 模板ID
+     * @return array
+     */
+    public static function delMiniTemplateMsg(string $appId,string $templateId){
+        $resArr = [
+            'code' => 0,
+        ];
+
+        $url = self::$urlDelMiniTemplateMsg . self::getAuthorizerAccessToken($appId);
+        $delRes = self::sendPostReq($url, 'json', [
+            'template_id' => $templateId,
+        ], [
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYHOST => false,
+        ]);
+        $delData = Tool::jsonDecode($delRes);
+        if($delData['errcode'] == 0){
+            $resArr['data'] = $delData;
+        } else {
+            $resArr['code'] = ErrorCode::WXOPEN_POST_ERROR;
+            $resArr['message'] = $delData['errmsg'];
+        }
+
+        return $resArr;
+    }
+
+    /**
+     * 发送小程序模板消息
+     * @param string $appId 小程序app id
+     * @param \Wx\Open\MiniTemplateMsg $templateMsg
+     * @return array
+     */
+    public static function sendMiniTemplateMsg(string $appId,MiniTemplateMsg $templateMsg){
+        $resArr = [
+            'code' => 0,
+        ];
+
+        $url = self::$urlSendMiniTemplateMsg . self::getAuthorizerAccessToken($appId);
+        $sendRes = self::sendPostReq($url, 'json', $templateMsg->getDetail(), [
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYHOST => false,
+        ]);
+        $sendData = Tool::jsonDecode($sendRes);
+        if($sendData['errcode'] == 0){
+            $resArr['data'] = $sendData;
+        } else {
+            $resArr['code'] = ErrorCode::WXOPEN_POST_ERROR;
+            $resArr['message'] = $sendData['errmsg'];
         }
 
         return $resArr;
