@@ -1,9 +1,9 @@
 <?php
 /**
  * Created by PhpStorm.
- * User: jw
- * Date: 17-4-1
- * Time: 上午10:29
+ * User: 姜伟
+ * Date: 18-7-15
+ * Time: 上午9:36
  */
 namespace Wx;
 
@@ -16,37 +16,14 @@ use Exception\Wx\WxOpenException;
 use SyServer\BaseServer;
 use Tool\ProjectTool;
 use Tool\Tool;
-use Traits\SimpleTrait;
-use Wx\Open\MiniCodeUpload;
 
-final class WxUtilOpen extends WxUtilBase {
-    use SimpleTrait;
-
+abstract class WxUtilOpenBase extends WxUtilBase {
     private static $urlComponentToken = 'https://api.weixin.qq.com/cgi-bin/component/api_component_token';
     private static $urlAuthorizerToken = 'https://api.weixin.qq.com/cgi-bin/component/api_authorizer_token?component_access_token=';
     private static $urlJsTicket = 'https://api.weixin.qq.com/cgi-bin/ticket/getticket?type=jsapi&access_token=';
     private static $urlPreAuthCode = 'https://api.weixin.qq.com/cgi-bin/component/api_create_preauthcode?component_access_token=';
     private static $urlAuthUrl = 'https://mp.weixin.qq.com/cgi-bin/componentloginpage?component_appid=';
     private static $urlAuthorizerAuth = 'https://api.weixin.qq.com/cgi-bin/component/api_query_auth?component_access_token=';
-    private static $urlSendCustom = 'https://api.weixin.qq.com/cgi-bin/message/custom/send?access_token=';
-    private static $urlGetDraftCodeList = 'https://api.weixin.qq.com/wxa/gettemplatedraftlist?access_token=';
-    private static $urlGetTemplateCodeList = 'https://api.weixin.qq.com/wxa/gettemplatelist?access_token=';
-    private static $urlAddTemplateCode = 'https://api.weixin.qq.com/wxa/addtotemplate?access_token=';
-    private static $urlDeleteTemplateCode = 'https://api.weixin.qq.com/wxa/deletetemplate?access_token=';
-    private static $urlModifyMiniServerDomain = 'https://api.weixin.qq.com/wxa/modify_domain?access_token=';
-    private static $urlSetMiniWebViewDomain = 'https://api.weixin.qq.com/wxa/setwebviewdomain?access_token=';
-    private static $urlRebindMiniAdmin = 'https://api.weixin.qq.com/cgi-bin/account/componentrebindadmin?access_token=';
-    private static $urlUploadMiniCode = 'https://api.weixin.qq.com/wxa/commit?access_token=';
-    private static $urlGetMiniPageConfig = 'https://api.weixin.qq.com/wxa/get_page?access_token=';
-    private static $urlAuditMiniCode = 'https://api.weixin.qq.com/wxa/submit_audit?access_token=';
-    private static $urlGetMiniAuditStatus = 'https://api.weixin.qq.com/wxa/get_auditstatus?access_token=';
-    private static $urlReleaseMiniCode = 'https://api.weixin.qq.com/wxa/release?access_token=';
-    private static $urlChangeMiniVisitStatus = 'https://api.weixin.qq.com/wxa/change_visitstatus?access_token=';
-    private static $urlRollbackMiniCode = 'https://api.weixin.qq.com/wxa/revertcoderelease?access_token=';
-    private static $urlUnAuditMiniCode = 'https://api.weixin.qq.com/wxa/undocodeaudit?access_token=';
-    private static $urlGrayReleaseMiniCode = 'https://api.weixin.qq.com/wxa/grayrelease?access_token=';
-    private static $urlRevertGrayReleaseMiniCode = 'https://api.weixin.qq.com/wxa/revertgrayrelease?access_token=';
-    private static $urlGetGrayReleasePlan = 'https://api.weixin.qq.com/wxa/getgrayreleaseplan?access_token=';
 
     /**
      * 更新平台access token
@@ -433,8 +410,8 @@ final class WxUtilOpen extends WxUtilBase {
         $resArr = Tool::jsonDecode($resData);
         if (isset($resArr['pre_auth_code'])) {
             $authUrl = self::$urlAuthUrl . $openCommonConfig->getAppId()
-                . '&pre_auth_code=' . $resArr['pre_auth_code']
-                . '&redirect_uri=' . urlencode($openCommonConfig->getUrlAuthCallback());
+                       . '&pre_auth_code=' . $resArr['pre_auth_code']
+                       . '&redirect_uri=' . urlencode($openCommonConfig->getUrlAuthCallback());
         }
 
         return $authUrl;
@@ -462,307 +439,6 @@ final class WxUtilOpen extends WxUtilBase {
         } else {
             $resArr['code'] = ErrorCode::WXOPEN_POST_ERROR;
             $resArr['message'] = '获取授权信息失败';
-        }
-
-        return $resArr;
-    }
-
-    /**
-     * 发送客服消息
-     * @param array $data 消息数据
-     * @param string $appId 授权公众号app id
-     * @return array
-     */
-    public static function sendCustomMsg(array $data,string $appId) : array {
-        $resArr = [
-            'code' => 0,
-        ];
-
-        $url = self::$urlSendCustom . self::getAuthorizerAccessToken($appId);
-        $sendRes = self::sendPostReq($url, 'json', $data, [
-            CURLOPT_HEADER => [
-                'Expect:',
-            ],
-        ]);
-        $resData = Tool::jsonDecode($sendRes);
-        if ($resData['errcode'] == 0) {
-            $resArr['data'] = $resData;
-        } else {
-            $resArr['code'] = ErrorCode::WXOPEN_POST_ERROR;
-            $resArr['message'] = $resData['errmsg'];
-        }
-
-        return $resArr;
-    }
-
-    /**
-     * 获取草稿代码列表
-     * @return array
-     */
-    public static function getDraftCodeList() : array {
-        $resArr = [
-            'code' => 0,
-        ];
-
-        $url = self::$urlGetDraftCodeList . self::getComponentAccessToken(WxConfigSingleton::getInstance()->getOpenCommonConfig()->getAppId());
-        $getRes = self::sendGetReq($url);
-        $getData = Tool::jsonDecode($getRes);
-        if($getData['errcode'] == 0){
-            $resArr['data'] = $getData;
-        } else {
-            $resArr['code'] = ErrorCode::WXOPEN_GET_ERROR;
-            $resArr['message'] = $getData['errmsg'];
-        }
-
-        return $resArr;
-    }
-
-    /**
-     * 获取模板代码列表
-     * @return array
-     */
-    public static function getTemplateCodeList() : array {
-        $resArr = [
-            'code' => 0,
-        ];
-
-        $url = self::$urlGetTemplateCodeList . self::getComponentAccessToken(WxConfigSingleton::getInstance()->getOpenCommonConfig()->getAppId());
-        $getRes = self::sendGetReq($url);
-        $getData = Tool::jsonDecode($getRes);
-        if($getData['errcode'] == 0){
-            $resArr['data'] = $getData;
-        } else {
-            $resArr['code'] = ErrorCode::WXOPEN_GET_ERROR;
-            $resArr['message'] = $getData['errmsg'];
-        }
-
-        return $resArr;
-    }
-
-    /**
-     * 添加模板代码
-     * @param string $draftId 草稿ID
-     * @return array
-     */
-    public static function addTemplateCode(string $draftId) : array {
-        $resArr = [
-            'code' => 0,
-        ];
-
-        $url = self::$urlAddTemplateCode . self::getComponentAccessToken(WxConfigSingleton::getInstance()->getOpenCommonConfig()->getAppId());
-        $addRes = self::sendPostReq($url, 'json', [
-            'draft_id' => $draftId,
-        ], [
-            CURLOPT_SSL_VERIFYPEER => false,
-            CURLOPT_SSL_VERIFYHOST => false,
-        ]);
-        $addData = Tool::jsonDecode($addRes);
-        if($addData['errcode'] == 0){
-            $resArr['data'] = $addData;
-        } else {
-            $resArr['code'] = ErrorCode::WXOPEN_POST_ERROR;
-            $resArr['message'] = $addData['errmsg'];
-        }
-
-        return $resArr;
-    }
-
-    /**
-     * 删除模板代码
-     * @param string $templateId 模板ID
-     * @return array
-     */
-    public static function deleteTemplateCode(string $templateId) : array {
-        $resArr = [
-            'code' => 0,
-        ];
-
-        $url = self::$urlDeleteTemplateCode . self::getComponentAccessToken(WxConfigSingleton::getInstance()->getOpenCommonConfig()->getAppId());
-        $delRes = self::sendPostReq($url, 'json', [
-            'template_id' => $templateId,
-        ], [
-            CURLOPT_SSL_VERIFYPEER => false,
-            CURLOPT_SSL_VERIFYHOST => false,
-        ]);
-        $delData = Tool::jsonDecode($delRes);
-        if($delData['errcode'] == 0){
-            $resArr['data'] = $delData;
-        } else {
-            $resArr['code'] = ErrorCode::WXOPEN_POST_ERROR;
-            $resArr['message'] = $delData['errmsg'];
-        }
-
-        return $resArr;
-    }
-
-    /**
-     * 设置小程序服务器域名
-     * @param string $appId 小程序app id
-     * @param string $action 操作类型 add:添加 delete:删除 set:覆盖 get:获取
-     * @param array $domains 域名列表
-     * @return array
-     * @throws \Exception\Wx\WxOpenException
-     */
-    public static function modifyMiniServerDomain(string $appId,string $action,array $domains=[]){
-        $modifyData = [
-            'action' => $action,
-        ];
-
-        $existDomains = WxConfigSingleton::getInstance()->getOpenCommonConfig()->getDomainMiniServers();
-        if(empty($existDomains)){
-            throw new WxOpenException('可用服务域名不能为空', ErrorCode::COMMON_PARAM_ERROR);
-        } else if(!in_array($action, ['add', 'delete', 'set', 'get'])){
-            throw new WxOpenException('操作类型不支持', ErrorCode::COMMON_PARAM_ERROR);
-        } else if(($action != 'get')){
-            if(empty($domains)){
-                throw new WxOpenException('域名不能为空', ErrorCode::COMMON_PARAM_ERROR);
-            }
-
-            $diffDomains = array_diff($domains, $existDomains);
-            if(!empty($diffDomains)){
-                throw new WxOpenException('域名' . implode(',', $diffDomains) . '不合法', ErrorCode::COMMON_PARAM_ERROR);
-            }
-
-            foreach ($domains as $eDomain) {
-                $modifyData['requestdomain'][] = 'https://' . $eDomain;
-                $modifyData['wsrequestdomain'][] = 'wss://' . $eDomain;
-                $modifyData['uploaddomain'][] = 'https://' . $eDomain;
-                $modifyData['downloaddomain'][] = 'https://' . $eDomain;
-            }
-        }
-
-
-        $resArr = [
-            'code' => 0,
-        ];
-
-        $url = self::$urlModifyMiniServerDomain . self::getAuthorizerAccessToken($appId);
-        $modifyRes = self::sendPostReq($url, 'json', $modifyData, [
-            CURLOPT_SSL_VERIFYPEER => false,
-            CURLOPT_SSL_VERIFYHOST => false,
-        ]);
-        $modifyData = Tool::jsonDecode($modifyRes);
-        if($modifyData['errcode'] == 0){
-            $resArr['data'] = $modifyData;
-        } else {
-            $resArr['code'] = ErrorCode::WXOPEN_POST_ERROR;
-            $resArr['message'] = $modifyData['errmsg'];
-        }
-
-        return $resArr;
-    }
-
-    /**
-     * 设置小程序业务域名
-     * @param string $appId 小程序app id
-     * @param string $action 操作类型 add:添加 delete:删除 set:覆盖 get:获取
-     * @param array $domains 域名列表
-     * @return array
-     * @throws \Exception\Wx\WxOpenException
-     */
-    public static function setMiniWebViewDomain(string $appId,string $action,array $domains=[]){
-        $data = [
-            'action' => $action,
-        ];
-
-        $existDomains = WxConfigSingleton::getInstance()->getOpenCommonConfig()->getDomainMiniServers();
-        if(empty($existDomains)){
-            throw new WxOpenException('可用服务域名不能为空', ErrorCode::COMMON_PARAM_ERROR);
-        } else if(!in_array($action, ['add', 'delete', 'set', 'get'])){
-            throw new WxOpenException('操作类型不支持', ErrorCode::COMMON_PARAM_ERROR);
-        } else if(($action != 'get')){
-            if(empty($domains)){
-                throw new WxOpenException('域名不能为空', ErrorCode::COMMON_PARAM_ERROR);
-            }
-
-            foreach ($domains as $eDomain) {
-                $data['webviewdomain'][] = 'https://' . $eDomain;
-            }
-        }
-
-
-        $resArr = [
-            'code' => 0,
-        ];
-
-        $url = self::$urlSetMiniWebViewDomain . self::getAuthorizerAccessToken($appId);
-        $setRes = self::sendPostReq($url, 'json', $data, [
-            CURLOPT_SSL_VERIFYPEER => false,
-            CURLOPT_SSL_VERIFYHOST => false,
-        ]);
-        $setData = Tool::jsonDecode($setRes);
-        if($setData['errcode'] == 0){
-            $resArr['data'] = $setData;
-        } else {
-            $resArr['code'] = ErrorCode::WXOPEN_POST_ERROR;
-            $resArr['message'] = $setData['errmsg'];
-        }
-
-        return $resArr;
-    }
-
-    /**
-     * 获取小程序换绑管理员地址
-     * @param string $appId 小程序app id
-     * @return string
-     */
-    public static function getMiniRebindAdminUrl(string $appId){
-        return 'https://mp.weixin.qq.com/wxopen/componentrebindadmin?appid=' . $appId . '&component_appid='
-               . WxConfigSingleton::getInstance()->getOpenCommonConfig()->getAppId() . '&redirect_uri='
-               . urlencode(WxConfigSingleton::getInstance()->getOpenCommonConfig()->getUrlMiniRebindAdmin());
-    }
-
-    /**
-     * 换绑小程序管理员
-     * @param string $taskId
-     * @return array
-     */
-    public static function rebindMiniAdmin(string $taskId){
-        $resArr = [
-            'code' => 0,
-        ];
-
-        $url = self::$urlRebindMiniAdmin . self::getComponentAccessToken(WxConfigSingleton::getInstance()->getOpenCommonConfig()->getAppId());
-        $rebindRes = self::sendPostReq($url, 'json', [
-            'taskid' => $taskId,
-        ], [
-            CURLOPT_SSL_VERIFYPEER => false,
-            CURLOPT_SSL_VERIFYHOST => false,
-        ]);
-        $rebindData = Tool::jsonDecode($rebindRes);
-        if($rebindData['errcode'] == 0){
-            $resArr['data'] = $rebindData;
-        } else {
-            $resArr['code'] = ErrorCode::WXOPEN_POST_ERROR;
-            $resArr['message'] = $rebindData['errmsg'];
-        }
-
-        return $resArr;
-    }
-
-    /**
-     * 上传小程序代码
-     * @param string $appId 小程序app id
-     * @param \Wx\Open\MiniCodeUpload $codeUpload
-     * @return array
-     */
-    public static function UploadMiniCode(string $appId,MiniCodeUpload $codeUpload){
-        $resArr = [
-            'code' => 0,
-        ];
-
-        $uploadData = $codeUpload->getDetail();
-        $url = self::$urlUploadMiniCode . self::getAuthorizerAccessToken($appId);
-        $uploadRes = self::sendPostReq($url, 'json', $uploadData, [
-            CURLOPT_SSL_VERIFYPEER => false,
-            CURLOPT_SSL_VERIFYHOST => false,
-        ]);
-        $uploadData = Tool::jsonDecode($uploadRes);
-        if($uploadData['errcode'] == 0){
-            $resArr['data'] = $uploadData;
-        } else {
-            $resArr['code'] = ErrorCode::WXOPEN_POST_ERROR;
-            $resArr['message'] = $uploadData['errmsg'];
         }
 
         return $resArr;
