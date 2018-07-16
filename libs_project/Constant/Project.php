@@ -23,7 +23,7 @@ final class Project {
     const MODULE_NAME_API = SY_PROJECT . self::MODULE_BASE_API;
 
     //数据常量
-    const DATA_KEY_SESSION_TOKEN = '_sytoken'; //键名-session标识
+    const DATA_KEY_SESSION_TOKEN = 'sytoken'; //键名-session标识
 
     //校验器常量
     const VALIDATOR_STRING_TYPE_REQUIRED = 'string_required'; //字符串类型-必填
