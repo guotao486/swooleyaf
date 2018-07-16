@@ -170,7 +170,6 @@ abstract class BaseServer {
         self::$_syServer->column('storepath_music', \swoole_table::TYPE_STRING, 150);
         self::$_syServer->column('storepath_resources', \swoole_table::TYPE_STRING, 150);
         self::$_syServer->column('storepath_cache', \swoole_table::TYPE_STRING, 150);
-        self::$_syServer->column('cookiedomain_base', \swoole_table::TYPE_STRING, 60);
         self::$_syServer->create();
 
         self::$_syServices = new \swoole_table((int)$this->_configs['server']['cachenum']['modules']);
@@ -438,7 +437,6 @@ abstract class BaseServer {
             'storepath_music' => $config['dir']['store']['music'],
             'storepath_resources' => $config['dir']['store']['resources'],
             'storepath_cache' => $config['dir']['store']['cache'],
-            'cookiedomain_base' => $config['domain']['cookie']['base'],
         ]);
     }
 
