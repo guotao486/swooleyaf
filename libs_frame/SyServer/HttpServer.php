@@ -36,6 +36,11 @@ class HttpServer extends BaseServer {
      */
     protected $_cors = [];
     /**
+     * swoole请求cookie域名数组
+     * @var array
+     */
+    private $_reqCookieDomains = [];
+    /**
      * @var \Tool\SyPack
      */
     private $_messagePack = null;
@@ -85,6 +90,7 @@ class HttpServer extends BaseServer {
         $this->_cors['allow']['methodStr'] = isset($this->_cors['allow']['methods']) ? implode(', ', $this->_cors['allow']['methods']) : '';
         $this->_messagePack = new SyPack();
         $this->_moduleContainer = new ModuleContainer();
+        $this->_reqCookieDomains = Tool::getConfig('project.' . SY_ENV . SY_PROJECT . '.domain.cookie');
 
         $this->checkHttpServer([
             'cachenum_sign' => (int)$this->_configs['server']['cachenum']['sign']
@@ -138,6 +144,8 @@ class HttpServer extends BaseServer {
 
             if(isset($headers['Location'])){
                 $response->status(302);
+            } else if(isset($headers['SyRsp-Status'])){
+                $response->status($headers['SyRsp-Status']);
             }
         } else {
             $response->header('Access-Control-Allow-Origin', '*');
@@ -154,7 +162,7 @@ class HttpServer extends BaseServer {
         if(is_array($cookies)){
             foreach ($cookies as $cookie) {
                 if(is_array($cookie) && isset($cookie['key'])
-                    && (is_string($cookie['key']) || is_numeric($cookie['key']))){
+                   && (is_string($cookie['key']) || is_numeric($cookie['key']))){
                     $cookieName = preg_replace('/[^0-9a-zA-Z\-\_]+/', '', $cookie['key']);
                     $value = Tool::getArrayVal($cookie, 'value', null);
                     $expires = Tool::getArrayVal($cookie, 'expires', 0);
@@ -296,7 +304,7 @@ class HttpServer extends BaseServer {
         if (isset($_SERVER['ACCESS-CONTROL-REQUEST-METHOD'])) { //校验请求方式
             $methodStr = ', ' . strtoupper(trim($_SERVER['ACCESS-CONTROL-REQUEST-METHOD']));
             if (strpos(', ' . $this->_cors['allow']['methodStr'], $methodStr) === false) {
-                return HttpServer::RESPONSE_RESULT_TYPE_FORBIDDEN;
+                return self::RESPONSE_RESULT_TYPE_FORBIDDEN;
             }
         }
 
@@ -305,9 +313,18 @@ class HttpServer extends BaseServer {
             foreach ($controlReqHeaders as $eHeader) {
                 $headerName = trim($eHeader);
                 if ((strlen($headerName) > 0) && !in_array($headerName, $this->_cors['allow']['headers'])) {
-                    return HttpServer::RESPONSE_RESULT_TYPE_FORBIDDEN;
+                    return self::RESPONSE_RESULT_TYPE_FORBIDDEN;
                 }
             }
+        }
+        if(isset($_SERVER['SY-DOMAIN'])){
+            $cookieDomain = trim($_SERVER['SY-DOMAIN']);
+            if(!in_array($cookieDomain, $this->_reqCookieDomains)){
+                return self::RESPONSE_RESULT_TYPE_FORBIDDEN;
+            }
+            $_SERVER['SY-DOMAIN'] = $cookieDomain;
+        } else {
+            $_SERVER['SY-DOMAIN'] = $this->_reqCookieDomains[0];
         }
 
         $reqMethod = strtoupper(Tool::getArrayVal($_SERVER, 'REQUEST_METHOD', 'GET'));
@@ -316,10 +333,10 @@ class HttpServer extends BaseServer {
             $headers['Access-Control-Max-Age'] = $this->_cors['options']['maxage'];
             $headers['Access-Control-Allow-Methods'] = $this->_cors['allow']['headerStr'];
             $headers['Access-Control-Allow-Headers'] = $this->_cors['allow']['methodStr'];
-            return HttpServer::RESPONSE_RESULT_TYPE_ALLOW;
+            return self::RESPONSE_RESULT_TYPE_ALLOW;
         }
 
-        return HttpServer::RESPONSE_RESULT_TYPE_ACCEPT;
+        return self::RESPONSE_RESULT_TYPE_ACCEPT;
     }
 
     /**
@@ -594,6 +611,7 @@ class HttpServer extends BaseServer {
                 $this->setRspHeaders($response, $rspHeaders);
             } else {
                 $rspHeaders['Content-Type'] = 'text/plain; charset=utf-8';
+                $rspHeaders['SyRsp-Status'] = 403;
                 $this->setRspHeaders($response, $rspHeaders);
             }
         } else {
