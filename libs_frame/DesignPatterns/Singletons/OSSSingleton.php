@@ -103,7 +103,7 @@ class OSSSingleton {
      * @throws \Exception\OSS\OSSException
      */
     public function setBucketName(string $bucketName) {
-        if (preg_match('/^[0-9a-zA-Z]{2,50}$/', $bucketName) > 0) {
+        if (strlen($bucketName) > 0) {
             $this->bucketName = $bucketName;
         } else {
             throw new OSSException('bucket名称不合法', ErrorCode::OSS_PARAM_ERROR);
