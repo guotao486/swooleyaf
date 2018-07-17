@@ -296,7 +296,7 @@ final class WxUtilOpenMini extends WxUtilOpenBase {
      * @param \Wx\Open\MiniCodeUpload $codeUpload
      * @return array
      */
-    public static function UploadMiniCode(string $appId,MiniCodeUpload $codeUpload){
+    public static function uploadMiniCode(string $appId,MiniCodeUpload $codeUpload){
         $resArr = [
             'code' => 0,
         ];
