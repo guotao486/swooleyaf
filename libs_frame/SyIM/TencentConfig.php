@@ -11,8 +11,30 @@ use Constant\ErrorCode;
 use Exception\IM\TencentException;
 
 class TencentConfig {
+    /**
+     * 应用id
+     * @var string
+     */
     private $appId = '';
+    /**
+     * 管理员帐号
+     * @var string
+     */
+    private $accountAdmin = '';
+    /**
+     * 账号类型
+     * @var string
+     */
+    private $accountType = '';
+    /**
+     * 私钥文件,全路径
+     * @var string
+     */
     private $privateKey = '';
+    /**
+     * 签名命令文件,全路径
+     * @var string
+     */
     private $commandSign = '';
 
     public function __construct(){
@@ -37,6 +59,43 @@ class TencentConfig {
             $this->appId = $appId;
         } else {
             throw new TencentException('appid不合法', ErrorCode::IM_PARAM_ERROR);
+        }
+    }
+
+    /**
+     * @return string
+     */
+    public function getAccountAdmin() : string {
+        return $this->accountAdmin;
+    }
+
+    /**
+     * @param string $accountAdmin
+     * @throws \Exception\IM\TencentException
+     */
+    public function setAccountAdmin(string $accountAdmin){
+        if(ctype_alnum($accountAdmin)){
+            $this->accountAdmin = $accountAdmin;
+        } else {
+            throw new TencentException('管理员帐号不合法', ErrorCode::IM_PARAM_ERROR);
+        }
+    }
+
+    /**
+     * @return string
+     */
+    public function getAccountType() : string {
+        return $this->accountType;
+    }
+
+    /**
+     * @param string $accountType
+     */
+    public function setAccountType(string $accountType){
+        if(ctype_alnum($accountType)){
+            $this->accountType = $accountType;
+        } else {
+            throw new TencentException('账号类型不合法', ErrorCode::IM_PARAM_ERROR);
         }
     }
 

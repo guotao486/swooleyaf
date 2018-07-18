@@ -28,6 +28,8 @@ class IMConfigSingleton {
         $tencentConfig->setAppId((string)Tool::getArrayVal($configs, 'tencent.app.id', '', true));
         $tencentConfig->setPrivateKey((string)Tool::getArrayVal($configs, 'tencent.private.key', '', true));
         $tencentConfig->setCommandSign((string)Tool::getArrayVal($configs, 'tencent.command.sign', '', true));
+        $tencentConfig->setAccountAdmin((string)Tool::getArrayVal($configs, 'tencent.account.admin', '', true));
+        $tencentConfig->setAccountType((string)Tool::getArrayVal($configs, 'tencent.account.type', '', true));
         $this->tencentConfig = $tencentConfig;
     }
 
