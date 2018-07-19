@@ -67,7 +67,7 @@ class ImageController extends CommonController {
      * @apiDescription 获取前端OSS配置,用于前端直接post文件到oss
      * @apiGroup File
      * @apiParam {string} upload_type 上传类型 video:视频 image:图片
-     * @SyFilter-{"field": "upload_type","explain": "上传类型","type": "int","rules": {"required": 1,"min": 1}}
+     * @SyFilter-{"field": "upload_type","explain": "上传类型","type": "string","rules": {"required": 1,"min": 1}}
      * @apiUse CommonSuccess
      * @apiUse CommonFail
      */
