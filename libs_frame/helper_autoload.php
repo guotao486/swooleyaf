@@ -27,6 +27,11 @@ final class SyFrameLoader {
      * @var bool
      */
     private $fpdfStatus = true;
+    /**
+     * excel未初始化标识 true：未初始化 false：已初始化
+     * @var bool
+     */
+    private $excelStatus = true;
 
     private function __construct() {
         $this->preHandleMap = [
@@ -109,6 +114,12 @@ final class SyFrameLoader {
     }
 
     private function preHandlePhpExcel(string $className) : string {
+        if($this->excelStatus){
+            define('PHPEXCEL_ROOT', SY_FRAME_LIBS_ROOT . 'Excel/');
+
+            $this->excelStatus = false;
+        }
+
         return SY_FRAME_LIBS_ROOT . 'Excel/' . str_replace('_', '/', $className) . '.php';
     }
 

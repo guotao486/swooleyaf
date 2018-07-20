@@ -1,15 +1,4 @@
 <?php
-
-/** PHPExcel root directory */
-if (!defined('PHPEXCEL_ROOT')) {
-    /**
-     * @ignore
-     */
-    define('PHPEXCEL_ROOT', dirname(__FILE__) . '/../../');
-    require(PHPEXCEL_ROOT . 'PHPExcel/Autoloader.php');
-}
-
-
 /** MAX_VALUE */
 define('MAX_VALUE', 1.2e308);
 
@@ -21,7 +10,6 @@ define('MAX_ITERATIONS', 256);
 
 /** PRECISION */
 define('PRECISION', 8.88E-016);
-
 
 /**
  * PHPExcel_Calculation_Functions
