@@ -16,7 +16,7 @@ class TaskController extends CommonController {
      * @apiParam {string} [task_params] 任务参数,json格式
      * @apiParam {string} [task_desc] 任务描述
      * @SyFilter-{"field": "_ignoresign","explain": "签名标识","type": "string","rules": {"min": 0}}
-     * @SyFilter-{"field": "task_title","explain": "商品名称","type": "string","rules": {"min": 1,"required": 1}}
+     * @SyFilter-{"field": "task_title","explain": "任务名称","type": "string","rules": {"min": 1,"required": 1}}
      * @SyFilter-{"field": "persist_type","explain": "持久化类型","type": "int","rules": {"min": 1,"required": 1}}
      * @SyFilter-{"field": "task_url","explain": "任务url地址","type": "string","rules": {"url": 1,"required": 1}}
      * @SyFilter-{"field": "task_time","explain": "任务时间","type": "string","rules": {"min": 1,"required": 1}}
