@@ -1,6 +1,4 @@
 <?php
-require_once __DIR__ . '/helper_autoload.php';
-
 ini_set('display_errors', 'On');
 error_reporting(E_ALL);
 date_default_timezone_set('PRC');
@@ -27,4 +25,6 @@ if(substr($frameLibsDir, -1) == '/'){
 } else {
     define('SY_FRAME_LIBS_ROOT', $frameLibsDir . '/');
 }
+
+require_once SY_FRAME_LIBS_ROOT . 'helper_autoload.php';
 unset($frameLibsDir);
