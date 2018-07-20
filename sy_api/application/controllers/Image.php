@@ -79,7 +79,7 @@ class ImageController extends CommonController {
             $nowTime = \Tool\Tool::getNowTime();
             $expireTime = $nowTime + 1800;
             $maxFileSize = $uploadType == 'image' ? 5242880 : 62914560;
-            $uploadPath = $uploadType . '/' . date('Ymd', $nowTime) . '/';
+            $uploadPath = $uploadType . '/' . date('Ym', $nowTime) . '/';
             $successStatus = '200';
             $signRes = \OSS\OSSTool::signFrontPolicy([
                 'expiration' => gmdate("Y-m-d\TH:i:s.000\Z", $expireTime),
