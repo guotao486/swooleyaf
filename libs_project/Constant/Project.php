@@ -93,7 +93,9 @@ final class Project {
     //消息队列常量
     const MESSAGE_QUEUE_TOPIC_REDIS_ADD_LOG = 'a000'; //redis主题-添加日志
     const MESSAGE_QUEUE_TOPIC_REDIS_REQ_HEALTH_CHECK = 'a001'; //redis主题-请求健康检查
-    const MESSAGE_QUEUE_TOPIC_KAFKA_ADD_MYSQL_LOG = 'b000'; //kafka主题-添加mysql日志
+
+    //kafka常量
+    const KAFKA_TOPIC_TEST = SY_ENV . SY_PROJECT . '0000'; //主题-测试
 
     //时间常量
     const TIME_EXPIRE_LOCAL_USER_CACHE = 300; //超时时间-本地用户缓存,单位为秒

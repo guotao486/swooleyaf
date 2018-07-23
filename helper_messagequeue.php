@@ -1,6 +1,10 @@
 <?php
 require_once __DIR__ . '/helper_load.php';
 
+set_exception_handler('\SyError\ErrorHandler::handleException');
+set_error_handler('\SyError\ErrorHandler::handleError');
+\Log\Log::setPath(SY_LOG_PATH);
+
 /**
  * 消息队列消费
  */
@@ -26,9 +30,27 @@ if($type == 'redis'){
         sleep(1);
     }
 } else if($type == 'kafka'){
-    \MessageQueue\Consumer\KafkaConsumer::getInstance();
+    $consumerContainer = new \MessageQueue\Consumer\KafkaConsumerContainer();
+
     while (true) {
-        \MessageQueue\Consumer\KafkaConsumer::getInstance()->consumeMsg();
+        $message = \DesignPatterns\Singletons\KafkaSingleton::getInstance()->getConsumer()->consume(120000);
+        switch ($message->err) {
+            case RD_KAFKA_RESP_ERR_NO_ERROR:
+                $msgData = \Tool\Tool::jsonDecode($message->payload);
+                $consumer = $consumerContainer->getObj($message->topic_name);
+                if(!is_null($consumer)){
+                    $consumer->handleMessage($msgData);
+                }
+                break;
+            case RD_KAFKA_RESP_ERR__PARTITION_EOF:
+                break;
+            case RD_KAFKA_RESP_ERR__TIMED_OUT:
+                \Log\Log::error('kafka consumer handle time out');
+                break;
+            default:
+                \Log\Log::error($message->errstr(), $message->err);
+                break;
+        }
     }
 } else {
     syMessageQueueHelp();

@@ -102,8 +102,9 @@ class ErrorCode {
     const MONGO_SELECT_ERROR = 103106;
 
     //KAFKA错误,取值范围:103200-103299
-    const KAFKA_PRODUCER_ERROR = 103200;
-    const KAFKA_CONSUMER_ERROR = 103201;
+    const KAFKA_PARAM_ERROR = 103200;
+    const KAFKA_PRODUCER_ERROR = 103201;
+    const KAFKA_CONSUMER_ERROR = 103202;
 
     //Solr错误,取值范围:103300-103399
     const SOLR_PARAM_ERROR = 103300;
@@ -216,6 +217,7 @@ class ErrorCode {
         self::MONGO_DELETE_ERROR => 'Mongo删除数据出错',
         self::MONGO_UPDATE_ERROR => 'Mongo修改数据出错',
         self::MONGO_SELECT_ERROR => 'Mongo查询数据出错',
+        self::KAFKA_PARAM_ERROR => 'KAFKA参数出错',
         self::KAFKA_PRODUCER_ERROR => 'KAFKA生产者出错',
         self::KAFKA_CONSUMER_ERROR => 'KAFKA消费者出错',
         self::SOLR_PARAM_ERROR => 'Solr参数错误',
