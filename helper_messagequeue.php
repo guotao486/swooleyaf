@@ -2,6 +2,7 @@
 require_once __DIR__ . '/helper_load.php';
 
 define('SY_MODULE', SY_PROJECT . 'task');
+define('SY_SERVER_IP', (string)\Tool\Tool::getConfig('syserver.base.server.host'));
 set_exception_handler('\SyError\ErrorHandler::handleException');
 set_error_handler('\SyError\ErrorHandler::handleError');
 \Log\Log::setPath(SY_LOG_PATH);
