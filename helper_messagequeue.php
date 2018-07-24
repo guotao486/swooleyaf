@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/helper_load.php';
 
+define('SY_MODULE', SY_PROJECT . 'task');
 set_exception_handler('\SyError\ErrorHandler::handleException');
 set_error_handler('\SyError\ErrorHandler::handleError');
 \Log\Log::setPath(SY_LOG_PATH);
@@ -39,7 +40,11 @@ if($type == 'redis'){
                 $msgData = \Tool\Tool::jsonDecode($message->payload);
                 $consumer = $consumerContainer->getObj($message->topic_name);
                 if(!is_null($consumer)){
-                    $consumer->handleMessage($msgData);
+                    try {
+                        $consumer->handleMessage($msgData);
+                    } catch (Exception $e) {
+                        \Log\Log::error($e->getMessage(), $e->getCode(), $e->getTraceAsString());
+                    }
                 }
                 break;
             case RD_KAFKA_RESP_ERR__PARTITION_EOF:
