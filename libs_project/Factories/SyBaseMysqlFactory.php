@@ -15,7 +15,11 @@ use Entities\SyBase\LogModuleEntity;
 use Entities\SyBase\PayHistoryEntity;
 use Entities\SyBase\RefundBaseEntity;
 use Entities\SyBase\RefundHistoryEntity;
+use Entities\SyBase\RegionBaseEntity;
 use Entities\SyBase\RegionsEntity;
+use Entities\SyBase\RoleBaseEntity;
+use Entities\SyBase\RolePowerEntity;
+use Entities\SyBase\RoleRelationEntity;
 use Entities\SyBase\SmsRecordEntity;
 use Entities\SyBase\TimedTaskEntity;
 use Entities\SyBase\UserBaseEntity;
@@ -163,5 +167,33 @@ class SyBaseMysqlFactory {
      */
     public static function AlipayConfigEntity(string $dbName=''){
         return new AlipayConfigEntity($dbName);
+    }
+    /**
+     * @param string $dbName 数据库名
+     * @return \Entities\SyBase\RegionBaseEntity
+     */
+    public static function RegionBaseEntity(string $dbName=''){
+        return new RegionBaseEntity($dbName);
+    }
+    /**
+     * @param string $dbName 数据库名
+     * @return \Entities\SyBase\RoleBaseEntity
+     */
+    public static function RoleBaseEntity(string $dbName=''){
+        return new RoleBaseEntity($dbName);
+    }
+    /**
+     * @param string $dbName 数据库名
+     * @return \Entities\SyBase\RolePowerEntity
+     */
+    public static function RolePowerEntity(string $dbName=''){
+        return new RolePowerEntity($dbName);
+    }
+    /**
+     * @param string $dbName 数据库名
+     * @return \Entities\SyBase\RoleRelationEntity
+     */
+    public static function RoleRelationEntity(string $dbName=''){
+        return new RoleRelationEntity($dbName);
     }
 }

@@ -80,6 +80,9 @@ final class Project {
     const REDIS_PREFIX_WX_COMPONENT_ACCOUNT = 'sy002001_'; //前缀-微信开放平台账号
     const REDIS_PREFIX_WX_COMPONENT_AUTHORIZER = 'sy002002_'; //前缀-微信开放平台授权公众号
     const REDIS_PREFIX_WX_NATIVE_PRE = 'sy002003_'; //前缀-微信扫码预支付
+    const REDIS_SEPARATOR_ROLE_POWERS = 'sya01001_'; //前缀-角色权限列表
+    const REDIS_SEPARATOR_ROLE_LIST = 'sya01002_'; //前缀-角色列表
+    const REDIS_SEPARATOR_REGION_LIST = 'sya01003_'; //前缀-地区缓存
 
     //消息队列常量
     const MESSAGE_QUEUE_TOPIC_REDIS_ADD_LOG = 'a000'; //redis主题-添加日志
@@ -134,4 +137,34 @@ final class Project {
     //订单常量
     const ORDER_PAY_TYPE_GOODS = '1000'; //支付类型-商品
     const ORDER_REFUND_TYPE_GOODS = '5000'; //退款类型-商品
+
+    //地区常量
+    public static $totalRegionLevelType = [
+        self::REGION_LEVEL_TYPE_PROVINCE => '省',
+        self::REGION_LEVEL_TYPE_CITY => '市',
+        self::REGION_LEVEL_TYPE_COUNTY => '县',
+    ];
+    const REGION_LEVEL_TYPE_PROVINCE = 1; //地区类型-省
+    const REGION_LEVEL_TYPE_CITY = 2; //地区类型-市
+    const REGION_LEVEL_TYPE_COUNTY = 3; //地区类型-县
+
+    //角色常量
+    public static $totalRoleStatus = [
+        self::ROLE_STATUS_DELETE => '已删除',
+        self::ROLE_STATUS_INVALID => '无效',
+        self::ROLE_STATUS_VALID => '有效',
+    ];
+    const ROLE_STATUS_DELETE = -1; //状态-已删除
+    const ROLE_STATUS_INVALID = 0; //状态-无效
+    const ROLE_STATUS_VALID = 1; //状态-有效
+
+    //角色权限常量
+    public static $totalRolePowerLevel = [
+        self::ROLE_POWER_LEVEL_ONE => '第一级',
+        self::ROLE_POWER_LEVEL_TWO => '第二级',
+        self::ROLE_POWER_LEVEL_THREE => '第三级',
+    ];
+    const ROLE_POWER_LEVEL_ONE = 1; //层级-第一级
+    const ROLE_POWER_LEVEL_TWO = 2; //层级-第二级
+    const ROLE_POWER_LEVEL_THREE = 3; //层级-第三级
 }
