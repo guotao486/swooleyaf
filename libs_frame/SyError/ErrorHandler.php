@@ -41,7 +41,7 @@ class ErrorHandler {
     /**
      * 处理未捕获异常
      */
-    public static function handleException(\Exception $exception) {
+    public static function handleException(\Throwable $exception) {
         $msg = 'sy exception - ' . $exception->getMessage();
         Log::error($msg, $exception->getCode(), $exception->getTraceAsString());
 
