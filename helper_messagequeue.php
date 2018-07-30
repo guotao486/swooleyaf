@@ -22,42 +22,25 @@ function startRedisConsumer() {
 }
 
 $type = \Tool\Tool::getClientOption('-t');
-if($type == 'redis'){
-    $consumer = new \MessageQueue\Consumer\RedisConsumer();
-    pcntl_signal(SIGALRM, 'startRedisConsumer');
+switch ($type) {
+    case 'redis':
+        $consumer = new \MessageQueue\Consumer\RedisConsumer();
+        pcntl_signal(SIGALRM, 'startRedisConsumer');
 
-    while (true) {
-        pcntl_alarm(1);
-        pcntl_signal_dispatch();
-        sleep(1);
-    }
-} else if($type == 'kafka'){
-    $consumerContainer = new \MessageQueue\Consumer\KafkaConsumerContainer();
-
-    while (true) {
-        $message = \DesignPatterns\Singletons\KafkaSingleton::getInstance()->getConsumer()->consume(120000);
-        switch ($message->err) {
-            case RD_KAFKA_RESP_ERR_NO_ERROR:
-                $msgData = \Tool\Tool::jsonDecode($message->payload);
-                $consumer = $consumerContainer->getObj($message->topic_name);
-                if(!is_null($consumer)){
-                    try {
-                        $consumer->handleMessage($msgData);
-                    } catch (Exception $e) {
-                        \Log\Log::error($e->getMessage(), $e->getCode(), $e->getTraceAsString());
-                    }
-                }
-                break;
-            case RD_KAFKA_RESP_ERR__PARTITION_EOF:
-                break;
-            case RD_KAFKA_RESP_ERR__TIMED_OUT:
-                \Log\Log::error('kafka consumer handle time out');
-                break;
-            default:
-                \Log\Log::error($message->errstr(), $message->err);
-                break;
+        while (true) {
+            pcntl_alarm(1);
+            pcntl_signal_dispatch();
+            sleep(1);
         }
-    }
-} else {
-    syMessageQueueHelp();
+        break;
+    case 'kafka':
+        $kafka = new \Helper\MessageQueueKafka();
+
+        while (true) {
+            $message = \DesignPatterns\Singletons\KafkaSingleton::getInstance()->getConsumer()->consume(120000);
+            $kafka->handle($message);
+        }
+        break;
+    default:
+        syMessageQueueHelp();
 }
