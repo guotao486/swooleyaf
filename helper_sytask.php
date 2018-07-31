@@ -8,20 +8,8 @@ $hour = (int)$timeArr[0];
 
 //定时检测数据库连接
 if(in_array($minute, [0, 30])){
-    $syPack = new \Tool\SyPack();
-    $syPack->setCommandAndData(\Tool\SyPack::COMMAND_TYPE_RPC_CLIENT_SEND_API_REQ, [
-        'api_uri' => '/Index/Index/check',
-        'api_params' => [],
-    ]);
-    $checkContent = $syPack->packData();
-
-    foreach ($projects as $eProject) {
-        if($eProject['module_type'] == 'rpc'){
-            foreach ($eProject['listens'] as $eListen) {
-                \Tool\Tool::sendSyRpcReq($eListen['host'], $eListen['port'], $checkContent);
-            }
-        }
-    }
+    $dbCheck = new \Helper\DbCheck();
+    $dbCheck->check($projects);
 }
 
 $container = new \SyTask\SyModuleTaskContainer();
