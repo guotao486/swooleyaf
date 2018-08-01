@@ -11,6 +11,7 @@ use Constant\ErrorCode;
 use DesignPatterns\Singletons\IMConfigSingleton;
 use Exception\IM\TencentException;
 use ProjectCache\IMAccount;
+use SyIM\Tencent\SingleChatMsg;
 use SyIM\Tencent\UserImport;
 use SyIM\Tencent\UserInformation;
 use Tool\Tool;
@@ -37,6 +38,9 @@ class TencentIMTool {
                 break;
             case 'update_user_info':
                 $url .= '/profile/portrait_set';
+                break;
+            case 'send_single_msg':
+                $url .= '/openim/sendmsg';
                 break;
             default:
                 throw new TencentException('请求标识不存在', ErrorCode::IM_PARAM_ERROR);
@@ -198,6 +202,32 @@ class TencentIMTool {
         } else {
             $resArr['code'] = ErrorCode::IM_POST_ERROR;
             $resArr['message'] = strlen($importData['ErrorDisplay']) > 0 ? $importData['ErrorDisplay'] : $importData['ErrorInfo'];
+        }
+
+        return $resArr;
+    }
+
+    /**
+     * 发送单聊消息
+     * @param \SyIM\Tencent\SingleChatMsg $chatMsg
+     * @return array
+     */
+    public static function sendSingleMsg(SingleChatMsg $chatMsg){
+        $resArr = [
+            'code' => 0,
+        ];
+
+        $url = self::getReqUrl('send_single_msg');
+        $sendRes = self::sendPostReq($url, 'json', $chatMsg->getDetail(), [
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYHOST => false,
+        ]);
+        $sendData = Tool::jsonDecode($sendRes);
+        if($sendData['ActionStatus'] == self::IM_RSP_SUCCESS){
+            $resArr['data'] = $sendData;
+        } else {
+            $resArr['code'] = ErrorCode::IM_POST_ERROR;
+            $resArr['message'] = $sendData['ErrorInfo'];
         }
 
         return $resArr;
