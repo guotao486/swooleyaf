@@ -17,8 +17,6 @@ final class RequestSign {
 
     const KEY_SIGN = '_sign';
 
-    private static $secret = 'r2n2uyactaw9tiniyk';
-
     /**
      * 校验签名是否合法
      * @return string
@@ -28,7 +26,7 @@ final class RequestSign {
         $sign = Tool::getArrayVal($_POST, self::KEY_SIGN);
         if(!is_string($sign)){
             throw new SignException('签名值出错', ErrorCode::SIGN_ERROR);
-        } else if (strlen($sign) != 48) {
+        } else if (strlen($sign) <= 16) {
             throw new SignException('签名值出错', ErrorCode::SIGN_ERROR);
         }
 
@@ -73,6 +71,7 @@ final class RequestSign {
             $signNonce = $data['sign_nonce'];
         }
 
-        return $signNonce . $signTime . md5($signNonce . self::$secret . $signTime);
+        $configs = Tool::getConfig('project.' . SY_ENV . SY_PROJECT . '.request.sign');
+        return $signNonce . $signTime . hash($configs['method'], $signNonce . $configs['secret'] . $signTime);
     }
 }
