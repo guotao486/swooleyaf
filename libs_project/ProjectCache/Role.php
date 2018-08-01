@@ -18,10 +18,10 @@ use Traits\SimpleTrait;
 class Role {
     use SimpleTrait;
 
-    private static $roleListKey = Project::REDIS_SEPARATOR_ROLE_LIST . 'roles';
+    private static $roleListKey = Project::REDIS_PREFIX_ROLE_LIST . 'roles';
 
     public static function getRolePowerList(string $roleTag){
-        $redisKey = Project::REDIS_SEPARATOR_ROLE_POWERS . $roleTag;
+        $redisKey = Project::REDIS_PREFIX_ROLE_POWERS . $roleTag;
         $cacheData = CacheSimpleFactory::getRedisInstance()->hGetAll($redisKey);
         if(empty($cacheData)){
             $page = 1;
@@ -140,12 +140,12 @@ class Role {
 
     public static function clearRolePowerList(string $roleTag=''){
         if(strlen($roleTag) > 0){
-            $redisKey = Project::REDIS_SEPARATOR_ROLE_POWERS . $roleTag;
+            $redisKey = Project::REDIS_PREFIX_ROLE_POWERS . $roleTag;
             CacheSimpleFactory::getRedisInstance()->del($redisKey);
         } else {
             $roles = CacheSimpleFactory::getRedisInstance()->sMembers(self::$roleListKey);
             foreach ($roles as $eRoleTag) {
-                $redisKey = Project::REDIS_SEPARATOR_ROLE_POWERS . $eRoleTag;
+                $redisKey = Project::REDIS_PREFIX_ROLE_POWERS . $eRoleTag;
                 CacheSimpleFactory::getRedisInstance()->del($redisKey);
             }
             CacheSimpleFactory::getRedisInstance()->del(self::$roleListKey);

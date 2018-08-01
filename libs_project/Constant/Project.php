@@ -80,9 +80,9 @@ final class Project {
     const REDIS_PREFIX_WX_COMPONENT_ACCOUNT = 'sy002001_'; //前缀-微信开放平台账号
     const REDIS_PREFIX_WX_COMPONENT_AUTHORIZER = 'sy002002_'; //前缀-微信开放平台授权公众号
     const REDIS_PREFIX_WX_NATIVE_PRE = 'sy002003_'; //前缀-微信扫码预支付
-    const REDIS_SEPARATOR_ROLE_POWERS = 'sya01001_'; //前缀-角色权限列表
-    const REDIS_SEPARATOR_ROLE_LIST = 'sya01002_'; //前缀-角色列表
-    const REDIS_SEPARATOR_REGION_LIST = 'sya01003_'; //前缀-地区缓存
+    const REDIS_PREFIX_ROLE_POWERS = 'sya01001_'; //前缀-角色权限列表
+    const REDIS_PREFIX_ROLE_LIST = 'sya01002_'; //前缀-角色列表
+    const REDIS_PREFIX_REGION_LIST = 'sya01003_'; //前缀-地区缓存
 
     //消息队列常量
     const MESSAGE_QUEUE_TOPIC_REDIS_ADD_LOG = 'a000'; //redis主题-添加日志

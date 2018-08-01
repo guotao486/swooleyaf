@@ -18,7 +18,7 @@ use Traits\SimpleTrait;
 class Region {
     use SimpleTrait;
 
-    private static $listKey = Project::REDIS_SEPARATOR_REGION_LIST . 'regions';
+    private static $listKey = Project::REDIS_PREFIX_REGION_LIST . 'regions';
     private static $regionList = [];
     private static $refreshTime = 0;
 
