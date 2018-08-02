@@ -20,48 +20,6 @@ abstract class WxUtilBase {
     ];
 
     /**
-     * 数组转xml
-     * @param array $data
-     * @return string
-     * @throws \Exception\Wx\WxException
-     */
-    public static function arrayToXml(array $data) : string {
-        if (count($data) == 0) {
-            throw new WxException('数组为空', ErrorCode::WXOPEN_PARAM_ERROR);
-        }
-
-        $xml = '<xml>';
-        foreach ($data as $key => $value) {
-            if (is_numeric($value)) {
-                $xml .= '<' . $key . '>' . $value . '</' . $key . '>';
-            } else {
-                $xml .= '<' . $key . '><![CDATA[' . $value . ']]></' . $key . '>';
-            }
-        }
-        $xml .= '</xml>';
-
-        return $xml;
-    }
-
-    /**
-     * xml转数组
-     * @param string $xml
-     * @return array
-     * @throws \Exception\Wx\WxException
-     */
-    public static function xmlToArray(string $xml) : array {
-        if (strlen($xml . '') == 0) {
-            throw new WxException('xml数据异常', ErrorCode::WX_PARAM_ERROR);
-        }
-
-        //禁止引用外部xml实体
-        libxml_disable_entity_loader(true);
-        $element = simplexml_load_string($xml, 'SimpleXMLElement', LIBXML_NOCDATA);
-        $jsonStr = Tool::jsonEncode($element);
-        return Tool::jsonDecode($jsonStr);
-    }
-
-    /**
      * 发送post请求
      * @param string $url 请求地址
      * @param string $dataType 数据类型
@@ -79,7 +37,7 @@ abstract class WxUtilBase {
                 $dataStr = Tool::jsonEncode($data, JSON_UNESCAPED_UNICODE);
                 break;
             case 'xml' :
-                $dataStr = self::arrayToXml($data);
+                $dataStr = Tool::arrayToXml($data);
                 break;
             case 'query' :
                 $dataStr = http_build_query($data);

@@ -368,6 +368,8 @@ abstract class BaseServer {
         set_error_handler('\SyError\ErrorHandler::handleError');
         //设置时区
         date_default_timezone_set('PRC');
+        //禁止引用外部xml实体
+        libxml_disable_entity_loader(true);
         //设置bc数学函数小数点保留位数
         $bcConfigs = Tool::getConfig('project.' . SY_ENV . SY_PROJECT . '.bcmath');
         bcscale($bcConfigs['scale']);

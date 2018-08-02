@@ -110,8 +110,6 @@ class Tool {
             throw new CheckException('xml数据异常', ErrorCode::COMMON_PARAM_ERROR);
         }
 
-        //禁止引用外部xml实体
-        libxml_disable_entity_loader(true);
         $element = simplexml_load_string($xml, 'SimpleXMLElement', LIBXML_NOCDATA);
         $jsonStr = Tool::jsonEncode($element);
         return Tool::jsonDecode($jsonStr);

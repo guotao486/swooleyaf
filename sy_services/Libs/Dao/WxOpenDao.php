@@ -61,7 +61,7 @@ class WxOpenDao {
     }
 
     public static function handleNotifyWx(array $data) {
-        $incomeData = WxUtilOpenBase::xmlToArray($data['wx_xml']);
+        $incomeData = Tool::xmlToArray($data['wx_xml']);
         if (!isset($incomeData['Encrypt'])) {
             return 'fail';
         }
@@ -71,7 +71,7 @@ class WxOpenDao {
 
         $openCommonConfig = WxConfigSingleton::getInstance()->getOpenCommonConfig();
         $decryptRes = WxUtilOpenBase::decryptMsg($incomeData['Encrypt'], $openCommonConfig->getAppId(), $openCommonConfig->getToken(), $data['msg_signature'], $data['nonce'], $data['timestamp']);
-        $msgData = WxUtilOpenBase::xmlToArray($decryptRes['content']);
+        $msgData = Tool::xmlToArray($decryptRes['content']);
         $funcName = Tool::getArrayVal(self::$notifyWxMap, $msgData['InfoType'], null);
         if (!is_null($funcName)) {
             self::$funcName($msgData);
@@ -143,7 +143,7 @@ class WxOpenDao {
     }
 
     public static function handleNotifyAuthorizer(array $data) {
-        $incomeData = WxUtilOpenBase::xmlToArray($data['wx_xml']);
+        $incomeData = Tool::xmlToArray($data['wx_xml']);
         if(!isset($incomeData['Encrypt'])){
             return 'fail';
         }
@@ -153,7 +153,7 @@ class WxOpenDao {
 
         $openCommonConfig = WxConfigSingleton::getInstance()->getOpenCommonConfig();
         $decryptRes = WxUtilOpenBase::decryptMsg($incomeData['Encrypt'], $openCommonConfig->getAppId(), $openCommonConfig->getToken(), $data['msg_signature'], $data['nonce'], $data['timestamp']);
-        $msgData = WxUtilOpenBase::xmlToArray($decryptRes['content']);
+        $msgData = Tool::xmlToArray($decryptRes['content']);
         if(!isset($msgData['MsgType'])){
             return 'fail';
         }
@@ -164,7 +164,7 @@ class WxOpenDao {
         }
 
         $handleRes = self::$funcName($msgData);
-        $replyXml = WxUtilOpenBase::arrayToXml($handleRes);
+        $replyXml = Tool::arrayToXml($handleRes);
         return WxUtilOpenBase::encryptMsg($replyXml, $openCommonConfig->getAppId(), $openCommonConfig->getToken(), $decryptRes['aes_key']);
     }
 }

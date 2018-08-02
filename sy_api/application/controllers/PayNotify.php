@@ -22,7 +22,7 @@ class PayNotifyController extends CommonController {
     public function handleWxPayNotifyAction() {
         $wxMsg = \Tool\Tool::getArrayVal($GLOBALS, 'HTTP_RAW_POST_DATA', '');
         \Log\Log::log('wx pay data:' . $wxMsg);
-        $xmlData = \Wx\WxUtilShop::xmlToArray($wxMsg);
+        $xmlData = \Tool\Tool::xmlToArray($wxMsg);
         if (\Wx\WxUtilShop::checkSign($xmlData, $xmlData['appid'])) {
             $handleRes = \SyModule\SyModuleOrder::getInstance()->sendApiReq('/Index/Pay/handleWxPayNotify', $xmlData);
             $handleData = \Tool\Tool::jsonDecode($handleRes);
@@ -55,7 +55,7 @@ class PayNotifyController extends CommonController {
     public function handleWxPrePayNotifyAction() {
         $wxMsg = \Tool\Tool::getArrayVal($GLOBALS, 'HTTP_RAW_POST_DATA', '');
         \Log\Log::log('wx pre pay data:' . $wxMsg);
-        $xmlData = \Wx\WxUtilShop::xmlToArray($wxMsg);
+        $xmlData = \Tool\Tool::xmlToArray($wxMsg);
         if (\Wx\WxUtilShop::checkSign($xmlData, $xmlData['appid'])) {
             $handleRes = \SyModule\SyModuleOrder::getInstance()->sendApiReq('/Index/Pay/handleWxPrePayNotify', $xmlData);
             $resData = \Tool\Tool::jsonDecode($handleRes);

@@ -105,7 +105,7 @@ class PayController extends CommonController {
         //返回结果
         $resData = $returnObj->getDetail();
         $this->SyResult->setData([
-            'result' => \Wx\WxUtilShop::arrayToXml($resData),
+            'result' => \Tool\Tool::arrayToXml($resData),
         ]);
         unset($returnObj);
 
