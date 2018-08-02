@@ -126,7 +126,7 @@ class Tool {
         $res = openssl_get_privatekey($priKey);
         openssl_sign($data, $sign, $res);
         openssl_free_key($res);
-        //base64编码
+
         return base64_encode($sign);
     }
 
@@ -142,6 +142,7 @@ class Tool {
         $res = openssl_get_publickey($pubKey);
         $result = (boolean)openssl_verify($data, base64_decode($sign), $res);
         openssl_free_key($res);
+
         return $result;
     }
 
@@ -165,6 +166,7 @@ class Tool {
             $result .= $decrypt;
         }
         openssl_free_key($res);
+
         return $result;
     }
 
@@ -186,8 +188,8 @@ class Tool {
      * @return boolean 签名结果
      */
     public static function md5Verify(string $needStr,string $sign,string $key) : bool {
-        $thisSign = md5($needStr . $key);
-        return ($thisSign == $sign) ? true : false;
+        $nowSign = md5($needStr . $key);
+        return $nowSign === $sign;
     }
 
     /**
