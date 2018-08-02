@@ -106,7 +106,7 @@ class Tool {
      * @throws \Exception\Common\CheckException
      */
     public static function xmlToArray(string $xml) {
-        if (strlen($xml . '') == 0) {
+        if (strlen($xml) == 0) {
             throw new CheckException('xml数据异常', ErrorCode::COMMON_PARAM_ERROR);
         }
 
