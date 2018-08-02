@@ -121,9 +121,9 @@ final class WxUtilShop extends WxUtilBase {
 
         //发起统一下单
         $orderDetail = $order->getDetail();
-        $reqXml = self::arrayToXml($orderDetail);
+        $reqXml = Tool::arrayToXml($orderDetail);
         $resXml = self::sendPostReq(self::$urlUnifiedOrder, 'string', $reqXml);
-        $resData = self::xmlToArray($resXml);
+        $resData = Tool::xmlToArray($resXml);
         if($resData['return_code'] == 'FAIL'){
             $resArr['code'] = ErrorCode::WX_PARAM_ERROR;
             $resArr['message'] = $resData['return_msg'];
@@ -159,9 +159,9 @@ final class WxUtilShop extends WxUtilBase {
 
         //发起统一下单
         $orderDetail = $order->getDetail();
-        $reqXml = self::arrayToXml($orderDetail);
+        $reqXml = Tool::arrayToXml($orderDetail);
         $resXml = self::sendPostReq(self::$urlUnifiedOrder, 'string', $reqXml);
-        $resData = self::xmlToArray($resXml);
+        $resData = Tool::xmlToArray($resXml);
         if($resData['return_code'] == 'FAIL'){
             $resArr['code'] = ErrorCode::WX_PARAM_ERROR;
             $resArr['message'] = $resData['return_msg'];
@@ -196,9 +196,9 @@ final class WxUtilShop extends WxUtilBase {
         $shortUrl = new ShortUrl($payDetail['appid']);
         $shortUrl->setLongUrl($codeUrl);
         $urlDetail = $shortUrl->getDetail();
-        $reqXml = self::arrayToXml($urlDetail);
+        $reqXml = Tool::arrayToXml($urlDetail);
         $resXml = self::sendPostReq(self::$urlShorturl, 'string', $reqXml);
-        $resData = self::xmlToArray($resXml);
+        $resData = Tool::xmlToArray($resXml);
         if ($resData['return_code'] == 'FAIL') {
             Log::error($resData['return_msg'], ErrorCode::WX_PARAM_ERROR);
             $url = self::$urlQrCode . urlencode($codeUrl);
@@ -231,7 +231,7 @@ final class WxUtilShop extends WxUtilBase {
         $tmpCert = tmpfile();
         fwrite($tmpCert, $shopConfig->getSslCert());
         $tmpCertData = stream_get_meta_data($tmpCert);
-        $reqXml = self::arrayToXml($companyDetail);
+        $reqXml = Tool::arrayToXml($companyDetail);
         $resXml = self::sendPostReq(self::$urlCompanyPay, 'string', $reqXml, [
             CURLOPT_SSLCERTTYPE => 'PEM',
             CURLOPT_SSLCERT => $tmpCertData['uri'],
@@ -240,7 +240,7 @@ final class WxUtilShop extends WxUtilBase {
         ]);
         fclose($tmpKey);
         fclose($tmpCert);
-        $resData = self::xmlToArray($resXml);
+        $resData = Tool::xmlToArray($resXml);
         if ($resData['return_code'] == 'FAIL') {
             Log::error($resData['return_msg'], ErrorCode::WX_PARAM_ERROR);
 
@@ -276,7 +276,7 @@ final class WxUtilShop extends WxUtilBase {
         $tmpCert = tmpfile();
         fwrite($tmpCert, $shopConfig->getSslCert());
         $tmpCertData = stream_get_meta_data($tmpCert);
-        $reqXml = self::arrayToXml($queryDetail);
+        $reqXml = Tool::arrayToXml($queryDetail);
         $resXml = self::sendPostReq(self::$urlQueryCompanyPay, 'string', $reqXml, [
             CURLOPT_SSLCERTTYPE => 'PEM',
             CURLOPT_SSLCERT => $tmpCertData['uri'],
@@ -285,7 +285,7 @@ final class WxUtilShop extends WxUtilBase {
         ]);
         fclose($tmpKey);
         fclose($tmpCert);
-        $resData = self::xmlToArray($resXml);
+        $resData = Tool::xmlToArray($resXml);
         if ($resData['return_code'] == 'FAIL') {
             Log::error($resData['return_msg'], ErrorCode::WX_PARAM_ERROR);
 
@@ -470,9 +470,9 @@ final class WxUtilShop extends WxUtilBase {
         ];
 
         $queryDetail = $query->getDetail();
-        $reqXml = self::arrayToXml($queryDetail);
+        $reqXml = Tool::arrayToXml($queryDetail);
         $resXml = self::sendPostReq(self::$urlOrderQuery, 'string', $reqXml);
-        $resData = self::xmlToArray($resXml);
+        $resData = Tool::xmlToArray($resXml);
         if ($resData['return_code'] == 'FAIL') {
             $resArr['code'] = ErrorCode::WX_POST_ERROR;
             $resArr['message'] = $resData['return_msg'];
@@ -497,9 +497,9 @@ final class WxUtilShop extends WxUtilBase {
         ];
 
         $queryDetail = $query->getDetail();
-        $reqXml = self::arrayToXml($queryDetail);
+        $reqXml = Tool::arrayToXml($queryDetail);
         $resXml = self::sendPostReq(self::$urlRefundQuery, 'string', $reqXml);
-        $resData = self::xmlToArray($resXml);
+        $resData = Tool::xmlToArray($resXml);
         if ($resData['return_code'] == 'FAIL') {
             $resArr['code'] = ErrorCode::WX_POST_ERROR;
             $resArr['message'] = $resData['return_msg'];
@@ -531,7 +531,7 @@ final class WxUtilShop extends WxUtilBase {
         $tmpCert = tmpfile();
         fwrite($tmpCert, $shopConfig->getSslCert());
         $tmpCertData = stream_get_meta_data($tmpCert);
-        $reqXml = self::arrayToXml($refundDetail);
+        $reqXml = Tool::arrayToXml($refundDetail);
         $resXml = self::sendPostReq(self::$urlOrderRefund, 'string', $reqXml, [
             CURLOPT_SSLCERTTYPE => 'PEM',
             CURLOPT_SSLCERT => $tmpCertData['uri'],
@@ -540,7 +540,7 @@ final class WxUtilShop extends WxUtilBase {
         ]);
         fclose($tmpKey);
         fclose($tmpCert);
-        $resData = self::xmlToArray($resXml);
+        $resData = Tool::xmlToArray($resXml);
         if ($resData['return_code'] == 'FAIL') {
             $resArr['code'] = ErrorCode::WX_POST_ERROR;
             $resArr['message'] = $resData['return_msg'];
@@ -564,10 +564,10 @@ final class WxUtilShop extends WxUtilBase {
         ];
 
         $billDetail = $bill->getDetail();
-        $reqXml = self::arrayToXml($billDetail);
+        $reqXml = Tool::arrayToXml($billDetail);
         $resXml = self::sendPostReq(self::$urlDownloadBill, 'string', $reqXml);
         if (substr($resXml, 0, 5) == '<xml>') {
-            $resData = self::xmlToArray($resXml);
+            $resData = Tool::xmlToArray($resXml);
             $resArr['code'] = ErrorCode::WX_POST_ERROR;
             $resArr['message'] = $resData['return_msg'];
         } else {
@@ -592,9 +592,9 @@ final class WxUtilShop extends WxUtilBase {
         ];
 
         $closeDetail = $close->getDetail();
-        $reqXml = self::arrayToXml($closeDetail);
+        $reqXml = Tool::arrayToXml($closeDetail);
         $resXml = self::sendPostReq(self::$urlOrderClose, 'string', $reqXml);
-        $resData = self::xmlToArray($resXml);
+        $resData = Tool::xmlToArray($resXml);
         if ($resData['return_code'] == 'FAIL') {
             $resArr['code'] = ErrorCode::WX_POST_ERROR;
             $resArr['message'] = $resData['return_msg'];
@@ -619,9 +619,9 @@ final class WxUtilShop extends WxUtilBase {
         ];
 
         $payDetail = $pay->getDetail();
-        $reqXml = self::arrayToXml($payDetail);
+        $reqXml = Tool::arrayToXml($payDetail);
         $resXml = self::sendPostReq(self::$urlMicroPay, 'string', $reqXml);
-        $resData = self::xmlToArray($resXml);
+        $resData = Tool::xmlToArray($resXml);
         if ($resData['return_code'] == 'FAIL') {
             $resArr['code'] = ErrorCode::WX_POST_ERROR;
             $resArr['message'] = $resData['return_msg'];
