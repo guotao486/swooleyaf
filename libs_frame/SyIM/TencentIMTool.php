@@ -141,18 +141,18 @@ class TencentIMTool {
      * @throws \Exception\IM\TencentException
      */
     public static function createSign(string $userTag){
-        $sign = '';
+        $output = [];
         $commandStatus = 0;
         $command = IMConfigSingleton::getInstance()->getTencentConfig()->getCommandSign()
                    . ' ' . escapeshellarg(IMConfigSingleton::getInstance()->getTencentConfig()->getPrivateKey())
                    . ' ' . escapeshellarg(IMConfigSingleton::getInstance()->getTencentConfig()->getAppId())
                    . ' ' . escapeshellarg($userTag);
-        exec($command, $sign, $commandStatus);
+        exec($command, $output, $commandStatus);
         if($commandStatus == -1){
             throw new TencentException('生成即时通讯签名失败', ErrorCode::IM_SIGN_ERROR);
         }
 
-        return $sign;
+        return $output[0];
     }
 
     /**
