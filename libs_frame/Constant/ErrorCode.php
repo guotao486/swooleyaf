@@ -142,7 +142,7 @@ class ErrorCode {
 
     //消息队列错误,取值范围:103900-103999
     const MESSAGE_QUEUE_TOPIC_ERROR = 103900;
-    const MESSAGE_QUEUE_TOPIC_DATA_ERROR = 103900;
+    const MESSAGE_QUEUE_TOPIC_DATA_ERROR = 103901;
 
     //etcd配置错误,取值范围:104000-104099
     const ETCD_PARAM_ERROR = 104000;
@@ -157,6 +157,10 @@ class ErrorCode {
     const IM_POST_ERROR = 104201;
     const IM_GET_ERROR = 104202;
     const IM_SIGN_ERROR = 104203;
+
+    //ffmpeg错误,取值范围:104300-104399
+    const FFMPEG_PARAM_ERROR = 104300;
+    const FFMPEG_EXEC_ERROR = 104301;
 
     protected static $msgArr = [
         self::COMMON_SUCCESS => '成功',
@@ -254,6 +258,8 @@ class ErrorCode {
         self::IM_POST_ERROR => '即时通讯POST请求错误',
         self::IM_GET_ERROR => '即时通讯GET请求错误',
         self::IM_SIGN_ERROR => '即时通讯签名错误',
+        self::FFMPEG_PARAM_ERROR => 'ffmpeg参数错误',
+        self::FFMPEG_EXEC_ERROR => 'ffmpeg处理错误',
     ];
 
     /**
