@@ -154,49 +154,36 @@ final class WxUtilOpenMini extends WxUtilOpenBase {
      * @throws \Exception\Wx\WxOpenException
      */
     public static function modifyMiniServerDomain(string $appId,string $action,array $domains=[]){
-        $modifyData = [
-            'action' => $action,
-        ];
-
-        $existDomains = WxConfigSingleton::getInstance()->getOpenCommonConfig()->getDomainMiniServers();
-        if(empty($existDomains)){
-            throw new WxOpenException('可用服务域名不能为空', ErrorCode::COMMON_PARAM_ERROR);
-        } else if(!in_array($action, ['add', 'delete', 'set', 'get'])){
+        if(!in_array($action, ['add', 'delete', 'set', 'get'])){
             throw new WxOpenException('操作类型不支持', ErrorCode::COMMON_PARAM_ERROR);
-        } else if(($action != 'get')){
+        } else if($action != 'get'){
             if(empty($domains)){
                 throw new WxOpenException('域名不能为空', ErrorCode::COMMON_PARAM_ERROR);
             }
 
-            $diffDomains = array_diff($domains, $existDomains);
-            if(!empty($diffDomains)){
-                throw new WxOpenException('域名' . implode(',', $diffDomains) . '不合法', ErrorCode::COMMON_PARAM_ERROR);
-            }
-
-            foreach ($domains as $eDomain) {
-                $modifyData['requestdomain'][] = 'https://' . $eDomain;
-                $modifyData['wsrequestdomain'][] = 'wss://' . $eDomain;
-                $modifyData['uploaddomain'][] = 'https://' . $eDomain;
-                $modifyData['downloaddomain'][] = 'https://' . $eDomain;
-            }
+            $modifyData = $domains;
+            $modifyData['action'] = $action;
+        } else {
+            $modifyData = [
+                'action' => $action,
+            ];
         }
-
 
         $resArr = [
             'code' => 0,
         ];
 
         $url = self::$urlModifyMiniServerDomain . self::getAuthorizerAccessToken($appId);
-        $modifyRes = self::sendPostReq($url, 'json', $modifyData, [
+        $sendRes = self::sendPostReq($url, 'json', $modifyData, [
             CURLOPT_SSL_VERIFYPEER => false,
             CURLOPT_SSL_VERIFYHOST => false,
         ]);
-        $modifyData = Tool::jsonDecode($modifyRes);
-        if($modifyData['errcode'] == 0){
-            $resArr['data'] = $modifyData;
+        $sendData = Tool::jsonDecode($sendRes);
+        if($sendData['errcode'] == 0){
+            $resArr['data'] = $sendData;
         } else {
             $resArr['code'] = ErrorCode::WXOPEN_POST_ERROR;
-            $resArr['message'] = $modifyData['errmsg'];
+            $resArr['message'] = $sendData['errmsg'];
         }
 
         return $resArr;
@@ -211,25 +198,20 @@ final class WxUtilOpenMini extends WxUtilOpenBase {
      * @throws \Exception\Wx\WxOpenException
      */
     public static function setMiniWebViewDomain(string $appId,string $action,array $domains=[]){
-        $data = [
-            'action' => $action,
-        ];
-
-        $existDomains = WxConfigSingleton::getInstance()->getOpenCommonConfig()->getDomainMiniServers();
-        if(empty($existDomains)){
-            throw new WxOpenException('可用服务域名不能为空', ErrorCode::COMMON_PARAM_ERROR);
-        } else if(!in_array($action, ['add', 'delete', 'set', 'get'])){
+        if(!in_array($action, ['add', 'delete', 'set', 'get'])){
             throw new WxOpenException('操作类型不支持', ErrorCode::COMMON_PARAM_ERROR);
-        } else if(($action != 'get')){
+        } else if($action != 'get'){
             if(empty($domains)){
                 throw new WxOpenException('域名不能为空', ErrorCode::COMMON_PARAM_ERROR);
             }
 
-            foreach ($domains as $eDomain) {
-                $data['webviewdomain'][] = 'https://' . $eDomain;
-            }
+            $data = $domains;
+            $data['action'] = $action;
+        } else {
+            $data = [
+                'action' => $action,
+            ];
         }
-
 
         $resArr = [
             'code' => 0,

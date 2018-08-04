@@ -404,13 +404,13 @@ abstract class WxUtilOpenBase extends WxUtilBase {
         $authUrl = '';
         $openCommonConfig = WxConfigSingleton::getInstance()->getOpenCommonConfig();
         $url = self::$urlPreAuthCode . self::getComponentAccessToken($openCommonConfig->getAppId());
-        $resData = self::sendPostReq($url, 'json', [
+        $sendRes = self::sendPostReq($url, 'json', [
             'component_appid' => $openCommonConfig->getAppId(),
         ]);
-        $resArr = Tool::jsonDecode($resData);
-        if (isset($resArr['pre_auth_code'])) {
+        $sendData = Tool::jsonDecode($sendRes);
+        if (isset($sendData['pre_auth_code'])) {
             $authUrl = self::$urlAuthUrl . $openCommonConfig->getAppId()
-                       . '&pre_auth_code=' . $resArr['pre_auth_code']
+                       . '&pre_auth_code=' . $sendData['pre_auth_code']
                        . '&redirect_uri=' . urlencode($openCommonConfig->getUrlAuthCallback());
         }
 
@@ -438,7 +438,7 @@ abstract class WxUtilOpenBase extends WxUtilBase {
             $resArr['data'] = $getData;
         } else {
             $resArr['code'] = ErrorCode::WXOPEN_POST_ERROR;
-            $resArr['message'] = '获取授权信息失败';
+            $resArr['message'] = '授权失败,请重新授权';
         }
 
         return $resArr;
