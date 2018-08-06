@@ -58,16 +58,12 @@ class BaseBootstarp {
 
         self::$appConfigs = $config->toArray();
         if (isset(self::$appConfigs['application']['modules'])) {
-            $str1 = preg_replace([
-                '/[^0-9a-zA-Z\,]+/',
-                '/\,+/',
-            ], [
-                '',
-                ' ',
-            ], self::$appConfigs['application']['modules']);
-            $str2 = trim($str1);
-            if ($str2 !== '') {
-                self::$acceptModules = explode(' ', ucwords($str2));
+            $moduleArr = explode(',', self::$appConfigs['application']['modules']);
+            foreach ($moduleArr as $eModule) {
+                $eModuleTag = trim($eModule);
+                if(ctype_alnum($eModuleTag)){
+                    self::$acceptModules[$eModuleTag] = 1;
+                }
             }
         }
         if (empty(self::$acceptModules)) {
@@ -77,27 +73,32 @@ class BaseBootstarp {
         Registry::set('config', $config);
 
         //设置默认模块
-        if (isset(self::$appConfigs['application']['dispatcher']['defaultModule']) && (preg_match('/^[0-9a-zA-Z]+$/', self::$appConfigs['application']['dispatcher']['defaultModule']) > 0)) {
-            self::$defaultModule = ucfirst(self::$appConfigs['application']['dispatcher']['defaultModule']);
-        } else {
-            throw new ServerException('默认模块名不存在或不合法', ErrorCode::SWOOLE_SERVER_PARAM_ERROR);
+        if(!isset(self::$appConfigs['application']['dispatcher']['defaultModule'])){
+            throw new ServerException('默认模块名不存在', ErrorCode::SWOOLE_SERVER_PARAM_ERROR);
+        } else if(!ctype_alnum(self::$appConfigs['application']['dispatcher']['defaultModule'])){
+            throw new ServerException('默认模块名不合法', ErrorCode::SWOOLE_SERVER_PARAM_ERROR);
         }
+        self::$defaultModule = ucfirst(self::$appConfigs['application']['dispatcher']['defaultModule']);
+
         //设置默认控制器
-        if (isset(self::$appConfigs['application']['dispatcher']['defaultController']) && (preg_match('/^[0-9a-zA-Z]+$/', self::$appConfigs['application']['dispatcher']['defaultController']) > 0)) {
-            self::$defaultController = ucfirst(self::$appConfigs['application']['dispatcher']['defaultController']);
-        } else {
-            throw new ServerException('默认控制器名不存在或不合法', ErrorCode::SWOOLE_SERVER_PARAM_ERROR);
+        if(!isset(self::$appConfigs['application']['dispatcher']['defaultController'])){
+            throw new ServerException('默认控制器名不存在', ErrorCode::SWOOLE_SERVER_PARAM_ERROR);
+        } else if(!ctype_alnum(self::$appConfigs['application']['dispatcher']['defaultController'])){
+            throw new ServerException('默认控制器名不合法', ErrorCode::SWOOLE_SERVER_PARAM_ERROR);
         }
+        self::$defaultController = ucfirst(self::$appConfigs['application']['dispatcher']['defaultController']);
+
         //设置默认方法
-        if (isset(self::$appConfigs['application']['dispatcher']['defaultAction']) && (preg_match('/^[0-9a-zA-Z\_]+$/', self::$appConfigs['application']['dispatcher']['defaultAction']) > 0)) {
-            self::$defaultAction = lcfirst(self::$appConfigs['application']['dispatcher']['defaultAction']);
-        } else {
-            throw new ServerException('默认方法名不存在或不合法', ErrorCode::SWOOLE_SERVER_PARAM_ERROR);
+        if(!isset(self::$appConfigs['application']['dispatcher']['defaultAction'])){
+            throw new ServerException('默认方法名不存在', ErrorCode::SWOOLE_SERVER_PARAM_ERROR);
+        } else if(!ctype_alnum(self::$appConfigs['application']['dispatcher']['defaultAction'])){
+            throw new ServerException('默认方法名不合法', ErrorCode::SWOOLE_SERVER_PARAM_ERROR);
         }
+        self::$defaultAction = lcfirst(self::$appConfigs['application']['dispatcher']['defaultAction']);
 
         $dispatcher->setDefaultModule(self::$defaultModule)
-            ->setDefaultController(self::$defaultController)
-            ->setDefaultAction(self::$defaultAction);
+                   ->setDefaultController(self::$defaultController)
+                   ->setDefaultAction(self::$defaultAction);
     }
 
     /**

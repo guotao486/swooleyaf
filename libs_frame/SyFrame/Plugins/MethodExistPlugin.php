@@ -15,21 +15,25 @@ use Yaf\Response_Abstract;
 
 class MethodExistPlugin extends Plugin_Abstract {
     /**
-     * 控制器根目录
-     * @var string
-     */
-    private $controllerPath = '';
-    /**
      * 已存在的方法数组
      * @var array
      */
     private $existMethods = [];
 
     public function __construct() {
-        $this->controllerPath = APP_PATH . '/application/controllers/';
     }
 
     private function __clone() {
+    }
+
+    private function getControllerFile(string $moduleName,string $controllerName) : string {
+        if($moduleName == 'Index'){
+            $file = APP_PATH . '/application/controllers/' . $controllerName . '.php';
+        } else {
+            $file = APP_PATH . '/application/modules/' . $moduleName . '/controllers/' . $controllerName . '.php';
+        }
+
+        return $file;
     }
 
     public function routerShutdown(Request_Abstract $request,Response_Abstract $response) {
@@ -38,9 +42,9 @@ class MethodExistPlugin extends Plugin_Abstract {
             throw new ValidatorException('路由格式错误', ErrorCode::COMMON_ROUTE_URI_FORMAT_ERROR);
         }
 
-        $controllerTag = '\\' . strtolower($uriArr[2]);
+        $controllerTag = '\\' . strtolower($uriArr[1] . $uriArr[2]);
         if(!isset($this->existMethods[$controllerTag])){
-            $file = $this->controllerPath . $uriArr[2] . '.php';
+            $file = $this->getControllerFile($uriArr[1], $uriArr[2]);
             if(!file_exists($file)){
                 throw new ValidatorException('控制器不存在', ErrorCode::COMMON_ROUTE_CONTROLLER_NOT_EXIST);
             }
