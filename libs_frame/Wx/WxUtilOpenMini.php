@@ -423,7 +423,7 @@ final class WxUtilOpenMini extends WxUtilOpenBase {
         ];
 
         $url = self::$urlReleaseMiniCode . self::getAuthorizerAccessToken($appId);
-        $releaseRes = self::sendPostReq($url, 'json', [], [
+        $releaseRes = self::sendPostReq($url, 'string', '{}', [
             CURLOPT_SSL_VERIFYPEER => false,
             CURLOPT_SSL_VERIFYHOST => false,
         ]);

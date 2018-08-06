@@ -64,7 +64,7 @@ class BasicRoute extends Request_Abstract implements Route_Interface {
         }
         $uriArr = explode('/', $trueUri);
         $moduleName = $uriArr[1] !== '' ? ucfirst($uriArr[1]) : $this->defaultModule;
-        if(!in_array($moduleName, $this->acceptModules, true)){
+        if(!isset($this->acceptModules[$moduleName])){
             throw new ValidatorException('模块不支持', ErrorCode::COMMON_ROUTE_MODULE_NOT_ACCEPT);
         }
 

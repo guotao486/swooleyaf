@@ -10,7 +10,6 @@ class Bootstrap extends \Yaf\Bootstrap_Abstract {
      * @var bool
      */
     private static $firstTag = true;
-    private static $acceptModules = [];
 
     private function __clone() {
     }
@@ -18,8 +17,6 @@ class Bootstrap extends \Yaf\Bootstrap_Abstract {
     public function _initBoot(\Yaf\Dispatcher $dispatcher) {
         if(self::$firstTag){
             \SyFrame\BaseBootstarp::initBase($dispatcher);
-
-            self::$acceptModules = \SyFrame\BaseBootstarp::getAppConfigs('application.modules', []);
 
             //设置路由
             $dispatcher->getRouter()->addRoute(\Constant\Server::ROUTE_TYPE_BASIC, new \SyFrame\Routes\BasicRoute());
