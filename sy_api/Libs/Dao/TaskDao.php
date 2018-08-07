@@ -68,9 +68,9 @@ class TaskDao {
         Project::TASK_PERSIST_TYPE_CRON => 'addCronTask',
     ];
 
-    private static function getSingleTasks() {
+    private static function getSingleTasks(bool $forceRefresh) {
         $nowTime = Tool::getNowTime();
-        if (($nowTime - self::$singleRefreshTime) >= 180) {
+        if($forceRefresh || (($nowTime - self::$singleRefreshTime) >= 180)){
             $taskBase = new TaskBaseEntity();
             $ormResult1 = $taskBase->getContainer()->getModel()->getOrmDbTable();
             $ormResult1->where('`persist_type`=? AND `status`=? AND `start_time`<=?', [
@@ -95,9 +95,9 @@ class TaskDao {
         return self::$singleTasks;
     }
 
-    private static function getIntervalTasks() {
+    private static function getIntervalTasks(bool $forceRefresh) {
         $nowTime = Tool::getNowTime();
-        if (($nowTime - self::$intervalRefreshTime) >= 300) {
+        if($forceRefresh || (($nowTime - self::$intervalRefreshTime) >= 300)){
             $taskBase = new TaskBaseEntity();
             $ormResult1 = $taskBase->getContainer()->getModel()->getOrmDbTable();
             $ormResult1->where('`persist_type`=? AND `status`=?', [
@@ -121,9 +121,9 @@ class TaskDao {
         return self::$intervalTasks;
     }
 
-    private static function getCronTasks() {
+    private static function getCronTasks(bool $forceRefresh) {
         $nowTime = Tool::getNowTime();
-        if (($nowTime - self::$cronRefreshTime) >= 300) {
+        if($forceRefresh || (($nowTime - self::$cronRefreshTime) >= 300)){
             $taskBase = new TaskBaseEntity();
             $ormResult1 = $taskBase->getContainer()->getModel()->getOrmDbTable();
             $ormResult1->where('`persist_type`=? AND `status`=?', [
@@ -276,7 +276,7 @@ class TaskDao {
         $nowTime = Tool::getNowTime();
         $taskBase = new TaskBaseEntity();
         $taskLog = new TaskLogEntity();
-        $tasks = self::getSingleTasks();
+        $tasks = self::getSingleTasks(false);
         foreach ($tasks as $taskTag => $task) {
             if ($task->getExecTime() <= $nowTime) {
                 $ormResult1 = $taskBase->getContainer()->getModel()->getOrmDbTable();
@@ -305,7 +305,7 @@ class TaskDao {
     public static function handlePersistIntervalTask(array $data) {
         $nowTime = Tool::getNowTime();
         $taskLog = new TaskLogEntity();
-        $tasks = self::getIntervalTasks();
+        $tasks = self::getIntervalTasks(false);
         foreach ($tasks as $taskTag => $task) {
             if (($nowTime % $task->getExecTime()) == 0) {
                 $taskLog->getContainer()->getModel()->insert([
@@ -334,7 +334,7 @@ class TaskDao {
             'week' => (int)$timeData[5],
         ];
         $taskLog = new TaskLogEntity();
-        $tasks = self::getCronTasks();
+        $tasks = self::getCronTasks(false);
         foreach ($tasks as $taskTag => $task) {
             if ($task->getExecTime()->checkTime($timeArr)) {
                 $taskLog->getContainer()->getModel()->insert([
@@ -348,6 +348,20 @@ class TaskDao {
 
         return [
             'msg' => '执行cron任务成功',
+        ];
+    }
+
+    public static function refreshCacheTaskList(array $data){
+        if($data['task_type'] == Project::TASK_PERSIST_TYPE_SINGLE){
+            self::getSingleTasks(true);
+        } else if($data['task_type'] == Project::TASK_PERSIST_TYPE_INTERVAL){
+            self::getIntervalTasks(true);
+        } else if($data['task_type'] == Project::TASK_PERSIST_TYPE_CRON){
+            self::getCronTasks(true);
+        }
+
+        return [
+            'msg' => '刷新成功',
         ];
     }
 }

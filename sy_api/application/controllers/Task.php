@@ -150,4 +150,21 @@ class TaskController extends CommonController {
         $this->SyResult->setData($handleRes);
         $this->sendRsp();
     }
+
+    /**
+     * 刷新缓存任务列表
+     * @api {get} /Index/Task/refreshCacheTaskList 刷新缓存任务列表
+     * @apiDescription 刷新缓存任务列表
+     * @apiGroup Task
+     * @apiParam {number} task_type 任务类型 1:单次任务 2:间隔时间任务 3:cron计划任务
+     * @SyFilter-{"field": "task_type","explain": "任务类型","type": "int","rules": {"required": 1,"min": 1,"min": 3}}
+     */
+    public function refreshCacheTaskListAction() {
+        $needParams = [
+            'task_type' => (int)\Request\SyRequest::getParams('task_type'),
+        ];
+        $getRes = \Dao\TaskDao::refreshCacheTaskList($needParams);
+        $this->SyResult->setData($getRes);
+        $this->sendRsp();
+    }
 }
