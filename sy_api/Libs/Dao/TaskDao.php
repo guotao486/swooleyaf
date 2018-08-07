@@ -334,7 +334,7 @@ class TaskDao {
             'week' => (int)$timeData[5],
         ];
         $taskLog = new TaskLogEntity();
-        $tasks = self::getIntervalTasks();
+        $tasks = self::getCronTasks();
         foreach ($tasks as $taskTag => $task) {
             if ($task->getExecTime()->checkTime($timeArr)) {
                 $taskLog->getContainer()->getModel()->insert([
