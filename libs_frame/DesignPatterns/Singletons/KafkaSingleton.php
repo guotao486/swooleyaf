@@ -33,7 +33,7 @@ class KafkaSingleton {
     private function __construct(){
         $producerConfigs = Tool::getConfig('kafka.' . SY_ENV . SY_PROJECT . 'producer');
         $consumerConfigs = Tool::getConfig('kafka.' . SY_ENV . SY_PROJECT . 'consumer');
-        $brokers = trim(Tool::getArrayVal($consumerConfigs, 'metadata_broker_list', ''));
+        $brokers = trim(Tool::getArrayVal($consumerConfigs, 'metadata.broker.list', '', true));
         if(strlen($brokers) == 0){
             throw new KafkaException('broker不能为空', ErrorCode::KAFKA_CONSUMER_ERROR);
         }
@@ -50,19 +50,19 @@ class KafkaSingleton {
         $this->producer->setLogLevel(LOG_DEBUG);
         $this->producer->addBrokers($brokers);
 
+        //group id不能一直不变,如果一直不变,可能会导致无法消费消息
+        $groupId = SY_ENV . SY_PROJECT . time();
         $kafkaConsumerConf = new KafkaConsumerConfig();
         $kafkaConsumerConf->setEnableAutoCommit((int)Tool::getArrayVal($consumerConfigs, 'enable.auto.commit', 1, true));
         $kafkaConsumerConf->setAutoOffsetReset((string)Tool::getArrayVal($consumerConfigs, 'auto.offset.reset', 'smallest', true));
-        $kafkaConsumerConf->setGroupId((string)Tool::getArrayVal($consumerConfigs, 'group.id', '', true));
+        $kafkaConsumerConf->setGroupId($groupId);
         $kafkaConsumerConf->setMetadataBrokerList((string)Tool::getArrayVal($consumerConfigs, 'metadata.broker.list', '', true));
 
         $topicConf = new TopicConf();
         $topicConf->set('auto.offset.reset', $kafkaConsumerConf->getAutoOffsetReset());
 
-        //group id不能一直不变,如果一直不变,可能会导致无法消费消息
-        $groupId = SY_ENV . SY_PROJECT . time();
         $consumerConf = new Conf();
-        $consumerConf->set('group.id', $groupId);
+        $consumerConf->set('group.id', $kafkaConsumerConf->getGroupId());
         $consumerConf->set('metadata.broker.list', $brokers);
         $consumerConf->setDefaultTopicConf($topicConf);
         $this->consumer = new KafkaConsumer($consumerConf);
@@ -96,8 +96,10 @@ class KafkaSingleton {
      */
     public function sendData(string $topicName,array $data) {
         $topic = $this->producer->newTopic($topicName);
-        $topic->produce(RD_KAFKA_PARTITION_UA, 0, Tool::jsonEncode($data, JSON_UNESCAPED_UNICODE));
-        $this->producer->poll(0);
+        foreach ($data as $eData) {
+            $topic->produce(RD_KAFKA_PARTITION_UA, 0, Tool::jsonEncode($eData, JSON_UNESCAPED_UNICODE));
+            $this->producer->poll(0);
+        }
 
         while ($this->producer->getOutQLen() > 0) {
             $this->producer->poll(50);
