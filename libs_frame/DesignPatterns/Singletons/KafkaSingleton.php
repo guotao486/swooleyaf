@@ -59,8 +59,10 @@ class KafkaSingleton {
         $topicConf = new TopicConf();
         $topicConf->set('auto.offset.reset', $kafkaConsumerConf->getAutoOffsetReset());
 
+        //group id不能一直不变,如果一直不变,可能会导致无法消费消息
+        $groupId = SY_ENV . SY_PROJECT . time();
         $consumerConf = new Conf();
-        $consumerConf->set('group.id', $kafkaConsumerConf->getGroupId());
+        $consumerConf->set('group.id', $groupId);
         $consumerConf->set('metadata.broker.list', $brokers);
         $consumerConf->setDefaultTopicConf($topicConf);
         $this->consumer = new KafkaConsumer($consumerConf);
