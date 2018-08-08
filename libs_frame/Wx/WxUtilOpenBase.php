@@ -13,6 +13,7 @@ use Constant\Server;
 use DesignPatterns\Factories\CacheSimpleFactory;
 use DesignPatterns\Singletons\WxConfigSingleton;
 use Exception\Wx\WxOpenException;
+use Log\Log;
 use SyServer\BaseServer;
 use Tool\ProjectTool;
 use Tool\Tool;
@@ -32,25 +33,26 @@ abstract class WxUtilOpenBase extends WxUtilBase {
      */
     public static function refreshComponentAccessToken(string $verifyTicket){
         $openCommonConfig = WxConfigSingleton::getInstance()->getOpenCommonConfig();
-        $resData = self::sendPostReq(self::$urlComponentToken, 'json', [
+        $sendRes = self::sendPostReq(self::$urlComponentToken, 'json', [
             'component_appid' => $openCommonConfig->getAppId(),
             'component_appsecret' => $openCommonConfig->getSecret(),
             'component_verify_ticket' => $verifyTicket,
         ]);
-        $resArr = Tool::jsonDecode($resData);
-        if (isset($resArr['component_access_token'])) {
-            $expireTime = Tool::getNowTime() + 7000;
+        $sendData = Tool::jsonDecode($sendRes);
+        if (isset($sendData['component_access_token'])) {
+            $wxExpireTime = (int)$sendData['expires_in'];
+            $expireTime = Tool::getNowTime() + $wxExpireTime - 1;
             $redisKey = Project::REDIS_PREFIX_WX_COMPONENT_ACCOUNT . $openCommonConfig->getAppId();
             CacheSimpleFactory::getRedisInstance()->hMset($redisKey, [
-                'access_token' => $resArr['component_access_token'],
+                'access_token' => $sendData['component_access_token'],
                 'expire_time' => $expireTime,
                 'unique_key' => $redisKey,
             ]);
-            CacheSimpleFactory::getRedisInstance()->expire($redisKey, 7100);
+            CacheSimpleFactory::getRedisInstance()->expire($redisKey, $wxExpireTime);
 
             $localKey = Server::CACHE_LOCAL_TAG_PREFIX_WX_COMPONENT_ACCESS_TOKEN . $openCommonConfig->getAppId();
             BaseServer::setProjectCache($localKey, [
-                'value' => $resArr['component_access_token'],
+                'value' => $sendData['component_access_token'],
                 'expire_time' => $expireTime,
             ]);
         } else {
@@ -65,10 +67,11 @@ abstract class WxUtilOpenBase extends WxUtilBase {
      * @throws \Exception\Wx\WxOpenException
      */
     public static function getComponentAccessToken(string $appId) : string {
+        $nowTime = Tool::getNowTime();
         $localKey = Server::CACHE_LOCAL_TAG_PREFIX_WX_COMPONENT_ACCESS_TOKEN . $appId;
-        $accessToken = BaseServer::getProjectCache($localKey, 'value', '');
-        if(strlen($accessToken) > 0){
-            return $accessToken;
+        $cacheData = BaseServer::getProjectCache($localKey, '', []);
+        if(isset($cacheData['expire_time']) && ($cacheData['expire_time'] >= $nowTime)){
+            return $cacheData['value'];
         }
 
         $redisKey = Project::REDIS_PREFIX_WX_COMPONENT_ACCOUNT . $appId;
@@ -412,6 +415,8 @@ abstract class WxUtilOpenBase extends WxUtilBase {
             $authUrl = self::$urlAuthUrl . $openCommonConfig->getAppId()
                        . '&pre_auth_code=' . $sendData['pre_auth_code']
                        . '&redirect_uri=' . urlencode($openCommonConfig->getUrlAuthCallback());
+        } else {
+            Log::error('wxopen get auth url error:' . $sendRes, ErrorCode::WXOPEN_POST_ERROR);
         }
 
         return $authUrl;
