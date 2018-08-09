@@ -42,6 +42,7 @@ class WxOpenDao {
      */
     private static function handleNotifyWxAuthorized(array $data) {
         ProjectTool::handleAppAuthForWxOpen(Project::WX_COMPONENT_AUTHORIZER_OPTION_TYPE_AUTHORIZED, $data);
+        WxUtilOpenBase::getAuthorizerAccessToken($data['AuthorizerAppid']);
     }
 
     /**
