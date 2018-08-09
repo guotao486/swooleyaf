@@ -17,9 +17,9 @@ class PayHistoryEntity extends MysqlEntity {
 
     /**
      * 交易类型
-     * @var int
+     * @var string
      */
-    public $type = 0;
+    public $trade_type = '';
 
     /**
      * 交易单号

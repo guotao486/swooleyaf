@@ -33,6 +33,7 @@ class PayDao {
         Project::PAY_TYPE_WX_JS => 'payTypeCheckWxJs',
         Project::PAY_TYPE_WX_NATIVE_DYNAMIC => 'payTypeCheckWxNativeDynamic',
         Project::PAY_TYPE_WX_NATIVE_STATIC => 'payTypeCheckWxNativeStatic',
+        Project::PAY_TYPE_WX_MINI_JS => 'payTypeCheckWxMiniJs',
         Project::PAY_TYPE_ALI_CODE => 'payTypeCheckAliCode',
         Project::PAY_TYPE_ALI_WEB => 'payTypeCheckAliWeb',
     ];
@@ -40,6 +41,7 @@ class PayDao {
         Project::PAY_TYPE_WX_JS => 'payTypeHandleWxJs',
         Project::PAY_TYPE_WX_NATIVE_DYNAMIC => 'payTypeHandleWxNativeDynamic',
         Project::PAY_TYPE_WX_NATIVE_STATIC => 'payTypeHandleWxNativeStatic',
+        Project::PAY_TYPE_WX_MINI_JS => 'payTypeHandleWxMiniJs',
         Project::PAY_TYPE_ALI_CODE => 'payTypeHandleAliCode',
         Project::PAY_TYPE_ALI_WEB => 'payTypeHandleAliWeb',
     ];
@@ -79,6 +81,16 @@ class PayDao {
         $data['a00_appid'] = Tool::getConfig('project.' . SY_ENV . SY_PROJECT . '.wx.appid.default');
     }
 
+    private static function payTypeCheckWxMiniJs(array &$data) {
+        $wxOpenid = SyUser::getOpenId();
+        if (strlen($wxOpenid) == 0) {
+            throw new CheckException('请先微信登录', ProjectCode::USER_NOT_LOGIN_WX_AUTH);
+        }
+
+        $data['a00_openid'] = $wxOpenid;
+        $data['a00_appid'] = Tool::getConfig('project.' . SY_ENV . SY_PROJECT . '.wx.appid.default');
+    }
+
     private static function payTypeCheckAliCode(array &$data) {
         $data['a01_appid'] = Tool::getConfig('project.' . SY_ENV . SY_PROJECT . '.alipay.appid.default');
         $data['a01_timeout'] = (string)SyRequest::getParams('a01_timeout', '');
@@ -109,8 +121,8 @@ class PayDao {
         }
 
         return [
-            'config' => $applyRes['data']['config'],
             'api' => $applyRes['data']['pay'],
+            'config' => $applyRes['data']['config'],
         ];
     }
 
@@ -149,6 +161,24 @@ class PayDao {
 
         return [
             'code_url' => $applyRes
+        ];
+    }
+
+    private static function payTypeHandleWxMiniJs(array $data) {
+        $order = new UnifiedOrder(UnifiedOrder::TRADE_TYPE_JSAPI, $data['a00_appid']);
+        $order->setBody($data['content_result']['pay_name']);
+        $order->setTotalFee($data['content_result']['pay_money']);
+        $order->setOutTradeNo($data['content_result']['pay_sn']);
+        $order->setAttach($data['content_result']['pay_attach']);
+        $order->setOpenid($data['a00_openid']);
+        $applyRes = WxUtilShop::applyJsPay($order, 'mini');
+        unset($order);
+        if($applyRes['code'] > 0){
+            throw new CheckException($applyRes['message'], ErrorCode::COMMON_PARAM_ERROR);
+        }
+
+        return [
+            'api' => $applyRes['data']['pay'],
         ];
     }
 
@@ -207,7 +237,7 @@ class PayDao {
     public static function completePay(array $data){
         //添加支付原始记录
         $payHistory = SyBaseMysqlFactory::PayHistoryEntity();
-        $payHistory->type = $data['pay_type'];
+        $payHistory->trade_type = $data['pay_type'];
         $payHistory->trade_sn = $data['pay_tradesn'];
         $payHistory->seller_sn = $data['pay_sellersn'];
         $payHistory->app_id = $data['pay_appid'];

@@ -16,7 +16,7 @@ class PayController extends CommonController {
      * @apiDescription 申请支付
      * @apiGroup Pay
      * @apiParam {string} session_id 会话ID
-     * @apiParam {string} pay_type 支付类型 a000:微信JS a001:微信动态二维码 a002:微信静态二维码 a100:支付宝二维码 a101:支付宝网页
+     * @apiParam {string} pay_type 支付类型 a000:微信公众号JS a001:微信公众号动态二维码 a002:微信公众号静态二维码 a003:微信小程序JS a100:支付宝二维码 a101:支付宝网页
      * @apiParam {string} pay_content 支付内容 1000:商品订单
      * @apiParam {string} [a01_timeout] 支付宝订单过期时间
      * @apiParam {string} [a01_returnurl] 支付宝同步通知链接
