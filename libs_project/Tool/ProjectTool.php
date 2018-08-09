@@ -121,8 +121,8 @@ final class ProjectTool {
             default:
                 throw new WxOpenException('授权操作类型不支持', ErrorCode::WXOPEN_PARAM_ERROR);
         }
-
         unset($ormResult1, $entity);
+        
         $redisKey = Project::REDIS_PREFIX_WX_COMPONENT_AUTHORIZER . $data['AuthorizerAppid'];
         CacheSimpleFactory::getRedisInstance()->del($redisKey);
     }
@@ -138,6 +138,7 @@ final class ProjectTool {
         $ormResult1 = $entity->getContainer()->getModel()->getOrmDbTable();
         $ormResult1->where('`component_appid`=? AND `authorizer_appid`=?', [WxConfigSingleton::getInstance()->getOpenCommonConfig()->getAppId(), $appId,]);
         $authorizerInfo = $entity->getContainer()->getModel()->findOne($ormResult1);
+        unset($ormResult1, $entity);
         if(empty($authorizerInfo)){
             throw new WxOpenException('授权公众号不存在', ErrorCode::WXOPEN_PARAM_ERROR);
         } else if($authorizerInfo['authorizer_status'] != Project::WX_COMPONENT_AUTHORIZER_STATUS_ALLOW){
@@ -162,6 +163,7 @@ final class ProjectTool {
             'authorizer_info' => Tool::jsonEncode($data['authorizer_info'], JSON_UNESCAPED_UNICODE),
             'updated' => Tool::getNowTime(),
         ]);
+        unset($ormResult1, $entity);
     }
 
     /**
