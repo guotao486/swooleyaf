@@ -111,7 +111,11 @@ final class WxUtilShop extends WxUtilBase {
     /**
      * 发起jsapi支付
      * @param \Wx\Shop\UnifiedOrder $order 订单信息
-     * @param string $platType 平台类型 shop：公众号 open：第三方平台
+     * @param string $platType 平台类型
+     *   shop:公众号
+     *   mini:小程序
+     *   open:第三方平台代理公众号
+     *   openmini:第三方平台代理小程序
      * @return array
      */
     public static function applyJsPay(UnifiedOrder $order,string $platType) : array {
@@ -135,13 +139,17 @@ final class WxUtilShop extends WxUtilBase {
             $payConfig = new JsPayConfig($orderDetail['appid']);
             $payConfig->setTimeStamp(Tool::getNowTime() . '');
             $payConfig->setPackage($resData['prepay_id']);
-            //获取js参数
-            $jsConfig = new JsConfig($orderDetail['appid']);
             $resArr['data'] = [
-                'config' => $jsConfig->getDetail($platType),
                 'pay' => $payConfig->getDetail(),
             ];
-            unset($payConfig, $jsConfig);
+            unset($payConfig);
+
+            if(in_array($platType, ['shop', 'open',])){
+                //获取js参数
+                $jsConfig = new JsConfig($orderDetail['appid']);
+                $resArr['data']['config'] = $jsConfig->getDetail($platType);
+                unset($jsConfig);
+            }
         }
 
         return $resArr;
@@ -644,10 +652,10 @@ final class WxUtilShop extends WxUtilBase {
      */
     public static function getAuthorizeUrl(string $redirectUrl,string $type,string $appId) : string {
         $url = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid='
-            . WxConfigSingleton::getInstance()->getShopConfig($appId)->getAppId()
-            . '&redirect_uri='
-            . urlencode($redirectUrl)
-            . '&response_type=code&scope=';
+               . WxConfigSingleton::getInstance()->getShopConfig($appId)->getAppId()
+               . '&redirect_uri='
+               . urlencode($redirectUrl)
+               . '&response_type=code&scope=';
         if ($type == 'base') {
             $url .= 'snsapi_base';
         } else {
