@@ -1013,7 +1013,7 @@ final class WxUtilShop extends WxUtilBase {
         $ticket = self::getJsTicket($appId);
         if(strlen($ticket) > 0){
             $nowTime = preg_match('/^[1-4][0-9]{9}$/', $timestamp) > 0 ? $timestamp : Tool::getNowTime() . '';
-            $nonce = strlen($nonceStr) >= 16 ? $nonceStr : self::createNonceStr();
+            $nonce = strlen($nonceStr) >= 16 ? $nonceStr : Tool::createNonceStr(32, 'numlower');
             $needStr = 'jsapi_ticket=' . $ticket . '&noncestr=' . $nonce . '&timestamp=' . $nowTime . '&url=' . $url;
             return [
                 'appId' => WxConfigSingleton::getInstance()->getShopConfig($appId)->getAppId(),

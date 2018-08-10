@@ -10,6 +10,7 @@ namespace SyServer;
 use Constant\ErrorCode;
 use Constant\Project;
 use Constant\Server;
+use DesignPatterns\Factories\CacheSimpleFactory;
 use Exception\Swoole\ServerException;
 use Log\Log;
 use MessageQueue\Producer\RedisProducer;
@@ -440,6 +441,15 @@ abstract class BaseServer {
             'storepath_resources' => $config['dir']['store']['resources'],
             'storepath_cache' => $config['dir']['store']['cache'],
         ]);
+
+        //设置唯一ID自增基数
+        $num = (int)CacheSimpleFactory::getRedisInstance()->incr(Project::DATA_KEY_CACHE_UNIQUE_ID);
+        if($num < 100000000){
+            $randomNum = random_int(100000000, 150000000);
+            if(!CacheSimpleFactory::getRedisInstance()->set(Project::DATA_KEY_CACHE_UNIQUE_ID, $randomNum)){
+                throw new ServerException('设置唯一ID自增基数出错', ErrorCode::SWOOLE_SERVER_PARAM_ERROR);
+            };
+        }
     }
 
     /**

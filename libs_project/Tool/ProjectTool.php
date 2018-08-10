@@ -19,24 +19,6 @@ final class ProjectTool {
     use SimpleTrait;
 
     /**
-     * 生成唯一单号
-     * @return string
-     */
-    public static function createUniqueSn() : string {
-        $redis = CacheSimpleFactory::getRedisInstance();
-        $needStr = date('YmdHis');
-        $uniqueSn = $needStr . random_int(10000000, 99999999);
-        $redisKey = Project::REDIS_PREFIX_ORDER_SN . $uniqueSn;
-        while($redis->exists($redisKey)) {
-            $uniqueSn = $needStr . random_int(10000000, 99999999);
-            $redisKey = Project::REDIS_PREFIX_ORDER_SN . $uniqueSn;
-        }
-        $redis->set($redisKey, '1', 10);
-
-        return $uniqueSn;
-    }
-
-    /**
      * 处理微信开放平台公众号授权
      * @param int $optionType 操作类型
      * @param array $data

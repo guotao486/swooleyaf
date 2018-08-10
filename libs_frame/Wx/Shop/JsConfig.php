@@ -16,7 +16,7 @@ class JsConfig {
     public function __construct(string $appId) {
         $this->appId = $appId;
         $this->timestamp = Tool::getNowTime();
-        $this->nonceStr = WxUtilShop::createNonceStr();
+        $this->nonceStr = Tool::createNonceStr(32, 'numlower');
     }
 
     /**

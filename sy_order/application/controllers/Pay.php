@@ -84,7 +84,7 @@ class PayController extends CommonController {
         if (is_array($cacheData) && isset($cacheData['cache_key']) && ($cacheData['cache_key'] == $redisKey)) {
             $nonceStr = (string)\Request\SyRequest::getParams('nonce_str');
             //生成一条新的单号记录
-            $orderSn = substr($productId, 0, 4) . \Tool\ProjectTool::createUniqueSn();
+            $orderSn = substr($productId, 0, 4) . \Tool\Tool::createUniqueId();
             //统一下单
             $order = new \Wx\Shop\UnifiedOrder(\Wx\Shop\UnifiedOrder::TRADE_TYPE_NATIVE, $appId);
             $order->setBody($cacheData['pay_name']);

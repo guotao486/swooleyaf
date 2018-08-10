@@ -10,6 +10,7 @@ namespace Wx\Shop;
 use Constant\ErrorCode;
 use DesignPatterns\Singletons\WxConfigSingleton;
 use Exception\Wx\WxException;
+use Tool\Tool;
 use Wx\WxUtilShop;
 
 class PayCompanyQuery {
@@ -17,7 +18,7 @@ class PayCompanyQuery {
         $shopConfig = WxConfigSingleton::getInstance()->getShopConfig($appId);
         $this->appid = $shopConfig->getAppId();
         $this->mch_id = $shopConfig->getPayMchId();
-        $this->nonce_str = WxUtilShop::createNonceStr();
+        $this->nonce_str = Tool::createNonceStr(32, 'numlower');
     }
 
     /**

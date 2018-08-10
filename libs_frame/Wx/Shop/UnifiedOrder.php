@@ -46,7 +46,7 @@ class UnifiedOrder {
 
         $shopConfig = WxConfigSingleton::getInstance()->getShopConfig($appId);
         $this->fee_type = 'CNY';
-        $this->nonce_str = WxUtilShop::createNonceStr();
+        $this->nonce_str = Tool::createNonceStr(32, 'numlower');
         $this->appid = $shopConfig->getAppId();
         $this->mch_id = $shopConfig->getPayMchId();
         $this->notify_url = $shopConfig->getPayNotifyUrl();
