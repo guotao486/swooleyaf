@@ -98,9 +98,9 @@
     chmod a+x /home/jw/phpspace/swooleyaf/startTaskInterval.sh
     chmod a+x /home/jw/phpspace/swooleyaf/startTaskSingle.sh
     //启动定时任务
-    nohup sh /home/jw/phpspace/swooleyaf/startTaskCron.sh 2>&1 >/dev/null &
-    nohup sh /home/jw/phpspace/swooleyaf/startTaskInterval.sh 2>&1 >/dev/null &
-    nohup sh /home/jw/phpspace/swooleyaf/startTaskSingle.sh 2>&1 >/dev/null &
+    nohup sh /home/jw/phpspace/swooleyaf/startTaskCron.sh >/dev/null 2>&1 &
+    nohup sh /home/jw/phpspace/swooleyaf/startTaskInterval.sh >/dev/null 2>&1 &
+    nohup sh /home/jw/phpspace/swooleyaf/startTaskSingle.sh >/dev/null 2>&1 &
     //关闭定时任务
     ps -ef | grep startTaskCron.sh |kill -9
     ps -ef | grep startTaskInterval.sh |kill -9
