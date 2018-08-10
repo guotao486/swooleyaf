@@ -10,6 +10,7 @@ namespace Wx\Shop;
 use Constant\ErrorCode;
 use DesignPatterns\Singletons\WxConfigSingleton;
 use Exception\Wx\WxException;
+use Tool\Tool;
 use Wx\WxUtilShop;
 
 class RefundQuery {
@@ -18,7 +19,7 @@ class RefundQuery {
         $this->appid = $shopConfig->getAppId();
         $this->mch_id = $shopConfig->getPayMchId();
         $this->sign_type = 'MD5';
-        $this->nonce_str = WxUtilShop::createNonceStr();
+        $this->nonce_str = Tool::createNonceStr(32, 'numlower');
     }
 
     /**

@@ -12,13 +12,6 @@ use Exception\Wx\WxException;
 use Tool\Tool;
 
 abstract class WxUtilBase {
-    private static $chars = [
-        '2', '3', '4', '5', '6', '7', '8', '9',
-        'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h',
-        'i', 'j', 'k', 'm', 'n', 'p', 'q', 'r',
-        's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
-    ];
-
     /**
      * 发送post请求
      * @param string $url 请求地址
@@ -95,19 +88,5 @@ abstract class WxUtilBase {
         } else {
             throw new WxException('curl出错，错误码=' . $sendRes['res_no'], ErrorCode::WX_GET_ERROR);
         }
-    }
-
-    /**
-     * 生成随机字符串
-     * @param int $length 需要获取的随机字符串长度
-     * @return string
-     */
-    public static function createNonceStr(int $length=32) : string {
-        $resStr = '';
-        for ($i = 0; $i < $length; $i++) {
-            $resStr .= self::$chars[random_int(0, 31)];
-        }
-
-        return $resStr;
     }
 }

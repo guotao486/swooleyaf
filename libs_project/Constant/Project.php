@@ -24,6 +24,7 @@ final class Project {
 
     //数据常量
     const DATA_KEY_SESSION_TOKEN = 'sytoken'; //键名-session标识
+    const DATA_KEY_CACHE_UNIQUE_ID = self::REDIS_PREFIX_UNIQUE_ID . 'uniqueid'; //键名-缓存唯一ID
 
     //校验器常量
     const VALIDATOR_STRING_TYPE_REQUIRED = 'string_required'; //字符串类型-必填
@@ -67,7 +68,7 @@ final class Project {
 
     //REDIS常量 以sy000开头的前缀为框架内部前缀,以sy+3位数字开头的前缀为公共模块前缀
     const REDIS_PREFIX_SESSION = 'sy000001_'; //前缀-session
-    const REDIS_PREFIX_ORDER_SN = 'sy001000_'; //前缀-订单单号
+    const REDIS_PREFIX_UNIQUE_ID = 'sy001000_'; //前缀-唯一ID
     const REDIS_PREFIX_MESSAGE_QUEUE = 'sy001001_'; //前缀-消息队列
     const REDIS_PREFIX_WX_ACCOUNT = 'sy002000_'; //前缀-微信公众号
     const REDIS_PREFIX_WX_COMPONENT_ACCOUNT = 'sy002001_'; //前缀-微信开放平台账号

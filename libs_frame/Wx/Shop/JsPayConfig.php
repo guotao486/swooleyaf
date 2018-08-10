@@ -9,13 +9,14 @@ namespace Wx\Shop;
 
 use Constant\ErrorCode;
 use Exception\Wx\WxException;
+use Tool\Tool;
 use Wx\WxUtilShop;
 
 class JsPayConfig {
     public function __construct(string $appId) {
         $this->appId = $appId;
         $this->signType = 'MD5';
-        $this->nonceStr = WxUtilShop::createNonceStr();
+        $this->nonceStr = Tool::createNonceStr(32, 'numlower');
     }
 
     /**
