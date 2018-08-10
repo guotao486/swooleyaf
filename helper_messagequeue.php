@@ -37,7 +37,7 @@ switch ($type) {
         $kafka = new \Helper\MessageQueueKafka();
 
         while (true) {
-            $message = \DesignPatterns\Singletons\KafkaSingleton::getInstance()->getConsumer()->consume(120000);
+            $message = \DesignPatterns\Singletons\KafkaSingleton::getInstance()->getConsumer()->consume(PHP_INT_MAX);
             $kafka->handle($message);
         }
         break;
