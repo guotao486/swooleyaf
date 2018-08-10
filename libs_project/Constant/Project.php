@@ -169,4 +169,13 @@ final class Project {
     const ROLE_POWER_LEVEL_ONE = 1; //层级-第一级
     const ROLE_POWER_LEVEL_TWO = 2; //层级-第二级
     const ROLE_POWER_LEVEL_THREE = 3; //层级-第三级
+
+    //登录常量
+    const LOGIN_TYPE_PHONE = 'a000'; //类型-手机号码
+    const LOGIN_TYPE_EMAIL = 'a001'; //类型-邮箱
+    const LOGIN_TYPE_ACCOUNT = 'a002'; //类型-账号
+    const LOGIN_TYPE_WX_AUTH_BASE = 'a100'; //类型-微信静默授权
+    const LOGIN_TYPE_WX_AUTH_USER = 'a101'; //类型-微信手动授权
+    const LOGIN_TYPE_WX_SCAN = 'a102'; //类型-微信扫码
+    const LOGIN_TYPE_QQ = 'a200'; //类型-QQ
 }

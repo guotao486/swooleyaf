@@ -8,6 +8,7 @@
 namespace Dao;
 
 use Constant\ErrorCode;
+use Constant\Project;
 use Exception\Common\CheckException;
 use Request\SyRequest;
 use Tool\Tool;
@@ -17,22 +18,22 @@ class LoginDao {
     use SimpleDaoTrait;
 
     private static $loginCheckMap = [
-        'a000' => 'loginCheckPhone',
-        'a001' => 'loginCheckEmail',
-        'a002' => 'loginCheckAccount',
-        'a100' => 'loginCheckWxAuthBase',
-        'a101' => 'loginCheckWxAuthUser',
-        'a102' => 'loginCheckWxScan',
-        'a200' => 'loginCheckQQ',
+        Project::LOGIN_TYPE_PHONE => 'loginCheckPhone',
+        Project::LOGIN_TYPE_EMAIL => 'loginCheckEmail',
+        Project::LOGIN_TYPE_ACCOUNT => 'loginCheckAccount',
+        Project::LOGIN_TYPE_WX_AUTH_BASE => 'loginCheckWxAuthBase',
+        Project::LOGIN_TYPE_WX_AUTH_USER => 'loginCheckWxAuthUser',
+        Project::LOGIN_TYPE_WX_SCAN => 'loginCheckWxScan',
+        Project::LOGIN_TYPE_QQ => 'loginCheckQQ',
     ];
     private static $loginHandleMap = [
-        'a000' => 'loginHandlePhone',
-        'a001' => 'loginHandleEmail',
-        'a002' => 'loginHandleAccount',
-        'a100' => 'loginHandleWxAuthBase',
-        'a101' => 'loginHandleWxAuthUser',
-        'a102' => 'loginHandleWxScan',
-        'a200' => 'loginHandleQQ',
+        Project::LOGIN_TYPE_PHONE => 'loginHandlePhone',
+        Project::LOGIN_TYPE_EMAIL => 'loginHandleEmail',
+        Project::LOGIN_TYPE_ACCOUNT => 'loginHandleAccount',
+        Project::LOGIN_TYPE_WX_AUTH_BASE => 'loginHandleWxAuthBase',
+        Project::LOGIN_TYPE_WX_AUTH_USER => 'loginHandleWxAuthUser',
+        Project::LOGIN_TYPE_WX_SCAN => 'loginHandleWxScan',
+        Project::LOGIN_TYPE_QQ => 'loginHandleQQ',
     ];
 
     private static function loginCheckPhone(array &$data) {
