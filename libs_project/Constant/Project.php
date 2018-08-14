@@ -70,6 +70,7 @@ final class Project {
     const REDIS_PREFIX_SESSION = 'sy000001_'; //前缀-session
     const REDIS_PREFIX_UNIQUE_ID = 'sy001000_'; //前缀-唯一ID
     const REDIS_PREFIX_MESSAGE_QUEUE = 'sy001001_'; //前缀-消息队列
+    const REDIS_PREFIX_KAFKA_MESSAGE_OFFSET = 'sy001002_'; //前缀-kafka消息位移缓存
     const REDIS_PREFIX_WX_ACCOUNT = 'sy002000_'; //前缀-微信公众号
     const REDIS_PREFIX_WX_COMPONENT_ACCOUNT = 'sy002001_'; //前缀-微信开放平台账号
     const REDIS_PREFIX_WX_COMPONENT_AUTHORIZER = 'sy002002_'; //前缀-微信开放平台授权公众号
