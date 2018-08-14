@@ -21,6 +21,12 @@ function startRedisConsumer() {
     $consumer->start();
 }
 
+function handleKafkaMessage() {
+    global $kafka;
+    $kafka->refresh();
+    $kafka->handleMessage();
+}
+
 $type = \Tool\Tool::getClientOption('-t');
 switch ($type) {
     case 'redis':
@@ -35,10 +41,12 @@ switch ($type) {
         break;
     case 'kafka':
         $kafka = new \Helper\MessageQueueKafka();
+        pcntl_signal(SIGALRM, 'handleKafkaMessage');
 
         while (true) {
-            $message = \DesignPatterns\Singletons\KafkaSingleton::getInstance()->getConsumer()->consume(PHP_INT_MAX);
-            $kafka->handle($message);
+            pcntl_alarm(10);
+            pcntl_signal_dispatch();
+            sleep(10);
         }
         break;
     default:

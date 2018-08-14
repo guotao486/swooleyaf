@@ -9,8 +9,6 @@ namespace DesignPatterns\Singletons;
 
 use Constant\ErrorCode;
 use Exception\Kafka\KafkaException;
-use MessageQueue\KafkaConsumerConfig;
-use MessageQueue\KafkaProducerConfig;
 use RdKafka\Conf;
 use RdKafka\KafkaConsumer;
 use RdKafka\Producer;
@@ -31,40 +29,45 @@ class KafkaSingleton {
     private $consumer = null;
 
     private function __construct(){
-        $producerConfigs = Tool::getConfig('kafka.' . SY_ENV . SY_PROJECT . 'producer');
-        $consumerConfigs = Tool::getConfig('kafka.' . SY_ENV . SY_PROJECT . 'consumer');
-        $brokers = trim(Tool::getArrayVal($consumerConfigs, 'metadata.broker.list', '', true));
+        $kafkaConfigs = Tool::getConfig('kafka.' . SY_ENV . SY_PROJECT);
+        $brokers = trim(Tool::getArrayVal($kafkaConfigs, 'common.metadata.broker.list', '', true));
         if(strlen($brokers) == 0){
             throw new KafkaException('broker不能为空', ErrorCode::KAFKA_CONSUMER_ERROR);
         }
 
-        $kafkaProducerConf = new KafkaProducerConfig();
-        $kafkaProducerConf->setRequestRequiredAcks((int)Tool::getArrayVal($producerConfigs, 'request.required.acks', 1, true));
-        $kafkaProducerConf->setRequestTimeoutMs((int)Tool::getArrayVal($producerConfigs, 'request.timeout.ms', 3000, true));
-        $iniProducerConfigs = $kafkaProducerConf->getDetail();
+        //设置生产者配置
         $producerConf = new Conf();
-        foreach ($iniProducerConfigs as $configKey => $configValue) {
-            $producerConf->set($configKey, $configValue);
-        }
+        $producerConf->set('request.required.acks', (int)Tool::getArrayVal($kafkaConfigs, 'producer.request.required.acks', 1, true));
+        $producerConf->set('request.timeout.ms', (int)Tool::getArrayVal($kafkaConfigs, 'producer.request.timeout.ms', 3000, true));
         $this->producer = new Producer($producerConf);
         $this->producer->setLogLevel(LOG_DEBUG);
         $this->producer->addBrokers($brokers);
 
-        //group id不能一直不变,如果一直不变,可能会导致无法消费消息
-        $groupId = SY_ENV . SY_PROJECT . time();
-        $kafkaConsumerConf = new KafkaConsumerConfig();
-        $kafkaConsumerConf->setEnableAutoCommit((int)Tool::getArrayVal($consumerConfigs, 'enable.auto.commit', 1, true));
-        $kafkaConsumerConf->setAutoOffsetReset((string)Tool::getArrayVal($consumerConfigs, 'auto.offset.reset', 'smallest', true));
-        $kafkaConsumerConf->setGroupId($groupId);
-        $kafkaConsumerConf->setMetadataBrokerList((string)Tool::getArrayVal($consumerConfigs, 'metadata.broker.list', '', true));
-
-        $topicConf = new TopicConf();
-        $topicConf->set('auto.offset.reset', $kafkaConsumerConf->getAutoOffsetReset());
-
+        //设置消费者配置
+        $groupId = SY_ENV . SY_PROJECT . Tool::createNonceStr(4) . time();
+        $consumerTopicConf = new TopicConf();
+        $consumerTopicConf->set('auto.offset.reset', (string)Tool::getArrayVal($kafkaConfigs, 'consumer.auto.offset.reset', 'earliest', true));
+        $consumerTopicConf->set('offset.store.sync.interval.ms', (int)Tool::getArrayVal($kafkaConfigs, 'consumer.offset.store.sync.interval.ms', 0, true));
         $consumerConf = new Conf();
-        $consumerConf->set('group.id', $kafkaConsumerConf->getGroupId());
+        $consumerConf->set('group.id', $groupId);
         $consumerConf->set('metadata.broker.list', $brokers);
-        $consumerConf->setDefaultTopicConf($topicConf);
+        $consumerConf->set('enable.auto.commit', true);
+        $consumerConf->set('auto.commit.interval.ms', 0);
+        $consumerConf->set('enable.auto.offset.store', true);
+        $consumerConf->set('offset.store.method', 'broker');
+        $consumerConf->setDefaultTopicConf($consumerTopicConf);
+        $consumerConf->setRebalanceCb(function (KafkaConsumer $kafka, $err,array $partitions=null) {
+            switch ($err) {
+                case RD_KAFKA_RESP_ERR__ASSIGN_PARTITIONS:
+                    $kafka->assign($partitions);
+                    break;
+                case RD_KAFKA_RESP_ERR__REVOKE_PARTITIONS:
+                    $kafka->assign(null);
+                    break;
+                default:
+                    throw new KafkaException('kafka消费出错', ErrorCode::KAFKA_CONSUMER_ERROR);
+            }
+        });
         $this->consumer = new KafkaConsumer($consumerConf);
         $this->consumer->subscribe([
             '^' . SY_ENV . SY_PROJECT . '[0-9a-zA-Z]+',
