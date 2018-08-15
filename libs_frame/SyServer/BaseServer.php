@@ -398,6 +398,10 @@ abstract class BaseServer {
                     ]);
                 }
             }
+
+            if(defined('SY_ADD_TIMER') && SY_ADD_TIMER && method_exists($this, 'addTimer')){
+                $this->addTimer($server);
+            }
         }
     }
 
