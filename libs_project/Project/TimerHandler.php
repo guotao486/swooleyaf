@@ -32,8 +32,7 @@ class TimerHandler {
         }
     }
 
-    public static function handle(){
-        $nowTime = time();
+    public static function handle(int $nowTime){
         //获取当前时间队列的任务列表
         $redisKeyQueue1 = Project::REDIS_PREFIX_TIMER_QUEUE . $nowTime;
         $taskBase = SyTaskMysqlFactory::TaskBaseEntity();

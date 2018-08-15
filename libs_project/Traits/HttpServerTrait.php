@@ -92,7 +92,8 @@ trait HttpServerTrait {
                 ]);
                 break;
             case Project::TASK_TYPE_TIME_WHEEL_TASK:
-                TimerHandler::handle();
+                $nowTime = self::$_syServer->incr(self::$_serverToken, 'timer_time', 1);
+                TimerHandler::handle($nowTime);
                 $result->setData([
                     'result' => 'success',
                 ]);
