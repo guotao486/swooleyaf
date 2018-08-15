@@ -164,6 +164,7 @@ abstract class BaseServer {
         //创建共享内存数据表
         self::$_syServer = new \swoole_table(1);
         self::$_syServer->column('memory_usage', \swoole_table::TYPE_INT, 4);
+        self::$_syServer->column('timer_time', \swoole_table::TYPE_INT, 4);
         self::$_syServer->column('request_times', \swoole_table::TYPE_INT, 4);
         self::$_syServer->column('request_handling', \swoole_table::TYPE_INT, 4);
         self::$_syServer->column('host_local', \swoole_table::TYPE_STRING, 20);
@@ -430,6 +431,8 @@ abstract class BaseServer {
             Log::error('write ' . SY_MODULE . ' pid file error');
         }
 
+        //为了防止定时任务出现重启服务的时候,导致重启期间(1-3s内)的定时任务无法处理,将定时器时间初始化为当前时间戳之前6秒
+        $initTimerTime = time() - 6;
         $config = Tool::getConfig('project.' . SY_ENV . SY_PROJECT);
         Dir::create($config['dir']['store']['image']);
         Dir::create($config['dir']['store']['music']);
@@ -437,6 +440,7 @@ abstract class BaseServer {
         Dir::create($config['dir']['store']['cache']);
         self::$_syServer->set(self::$_serverToken, [
             'memory_usage' => memory_get_usage(),
+            'timer_time' => $initTimerTime,
             'request_times' => 0,
             'request_handling' => 0,
             'host_local' => $this->_host,
