@@ -177,9 +177,10 @@ class RedisSingleton {
     }
 
     public function reConnect() {
+        $nowTime = time();
         if (is_null($this->conn)) {
             $this->init();
-        } else if (Tool::getNowTime() - $this->connTime >= 15) {
+        } else if ($nowTime - $this->connTime >= 15) {
             $this->conn->close();
             $this->init();
         }
