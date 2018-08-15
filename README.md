@@ -87,21 +87,6 @@
         
 ## 定时任务
 1. 定时任务处理都是通过发送HTTP GET请求的方式进行,在执行定时任务之前,必须确保请求接口可正常访问
-2. 目前支持的定时任务有三种: 
+2. 目前支持的定时任务有两种: 
 - 一次性定时任务,必须指定任务的执行时间戳
 - 间隔定时任务,必须指定任务的间隔时间,单位为秒
-- cron定时任务,必须指定任务的cron计划时间
-
-### 命令
-    //添加脚本执行权限
-    chmod a+x /home/jw/phpspace/swooleyaf/startTaskCron.sh
-    chmod a+x /home/jw/phpspace/swooleyaf/startTaskInterval.sh
-    chmod a+x /home/jw/phpspace/swooleyaf/startTaskSingle.sh
-    //启动定时任务
-    nohup sh /home/jw/phpspace/swooleyaf/startTaskCron.sh >/dev/null 2>&1 &
-    nohup sh /home/jw/phpspace/swooleyaf/startTaskInterval.sh >/dev/null 2>&1 &
-    nohup sh /home/jw/phpspace/swooleyaf/startTaskSingle.sh >/dev/null 2>&1 &
-    //关闭定时任务
-    ps -ef | grep startTaskCron.sh |kill -9
-    ps -ef | grep startTaskInterval.sh |kill -9
-    ps -ef | grep startTaskSingle.sh |kill -9

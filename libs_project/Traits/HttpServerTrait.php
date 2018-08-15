@@ -8,7 +8,9 @@
 namespace Traits;
 
 use Constant\Project;
+use Project\TimerHandler;
 use Response\Result;
+use Tool\SyPack;
 use Tool\Tool;
 
 trait HttpServerTrait {
@@ -89,6 +91,12 @@ trait HttpServerTrait {
                     'result' => 'success',
                 ]);
                 break;
+            case Project::TASK_TYPE_TIME_WHEEL_TASK:
+                TimerHandler::handle();
+                $result->setData([
+                    'result' => 'success',
+                ]);
+                break;
             default:
                 $result->setData([
                     'result' => 'fail',
@@ -97,5 +105,19 @@ trait HttpServerTrait {
         }
 
         return $result->getJson();
+    }
+
+    protected function addTimer(\swoole_server $server) {
+        $this->_messagePack->setCommandAndData(SyPack::COMMAND_TYPE_SOCKET_CLIENT_SEND_TASK_REQ, [
+            'task_module' => Project::MODULE_NAME_API,
+            'task_command' => Project::TASK_TYPE_TIME_WHEEL_TASK,
+            'task_params' => [],
+        ]);
+        $taskData = $this->_messagePack->packData();
+        $this->_messagePack->init();
+
+        $server->tick(1000, function() use ($server, $taskData) {
+            $server->task($taskData);
+        });
     }
 }

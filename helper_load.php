@@ -9,6 +9,7 @@ define('SY_PROJECT', 'z01');
 define('SY_RECONNECT_DB', true);
 define('SY_CACHE_WXSHOP', false);
 define('SY_CACHE_WXOPEN', false);
+define('SY_ADD_TIMER', true);
 $syLogPath = ini_get('seaslog.default_basepath');
 if(substr($syLogPath, -1) == '/'){
     $syLogPath .= 'sy' . SY_PROJECT;

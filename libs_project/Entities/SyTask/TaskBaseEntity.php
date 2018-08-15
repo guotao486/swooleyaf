@@ -58,16 +58,16 @@ class TaskBaseEntity extends MysqlEntity {
     public $exec_params = '';
 
     /**
-     * 任务执行时间
-     * @var string
-     */
-    public $exec_time = '';
-
-    /**
-     * 开始时间戳,一次性任务为任务执行时间戳,间隔任务为间隔时间秒数,cron任务为创建时间戳
+     * 开始时间戳
      * @var int
      */
     public $start_time = 0;
+
+    /**
+     * 间隔时间,单位为秒
+     * @var int
+     */
+    public $interval_time = 0;
 
     /**
      * 任务状态

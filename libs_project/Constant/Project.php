@@ -59,18 +59,28 @@ final class Project {
     const COMMON_LIMIT_DEFAULT = 10; //默认分页限制
 
     //任务常量
+    public static $totalTaskStatus = [
+        self::TASK_STATUS_DELETE => '已删除',
+        self::TASK_STATUS_INVALID => '无效',
+        self::TASK_STATUS_VALID => '有效',
+    ];
+    public static $totalTaskPersistType = [
+        self::TASK_PERSIST_TYPE_SINGLE => '单次任务',
+        self::TASK_PERSIST_TYPE_INTERVAL => '间隔任务',
+    ];
     const TASK_STATUS_DELETE = -1; //任务状态-已删除
     const TASK_STATUS_INVALID = 0; //任务状态-无效
     const TASK_STATUS_VALID = 1; //任务状态-有效
     const TASK_PERSIST_TYPE_SINGLE = 1; //持久化类型-单次
     const TASK_PERSIST_TYPE_INTERVAL = 2; //持久化类型-间隔时间
-    const TASK_PERSIST_TYPE_CRON = 3; //持久化类型-cron计划
 
     //REDIS常量 以sy000开头的前缀为框架内部前缀,以sy+3位数字开头的前缀为公共模块前缀
     const REDIS_PREFIX_SESSION = 'sy000001_'; //前缀-session
     const REDIS_PREFIX_UNIQUE_ID = 'sy001000_'; //前缀-唯一ID
     const REDIS_PREFIX_MESSAGE_QUEUE = 'sy001001_'; //前缀-消息队列
     const REDIS_PREFIX_KAFKA_MESSAGE_OFFSET = 'sy001002_'; //前缀-kafka消息位移缓存
+    const REDIS_PREFIX_TIMER_QUEUE = 'sy001003_'; //前缀-定时器队列
+    const REDIS_PREFIX_TIMER_CONTENT = 'sy001004_'; //前缀-定时器内容
     const REDIS_PREFIX_WX_ACCOUNT = 'sy002000_'; //前缀-微信公众号
     const REDIS_PREFIX_WX_COMPONENT_ACCOUNT = 'sy002001_'; //前缀-微信开放平台账号
     const REDIS_PREFIX_WX_COMPONENT_AUTHORIZER = 'sy002002_'; //前缀-微信开放平台授权公众号
@@ -115,4 +125,5 @@ final class Project {
     const TASK_TYPE_CLEAR_LOCAL_USER_CACHE = '0002'; //任务类型-清除本地用户信息缓存
     const TASK_TYPE_CLEAR_LOCAL_WXSHOP_TOKEN_CACHE = '0003'; //任务类型-清除本地微信商户号token缓存
     const TASK_TYPE_CLEAR_LOCAL_WXOPEN_AUTHORIZER_TOKEN_CACHE = '0004'; //任务类型-清除本地微信开放平台授权者token缓存
+    const TASK_TYPE_TIME_WHEEL_TASK = '0005'; //任务类型-时间轮任务
 }
