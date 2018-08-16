@@ -25,11 +25,7 @@ class TimerHandler {
             CURLOPT_RETURNTRANSFER => true,
         ];
         if($method == 'GET'){
-            $trueUrl = $url;
-            if(strlen($params) > 0){
-                $trueUrl .= '?' . $params;
-            }
-            $curlConfig[CURLOPT_URL] = $trueUrl;
+            $curlConfig[CURLOPT_URL] = $url . '?' . $params;
         } else {
             $curlConfig[CURLOPT_URL] = $url;
             $curlConfig[CURLOPT_POST] = true;
@@ -76,8 +72,8 @@ class TimerHandler {
                         $needTime = $nowTime + $taskData['interval_time'];
                         $redisKeyQueue2 = Project::REDIS_PREFIX_TIMER_QUEUE . $needTime;
                         $listNum = CacheSimpleFactory::getRedisInstance()->rPush($redisKeyQueue2, $eTag);
-                        if($listNum == 1){
-                            $expireTime = $needTime + 60;
+                        if(in_array($listNum, [1, 2, 3])){
+                            $expireTime = $needTime + 300;
                             CacheSimpleFactory::getRedisInstance()->expireAt($redisKeyQueue2, $expireTime);
                         }
                     }

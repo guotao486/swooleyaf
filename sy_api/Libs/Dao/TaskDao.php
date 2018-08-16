@@ -75,10 +75,10 @@ class TaskDao {
         }
 
         $needTime = $data['start_time'] + $data['interval_time'];
-        $expireTime = $needTime + 60;
+        $expireTime = $needTime + 300;
         $redisKeyQueue = Project::REDIS_PREFIX_TIMER_QUEUE . $needTime;
         $listNum = CacheSimpleFactory::getRedisInstance()->rPush($redisKeyQueue, $taskTag);
-        if($listNum == 1){
+        if(in_array($listNum, [1, 2, 3])){
             CacheSimpleFactory::getRedisInstance()->expireAt($redisKeyQueue, $expireTime);
         }
 
@@ -88,7 +88,7 @@ class TaskDao {
             'persist_type' => $data['persist_type'],
             'exec_method' => $data['task_method'],
             'exec_url' => $data['task_url'],
-            'exec_params' => empty($data['task_params']) ? '' : http_build_query($data['task_params']),
+            'exec_params' => empty($data['task_params']) ? '_tp=' : http_build_query($data['task_params']),
             'interval_time' => $data['interval_time'],
         ]);
         if($data['persist_type'] == Project::TASK_PERSIST_TYPE_SINGLE){
