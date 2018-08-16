@@ -54,7 +54,6 @@ class MessageQueueKafka {
                 $cacheData = RedisSingleton::getInstance()->getConn()->get($redisKey);
                 if($cacheData !== false){
                     unset($consumer);
-
                     break;
                 }
 
@@ -74,7 +73,8 @@ class MessageQueueKafka {
                 $totalNum = 0;
                 break;
             case RD_KAFKA_RESP_ERR__TIMED_OUT:
-                Log::error('kafka consumer handle time out');
+                Log::error('kafka consumer handle time out, msg:' . $message->errstr());
+                $totalNum = 0;
                 break;
             default:
                 Log::error($message->errstr(), $message->err);
