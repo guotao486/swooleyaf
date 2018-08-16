@@ -68,8 +68,8 @@ class Tool {
         }
 
         $keyFirst = substr($key, 0, $index);
-        $keyLeft = substr($key, ($index + 1));
-        if(is_array($array[$keyFirst])){
+        if(isset($array[$keyFirst]) && is_array($array[$keyFirst])){
+            $keyLeft = substr($key, ($index + 1));
             $newData = $array[$keyFirst];
             unset($array);
 

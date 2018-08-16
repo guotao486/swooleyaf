@@ -54,7 +54,7 @@ class TaskDao {
         self::$funcName($data);
 
         $nowTime = Tool::getNowTime();
-        $taskTag = Tool::createNonceStr(6) . $nowTime;
+        $taskTag = Tool::createNonceStr(6, 'numlower') . $nowTime;
         $taskBase = SyTaskMysqlFactory::TaskBaseEntity();
         $taskBase->tag = $taskTag;
         $taskBase->task_title = $data['task_title'];
