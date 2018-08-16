@@ -431,13 +431,15 @@ abstract class BaseServer {
             Log::error('write ' . SY_MODULE . ' pid file error');
         }
 
-        //为了防止定时任务出现重启服务的时候,导致重启期间(1-3s内)的定时任务无法处理,将定时器时间初始化为当前时间戳之前6秒
-        $initTimerTime = time() - 6;
         $config = Tool::getConfig('project.' . SY_ENV . SY_PROJECT);
         Dir::create($config['dir']['store']['image']);
         Dir::create($config['dir']['store']['music']);
         Dir::create($config['dir']['store']['resources']);
         Dir::create($config['dir']['store']['cache']);
+
+        //为了防止定时任务出现重启服务的时候,导致重启期间(1-3s内)的定时任务无法处理,将定时器时间初始化为当前时间戳之前6秒
+        $timerAdvanceTime = (int)Tool::getArrayVal($config, 'timer.time.advance', 6, true);
+        $initTimerTime = time() - $timerAdvanceTime;
         self::$_syServer->set(self::$_serverToken, [
             'memory_usage' => memory_get_usage(),
             'timer_time' => $initTimerTime,
