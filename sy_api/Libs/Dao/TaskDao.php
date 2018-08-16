@@ -60,6 +60,7 @@ class TaskDao {
         $taskBase->task_title = $data['task_title'];
         $taskBase->task_desc = $data['task_desc'];
         $taskBase->persist_type = $data['persist_type'];
+        $taskBase->exec_method = $data['task_method'];
         $taskBase->exec_obj = $data['task_url'];
         $taskBase->exec_params = Tool::jsonEncode($data['task_params'], JSON_UNESCAPED_UNICODE);
         $taskBase->start_time = $data['start_time'];
@@ -81,15 +82,13 @@ class TaskDao {
             CacheSimpleFactory::getRedisInstance()->expireAt($redisKeyQueue, $expireTime);
         }
 
-        $taskUrl = $data['task_url'];
-        if(!empty($data['task_params'])){
-            $taskUrl .= '?' . http_build_query($data['task_params']);
-        }
         $redisKeyContent = Project::REDIS_PREFIX_TIMER_CONTENT . $taskTag;
         CacheSimpleFactory::getRedisInstance()->hMset($redisKeyContent, [
             'unique_key' => $taskTag,
             'persist_type' => $data['persist_type'],
-            'exec_url' => $taskUrl,
+            'exec_method' => $data['task_method'],
+            'exec_url' => $data['task_url'],
+            'exec_params' => empty($data['task_params']) ? '' : http_build_query($data['task_params']),
             'interval_time' => $data['interval_time'],
         ]);
         if($data['persist_type'] == Project::TASK_PERSIST_TYPE_SINGLE){

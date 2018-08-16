@@ -16,15 +16,27 @@ use Traits\SimpleTrait;
 class TimerHandler {
     use SimpleTrait;
 
-    private static function sendUrl(string $url) {
-        $sendRes = Tool::sendCurlReq([
-            CURLOPT_URL => $url,
+    private static function sendUrl(string $method,string $url,string $params) {
+        $curlConfig = [
             CURLOPT_TIMEOUT_MS => 3000,
             CURLOPT_SSL_VERIFYPEER => false,
             CURLOPT_SSL_VERIFYHOST => false,
             CURLOPT_HEADER => false,
             CURLOPT_RETURNTRANSFER => true,
-        ]);
+        ];
+        if($method == 'GET'){
+            $trueUrl = $url;
+            if(strlen($params) > 0){
+                $trueUrl .= '?' . $params;
+            }
+            $curlConfig[CURLOPT_URL] = $trueUrl;
+        } else {
+            $curlConfig[CURLOPT_URL] = $url;
+            $curlConfig[CURLOPT_POST] = true;
+            $curlConfig[CURLOPT_POSTFIELDS] = $params;
+        }
+
+        $sendRes = Tool::sendCurlReq($curlConfig);
         if ($sendRes['res_no'] == 0) {
             return $sendRes['res_content'];
         } else {
@@ -56,7 +68,7 @@ class TimerHandler {
 
                     $taskLog->getContainer()->getModel()->insert([
                         'tag' => $eTag,
-                        'exec_result' => self::sendUrl($taskData['exec_url']),
+                        'exec_result' => self::sendUrl($taskData['exec_method'], $taskData['exec_url'], $taskData['exec_params']),
                         'created' => $nowTime,
                     ]);
 

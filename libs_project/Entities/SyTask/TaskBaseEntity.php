@@ -46,6 +46,12 @@ class TaskBaseEntity extends MysqlEntity {
     public $persist_type = 0;
 
     /**
+     * 执行方式
+     * @var string
+     */
+    public $exec_method = 'GET';
+
+    /**
      * 任务执行对象,外部url请求地址
      * @var string
      */
