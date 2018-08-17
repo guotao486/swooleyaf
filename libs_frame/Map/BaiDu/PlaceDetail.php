@@ -11,7 +11,7 @@ use Constant\ErrorCode;
 use Exception\Map\BaiduMapException;
 use Tool\Tool;
 
-class PlaceDetail extends BaseConfig {
+class PlaceDetail extends MapBase {
     const SCOPE_BASE = 1; //结果详细程度-基本信息
     const SCOPE_DETAIL = 2; //结果详细程度-POI详细信息
 

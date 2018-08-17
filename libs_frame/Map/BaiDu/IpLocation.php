@@ -11,7 +11,7 @@ use Constant\ErrorCode;
 use Exception\Map\BaiduMapException;
 use Tool\Tool;
 
-class IpLocation extends BaseConfig {
+class IpLocation extends MapBase {
     const COORD_TYPE_BD_MC = ''; //坐标类型-百度墨卡托
     const COORD_TYPE_BD = 'bd09ll'; //坐标类型-百度
     const COORD_TYPE_GCJ = 'gcj02'; //坐标类型-国测局

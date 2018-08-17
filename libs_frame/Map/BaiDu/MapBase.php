@@ -8,9 +8,10 @@
 namespace Map\BaiDu;
 
 use Constant\ErrorCode;
+use DesignPatterns\Singletons\MapBaiduSingleton;
 use Exception\Map\BaiduMapException;
 
-abstract class BaseConfig {
+abstract class MapBase {
     const CHECK_TYPE_SERVER_IP = 'server-ip'; //校验类型-服务端ip
     const CHECK_TYPE_SERVER_SN = 'server-sn'; //校验类型-服务端签名
     const CHECK_TYPE_BROWSE = 'browse'; //校验类型-浏览器
@@ -18,6 +19,7 @@ abstract class BaseConfig {
     public function __construct() {
         $this->output = 'json';
         $this->checkType = self::CHECK_TYPE_SERVER_IP;
+        $this->serverIp = MapBaiduSingleton::getInstance()->getConfig()->getServerIp();
         $this->reqMethod = 'GET';
     }
 
@@ -79,18 +81,6 @@ abstract class BaseConfig {
      */
     public function getServerIp() : string {
         return $this->serverIp;
-    }
-
-    /**
-     * @param string $serverIp
-     * @throws \Exception\Map\BaiduMapException
-     */
-    public function setServerIp(string $serverIp) {
-        if(preg_match('/^(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])(\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])){3}$/', $serverIp) > 0){
-            $this->serverIp = $serverIp;
-        } else {
-            throw new BaiduMapException('服务端IP不合法', ErrorCode::MAP_BAIDU_PARAM_ERROR);
-        }
     }
 
     /**

@@ -11,7 +11,7 @@ use Constant\ErrorCode;
 use Exception\Map\BaiduMapException;
 use Tool\Tool;
 
-class CoordinateTranslate extends BaseConfig {
+class CoordinateTranslate extends MapBase {
     const COORDINATE_TYPE_GPS = 1; //坐标类型-GPS角度
     const COORDINATE_TYPE_GPS_MS = 2; //坐标类型-GPS米制
     const COORDINATE_TYPE_GOOGLE = 3; //坐标类型-google

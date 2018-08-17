@@ -11,7 +11,7 @@ use Constant\ErrorCode;
 use Exception\Map\BaiduMapException;
 use Tool\Tool;
 
-class PlaceSearch extends BaseConfig {
+class PlaceSearch extends MapBase {
     const LL_COORDINATE_TYPE_WGS = 1; //经纬度坐标类型-GPS
     const LL_COORDINATE_TYPE_GCJ = 2; //经纬度坐标类型-国测局
     const LL_COORDINATE_TYPE_BD = 3; //经纬度坐标类型-百度
