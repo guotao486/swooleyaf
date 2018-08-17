@@ -11,7 +11,7 @@ use Constant\ErrorCode;
 use Exception\Map\BaiduMapException;
 use Tool\Tool;
 
-class GeoCoder extends BaseConfig {
+class GeoCoder extends MapBase {
     public function __construct(){
         parent::__construct();
 

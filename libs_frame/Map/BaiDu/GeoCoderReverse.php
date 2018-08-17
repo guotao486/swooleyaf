@@ -11,7 +11,7 @@ use Constant\ErrorCode;
 use Exception\Map\BaiduMapException;
 use Tool\Tool;
 
-class GeoCoderReverse extends BaseConfig {
+class GeoCoderReverse extends MapBase {
     public function __construct(){
         parent::__construct();
 
