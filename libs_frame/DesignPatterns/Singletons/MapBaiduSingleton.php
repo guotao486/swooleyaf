@@ -11,10 +11,12 @@ use Constant\ErrorCode;
 use Exception\Map\BaiduMapException;
 use Log\Log;
 use Map\BaiDu\CoordinateTranslate;
+use Map\BaiDu\GeoCoder;
+use Map\BaiDu\GeoCoderReverse;
 use Map\BaiDu\IpLocation;
+use Map\BaiDu\MapConfig;
 use Map\BaiDu\PlaceDetail;
 use Map\BaiDu\PlaceSearch;
-use Map\BaiDu\ReqCheck;
 use Tool\Tool;
 use Traits\SingletonTrait;
 
@@ -25,16 +27,23 @@ class MapBaiduSingleton {
     private $urlPlaceDetail = 'http://api.map.baidu.com/place/v2/detail';
     private $urlCoordinateTranslate = 'http://api.map.baidu.com/geoconv/v1/';
     private $urlIpLocation = 'http://api.map.baidu.com/location/ip';
+    private $urlGeoCoder = 'http://api.map.baidu.com/geocoder/v2/';
 
     /**
-     * 开发密钥
-     * @var string
+     * @var null|\Map\BaiDu\MapConfig
      */
-    private $ak = '';
+    private $config = null;
 
     private function __construct() {
         $configs = Tool::getConfig('map.' . SY_ENV . SY_PROJECT);
-        $this->setAk((string)Tool::getArrayVal($configs, 'baidu.ak', '', true));
+
+        $mapConfig = new MapConfig();
+        $mapConfig->setAk((string)Tool::getArrayVal($configs, 'baidu.ak', '', true));
+        $mapConfig->setServerIp((string)Tool::getArrayVal($configs, 'baidu.server.ip', '', true));
+        $this->config = $mapConfig;
+    }
+
+    private function __clone(){
     }
 
     /**
@@ -49,22 +58,10 @@ class MapBaiduSingleton {
     }
 
     /**
-     * @return string
+     * @return \Map\BaiDu\MapConfig|null
      */
-    public function getAk() : string {
-        return $this->ak;
-    }
-
-    /**
-     * @param string $ak
-     * @throws \Exception\Map\BaiduMapException
-     */
-    public function setAk(string $ak) {
-        if(preg_match('/^[0-9a-zA-Z]{32}$/', $ak) > 0){
-            $this->ak = $ak;
-        } else {
-            throw new BaiduMapException('密钥不合法', ErrorCode::MAP_BAIDU_PARAM_ERROR);
-        }
+    public function getConfig(){
+        return $this->config;
     }
 
     /**
@@ -149,7 +146,6 @@ class MapBaiduSingleton {
             $curlConfigs[CURLOPT_USERAGENT] = $userAgent;
         }
         $sendRes = Tool::sendCurlReq($curlConfigs);
-
         if($sendRes['res_no'] == 0){
             $resData = Tool::jsonDecode($sendRes['res_content']);
             if(is_array($resData)){
@@ -189,7 +185,7 @@ class MapBaiduSingleton {
             'coord_type' => $search->getCoordinateType(),
             'page_size' => $search->getPageSize(),
             'page_num' => $search->getPageIndex() - 1,
-            'ak' => $this->ak,
+            'ak' => $this->config->getAk(),
             'timestamp' => Tool::getNowTime(),
         ];
         if(!empty($search->getTags())){
@@ -199,14 +195,11 @@ class MapBaiduSingleton {
             $data['filter'] = $search->getFilter();
         }
         $trueData = array_merge($data, $search->getAreaSearchContent($searchType));
+        $search->setReqData($trueData);
+        $search->setReqUrl($this->urlPlaceSearch);
+        $search->checkDataByType();
 
-        $reqCheck = new ReqCheck();
-        $reqCheck->setObj($search);
-        $reqCheck->setReqData($trueData);
-        $reqCheck->setReqUrl($this->urlPlaceSearch);
-        $reqCheck->checkReq();
-
-        $getRes = $this->sendGet($this->urlPlaceSearch, $reqCheck->getReqData(), $reqCheck->getReqConfigs());
+        $getRes = $this->sendGet($this->urlPlaceSearch, $search->getReqData(), $search->getReqConfigs());
         if($getRes['status'] == 0){
             $resArr['data'] = $getRes['results'];
             $resArr['total_num'] = $getRes['total'];
@@ -233,19 +226,17 @@ class MapBaiduSingleton {
             throw new BaiduMapException('uid不能为空', ErrorCode::MAP_BAIDU_PARAM_ERROR);
         }
 
-        $reqCheck = new ReqCheck();
-        $reqCheck->setObj($detail);
-        $reqCheck->setReqData([
+        $detail->setReqData([
             'uids' => implode(',', $detail->getUids()),
             'output' => $detail->getOutput(),
             'scope' => $detail->getScope(),
-            'ak' => $this->ak,
+            'ak' => $this->config->getAk(),
             'timestamp' => Tool::getNowTime(),
         ]);
-        $reqCheck->setReqUrl($this->urlPlaceDetail);
-        $reqCheck->checkReq();
+        $detail->setReqUrl($this->urlPlaceDetail);
+        $detail->checkDataByType();
 
-        $getRes = $this->sendGet($this->urlPlaceDetail, $reqCheck->getReqData(), $reqCheck->getReqConfigs());
+        $getRes = $this->sendGet($this->urlPlaceDetail, $detail->getReqData(), $detail->getReqConfigs());
         if($getRes['status'] == 0){
             $resArr['data'] = $getRes['result'];
         } else {
@@ -271,19 +262,17 @@ class MapBaiduSingleton {
             throw new BaiduMapException('源坐标不能为空', ErrorCode::MAP_BAIDU_PARAM_ERROR);
         }
 
-        $reqCheck = new ReqCheck();
-        $reqCheck->setObj($coord);
-        $reqCheck->setReqData([
+        $coord->setReqData([
             'coords' => implode(';', $coord->getCoords()),
-            'ak' => $this->ak,
+            'ak' => $this->config->getAk(),
             'from' => $coord->getFromType(),
             'to' => $coord->getToType(),
             'output' => $coord->getOutput(),
         ]);
-        $reqCheck->setReqUrl($this->urlCoordinateTranslate);
-        $reqCheck->checkReq();
+        $coord->setReqUrl($this->urlCoordinateTranslate);
+        $coord->checkDataByType();
 
-        $getRes = $this->sendGet($this->urlCoordinateTranslate, $reqCheck->getReqData(), $reqCheck->getReqConfigs());
+        $getRes = $this->sendGet($this->urlCoordinateTranslate, $coord->getReqData(), $coord->getReqConfigs());
         if($getRes['status'] == 0){
             $resArr['data'] = $getRes['result'];
         } else {
@@ -311,19 +300,97 @@ class MapBaiduSingleton {
 
         $data = [
             'ip' => $ipLocation->getIp(),
-            'ak' => $this->ak,
+            'ak' => $this->config->getAk(),
         ];
         if(strlen($ipLocation->getReturnCoordType()) > 0){
             $data['coor'] = $ipLocation->getReturnCoordType();
         }
 
-        $reqCheck = new ReqCheck();
-        $reqCheck->setObj($ipLocation);
-        $reqCheck->setReqData($data);
-        $reqCheck->setReqUrl($this->urlIpLocation);
-        $reqCheck->checkReq();
+        $ipLocation->setReqData($data);
+        $ipLocation->setReqUrl($this->urlIpLocation);
+        $ipLocation->checkDataByType();
 
-        $getRes = $this->sendGet($this->urlIpLocation, $reqCheck->getReqData(), $reqCheck->getReqConfigs());
+        $getRes = $this->sendGet($this->urlIpLocation, $ipLocation->getReqData(), $ipLocation->getReqConfigs());
+        if($getRes['status'] == 0){
+            $resArr['data'] = $getRes;
+            unset($resArr['data']['status']);
+        } else {
+            $resArr['code'] = ErrorCode::MAP_BAIDU_GET_ERROR;
+            $resArr['message'] = $getRes['message'];
+        }
+
+        return $resArr;
+    }
+
+    /**
+     * 逆地理编码
+     * @param \Map\BaiDu\GeoCoderReverse $geoCoderReverse
+     * @return array
+     * @throws \Exception\Map\BaiduMapException
+     */
+    public function reverseGeoCoder(GeoCoderReverse $geoCoderReverse) : array {
+        $resArr = [
+            'code' => 0,
+        ];
+
+        if(strlen($geoCoderReverse->getLocation()) == 0){
+            throw new BaiduMapException('坐标地址不能为空', ErrorCode::MAP_BAIDU_PARAM_ERROR);
+        }
+
+        $data = [
+            'location' => $geoCoderReverse->getLocation(),
+            'coordtype' => $geoCoderReverse->getCoordType(),
+            'ret_coordtype' => $geoCoderReverse->getCoordTypeReturn(),
+            'ak' => $this->config->getAk(),
+            'output' => $geoCoderReverse->getOutput(),
+        ];
+        if($geoCoderReverse->getPoiStatus() == 1){
+            $data['pois'] = $geoCoderReverse->getPoiStatus();
+            $data['radius'] = $geoCoderReverse->getPoiRadius();
+        }
+
+        $geoCoderReverse->setReqData($data);
+        $geoCoderReverse->setReqUrl($this->urlGeoCoder);
+        $geoCoderReverse->checkDataByType();
+
+        $getRes = $this->sendGet($this->urlGeoCoder, $geoCoderReverse->getReqData(), $geoCoderReverse->getReqConfigs());
+        if($getRes['status'] == 0){
+            $resArr['data'] = $getRes;
+            unset($resArr['data']['status']);
+        } else {
+            $resArr['code'] = ErrorCode::MAP_BAIDU_GET_ERROR;
+            $resArr['message'] = $getRes['message'];
+        }
+
+        return $resArr;
+    }
+
+    /**
+     * 地理编码
+     * @param \Map\BaiDu\GeoCoder $geoCoder
+     * @return array
+     * @throws \Exception\Map\BaiduMapException
+     */
+    public function getGeoCoder(GeoCoder $geoCoder) : array {
+        $resArr = [
+            'code' => 0,
+        ];
+
+        if(strlen($geoCoder->getAddress()) == 0){
+            throw new BaiduMapException('地址不能为空', ErrorCode::MAP_BAIDU_PARAM_ERROR);
+        }
+
+        $geoCoder->setReqData([
+            'address' => $geoCoder->getAddress(),
+            'city' => $geoCoder->getCityName(),
+            'ret_coordtype' => $geoCoder->getCoordTypeReturn(),
+            'ak' => $this->config->getAk(),
+            'output' => $geoCoder->getOutput(),
+        ]);
+        $geoCoder->setReqUrl($this->urlGeoCoder);
+        $geoCoder->checkDataByType();
+
+        $getRes = $this->sendGet($this->urlGeoCoder, $geoCoder->getReqData(), $geoCoder->getReqConfigs());
         if($getRes['status'] == 0){
             $resArr['data'] = $getRes;
             unset($resArr['data']['status']);
