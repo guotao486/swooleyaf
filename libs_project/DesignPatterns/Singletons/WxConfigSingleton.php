@@ -107,6 +107,7 @@ class WxConfigSingleton {
      */
     public function refreshShopConfig(string $appId) {
         $expireTime = Tool::getNowTime() + Project::TIME_EXPIRE_LOCAL_WXSHOP_REFRESH;
+        $wxDefaultConfig = Tool::getConfig('project.' . SY_ENV . SY_PROJECT . '.wx');
         $shopConfig = new WxConfigShop();
         $shopConfig->setAppId($appId);
         $shopConfig->setExpireTime($expireTime);
@@ -124,8 +125,8 @@ class WxConfigSingleton {
             $shopConfig->setSecret((string)$configInfo['app_secret']);
             $shopConfig->setPayMchId((string)$configInfo['pay_mchid']);
             $shopConfig->setPayKey((string)$configInfo['pay_key']);
-            $shopConfig->setPayNotifyUrl((string)$configInfo['payurl_notify']);
-            $shopConfig->setPayAuthUrl((string)$configInfo['payurl_auth']);
+            $shopConfig->setPayNotifyUrl($wxDefaultConfig['url']['notify']['default']);
+            $shopConfig->setPayAuthUrl($wxDefaultConfig['url']['auth']['default']);
             $shopConfig->setSslCert((string)$configInfo['payssl_cert']);
             $shopConfig->setSslKey((string)$configInfo['payssl_key']);
             if (is_array($templates)) {

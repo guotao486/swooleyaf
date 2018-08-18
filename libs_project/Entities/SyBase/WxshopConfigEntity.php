@@ -52,18 +52,6 @@ class WxshopConfigEntity extends MysqlEntity {
     public $pay_key = '';
 
     /**
-     * 公众号支付授权URL
-     * @var string
-     */
-    public $payurl_auth = '';
-
-    /**
-     * 公众号支付异步通知URL
-     * @var string
-     */
-    public $payurl_notify = '';
-
-    /**
      * 公众号商户证书内容，去除证书文件的第一行和最后一行以及所有换行
      * @var string
      */
