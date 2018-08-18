@@ -247,7 +247,7 @@ class MapBaiduSingleton {
         $suggestion->setReqUrl($this->urlPlaceSuggestion);
         $suggestion->checkDataByType();
 
-        $getRes = $this->sendGet($this->urlPlaceSearch, $suggestion->getReqData(), $suggestion->getReqConfigs());
+        $getRes = $this->sendGet($this->urlPlaceSuggestion, $suggestion->getReqData(), $suggestion->getReqConfigs());
         if($getRes['status'] == 0){
             $resArr['data'] = $getRes;
             unset($resArr['data']['status']);
