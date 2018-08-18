@@ -8,14 +8,16 @@
 namespace Map\Tencent;
 
 use Constant\ErrorCode;
+use DesignPatterns\Singletons\MapTencentSingleton;
 use Exception\Map\TencentMapException;
 
-abstract class BaseConfig {
+abstract class MapBase {
     const GET_TYPE_SERVER = 'server'; //获取类型-服务端
     const GET_TYPE_MOBILE = 'mobile'; //获取类型-移动端
     const GET_TYPE_BROWSE = 'browse'; //获取类型-网页端
 
     public function __construct() {
+        $this->serverIp = MapTencentSingleton::getInstance()->getConfig()->getServerIp();
         $this->output = 'json';
     }
 
@@ -52,18 +54,6 @@ abstract class BaseConfig {
      */
     public function getServerIp() : string {
         return $this->serverIp;
-    }
-
-    /**
-     * @param string $serverIp
-     * @throws \Exception\Map\TencentMapException
-     */
-    public function setServerIp(string $serverIp) {
-        if(preg_match('/^(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])(\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])){3}$/', $serverIp) > 0){
-            $this->serverIp = $serverIp;
-        } else {
-            throw new TencentMapException('服务端IP不合法', ErrorCode::MAP_TENCENT_PARAM_ERROR);
-        }
     }
 
     /**
@@ -116,43 +106,38 @@ abstract class BaseConfig {
      * 通过类型获取内容
      * @param string $getType
      * @param array $configs
-     * @return string
+     * @return void
      * @throws \Exception\Map\TencentMapException
      */
-    public function getContentByType(string $getType,array &$configs) : string {
-        if($getType == self::GET_TYPE_BROWSE){
-            if(strlen($this->webUrl) == 0){
-                throw new TencentMapException('页面URL不能为空', ErrorCode::MAP_TENCENT_PARAM_ERROR);
-            }
+    public function getContentByType(string $getType,array &$configs) {
+        switch ($getType) {
+            case self::GET_TYPE_BROWSE:
+                if(strlen($this->webUrl) == 0){
+                    throw new TencentMapException('页面URL不能为空', ErrorCode::MAP_TENCENT_PARAM_ERROR);
+                }
 
-            $content = $this->webUrl;
-            $configs['referer'] = $this->webUrl;
-        } else if($getType == self::GET_TYPE_MOBILE){
-            if(strlen($this->appIdentifier) == 0){
-                throw new TencentMapException('应用标识符不能为空', ErrorCode::MAP_TENCENT_PARAM_ERROR);
-            }
+                $configs['referer'] = $this->webUrl;
+                break;
+            case self::GET_TYPE_SERVER:
+                if(isset($configs['headers']) && is_array($configs['headers'])){
+                    $configs['headers'][] = 'X-FORWARDED-FOR:' . $this->serverIp;
+                    $configs['headers'][] = 'CLIENT-IP:' . $this->serverIp;
+                } else {
+                    $configs['headers'] = [
+                        'X-FORWARDED-FOR:' . $this->serverIp,
+                        'CLIENT-IP:' . $this->serverIp,
+                    ];
+                }
+                break;
+            case self::GET_TYPE_MOBILE:
+                if(strlen($this->appIdentifier) == 0){
+                    throw new TencentMapException('应用标识符不能为空', ErrorCode::MAP_TENCENT_PARAM_ERROR);
+                }
 
-            $content = $this->appIdentifier;
-            $configs['referer'] = $this->appIdentifier;
-        } else if($getType == self::GET_TYPE_SERVER){
-            if(strlen($this->serverIp) == 0){
-                throw new TencentMapException('服务端IP不能为空', ErrorCode::MAP_TENCENT_PARAM_ERROR);
-            }
-
-            $content = $this->serverIp;
-            if(isset($configs['headers']) && is_array($configs['headers'])){
-                $configs['headers'][] = 'X-FORWARDED-FOR:' . $content;
-                $configs['headers'][] = 'CLIENT-IP:' . $content;
-            } else {
-                $configs['headers'] = [
-                    'X-FORWARDED-FOR:' . $content,
-                    'CLIENT-IP:' . $content
-                ];
-            }
-        } else {
-            throw new TencentMapException('获取类型不支持', ErrorCode::MAP_TENCENT_PARAM_ERROR);
+                $configs['referer'] = $this->appIdentifier;
+                break;
+            default:
+                throw new TencentMapException('获取类型不支持', ErrorCode::MAP_TENCENT_PARAM_ERROR);
         }
-
-        return $content;
     }
 }

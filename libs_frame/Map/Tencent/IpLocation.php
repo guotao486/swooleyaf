@@ -11,7 +11,7 @@ use Constant\ErrorCode;
 use Exception\Map\TencentMapException;
 use Tool\Tool;
 
-class IpLocation extends BaseConfig {
+class IpLocation extends MapBase {
     public function __construct() {
         parent::__construct();
     }

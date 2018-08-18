@@ -11,7 +11,7 @@ use Constant\ErrorCode;
 use Exception\Map\TencentMapException;
 use Tool\Tool;
 
-class PlaceSearch extends BaseConfig {
+class PlaceSearch extends MapBase {
     const REGION_AUTO_EXTENT_NO = 0;
     const REGION_AUTO_EXTENT_YES = 1;
     const PLACE_SEARCH_TYPE_REGION = 'region'; //区域搜索类型-地区
