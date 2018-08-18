@@ -411,14 +411,14 @@ class SyTool():
             run('mv nghttp2-1.26.0/ /usr/local/nghttp2')
             run('cd /usr/local/nghttp2 && ./configure && make libdir=/usr/lib64 && make libdir=/usr/lib64 install')
             run('rm -rf nghttp2-1.26.0.tar.bz2')
-        extSwooleLocal = ''.join([syDicts['path.package.local'], '/resources/php7/swoole-1.10.5.tgz'])
-        extSwooleRemote = ''.join([syDicts['path.package.remote'], '/swoole-1.10.5.tgz'])
+        extSwooleLocal = ''.join([syDicts['path.package.local'], '/resources/php7/swoole-4.0.4.tgz'])
+        extSwooleRemote = ''.join([syDicts['path.package.remote'], '/swoole-4.0.4.tgz'])
         put(extSwooleLocal, extSwooleRemote)
         with cd(syDicts['path.package.remote']):
-            run('tar -zxvf swoole-1.10.5.tgz')
-            run('cd swoole-1.10.5/ && /usr/local/php7/bin/phpize && ./configure --with-php-config=/usr/local/php7/bin/php-config --with-jemalloc-dir=/usr/local/jemalloc --enable-openssl --enable-http2 && make && make install')
-            run('rm -rf swoole-1.10.5/')
-            run('rm -rf swoole-1.10.5.tgz')
+            run('tar -zxvf swoole-4.0.4.tgz')
+            run('cd swoole-4.0.4/ && /usr/local/php7/bin/phpize && ./configure --with-php-config=/usr/local/php7/bin/php-config --with-jemalloc-dir=/usr/local/jemalloc --enable-openssl --enable-http2 && make && make install')
+            run('rm -rf swoole-4.0.4/')
+            run('rm -rf swoole-4.0.4.tgz')
 
     # 配置java环境
     @staticmethod
