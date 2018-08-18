@@ -107,7 +107,6 @@ class WxConfigSingleton {
      */
     public function refreshShopConfig(string $appId) {
         $expireTime = Tool::getNowTime() + Project::TIME_EXPIRE_LOCAL_WXSHOP_REFRESH;
-        $wxDefaultConfig = Tool::getConfig('project.' . SY_ENV . SY_PROJECT . '.wx');
         $shopConfig = new WxConfigShop();
         $shopConfig->setAppId($appId);
         $shopConfig->setExpireTime($expireTime);
@@ -119,6 +118,7 @@ class WxConfigSingleton {
         if(empty($configInfo)){
             $shopConfig->setValid(false);
         } else {
+            $wxDefaultConfig = Tool::getConfig('project.' . SY_ENV . SY_PROJECT . '.wx');
             $templates = strlen($configInfo['app_templates']) > 0 ? Tool::jsonDecode($configInfo['app_templates']) : [];
             $shopConfig->setValid(true);
             $shopConfig->setClientIp((string)$configInfo['app_clientip']);
