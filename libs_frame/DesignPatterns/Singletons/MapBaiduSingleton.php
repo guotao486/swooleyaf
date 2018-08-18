@@ -17,6 +17,7 @@ use Map\BaiDu\IpLocation;
 use Map\BaiDu\MapConfig;
 use Map\BaiDu\PlaceDetail;
 use Map\BaiDu\PlaceSearch;
+use Map\BaiDu\PlaceSuggestion;
 use Tool\Tool;
 use Traits\SingletonTrait;
 
@@ -25,6 +26,7 @@ class MapBaiduSingleton {
 
     private $urlPlaceSearch = 'http://api.map.baidu.com/place/v2/search';
     private $urlPlaceDetail = 'http://api.map.baidu.com/place/v2/detail';
+    private $urlPlaceSuggestion = 'http://api.map.baidu.com/place/v2/suggestion';
     private $urlCoordinateTranslate = 'http://api.map.baidu.com/geoconv/v1/';
     private $urlIpLocation = 'http://api.map.baidu.com/location/ip';
     private $urlGeoCoder = 'http://api.map.baidu.com/geocoder/v2/';
@@ -203,6 +205,52 @@ class MapBaiduSingleton {
         if($getRes['status'] == 0){
             $resArr['data'] = $getRes['results'];
             $resArr['total_num'] = $getRes['total'];
+        } else {
+            $resArr['code'] = ErrorCode::MAP_BAIDU_GET_ERROR;
+            $resArr['message'] = $getRes['message'];
+        }
+
+        return $resArr;
+    }
+
+    /**
+     * 地区输入提示
+     * @param \Map\BaiDu\PlaceSuggestion $suggestion
+     * @return array
+     * @throws \Exception\Map\BaiduMapException
+     */
+    public function suggestionPlace(PlaceSuggestion $suggestion) : array {
+        $resArr = [
+            'code' => 0,
+        ];
+
+        if(strlen($suggestion->getKeyword()) == 0){
+            throw new BaiduMapException('关键词不能为空', ErrorCode::MAP_BAIDU_PARAM_ERROR);
+        } else if(strlen($suggestion->getRegion()) == 0){
+            throw new BaiduMapException('地区不能为空', ErrorCode::MAP_BAIDU_PARAM_ERROR);
+        }
+
+        $data = [
+            'query' => $suggestion->getKeyword(),
+            'region' => $suggestion->getRegion(),
+            'city_limit' => $suggestion->getCityLimit(),
+            'coord_type' => $suggestion->getCoordType(),
+            'ret_coordtype' => $suggestion->getCoordTypeReturn(),
+            'output' => $suggestion->getOutput(),
+            'ak' => $this->config->getAk(),
+            'timestamp' => Tool::getNowTime(),
+        ];
+        if(strlen($suggestion->getLocation()) > 0){
+            $data['location'] = $suggestion->getLocation();
+        }
+        $suggestion->setReqData($data);
+        $suggestion->setReqUrl($this->urlPlaceSuggestion);
+        $suggestion->checkDataByType();
+
+        $getRes = $this->sendGet($this->urlPlaceSuggestion, $suggestion->getReqData(), $suggestion->getReqConfigs());
+        if($getRes['status'] == 0){
+            $resArr['data'] = $getRes;
+            unset($resArr['data']['status']);
         } else {
             $resArr['code'] = ErrorCode::MAP_BAIDU_GET_ERROR;
             $resArr['message'] = $getRes['message'];
