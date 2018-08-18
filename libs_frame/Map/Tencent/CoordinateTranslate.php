@@ -11,7 +11,7 @@ use Constant\ErrorCode;
 use Exception\Map\TencentMapException;
 use Tool\Tool;
 
-class CoordinateTranslate extends BaseConfig {
+class CoordinateTranslate extends MapBase {
     const COORDINATE_TYPE_GPS = 1; //坐标类型-GPS
     const COORDINATE_TYPE_SOGOU = 2; //坐标类型-搜狗
     const COORDINATE_TYPE_BD = 3; //坐标类型-百度
@@ -81,6 +81,7 @@ class CoordinateTranslate extends BaseConfig {
 
     /**
      * @param int $fromType
+     * @throws \Exception\Map\TencentMapException
      */
     public function setFromType(int $fromType) {
         if(in_array($fromType, [self::COORDINATE_TYPE_GPS, self::COORDINATE_TYPE_SOGOU, self::COORDINATE_TYPE_BD, self::COORDINATE_TYPE_MAPBAR, self::COORDINATE_TYPE_GOOGLE, self::COORDINATE_TYPE_SOGOU_MC,], true)){
