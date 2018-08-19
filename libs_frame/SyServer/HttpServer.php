@@ -82,9 +82,6 @@ class HttpServer extends BaseServer {
     public function __construct(int $port) {
         parent::__construct($port);
         define('SY_API', true);
-        //设置静态文件访问，swoole1.9.17+才能使用
-        $this->_configs['swoole']['document_root'] = SY_ROOT . '/static';
-        $this->_configs['swoole']['enable_static_handler'] = true;
         $this->_cors = Tool::getConfig('cors.' . SY_ENV . SY_PROJECT);
         $this->_cors['allow']['headerStr'] = isset($this->_cors['allow']['headers']) ? implode(', ', $this->_cors['allow']['headers']) : '';
         $this->_cors['allow']['methodStr'] = isset($this->_cors['allow']['methods']) ? implode(', ', $this->_cors['allow']['methods']) : '';
