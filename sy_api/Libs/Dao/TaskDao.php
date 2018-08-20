@@ -145,6 +145,7 @@ class TaskDao {
         } else if($taskBaseInfo['status'] != Project::TASK_STATUS_VALID){
             throw new CheckException('只有有效的任务才能刷新', ErrorCode::COMMON_PARAM_ERROR);
         }
+        unset($ormResult1, $taskBase);
 
         self::setTaskCache([
             'task_tag' => $data['task_tag'],
