@@ -18,17 +18,22 @@ use Validator\Impl\Int\IntIn;
 use Validator\Impl\Int\IntMax;
 use Validator\Impl\Int\IntMin;
 use Validator\Impl\Int\IntRequired;
+use Validator\Impl\String\StringAlnum;
+use Validator\Impl\String\StringAlpha;
 use Validator\Impl\String\StringBaseImage;
+use Validator\Impl\String\StringDigit;
 use Validator\Impl\String\StringEmail;
 use Validator\Impl\String\StringIP;
 use Validator\Impl\String\StringJson;
 use Validator\Impl\String\StringLat;
 use Validator\Impl\String\StringLng;
+use Validator\Impl\String\StringLower;
 use Validator\Impl\String\StringMax;
 use Validator\Impl\String\StringMin;
 use Validator\Impl\String\StringNoEmoji;
 use Validator\Impl\String\StringNoJs;
 use Validator\Impl\String\StringPhone;
+use Validator\Impl\String\StringPower;
 use Validator\Impl\String\StringRegex;
 use Validator\Impl\String\StringRequired;
 use Validator\Impl\String\StringSign;
@@ -65,6 +70,11 @@ class ValidatorContainer extends BaseContainer {
             Project::VALIDATOR_STRING_TYPE_NO_JS,
             Project::VALIDATOR_STRING_TYPE_NO_EMOJI,
             Project::VALIDATOR_STRING_TYPE_ZH,
+            Project::VALIDATOR_STRING_TYPE_ALNUM,
+            Project::VALIDATOR_STRING_TYPE_ALPHA,
+            Project::VALIDATOR_STRING_TYPE_DIGIT,
+            Project::VALIDATOR_STRING_TYPE_LOWER,
+            Project::VALIDATOR_STRING_TYPE_POWER,
         ];
 
         $this->bind(Project::VALIDATOR_INT_TYPE_REQUIRED, function () {
@@ -169,6 +179,26 @@ class ValidatorContainer extends BaseContainer {
 
         $this->bind(Project::VALIDATOR_STRING_TYPE_ZH, function () {
             return new StringZh();
+        });
+
+        $this->bind(Project::VALIDATOR_STRING_TYPE_ALNUM, function () {
+            return new StringAlnum();
+        });
+
+        $this->bind(Project::VALIDATOR_STRING_TYPE_ALPHA, function () {
+            return new StringAlpha();
+        });
+
+        $this->bind(Project::VALIDATOR_STRING_TYPE_DIGIT, function () {
+            return new StringDigit();
+        });
+
+        $this->bind(Project::VALIDATOR_STRING_TYPE_LOWER, function () {
+            return new StringLower();
+        });
+
+        $this->bind(Project::VALIDATOR_STRING_TYPE_POWER, function () {
+            return new StringPower();
         });
     }
 }

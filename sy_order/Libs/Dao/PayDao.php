@@ -236,6 +236,7 @@ class PayDao {
         $contentParams = $payService->checkPayParams();
         $data['content_result'] = $payService->getPayInfo($contentParams);
         CacheSimpleFactory::getRedisInstance()->set($redisKey, '1', 5);
+        unset($payService);
 
         $typeHandleFunc = Tool::getArrayVal(self::$payTypeHandleMap, $data['pay_type'], null);
         return self::$typeHandleFunc($data);

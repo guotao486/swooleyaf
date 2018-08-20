@@ -18,14 +18,14 @@ class PayController extends CommonController {
      * @apiParam {string} session_id 会话ID
      * @apiParam {string} pay_type 支付类型 a000:微信公众号JS a001:微信公众号动态二维码 a002:微信公众号静态二维码 a003:微信小程序JS a100:支付宝二维码 a101:支付宝网页
      * @apiParam {string} pay_content 支付内容 1000:商品订单
-     * @apiParam {string} pay_hash 支付hash
+     * @apiParam {string} pay_hash 支付hash,用于防止因客户端网络不好,连续多次申请
      * @apiParam {string} [a01_timeout] 支付宝订单过期时间
      * @apiParam {string} [a01_returnurl] 支付宝同步通知链接
      * @apiParam {string} [goods_ordersn] 商品订单单号
      * @SyFilter-{"field": "session_id","explain": "会话ID","type": "string","rules": {"required": 1,"min": 1}}
      * @SyFilter-{"field": "pay_type","explain": "支付类型","type": "string","rules": {"required": 1,"min": 4,"max": 4}}
      * @SyFilter-{"field": "pay_content","explain": "支付内容","type": "string","rules": {"required": 1,"min": 4,"max": 4}}
-     * @SyFilter-{"field": "pay_hash","explain": "支付hash","type": "string","rules": {"required": 1,"min": 32,"max": 32}}
+     * @SyFilter-{"field": "pay_hash","explain": "支付hash","type": "string","rules": {"required": 1,"min": 32,"max": 32,"alnum": 1}}
      * @SyFilter-{"field": "a01_timeout","explain": "订单过期时间","type": "string","rules": {"min": 0,"max": 20}}
      * @SyFilter-{"field": "a01_returnurl","explain": "同步通知链接","type": "string","rules": {"url": 1}}
      * @SyFilter-{"field": "goods_ordersn","explain": "订单单号","type": "string","rules": {"min": 10,"max": 32}}
@@ -33,18 +33,13 @@ class PayController extends CommonController {
      * @apiUse CommonFail
      */
     public function applyPayAction() {
-        $payHash = (string)\Request\SyRequest::getParams('pay_hash');
-        if(!ctype_alnum($payHash)){
-            $this->SyResult->setCodeMsg(\Constant\ErrorCode::COMMON_PARAM_ERROR, '支付hash不合法');
-        } else {
-            $needParams = [
-                'pay_type' => trim(\Request\SyRequest::getParams('pay_type')),
-                'pay_content' => trim(\Request\SyRequest::getParams('pay_content')),
-                'pay_hash' => $payHash,
-            ];
-            $applyRes = \Dao\PayDao::applyPay($needParams);
-            $this->SyResult->setData($applyRes);
-        }
+        $needParams = [
+            'pay_type' => trim(\Request\SyRequest::getParams('pay_type')),
+            'pay_content' => trim(\Request\SyRequest::getParams('pay_content')),
+            'pay_hash' => (string)\Request\SyRequest::getParams('pay_hash'),
+        ];
+        $applyRes = \Dao\PayDao::applyPay($needParams);
+        $this->SyResult->setData($applyRes);
 
         $this->sendRsp();
     }
