@@ -16,7 +16,7 @@ class RolePowerController extends CommonController {
     public function addPowerByStationAction(){
         $data = $_POST;
         $data['session_id'] = \Tool\SySession::getSessionId();
-        $addRes = \SyModule\SyModuleOrder::getInstance()->sendApiReq('/Index/RolePower/addPowerByStation', $data);
+        $addRes = \SyModule\SyModuleUser::getInstance()->sendApiReq('/Index/RolePower/addPowerByStation', $data);
         $this->sendRsp($addRes);
     }
 
@@ -26,7 +26,7 @@ class RolePowerController extends CommonController {
     public function editPowerByStationAction(){
         $data = $_POST;
         $data['session_id'] = \Tool\SySession::getSessionId();
-        $editRes = \SyModule\SyModuleOrder::getInstance()->sendApiReq('/Index/RolePower/editPowerByStation', $data);
+        $editRes = \SyModule\SyModuleUser::getInstance()->sendApiReq('/Index/RolePower/editPowerByStation', $data);
         $this->sendRsp($editRes);
     }
 
@@ -36,7 +36,7 @@ class RolePowerController extends CommonController {
     public function editRolePowersByStationAction(){
         $data = $_POST;
         $data['session_id'] = \Tool\SySession::getSessionId();
-        $editRes = \SyModule\SyModuleOrder::getInstance()->sendApiReq('/Index/RolePower/editRolePowersByStation', $data);
+        $editRes = \SyModule\SyModuleUser::getInstance()->sendApiReq('/Index/RolePower/editRolePowersByStation', $data);
         $this->sendRsp($editRes);
     }
 
@@ -46,7 +46,7 @@ class RolePowerController extends CommonController {
     public function delPowerByStationAction(){
         $data = $_GET;
         $data['session_id'] = \Tool\SySession::getSessionId();
-        $delRes = \SyModule\SyModuleOrder::getInstance()->sendApiReq('/Index/RolePower/delPowerByStation', $data);
+        $delRes = \SyModule\SyModuleUser::getInstance()->sendApiReq('/Index/RolePower/delPowerByStation', $data);
         $this->sendRsp($delRes);
     }
 
@@ -56,7 +56,7 @@ class RolePowerController extends CommonController {
     public function getPowerInfoByStationAction(){
         $data = $_GET;
         $data['session_id'] = \Tool\SySession::getSessionId();
-        $getRes = \SyModule\SyModuleOrder::getInstance()->sendApiReq('/Index/RolePower/getPowerInfoByStation', $data);
+        $getRes = \SyModule\SyModuleUser::getInstance()->sendApiReq('/Index/RolePower/getPowerInfoByStation', $data);
         $this->sendRsp($getRes);
     }
 
@@ -66,7 +66,7 @@ class RolePowerController extends CommonController {
     public function getPowerListByStationAction(){
         $data = $_GET;
         $data['session_id'] = \Tool\SySession::getSessionId();
-        $getRes = \SyModule\SyModuleOrder::getInstance()->sendApiReq('/Index/RolePower/getPowerListByStation', $data);
+        $getRes = \SyModule\SyModuleUser::getInstance()->sendApiReq('/Index/RolePower/getPowerListByStation', $data);
         $this->sendRsp($getRes);
     }
 
@@ -76,7 +76,7 @@ class RolePowerController extends CommonController {
     public function getRolePowersByStationAction(){
         $data = $_GET;
         $data['session_id'] = \Tool\SySession::getSessionId();
-        $getRes = \SyModule\SyModuleOrder::getInstance()->sendApiReq('/Index/RolePower/getRolePowersByStation', $data);
+        $getRes = \SyModule\SyModuleUser::getInstance()->sendApiReq('/Index/RolePower/getRolePowersByStation', $data);
         $this->sendRsp($getRes);
     }
 

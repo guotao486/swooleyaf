@@ -16,7 +16,7 @@ class RegionController extends CommonController {
     public function addRegionByStationAction(){
         $data = $_POST;
         $data['session_id'] = \Tool\SySession::getSessionId();
-        $addRes = \SyModule\SyModuleOrder::getInstance()->sendApiReq('/Index/Region/addRegionByStation', $data);
+        $addRes = \SyModule\SyModuleUser::getInstance()->sendApiReq('/Index/Region/addRegionByStation', $data);
         $this->sendRsp($addRes);
     }
 
@@ -26,7 +26,7 @@ class RegionController extends CommonController {
     public function editRegionByStationAction(){
         $data = $_POST;
         $data['session_id'] = \Tool\SySession::getSessionId();
-        $editRes = \SyModule\SyModuleOrder::getInstance()->sendApiReq('/Index/Region/editRegionByStation', $data);
+        $editRes = \SyModule\SyModuleUser::getInstance()->sendApiReq('/Index/Region/editRegionByStation', $data);
         $this->sendRsp($editRes);
     }
 
@@ -36,7 +36,7 @@ class RegionController extends CommonController {
     public function deleteRegionByStationAction(){
         $data = $_GET;
         $data['session_id'] = \Tool\SySession::getSessionId();
-        $delRes = \SyModule\SyModuleOrder::getInstance()->sendApiReq('/Index/Region/deleteRegionByStation', $data);
+        $delRes = \SyModule\SyModuleUser::getInstance()->sendApiReq('/Index/Region/deleteRegionByStation', $data);
         $this->sendRsp($delRes);
     }
 
@@ -46,7 +46,7 @@ class RegionController extends CommonController {
     public function getRegionInfoByStationAction(){
         $data = $_GET;
         $data['session_id'] = \Tool\SySession::getSessionId();
-        $getRes = \SyModule\SyModuleOrder::getInstance()->sendApiReq('/Index/Region/getRegionInfoByStation', $data);
+        $getRes = \SyModule\SyModuleUser::getInstance()->sendApiReq('/Index/Region/getRegionInfoByStation', $data);
         $this->sendRsp($getRes);
     }
 
@@ -56,7 +56,7 @@ class RegionController extends CommonController {
     public function getRegionListByStationAction(){
         $data = $_GET;
         $data['session_id'] = \Tool\SySession::getSessionId();
-        $getRes = \SyModule\SyModuleOrder::getInstance()->sendApiReq('/Index/Region/getRegionListByStation', $data);
+        $getRes = \SyModule\SyModuleUser::getInstance()->sendApiReq('/Index/Region/getRegionListByStation', $data);
         $this->sendRsp($getRes);
     }
 
@@ -64,7 +64,7 @@ class RegionController extends CommonController {
      * 前端获取单个地区信息
      */
     public function getRegionInfoByFrontAction(){
-        $getRes = \SyModule\SyModuleOrder::getInstance()->sendApiReq('/Index/Region/getRegionInfoByFront', $_GET);
+        $getRes = \SyModule\SyModuleUser::getInstance()->sendApiReq('/Index/Region/getRegionInfoByFront', $_GET);
         $this->sendRsp($getRes);
     }
 

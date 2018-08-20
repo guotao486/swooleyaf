@@ -78,6 +78,7 @@ final class Project {
     const REDIS_PREFIX_IMAGE_DATA = 'sy001003_'; //前缀-图片缓存
     const REDIS_PREFIX_IM_ADMIN = 'sy001004_'; //前缀-im管理账号缓存
     const REDIS_PREFIX_KAFKA_MESSAGE_OFFSET = 'sy001005_'; //前缀-kafka消息位移缓存
+    const REDIS_PREFIX_PAY_HASH = 'sy001006_'; //前缀-支付哈希
     const REDIS_PREFIX_WX_ACCOUNT = 'sy002000_'; //前缀-微信公众号
     const REDIS_PREFIX_WX_COMPONENT_ACCOUNT = 'sy002001_'; //前缀-微信开放平台账号
     const REDIS_PREFIX_WX_COMPONENT_AUTHORIZER = 'sy002002_'; //前缀-微信开放平台授权公众号

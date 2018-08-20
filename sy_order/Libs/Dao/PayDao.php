@@ -217,6 +217,12 @@ class PayDao {
     }
 
     public static function applyPay(array $data) {
+        $redisKey = Project::REDIS_PREFIX_PAY_HASH . $data['pay_hash'];
+        $cacheData = CacheSimpleFactory::getRedisInstance()->get($redisKey);
+        if($cacheData !== false){
+            throw new CheckException('支付处理中,请不要重复申请', ErrorCode::COMMON_PARAM_ERROR);
+        }
+
         $typeCheckFunc = Tool::getArrayVal(self::$payTypeCheckMap, $data['pay_type'], null);
         if (is_null($typeCheckFunc)) {
             throw new CheckException('支付类型不支持', ErrorCode::COMMON_PARAM_ERROR);
@@ -229,6 +235,7 @@ class PayDao {
         }
         $contentParams = $payService->checkPayParams();
         $data['content_result'] = $payService->getPayInfo($contentParams);
+        CacheSimpleFactory::getRedisInstance()->set($redisKey, '1', 5);
 
         $typeHandleFunc = Tool::getArrayVal(self::$payTypeHandleMap, $data['pay_type'], null);
         return self::$typeHandleFunc($data);
