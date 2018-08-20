@@ -73,6 +73,7 @@ final class Project {
     const TASK_STATUS_VALID = 1; //任务状态-有效
     const TASK_PERSIST_TYPE_SINGLE = 1; //持久化类型-单次
     const TASK_PERSIST_TYPE_INTERVAL = 2; //持久化类型-间隔时间
+    const TASK_CACHE_EXPIRE_TIME = 300; //缓存过期时间-五分钟
 
     //REDIS常量 以sy000开头的前缀为框架内部前缀,以sy+3位数字开头的前缀为公共模块前缀
     const REDIS_PREFIX_SESSION = 'sy000001_'; //前缀-session

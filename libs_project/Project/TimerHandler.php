@@ -73,7 +73,7 @@ class TimerHandler {
                         $redisKeyQueue2 = Project::REDIS_PREFIX_TIMER_QUEUE . $needTime;
                         $listNum = CacheSimpleFactory::getRedisInstance()->rPush($redisKeyQueue2, $eTag);
                         if(in_array($listNum, [1, 2, 3])){
-                            $expireTime = $needTime + 300;
+                            $expireTime = $needTime + Project::TASK_CACHE_EXPIRE_TIME;
                             CacheSimpleFactory::getRedisInstance()->expireAt($redisKeyQueue2, $expireTime);
                         }
                     }

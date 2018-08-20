@@ -24,11 +24,38 @@ class TaskDao {
         Project::TASK_PERSIST_TYPE_INTERVAL => 'addIntervalTask',
     ];
 
+    private static function setTaskCache(array $data) {
+        $needTime = $data['start_time'] + $data['interval_time'];
+        $expireTime = $needTime + Project::TASK_CACHE_EXPIRE_TIME;
+        if($data['persist_type'] == Project::TASK_PERSIST_TYPE_SINGLE){
+            $redisKeyQueue = Project::REDIS_PREFIX_TIMER_QUEUE . $needTime;
+        } else {
+            $redisKeyQueue = Project::REDIS_PREFIX_TIMER_QUEUE . $data['start_time'];
+        }
+        $listNum = CacheSimpleFactory::getRedisInstance()->rPush($redisKeyQueue, $data['task_tag']);
+        if(in_array($listNum, [1, 2, 3])){
+            CacheSimpleFactory::getRedisInstance()->expireAt($redisKeyQueue, $expireTime);
+        }
+
+        $redisKeyContent = Project::REDIS_PREFIX_TIMER_CONTENT . $data['task_tag'];
+        CacheSimpleFactory::getRedisInstance()->hMset($redisKeyContent, [
+            'unique_key' => $data['task_tag'],
+            'persist_type' => $data['persist_type'],
+            'exec_method' => $data['task_method'],
+            'exec_url' => $data['task_url'],
+            'exec_params' => empty($data['task_params']) ? '_tp=' : http_build_query($data['task_params']),
+            'interval_time' => $data['interval_time'],
+        ]);
+        if($data['persist_type'] == Project::TASK_PERSIST_TYPE_SINGLE){
+            CacheSimpleFactory::getRedisInstance()->expireAt($redisKeyContent, $expireTime);
+        }
+    }
+
     private static function addSingleTask(array &$data) {
-        $nowTime = Tool::getNowTime();
-        $startTime = (int)SyRequest::getParams('start_time', $nowTime);
-        if($startTime < $nowTime){
-            throw new CheckException('任务开始时间不能小于当前时间戳', ErrorCode::COMMON_PARAM_ERROR);
+        $needTime = Tool::getNowTime() + 10;
+        $startTime = (int)SyRequest::getParams('start_time', $needTime);
+        if($startTime < $needTime){
+            throw new CheckException('任务开始时间必须超过当前时间10秒', ErrorCode::COMMON_PARAM_ERROR);
         }
 
         $data['start_time'] = $startTime;
@@ -74,26 +101,15 @@ class TaskDao {
             throw new CheckException('添加任务失败', ErrorCode::COMMON_SERVER_ERROR);
         }
 
-        $needTime = $data['start_time'] + $data['interval_time'];
-        $expireTime = $needTime + 300;
-        $redisKeyQueue = Project::REDIS_PREFIX_TIMER_QUEUE . $needTime;
-        $listNum = CacheSimpleFactory::getRedisInstance()->rPush($redisKeyQueue, $taskTag);
-        if(in_array($listNum, [1, 2, 3])){
-            CacheSimpleFactory::getRedisInstance()->expireAt($redisKeyQueue, $expireTime);
-        }
-
-        $redisKeyContent = Project::REDIS_PREFIX_TIMER_CONTENT . $taskTag;
-        CacheSimpleFactory::getRedisInstance()->hMset($redisKeyContent, [
-            'unique_key' => $taskTag,
+        self::setTaskCache([
+            'task_tag' => $taskTag,
+            'task_url' => $data['task_url'],
+            'task_method' => $data['task_method'],
+            'task_params' => $data['task_params'],
+            'start_time' => $data['start_time'],
             'persist_type' => $data['persist_type'],
-            'exec_method' => $data['task_method'],
-            'exec_url' => $data['task_url'],
-            'exec_params' => empty($data['task_params']) ? '_tp=' : http_build_query($data['task_params']),
             'interval_time' => $data['interval_time'],
         ]);
-        if($data['persist_type'] == Project::TASK_PERSIST_TYPE_SINGLE){
-            CacheSimpleFactory::getRedisInstance()->expireAt($redisKeyContent, $expireTime);
-        }
 
         return [
             'task_id' => $taskId,
@@ -116,6 +132,32 @@ class TaskDao {
 
         return [
             'del_num' => $effectNum,
+        ];
+    }
+
+    public static function refreshTask(array $data){
+        $taskBase = SyTaskMysqlFactory::TaskBaseEntity();
+        $ormResult1 = $taskBase->getContainer()->getModel()->getOrmDbTable();
+        $ormResult1->where('`tag`=?', [$data['task_tag']]);
+        $taskBaseInfo = $taskBase->getContainer()->getModel()->findOne($ormResult1);
+        if(empty($taskBaseInfo)){
+            throw new CheckException('任务信息不存在', ErrorCode::COMMON_PARAM_ERROR);
+        } else if($taskBaseInfo['status'] != Project::TASK_STATUS_VALID){
+            throw new CheckException('只有有效的任务才能刷新', ErrorCode::COMMON_PARAM_ERROR);
+        }
+
+        self::setTaskCache([
+            'task_tag' => $data['task_tag'],
+            'task_url' => $taskBaseInfo['exec_obj'],
+            'task_method' => $taskBaseInfo['exec_method'],
+            'task_params' => strlen($taskBaseInfo['exec_params']) > 0 ? Tool::jsonDecode($taskBaseInfo['exec_params']) : [],
+            'start_time' => Tool::getNowTime() + 10,
+            'persist_type' => $taskBaseInfo['persist_type'],
+            'interval_time' => $taskBaseInfo['interval_time'],
+        ]);
+
+        return [
+            'msg' => '刷新成功',
         ];
     }
 

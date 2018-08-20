@@ -76,6 +76,23 @@ class TaskController extends CommonController {
     }
 
     /**
+     * 刷新任务,当任务因其他原因没有执行才调用
+     * @api {get} /Index/Task/refreshTask 刷新任务
+     * @apiDescription 刷新任务
+     * @apiGroup Task
+     * @apiParam {string} task_tag 任务标识
+     * @SyFilter-{"field": "task_tag","explain": "任务标识","type": "string","rules": {"required": 1,"min": 16,"max": 16}}
+     */
+    public function refreshTaskAction() {
+        $needParams = [
+            'task_tag' => trim(\Request\SyRequest::getParams('task_tag')),
+        ];
+        $refreshRes = \Dao\TaskDao::refreshTask($needParams);
+        $this->SyResult->setData($refreshRes);
+        $this->sendRsp();
+    }
+
+    /**
      * 获取任务列表
      * @api {get} /Index/Task/getTaskList 获取任务列表
      * @apiDescription 获取任务列表
