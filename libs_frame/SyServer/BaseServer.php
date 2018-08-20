@@ -196,7 +196,7 @@ abstract class BaseServer {
      * 创建请求ID
      */
     protected function createReqId() {
-        self::$_reqId = hash('md4', Tool::getNowTime() . Tool::createNonceStr(4));
+        self::$_reqId = hash('md4', Tool::getNowTime() . Tool::createNonceStr(5));
     }
 
     /**
