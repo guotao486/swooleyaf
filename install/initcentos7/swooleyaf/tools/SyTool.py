@@ -495,6 +495,7 @@ class SyTool():
     @staticmethod
     def installMysql():
         run('rm -rf /etc/my.cnf')
+        run('rpm -qa | grep mariadb | xargs -n1 -I {} rpm -e --nodeps {}')
         run('yum -y install make cmake libaio libaio-devel bison-devel ncurses-devel perl-Data-Dumpe')
         run('groupadd mysql && useradd -g mysql mysql -s /sbin/nologin')
         run('mkdir /usr/local/mysql/data && mkdir /home/logs/mysql && touch /home/logs/mysql/error.log && chown -R mysql /home/logs/mysql && chgrp -R mysql /home/logs/mysql')
