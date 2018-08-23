@@ -11,10 +11,10 @@ use Constant\Project;
 use Validator\Base\BaseValidator;
 use Validator\ValidatorService;
 
-class StringPower extends BaseValidator implements ValidatorService {
+class StringUpper extends BaseValidator implements ValidatorService {
     public function __construct() {
         parent::__construct();
-        $this->validatorType = Project::VALIDATOR_STRING_TYPE_POWER;
+        $this->validatorType = Project::VALIDATOR_STRING_TYPE_UPPER;
     }
 
     private function __clone() {

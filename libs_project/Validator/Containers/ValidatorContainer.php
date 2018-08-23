@@ -22,6 +22,8 @@ use Validator\Impl\String\StringAlnum;
 use Validator\Impl\String\StringAlpha;
 use Validator\Impl\String\StringBaseImage;
 use Validator\Impl\String\StringDigit;
+use Validator\Impl\String\StringDigitLower;
+use Validator\Impl\String\StringDigitUpper;
 use Validator\Impl\String\StringEmail;
 use Validator\Impl\String\StringIP;
 use Validator\Impl\String\StringJson;
@@ -33,11 +35,11 @@ use Validator\Impl\String\StringMin;
 use Validator\Impl\String\StringNoEmoji;
 use Validator\Impl\String\StringNoJs;
 use Validator\Impl\String\StringPhone;
-use Validator\Impl\String\StringPower;
 use Validator\Impl\String\StringRegex;
 use Validator\Impl\String\StringRequired;
 use Validator\Impl\String\StringSign;
 use Validator\Impl\String\StringTel;
+use Validator\Impl\String\StringUpper;
 use Validator\Impl\String\StringUrl;
 use Validator\Impl\String\StringZh;
 
@@ -74,7 +76,9 @@ class ValidatorContainer extends BaseContainer {
             Project::VALIDATOR_STRING_TYPE_ALPHA,
             Project::VALIDATOR_STRING_TYPE_DIGIT,
             Project::VALIDATOR_STRING_TYPE_LOWER,
-            Project::VALIDATOR_STRING_TYPE_POWER,
+            Project::VALIDATOR_STRING_TYPE_UPPER,
+            Project::VALIDATOR_STRING_TYPE_DIGIT_LOWER,
+            Project::VALIDATOR_STRING_TYPE_DIGIT_UPPER,
         ];
 
         $this->bind(Project::VALIDATOR_INT_TYPE_REQUIRED, function () {
@@ -197,8 +201,16 @@ class ValidatorContainer extends BaseContainer {
             return new StringLower();
         });
 
-        $this->bind(Project::VALIDATOR_STRING_TYPE_POWER, function () {
-            return new StringPower();
+        $this->bind(Project::VALIDATOR_STRING_TYPE_UPPER, function () {
+            return new StringUpper();
+        });
+
+        $this->bind(Project::VALIDATOR_STRING_TYPE_DIGIT_LOWER, function () {
+            return new StringDigitLower();
+        });
+
+        $this->bind(Project::VALIDATOR_STRING_TYPE_DIGIT_UPPER, function () {
+            return new StringDigitUpper();
         });
     }
 }
