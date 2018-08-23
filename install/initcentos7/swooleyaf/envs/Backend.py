@@ -10,8 +10,8 @@ class Backend(SyBase):
             '',
             'export LUAJIT_LIB=/usr/local/luajit/lib',
             'export LUAJIT_INC=/usr/local/luajit/include/luajit-2.0',
-            "export CPPFLAGS='-I/usr/local/libjpeg/include -I/usr/local/freetype/include'",
-            "export LDFLAGS='-L/usr/local/libjpeg/lib -L/usr/local/freetype/lib'",
+            "export CPPFLAGS='-I/usr/local/libjpeg/include -I/usr/local/freetype/include -I/usr/local/include -I/usr/local/zlib/include -I/usr/local/pcre/include'",
+            "export LDFLAGS='-L/usr/local/libjpeg/lib -L/usr/local/freetype/lib -L/usr/local/lib -L/usr/local/lib64 -L/usr/local/zlib/lib -L/usr/local/pcre/lib'",
             'export LD_LIBRARY_PATH=\$LD_LIBRARY_PATH:/usr/local/lib',
             'export ETCDCTL_API=3',
             'export PATH=\$PATH:/usr/local/git/bin:/usr/local/bin',
@@ -24,27 +24,30 @@ class Backend(SyBase):
             '6379/tcp',
         ]
         self._steps = {
-            1: SyTool.initSystemEnv,
-            2: SyTool.initSystem,
-            3: SyTool.openPorts,
-            4: SyTool.installGit,
-            5: SyTool.installNginx,
-            6: SyTool.installPhp7,
-            7: SyTool.installRedis,
-            8: SyTool.installInotify,
-            9: SyTool.installEtcd
+            1: SyTool.initSystem,
+            2: SyTool.installGit,
+            3: SyTool.installPcre,
+            4: SyTool.installZlib,
+            5: SyTool.installOpenssl,
+            6: SyTool.installNghttp2,
+            7: SyTool.installJpeg,
+            8: SyTool.installImageMagick,
+            9: SyTool.installFreetype,
+            10: SyTool.installNginx,
+            11: SyTool.installPhp7,
+            12: SyTool.installRedis,
+            13: SyTool.installInotify,
+            14: SyTool.installEtcd
         }
 
     def install(self, params):
         step = params['step']
         func = self._steps.get(step, '')
         while hasattr(func, '__call__'):
-            if step == 1:
-                func(self._profileEnv)
-            elif step == 3:
-                func(self._ports)
-            else:
+            if step > 1:
                 func()
+            else:
+                func(self._profileEnv, self._ports)
 
             step += 1
             func = self._steps.get(step, '')

@@ -16,22 +16,18 @@ class Mysql(SyBase):
             '3306/tcp',
         ]
         self._steps = {
-            1: SyTool.initSystemEnv,
-            2: SyTool.initSystem,
-            3: SyTool.openPorts,
-            4: SyTool.installMysql
+            1: SyTool.initSystem,
+            2: SyTool.installMysql
         }
 
     def install(self, params):
         step = params['step']
         func = self._steps.get(step, '')
         while hasattr(func, '__call__'):
-            if step == 1:
-                func(self._profileEnv)
-            elif step == 3:
-                func(self._ports)
-            else:
+            if step > 1:
                 func()
+            else:
+                func(self._profileEnv, self._ports)
 
             step += 1
             func = self._steps.get(step, '')

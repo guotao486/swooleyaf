@@ -2,19 +2,16 @@
 from fabric.api import *
 from initcentos7.swooleyaf.configs import syDicts
 
-
 class SyTool():
-    # 初始化系统环境配置
+    # 配置基础环境
     @staticmethod
-    def initSystemEnv(envList):
+    def initSystem(envList, portList):
+        # 初始化系统环境配置
         for eEnv in iter(envList):
             run('echo "%s" >> /etc/profile' % eEnv, False)
         run('source /etc/profile')
 
-    # 配置基础环境
-    @staticmethod
-    def initSystem():
-        run('yum -y install vim zip nss gcc gcc-c++ net-tools wget htop lsof unzip bzip2 curl-devel zlib-devel epel-release perl-ExtUtils-MakeMaker expat-devel gettext-devel openssl-devel iproute.x86_64 autoconf automake libtool make')
+        run('yum -y install gdb vim zip nss gcc gcc-c++ net-tools wget htop lsof unzip bzip2 curl-devel zlib-devel epel-release perl-ExtUtils-MakeMaker expat-devel gettext-devel openssl-devel iproute.x86_64 autoconf automake libtool make libpng.x86_64 freetype.x86_64 libjpeg-turbo.x86_64 libjpeg-turbo-devel.x86_64 libjpeg-turbo-utils.x86_64 libpng-devel.x86_64 freetype-devel.x86_64 libjpeg-turbo-devel')
         run('wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo')
         run('yum -y update')
         run('systemctl enable firewalld')
@@ -27,9 +24,7 @@ class SyTool():
             run('mkdir /usr/local/mysql')
             run('mkdir %s' % syDicts['path.package.remote'])
 
-    # 开放防火墙端口
-    @staticmethod
-    def openPorts(portList):
+        # 开放防火墙端口
         for ePort in iter(portList):
             run('firewall-cmd --zone=public --add-port=%s --permanent' % ePort, False)
         run('firewall-cmd --reload')
@@ -46,54 +41,102 @@ class SyTool():
         put(gitLocal, gitRemote)
         with cd(syDicts['path.package.remote']):
             run('tar -xzf git-2.10.2.tar.gz')
-            run('cd git-2.10.2/ && make prefix=/usr/local/git all && make prefix=/usr/local/git install && cd ../ && rm -rf git-2.10.2/ && rm -rf git-2.10.2.tar.gz')
+            run('cd git-2.10.2/ && ./configure --prefix=/usr/local/git && make all && make install && cd ../ && rm -rf git-2.10.2/ && rm -rf git-2.10.2.tar.gz')
             run('git config --global user.name "%s"' % syDicts['git.user.name'])
             run('git config --global user.email "%s"' % syDicts['git.user.email'])
 
-    # 配置nginx环境
+    # 配置pcre
     @staticmethod
-    def installNginx():
-        run('mkdir /home/logs/nginx')
-        run('mkdir /home/configs/nginx')
-        run('mkdir /home/configs/nginx/certs')
-        run('mkdir /home/configs/nginx/cache')
-        run('mkdir /home/configs/nginx/temp')
-        run('mkdir /home/configs/nginx/modules')
-        run('mkdir /home/configs/nginx/servers')
-        run('mkdir /home/configs/nginx/streams')
-        pcreLocal = ''.join([syDicts['path.package.local'], '/resources/nginx/pcre-8.42.tar.gz'])
+    def installPcre():
+        pcreLocal = ''.join([syDicts['path.package.local'], '/resources/linux/pcre-8.42.tar.gz'])
         pcreRemote = ''.join([syDicts['path.package.remote'], '/pcre-8.42.tar.gz'])
         put(pcreLocal, pcreRemote)
         with cd(syDicts['path.package.remote']):
             run('mkdir /usr/local/pcre')
             run('tar -zxvf pcre-8.42.tar.gz')
-            run('cd pcre-8.42/ && ./configure --prefix=/usr/local/pcre && make && make install')
+            run('cd pcre-8.42/ && ./configure --prefix=/usr/local/pcre && make && make install && echo "/usr/local/pcre/lib" >> /etc/ld.so.conf && ldconfig')
             run('rm -rf pcre-8.42/')
 
-        zlibLocal = ''.join([syDicts['path.package.local'], '/resources/nginx/zlib-1.2.11.tar.gz'])
+    # 配置zlib
+    @staticmethod
+    def installZlib():
+        zlibLocal = ''.join([syDicts['path.package.local'], '/resources/linux/zlib-1.2.11.tar.gz'])
         zlibRemote = ''.join([syDicts['path.package.remote'], '/zlib-1.2.11.tar.gz'])
         put(zlibLocal, zlibRemote)
         with cd(syDicts['path.package.remote']):
             run('mkdir /usr/local/zlib')
             run('tar -zxvf zlib-1.2.11.tar.gz')
-            run('cd zlib-1.2.11/ && ./configure --prefix=/usr/local/zlib && make && make install')
+            run('cd zlib-1.2.11/ && ./configure --prefix=/usr/local/zlib && make && make install && echo "/usr/local/zlib/lib" >> /etc/ld.so.conf && ldconfig')
             run('rm -rf zlib-1.2.11/')
 
-        opensslLocal = ''.join([syDicts['path.package.local'], '/resources/nginx/openssl-1.1.0i.tar.gz'])
-        opensslRemote = ''.join([syDicts['path.package.remote'], '/openssl-1.1.0i.tar.gz'])
+    # 配置openssl
+    @staticmethod
+    def installOpenssl():
+        opensslLocal = ''.join([syDicts['path.package.local'], '/resources/linux/openssl-1.0.2p.tar.gz'])
+        opensslRemote = ''.join([syDicts['path.package.remote'], '/openssl-1.0.2p.tar.gz'])
         put(opensslLocal, opensslRemote)
         with cd(syDicts['path.package.remote']):
             run('mkdir /usr/local/openssl')
-            run('tar -zxvf openssl-1.1.0i.tar.gz')
-            run('cd openssl-1.1.0i/ && ./config --prefix=/usr/local/openssl shared zlib && make && make install')
-            run('rm -rf openssl-1.1.0i/')
+            run('tar -zxvf openssl-1.0.2p.tar.gz')
+            run('cd openssl-1.0.2p/ && ./config --prefix=/usr/local/openssl shared zlib && make && make install && echo "/usr/local/openssl/lib" >> /etc/ld.so.conf && ldconfig')
+            run('rm -rf openssl-1.0.2p/')
             run('mv /usr/bin/openssl /usr/bin/openssl.old')
             run('mv /usr/include/openssl /usr/include/openssl.old')
             run('ln -s /usr/local/openssl/bin/openssl /usr/bin/openssl')
             run('ln -s /usr/local/openssl/include/openssl /usr/include/openssl')
-            run('echo "/usr/local/openssl/lib" >> /etc/ld.so.conf')
-            run('echo "/usr/local/lib64" >> /etc/ld.so.conf')
-            run('ldconfig -v')
+
+    # 配置nghttp2
+    @staticmethod
+    def installNghttp2():
+        nghttp2Local = ''.join([syDicts['path.package.local'], '/resources/linux/nghttp2-1.26.0.tar.bz2'])
+        nghttp2Remote = ''.join([syDicts['path.package.remote'], '/nghttp2-1.26.0.tar.bz2'])
+        put(nghttp2Local, nghttp2Remote)
+        with cd(syDicts['path.package.remote']):
+            run('tar -xf nghttp2-1.26.0.tar.bz2')
+            run('mv nghttp2-1.26.0/ /usr/local/nghttp2')
+            run('cd /usr/local/nghttp2 && ./configure && make && make install')
+            run('rm -rf nghttp2-1.26.0.tar.bz2')
+
+    # 配置jpeg
+    @staticmethod
+    def installJpeg():
+        jpegLocal = ''.join([syDicts['path.package.local'], '/resources/linux/jpegsrc.v9.tar.gz'])
+        jpegRemote = ''.join([syDicts['path.package.remote'], '/jpegsrc.v9.tar.gz'])
+        put(jpegLocal, jpegRemote)
+        with cd(syDicts['path.package.remote']):
+            run('mkdir /usr/local/libjpeg')
+            run('tar -zxvf jpegsrc.v9.tar.gz')
+            run('cd jpeg-9/ && ./configure --prefix=/usr/local/libjpeg --enable-shared --enable-static && make && make install && echo "/usr/local/libjpeg/lib" >> /etc/ld.so.conf && ldconfig')
+            run('rm -rf jpeg-9/ && rm -rf jpegsrc.v9.tar.gz')
+
+    # 配置ImageMagick
+    @staticmethod
+    def installImageMagick():
+        imageMagickLocal = ''.join([syDicts['path.package.local'], '/resources/linux/ImageMagick-7.0.6-7.tar.gz'])
+        imageMagickRemote = ''.join([syDicts['path.package.remote'], '/ImageMagick-7.0.6-7.tar.gz'])
+        put(imageMagickLocal, imageMagickRemote)
+        with cd(syDicts['path.package.remote']):
+            run('mkdir /usr/local/imagemagick')
+            run('tar -zxvf ImageMagick-7.0.6-7.tar.gz')
+            run('cd ImageMagick-7.0.6-7/ && ./configure --prefix=/usr/local/imagemagick --enable-shared --enable-lzw --without-perl --with-modules && make && make install')
+            run('rm -rf ImageMagick-7.0.6-7/ && rm -rf ImageMagick-7.0.6-7.tar.gz')
+
+    # 配置freetype
+    @staticmethod
+    def installFreetype():
+        freetypeLocal = ''.join([syDicts['path.package.local'], '/resources/linux/freetype-2.6.5.tar.bz2'])
+        freetypeRemote = ''.join([syDicts['path.package.remote'], '/freetype-2.6.5.tar.bz2'])
+        put(freetypeLocal, freetypeRemote)
+        with cd(syDicts['path.package.remote']):
+            run('mkdir /usr/local/freetype')
+            run('tar -xjf freetype-2.6.5.tar.bz2')
+            run('cd freetype-2.6.5/ && ./configure --prefix=/usr/local/freetype --enable-shared --enable-static && make && make install && echo "/usr/local/freetype/lib" >> /etc/ld.so.conf && ldconfig')
+            run('rm -rf freetype-2.6.5/ && rm -rf freetype-2.6.5.tar.bz2')
+
+    # 配置nginx环境
+    @staticmethod
+    def installNginx():
+        run('mkdir /home/logs/nginx && mkdir /home/configs/nginx && mkdir /home/configs/nginx/certs && mkdir /home/configs/nginx/cache && mkdir /home/configs/nginx/temp && mkdir /home/configs/nginx/modules && mkdir /home/configs/nginx/servers && mkdir /home/configs/nginx/streams')
 
         libunwindLocal = ''.join([syDicts['path.package.local'], '/resources/nginx/libunwind-1.1.tar.gz'])
         libunwindRemote = ''.join([syDicts['path.package.remote'], '/libunwind-1.1.tar.gz'])
@@ -101,8 +144,7 @@ class SyTool():
         with cd(syDicts['path.package.remote']):
             run('tar -zxvf libunwind-1.1.tar.gz')
             run('cd libunwind-1.1/ && CFLAGS=-fPIC ./configure --prefix=/usr && make CFLAGS=-fPIC && make CFLAGS=-fPIC install')
-            run('rm -rf libunwind-1.1/')
-            run('rm -rf libunwind-1.1.tar.gz')
+            run('rm -rf libunwind-1.1/ && rm -rf libunwind-1.1.tar.gz')
 
         gperftoolsLocal = ''.join([syDicts['path.package.local'], '/resources/nginx/gperftools-2.1.tar.gz'])
         gperftoolsRemote = ''.join([syDicts['path.package.remote'], '/gperftools-2.1.tar.gz'])
@@ -110,12 +152,9 @@ class SyTool():
         with cd(syDicts['path.package.remote']):
             run('tar -zxvf gperftools-2.1.tar.gz')
             run('cd gperftools-2.1/ && ./configure --prefix=/usr --enable-frame-pointers && make && make install')
-            run('rm -rf gperftools-2.1/')
-            run('rm -rf gperftools-2.1.tar.gz')
-            run('echo "/usr/local/lib" > /etc/ld.so.conf.d/usr_local_lib.conf')
-            run('/sbin/ldconfig')
-            run('mkdir /tmp/tcmalloc')
-            run('chmod 0777 /tmp/tcmalloc')
+            run('rm -rf gperftools-2.1/ && rm -rf gperftools-2.1.tar.gz')
+            run('echo "/usr/local/lib" > /etc/ld.so.conf.d/usr_local_lib.conf && ldconfig')
+            run('mkdir /tmp/tcmalloc && chmod 0777 /tmp/tcmalloc')
 
         luajitLocal = ''.join([syDicts['path.package.local'], '/resources/nginx/LuaJIT-2.0.5.tar.gz'])
         luajitRemote = ''.join([syDicts['path.package.remote'], '/LuaJIT-2.0.5.tar.gz'])
@@ -124,8 +163,7 @@ class SyTool():
             run('mkdir /usr/local/luajit')
             run('tar -zxvf LuaJIT-2.0.5.tar.gz')
             run('cd LuaJIT-2.0.5/ && make && make install PREFIX=/usr/local/luajit')
-            run('rm -rf LuaJIT-2.0.5/')
-            run('rm -rf LuaJIT-2.0.5.tar.gz')
+            run('rm -rf LuaJIT-2.0.5/ && rm -rf LuaJIT-2.0.5.tar.gz')
 
         ngxdevelLocal = ''.join([syDicts['path.package.local'], '/resources/nginx/ngx_devel_kit-0.2.19.tar.gz'])
         ngxdevelRemote = ''.join([syDicts['path.package.remote'], '/ngx_devel_kit-0.2.19.tar.gz'])
@@ -181,21 +219,17 @@ class SyTool():
         with cd(syDicts['path.package.remote']):
             pcreDirRemote = ''.join([syDicts['path.package.remote'], '/pcre-8.42'])
             zlibDirRemote = ''.join([syDicts['path.package.remote'], '/zlib-1.2.11'])
-            opensslDirRemote = ''.join([syDicts['path.package.remote'], '/openssl-1.1.0i'])
+            opensslDirRemote = ''.join([syDicts['path.package.remote'], '/openssl-1.0.2p'])
             run('mkdir /usr/local/nginx')
             run('tar -zxvf nginx-1.12.2.tar.gz')
             run('tar -zxvf pcre-8.42.tar.gz')
             run('tar -zxvf zlib-1.2.11.tar.gz')
-            run('tar -zxvf openssl-1.1.0i.tar.gz')
+            run('tar -zxvf openssl-1.0.2p.tar.gz')
             run('cd nginx-1.12.2/ && patch -p1 < /home/configs/nginx/modules/nginx_upstream_check_module/check_1.12.1+.patch && ./configure --prefix=/usr/local/nginx --with-pcre=%s --with-zlib=%s --with-openssl=%s --without-http_autoindex_module --without-http_ssi_module --with-http_ssl_module --with-http_stub_status_module --with-http_realip_module --with-http_gzip_static_module --with-http_v2_module --with-stream --with-stream_realip_module --with-stream_ssl_module --with-google_perftools_module --with-debug --add-module=/home/configs/nginx/modules/ngx_devel_kit --add-module=/home/configs/nginx/modules/lua-nginx-module --add-module=/home/configs/nginx/modules/nginx_upstream_check_module --add-module=/home/configs/nginx/modules/ngx_cache_purge --add-module=/home/configs/nginx/modules/headers-more-nginx-module --with-ld-opt="-Wl,-rpath,$LUAJIT_LIB" && make -j 4 && make install' % (pcreDirRemote, zlibDirRemote, opensslDirRemote))
-            run('rm -rf nginx-1.12.2/')
-            run('rm -rf nginx-1.12.2.tar.gz')
-            run('rm -rf pcre-8.42/')
-            run('rm -rf pcre-8.42.tar.gz')
-            run('rm -rf zlib-1.2.11/')
-            run('rm -rf zlib-1.2.11.tar.gz')
-            run('rm -rf openssl-1.1.0i/')
-            run('rm -rf openssl-1.1.0i.tar.gz')
+            run('rm -rf nginx-1.12.2/ && rm -rf nginx-1.12.2.tar.gz')
+            run('rm -rf pcre-8.42/ && rm -rf pcre-8.42.tar.gz')
+            run('rm -rf zlib-1.2.11/ && rm -rf zlib-1.2.11.tar.gz')
+            run('rm -rf openssl-1.0.2p/ && rm -rf openssl-1.0.2p.tar.gz')
 
         nginxConfLocal = ''.join([syDicts['path.package.local'], '/configs/swooleyaf/nginx/nginx.conf'])
         nginxConfRemote = '/usr/local/nginx/conf/nginx.conf'
@@ -239,42 +273,20 @@ class SyTool():
     # 配置PHP7环境
     @staticmethod
     def installPhp7():
-        run('yum -y install gdb php-mcrypt libmcrypt libmcrypt-devel libxslt libxml2 libxml2-devel openssl openssl-devel curl-devel libcurl-devel libpng.x86_64 freetype.x86_64 libjpeg-turbo.x86_64 libjpeg-turbo-devel.x86_64 libjpeg-turbo-utils.x86_64 libpng-devel.x86_64 freetype-devel.x86_64 libjpeg-turbo-devel libmcrypt-devel mysql-devel openldap openldap-devel libtool-ltdl-devel.x86_64 gmp-devel')
-
-        jpegLocal = ''.join([syDicts['path.package.local'], '/resources/php7/jpegsrc.v9.tar.gz'])
-        jpegRemote = ''.join([syDicts['path.package.remote'], '/jpegsrc.v9.tar.gz'])
-        put(jpegLocal, jpegRemote)
-        with cd(syDicts['path.package.remote']):
-            run('mkdir /usr/local/libjpeg')
-            run('tar -zxvf jpegsrc.v9.tar.gz')
-            run('cd jpeg-9/ && ./configure --prefix=/usr/local/libjpeg --enable-shared --enable-static && make && make install')
-            run('ldconfig /usr/local/libjpeg/lib')
-            run('rm -rf jpeg-9/')
-            run('rm -rf jpegsrc.v9.tar.gz')
-
-        freetypeLocal = ''.join([syDicts['path.package.local'], '/resources/php7/freetype-2.6.5.tar.bz2'])
-        freetypeRemote = ''.join([syDicts['path.package.remote'], '/freetype-2.6.5.tar.bz2'])
-        put(freetypeLocal, freetypeRemote)
-        with cd(syDicts['path.package.remote']):
-            run('mkdir /usr/local/freetype')
-            run('tar -xjf freetype-2.6.5.tar.bz2')
-            run('cd freetype-2.6.5/ && ./configure --prefix=/usr/local/freetype --enable-shared --enable-static && make && make install')
-            run('ldconfig /usr/local/freetype/lib')
-            run('rm -rf freetype-2.6.5/')
-            run('rm -rf freetype-2.6.5.tar.bz2')
+        run('yum -y install php-mcrypt libmcrypt libmcrypt-devel libxslt libxml2 libxml2-devel curl-devel libcurl-devel libmcrypt-devel mysql-devel openldap openldap-devel libtool-ltdl-devel.x86_64 gmp-devel')
 
         php7Local = ''.join([syDicts['path.package.local'], '/resources/php7/php-7.1.21.tar.gz'])
         php7Remote = ''.join([syDicts['path.package.remote'], '/php-7.1.21.tar.gz'])
         put(php7Local, php7Remote)
         with cd(syDicts['path.package.remote']):
-            run('mkdir /tmp/swoolyaf')
+            run('mkdir /tmp/swooleyaf')
             run('mkdir /home/configs/yaconf-cli')
             run('mkdir /home/configs/yaconf-fpm')
             run('mkdir /home/logs/seaslog-cli')
             run('mkdir /home/logs/seaslog-fpm')
             run('mkdir /usr/local/php7')
             run('tar -zxvf php-7.1.21.tar.gz')
-            run('cd php-7.1.21/ && ./configure --prefix=/usr/local/php7 --exec-prefix=/usr/local/php7 --bindir=/usr/local/php7/bin --sbindir=/usr/local/php7/sbin --includedir=/usr/local/php7/include --libdir=/usr/local/php7/lib/php --mandir=/usr/local/php7/php/man --with-config-file-path=/usr/local/php7/etc --with-mysql-sock=/usr/local/mysql/mysql.sock --with-zlib=/usr/local/zlib --with-mhash --with-openssl --with-mysqli=shared,mysqlnd --with-pdo-mysql=shared,mysqlnd --with-iconv --enable-zip --enable-inline-optimization --disable-debug --disable-rpath --enable-shared --enable-xml --enable-pcntl --enable-bcmath --enable-mysqlnd --enable-sysvsem --with-mysqli --enable-embedded-mysqli  --with-pdo-mysql --enable-shmop --enable-mbregex --enable-mbstring --enable-ftp --enable-sockets --with-xmlrpc --enable-soap --without-pear --with-gettext --enable-session --with-curl --enable-opcache --enable-fpm --without-gdbm --enable-fileinfo --with-gmp && make && make install')
+            run('cd php-7.1.21/ && ./configure --prefix=/usr/local/php7 --exec-prefix=/usr/local/php7 --bindir=/usr/local/php7/bin --sbindir=/usr/local/php7/sbin --includedir=/usr/local/php7/include --libdir=/usr/local/php7/lib/php --mandir=/usr/local/php7/php/man --with-config-file-path=/usr/local/php7/etc --with-mysql-sock=/usr/local/mysql/mysql.sock --with-zlib=/usr/local/zlib --with-mhash --with-openssl=/usr/local/openssl --with-mysqli=shared,mysqlnd --with-pdo-mysql=shared,mysqlnd --with-iconv --enable-zip --enable-inline-optimization --disable-debug --disable-rpath --enable-shared --enable-xml --enable-pcntl --enable-bcmath --enable-mysqlnd --enable-sysvsem --with-mysqli --enable-embedded-mysqli  --with-pdo-mysql --enable-shmop --enable-mbregex --enable-mbstring --enable-ftp --enable-sockets --with-xmlrpc --enable-soap --without-pear --with-gettext --enable-session --with-curl --enable-opcache --enable-fpm --without-gdbm --enable-fileinfo --with-gmp && make && make install')
 
         php7CliIniLocal = ''.join([syDicts['path.package.local'], '/configs/swooleyaf/php7/php-cli.ini'])
         php7CliIniRemote = '/usr/local/php7/etc/php-cli.ini'
@@ -305,26 +317,16 @@ class SyTool():
             run('cd ext/gd/ && /usr/local/php7/bin/phpize && ./configure --with-php-config=/usr/local/php7/bin/php-config --with-freetype-dir=/usr/local/freetype --with-jpeg-dir=/usr/local/libjpeg --with-zlib-dir=/usr/local/zlib --enable-gd-jis-conv --enable-gd-native-ttf && make && make install')
 
         # 扩展redis
-        extRedisLocal = ''.join([syDicts['path.package.local'], '/resources/php7/redis-3.1.6.tgz'])
-        extRedisRemote = ''.join([syDicts['path.package.remote'], '/redis-3.1.6.tgz'])
+        extRedisLocal = ''.join([syDicts['path.package.local'], '/resources/php7/redis-4.1.1.tgz'])
+        extRedisRemote = ''.join([syDicts['path.package.remote'], '/redis-4.1.1.tgz'])
         put(extRedisLocal, extRedisRemote)
         with cd(syDicts['path.package.remote']):
             run('mkdir /usr/local/phpredis')
-            run('tar -zxvf redis-3.1.6.tgz')
-            run('cd redis-3.1.6/ && /usr/local/php7/bin/phpize && ./configure --prefix=/usr/local/phpredis --with-php-config=/usr/local/php7/bin/php-config && make && make install')
-            run('rm -rf redis-3.1.6/')
-            run('rm -rf redis-3.1.6.tgz')
+            run('tar -zxvf redis-4.1.1.tgz')
+            run('cd redis-4.1.1/ && /usr/local/php7/bin/phpize && ./configure --prefix=/usr/local/phpredis --with-php-config=/usr/local/php7/bin/php-config && make && make install')
+            run('rm -rf redis-4.1.1/ && rm -rf redis-4.1.1.tgz')
 
         # 扩展imgick
-        extImageMagickLocal = ''.join([syDicts['path.package.local'], '/resources/php7/ImageMagick-7.0.6-7.tar.gz'])
-        extImageMagickRemote = ''.join([syDicts['path.package.remote'], '/ImageMagick-7.0.6-7.tar.gz'])
-        put(extImageMagickLocal, extImageMagickRemote)
-        with cd(syDicts['path.package.remote']):
-            run('mkdir /usr/local/imagemagick')
-            run('tar -zxvf ImageMagick-7.0.6-7.tar.gz')
-            run('cd ImageMagick-7.0.6-7/ && ./configure --prefix=/usr/local/imagemagick --enable-shared --enable-lzw --without-perl --with-modules && make && make install')
-            run('rm -rf ImageMagick-7.0.6-7/')
-            run('rm -rf ImageMagick-7.0.6-7.tar.gz')
         extImagickLocal = ''.join([syDicts['path.package.local'], '/resources/php7/imagick-3.4.3.tgz'])
         extImagickRemote = ''.join([syDicts['path.package.remote'], '/imagick-3.4.3.tgz'])
         put(extImagickLocal, extImagickRemote)
@@ -332,8 +334,7 @@ class SyTool():
             run('mkdir /usr/local/imagick')
             run('tar -zxvf imagick-3.4.3.tgz')
             run('cd imagick-3.4.3/ && /usr/local/php7/bin/phpize && ./configure --prefix=/usr/local/imagick --with-php-config=/usr/local/php7/bin/php-config --with-imagick=/usr/local/imagemagick && make && make install')
-            run('rm -rf imagick-3.4.3/')
-            run('rm -rf imagick-3.4.3.tgz')
+            run('rm -rf imagick-3.4.3/ && rm -rf imagick-3.4.3.tgz')
 
         # 扩展SeasLog
         extSeasLogLocal = ''.join([syDicts['path.package.local'], '/resources/php7/SeasLog-1.8.4.tgz'])
@@ -342,18 +343,16 @@ class SyTool():
         with cd(syDicts['path.package.remote']):
             run('tar -zxvf SeasLog-1.8.4.tgz')
             run('cd SeasLog-1.8.4/ && /usr/local/php7/bin/phpize && ./configure --with-php-config=/usr/local/php7/bin/php-config && make && make install')
-            run('rm -rf SeasLog-1.8.4/')
-            run('rm -rf SeasLog-1.8.4.tgz')
+            run('rm -rf SeasLog-1.8.4/ && rm -rf SeasLog-1.8.4.tgz')
 
         # 扩展mongodb
-        extMongodbLocal = ''.join([syDicts['path.package.local'], '/resources/php7/mongodb-1.3.4.tgz'])
-        extMongodbRemote = ''.join([syDicts['path.package.remote'], '/mongodb-1.3.4.tgz'])
+        extMongodbLocal = ''.join([syDicts['path.package.local'], '/resources/php7/mongodb-1.5.2.tgz'])
+        extMongodbRemote = ''.join([syDicts['path.package.remote'], '/mongodb-1.5.2.tgz'])
         put(extMongodbLocal, extMongodbRemote)
         with cd(syDicts['path.package.remote']):
-            run('tar -zxvf mongodb-1.3.4.tgz')
-            run('cd mongodb-1.3.4/ && /usr/local/php7/bin/phpize && ./configure --with-php-config=/usr/local/php7/bin/php-config && make && make install')
-            run('rm -rf mongodb-1.3.4/')
-            run('rm -rf mongodb-1.3.4.tgz')
+            run('tar -zxvf mongodb-1.5.2.tgz')
+            run('cd mongodb-1.5.2/ && /usr/local/php7/bin/phpize && ./configure --with-php-config=/usr/local/php7/bin/php-config && make && make install')
+            run('rm -rf mongodb-1.5.2/ && rm -rf mongodb-1.5.2.tgz')
 
         # 扩展msgpack
         extMsgpackLocal = ''.join([syDicts['path.package.local'], '/resources/php7/msgpack-2.0.2.tgz'])
@@ -362,8 +361,7 @@ class SyTool():
         with cd(syDicts['path.package.remote']):
             run('tar -zxvf msgpack-2.0.2.tgz')
             run('cd msgpack-2.0.2/ && /usr/local/php7/bin/phpize && ./configure --with-php-config=/usr/local/php7/bin/php-config && make && make install')
-            run('rm -rf msgpack-2.0.2/')
-            run('rm -rf msgpack-2.0.2.tgz')
+            run('rm -rf msgpack-2.0.2/ && rm -rf msgpack-2.0.2.tgz')
 
         # 扩展yac
         extYacLocal = ''.join([syDicts['path.package.local'], '/resources/php7/yac-2.0.2.tgz'])
@@ -372,8 +370,7 @@ class SyTool():
         with cd(syDicts['path.package.remote']):
             run('tar -zxvf yac-2.0.2.tgz')
             run('cd yac-2.0.2/ && /usr/local/php7/bin/phpize && ./configure --with-php-config=/usr/local/php7/bin/php-config && make && make install')
-            run('rm -rf yac-2.0.2/')
-            run('rm -rf yac-2.0.2.tgz')
+            run('rm -rf yac-2.0.2/ && rm -rf yac-2.0.2.tgz')
 
         # 扩展yaconf
         extYaconfLocal = ''.join([syDicts['path.package.local'], '/resources/php7/yaconf-1.0.7.tgz'])
@@ -382,8 +379,7 @@ class SyTool():
         with cd(syDicts['path.package.remote']):
             run('tar -zxvf yaconf-1.0.7.tgz')
             run('cd yaconf-1.0.7/ && /usr/local/php7/bin/phpize && ./configure --with-php-config=/usr/local/php7/bin/php-config && make && make install')
-            run('rm -rf yaconf-1.0.7/')
-            run('rm -rf yaconf-1.0.7.tgz')
+            run('rm -rf yaconf-1.0.7/ && rm -rf yaconf-1.0.7.tgz')
 
         # 扩展yaf
         extYafLocal = ''.join([syDicts['path.package.local'], '/resources/php7/yaf-3.0.7.tgz'])
@@ -392,8 +388,7 @@ class SyTool():
         with cd(syDicts['path.package.remote']):
             run('tar -zxvf yaf-3.0.7.tgz')
             run('cd yaf-3.0.7/ && /usr/local/php7/bin/phpize && ./configure --with-php-config=/usr/local/php7/bin/php-config && make && make install')
-            run('rm -rf yaf-3.0.7/')
-            run('rm -rf yaf-3.0.7.tgz')
+            run('rm -rf yaf-3.0.7/ && rm -rf yaf-3.0.7.tgz')
 
         # 扩展swoole
         extSwooleJemallocLocal = ''.join([syDicts['path.package.local'], '/resources/php7/jemalloc-4.5.0.tar.bz2'])
@@ -403,24 +398,14 @@ class SyTool():
             run('mkdir /usr/local/jemalloc')
             run('tar -xjvf jemalloc-4.5.0.tar.bz2')
             run('cd jemalloc-4.5.0/ && ./configure --prefix=/usr/local/jemalloc --with-jemalloc-prefix=je_ && make -j 4 && make install')
-            run('rm -rf jemalloc-4.5.0/')
-            run('rm -rf jemalloc-4.5.0.tar.bz2')
-        extSwooleHttp2Local = ''.join([syDicts['path.package.local'], '/resources/php7/nghttp2-1.26.0.tar.bz2'])
-        extSwooleHttp2Remote = ''.join([syDicts['path.package.remote'], '/nghttp2-1.26.0.tar.bz2'])
-        put(extSwooleHttp2Local, extSwooleHttp2Remote)
-        with cd(syDicts['path.package.remote']):
-            run('tar -xf nghttp2-1.26.0.tar.bz2')
-            run('mv nghttp2-1.26.0/ /usr/local/nghttp2')
-            run('cd /usr/local/nghttp2 && ./configure && make libdir=/usr/lib64 && make libdir=/usr/lib64 install')
-            run('rm -rf nghttp2-1.26.0.tar.bz2')
+            run('rm -rf jemalloc-4.5.0/ && rm -rf jemalloc-4.5.0.tar.bz2')
         extSwooleLocal = ''.join([syDicts['path.package.local'], '/resources/php7/swoole-4.0.4.tgz'])
         extSwooleRemote = ''.join([syDicts['path.package.remote'], '/swoole-4.0.4.tgz'])
         put(extSwooleLocal, extSwooleRemote)
         with cd(syDicts['path.package.remote']):
             run('tar -zxvf swoole-4.0.4.tgz')
             run('cd swoole-4.0.4/ && /usr/local/php7/bin/phpize && ./configure --with-php-config=/usr/local/php7/bin/php-config --with-jemalloc-dir=/usr/local/jemalloc --enable-openssl --enable-http2 && make && make install')
-            run('rm -rf swoole-4.0.4/')
-            run('rm -rf swoole-4.0.4.tgz')
+            run('rm -rf swoole-4.0.4/ && rm -rf swoole-4.0.4.tgz')
 
     # 配置java环境
     @staticmethod
@@ -444,8 +429,7 @@ class SyTool():
             run('mkdir /usr/local/inotify')
             run('tar -zxvf inotify-tools-3.14.tar.gz')
             run('cd inotify-tools-3.14/ && ./configure --prefix=/usr/local/inotify && make && make install')
-            run('rm -rf inotify-tools-3.14/')
-            run('rm -rf inotify-tools-3.14.tar.gz')
+            run('rm -rf inotify-tools-3.14/ && rm -rf inotify-tools-3.14.tar.gz')
             run('mkdir /usr/local/inotify/symodules')
             run('touch /usr/local/inotify/symodules/change_service.txt')
 
