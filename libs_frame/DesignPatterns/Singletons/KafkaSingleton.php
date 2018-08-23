@@ -55,6 +55,7 @@ class KafkaSingleton {
         $consumerConf->set('auto.commit.interval.ms', 0);
         $consumerConf->set('enable.auto.offset.store', true);
         $consumerConf->set('offset.store.method', 'broker');
+        $consumerConf->set('fetch.wait.max.ms', (int)Tool::getArrayVal($kafkaConfigs, 'consumer.fetch.wait.max.ms', 2000, true));
         $consumerConf->setDefaultTopicConf($consumerTopicConf);
         $consumerConf->setRebalanceCb(function (KafkaConsumer $kafka, $err,array $partitions=null) {
             switch ($err) {
