@@ -5,24 +5,25 @@ from initcentos7.swooleyaf.configs import syDicts
 class SyTool():
     # 配置基础环境
     @staticmethod
-    def initSystem(envList, portList):
+    def initSystem(envList, portList, tag):
         # 初始化系统环境配置
         for eEnv in iter(envList):
             run('echo "%s" >> /etc/profile' % eEnv, False)
         run('source /etc/profile')
 
-        run('yum -y install gdb vim zip nss gcc gcc-c++ net-tools wget htop lsof unzip bzip2 curl-devel zlib-devel epel-release perl-ExtUtils-MakeMaker expat-devel gettext-devel openssl-devel iproute.x86_64 autoconf automake make libtool libtool-ltdl libtool-ltdl-devel libpng.x86_64 freetype.x86_64 libjpeg-turbo.x86_64 libjpeg-turbo-devel.x86_64 libjpeg-turbo-utils.x86_64 libpng-devel.x86_64 freetype-devel.x86_64 libjpeg-turbo-devel')
-        run('wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo')
-        run('yum -y update')
-        run('systemctl enable firewalld')
-        run('systemctl start firewalld')
-        run('systemctl enable crond')
-        run('systemctl start crond')
-        with settings(warn_only=True):
-            run('mkdir /home/configs')
-            run('mkdir /home/logs')
-            run('mkdir /usr/local/mysql')
-            run('mkdir %s' % syDicts['path.package.remote'])
+        if tag == 1:
+            run('yum -y install gdb vim zip nss gcc gcc-c++ net-tools wget htop lsof unzip bzip2 curl-devel libcurl-devel zlib-devel epel-release perl-ExtUtils-MakeMaker expat-devel gettext-devel openssl-devel iproute.x86_64 autoconf automake make cmake libtool libtool-ltdl libtool-ltdl-devel libpng.x86_64 freetype.x86_64 libjpeg-turbo.x86_64 libjpeg-turbo-devel.x86_64 libjpeg-turbo-utils.x86_64 libpng-devel.x86_64 freetype-devel.x86_64 libjpeg-turbo-devel')
+            run('wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo')
+            run('yum -y update')
+            run('systemctl enable firewalld')
+            run('systemctl start firewalld')
+            run('systemctl enable crond')
+            run('systemctl start crond')
+            with settings(warn_only=True):
+                run('mkdir /home/configs')
+                run('mkdir /home/logs')
+                run('mkdir /usr/local/mysql')
+                run('mkdir %s' % syDicts['path.package.remote'])
 
         # 开放防火墙端口
         for ePort in iter(portList):
@@ -273,7 +274,7 @@ class SyTool():
     # 配置PHP7环境
     @staticmethod
     def installPhp7():
-        run('yum -y install php-mcrypt libmcrypt libmcrypt-devel libxslt libxml2 libxml2-devel curl-devel libcurl-devel libmcrypt-devel mysql-devel openldap openldap-devel libtool-ltdl-devel.x86_64 gmp-devel')
+        run('yum -y install libxslt libxml2 libxml2-devel mysql-devel openldap openldap-devel gmp-devel')
 
         php7Local = ''.join([syDicts['path.package.local'], '/resources/php7/php-7.1.21.tar.gz'])
         php7Remote = ''.join([syDicts['path.package.remote'], '/php-7.1.21.tar.gz'])
@@ -496,7 +497,7 @@ class SyTool():
     def installMysql():
         run('rm -rf /etc/my.cnf')
         run('rpm -qa | grep mariadb | xargs -n1 -I {} rpm -e --nodeps {}')
-        run('yum -y install make cmake libaio libaio-devel bison-devel ncurses-devel perl-Data-Dumpe')
+        run('yum -y install libaio libaio-devel bison-devel ncurses-devel perl-Data-Dumpe')
         run('groupadd mysql && useradd -g mysql mysql -s /sbin/nologin')
         run('mkdir /usr/local/mysql/data && mkdir /home/logs/mysql && touch /home/logs/mysql/error.log && chown -R mysql /home/logs/mysql && chgrp -R mysql /home/logs/mysql')
 

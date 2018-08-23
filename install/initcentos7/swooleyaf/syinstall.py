@@ -5,7 +5,6 @@ from initcentos7.swooleyaf.envs.Front import *
 from initcentos7.swooleyaf.envs.Backend import *
 from initcentos7.swooleyaf.envs.FrontBackend import *
 
-# 配置之前先用命令rpm -qa | grep mariadb找出已经安装的数据库,然后用命令rpm -e --nodeps xxx删除已经安装的软件(xxx为前一步命令找到的软件名)
 @roles('mysql')
 def installSyMysql(params):
     obj = Mysql()

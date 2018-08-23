@@ -47,7 +47,7 @@ class Backend(SyBase):
             if step > 1:
                 func()
             else:
-                func(self._profileEnv, self._ports)
+                func(self._profileEnv, self._ports, params['init'])
 
             step += 1
             func = self._steps.get(step, '')
