@@ -241,6 +241,10 @@ class SyTool():
         nginxApiConfRemote = '/home/configs/nginx/servers/demoapi.conf'
         put(nginxApiConfLocal, nginxApiConfRemote)
 
+        nginxApiStaticConfLocal = ''.join([syDicts['path.package.local'], '/configs/swooleyaf/nginx/demoapistatic.conf'])
+        nginxApiStaticConfRemote = '/home/configs/nginx/servers/demoapistatic.conf'
+        put(nginxApiStaticConfLocal, nginxApiStaticConfRemote)
+
         nginxOrderConfLocal = ''.join([syDicts['path.package.local'], '/configs/swooleyaf/nginx/a01order.conf'])
         nginxOrderConfRemote = '/home/configs/nginx/streams/a01order.conf'
         put(nginxOrderConfLocal, nginxOrderConfRemote)
