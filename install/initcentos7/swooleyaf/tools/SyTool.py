@@ -550,3 +550,25 @@ class SyTool():
         put(mongoCronLocal, mongoCronRemote)
         run('crontab %s' % mongoCronRemote)
         run('rm -rf %s' % mongoCronRemote)
+
+    @staticmethod
+    def installPython():
+        mongoLocal = ''.join([syDicts['path.package.local'], '/resources/python/Python-3.6.4.tar.xz'])
+        mongoRemote = ''.join([syDicts['path.package.remote'], '/Python-3.6.4.tar.xz'])
+        put(mongoLocal, mongoRemote)
+        with cd(syDicts['path.package.remote']):
+            run('mkdir /usr/local/python3')
+            run('tar -Jxvf Python-3.6.4.tar.xz')
+            run('cd Python-3.6.4/ && ./configure --prefix=/usr/local/python3 && make && make install && /usr/local/python3/bin/pip3 install fabric3')
+            run('rm -rf Python-3.6.4/ && rm -rf Python-3.6.4.tar.xz')
+
+    @staticmethod
+    def installNodejs():
+        mongoLocal = ''.join([syDicts['path.package.local'], '/resources/linux/node-v6.10.2-linux-x64.tar'])
+        mongoRemote = ''.join([syDicts['path.package.remote'], '/node-v6.10.2-linux-x64.tar'])
+        put(mongoLocal, mongoRemote)
+        with cd(syDicts['path.package.remote']):
+            run('tar -xvf node-v6.10.2-linux-x64.tar')
+            run('mv node-v6.10.2-linux-x64/ /usr/local/nodejs')
+            run('/usr/local/nodejs/bin/npm config set registry "http://registry.npm.taobao.org" && /usr/local/nodejs/bin/npm install apidoc -g')
+            run('rm -rf node-v6.10.2-linux-x64.tar')
