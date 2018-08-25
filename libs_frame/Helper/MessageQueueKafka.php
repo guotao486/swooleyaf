@@ -9,6 +9,7 @@ namespace Helper;
 
 use Constant\Project;
 use DesignPatterns\Singletons\KafkaSingleton;
+use DesignPatterns\Singletons\MysqlSingleton;
 use DesignPatterns\Singletons\RedisSingleton;
 use Log\Log;
 use MessageQueue\Consumer\KafkaConsumerContainer;
@@ -40,6 +41,9 @@ class MessageQueueKafka {
 
     public function refresh(){
         RedisSingleton::getInstance()->close();
+        if(SY_RECONNECT_DB){
+            MysqlSingleton::getInstance()->reConnect();
+        }
     }
 
     private function handle(Message $message,int &$totalNum){
