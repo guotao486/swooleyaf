@@ -1,4 +1,7 @@
-# 环境要求
+# 环境
+## 搭建脚本
+请移步至项目 https://github.com/a07061625/swooleyaf_install.git
+
 ## 基础环境
 - PHP7+
 - redis3.2+
@@ -54,7 +57,6 @@
 - pidfile: 项目进程pid文件存放目录
 - static: 静态文件目录
 - yaconf: 框架配置文件目录,该目录内的配置文件为样例,使用时需要将配置文件移动到php.ini配置文件中yaconf.directory配置对应的目录下
-- install: 框架环境搭建目录,存放了环境搭建需要的工具和脚本
 - 其他目录: 项目模块目录,每一个目录对应一个项目模块
 
 ## 命令
@@ -129,6 +131,3 @@ nginx配置: <br/>
 
 ## 图片处理
 - https://github.com/kosinix/grafika //参考地址
-
-## nginx防火墙
-- 详情参见文件: install/resources/nginx/helper_sywaf.md
