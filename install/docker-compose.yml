@@ -1,0 +1,23 @@
+version: "1"
+services:
+  basecommon:
+    build: ./resources/docker/base/common/
+    image: base-common
+  basenginx:
+    build: ./resources/docker/base/nginx/
+    image: base-nginx
+  basephp7:
+    build: ./resources/docker/base/php7/
+    image: base-php7
+  systemnginx:
+    build: ./resources/docker/system/nginx/
+    image: system-nginx
+  systemphp7:
+    build: ./resources/docker/system/php7/
+    image: system-php7
+  businessphp7a01api:
+    build: ./resources/docker/business/php7a01api/
+    image: business-php7a01api
+    ports:
+      - "7100"
+    command: -n sy_api -s start -module a01api -port 7100
