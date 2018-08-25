@@ -134,6 +134,18 @@ class SyTool():
             run('cd freetype-2.6.5/ && ./configure --prefix=/usr/local/freetype --enable-shared --enable-static && make && make install && echo "/usr/local/freetype/lib" >> /etc/ld.so.conf && ldconfig')
             run('rm -rf freetype-2.6.5/ && rm -rf freetype-2.6.5.tar.bz2')
 
+    # 配置jemalloc
+    @staticmethod
+    def installJemalloc():
+        jemallocLocal = ''.join([syDicts['path.package.local'], '/resources/linux/jemalloc-4.5.0.tar.bz2'])
+        jemallocRemote = ''.join([syDicts['path.package.remote'], '/jemalloc-4.5.0.tar.bz2'])
+        put(jemallocLocal, jemallocRemote)
+        with cd(syDicts['path.package.remote']):
+            run('mkdir /usr/local/jemalloc')
+            run('tar -xjvf jemalloc-4.5.0.tar.bz2')
+            run('cd jemalloc-4.5.0/ && ./configure --prefix=/usr/local/jemalloc --with-jemalloc-prefix=je_ && make -j 4 && make install')
+            run('rm -rf jemalloc-4.5.0/ && rm -rf jemalloc-4.5.0.tar.bz2')
+
     # 配置nginx环境
     @staticmethod
     def installNginx():
@@ -396,14 +408,6 @@ class SyTool():
             run('rm -rf yaf-3.0.7/ && rm -rf yaf-3.0.7.tgz')
 
         # 扩展swoole
-        extSwooleJemallocLocal = ''.join([syDicts['path.package.local'], '/resources/php7/jemalloc-4.5.0.tar.bz2'])
-        extSwooleJemallocRemote = ''.join([syDicts['path.package.remote'], '/jemalloc-4.5.0.tar.bz2'])
-        put(extSwooleJemallocLocal, extSwooleJemallocRemote)
-        with cd(syDicts['path.package.remote']):
-            run('mkdir /usr/local/jemalloc')
-            run('tar -xjvf jemalloc-4.5.0.tar.bz2')
-            run('cd jemalloc-4.5.0/ && ./configure --prefix=/usr/local/jemalloc --with-jemalloc-prefix=je_ && make -j 4 && make install')
-            run('rm -rf jemalloc-4.5.0/ && rm -rf jemalloc-4.5.0.tar.bz2')
         extSwooleLocal = ''.join([syDicts['path.package.local'], '/resources/php7/swoole-4.0.4.tgz'])
         extSwooleRemote = ''.join([syDicts['path.package.remote'], '/swoole-4.0.4.tgz'])
         put(extSwooleLocal, extSwooleRemote)

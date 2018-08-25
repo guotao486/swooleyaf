@@ -33,9 +33,10 @@ class Front(SyBase):
             7: SyTool.installJpeg,
             8: SyTool.installImageMagick,
             9: SyTool.installFreetype,
-            10: SyTool.installNginx,
-            11: SyTool.installPhp7,
-            12: SyTool.installJava
+            10: SyTool.installJemalloc,
+            11: SyTool.installNginx,
+            12: SyTool.installPhp7,
+            13: SyTool.installJava
         }
 
     def install(self, params):

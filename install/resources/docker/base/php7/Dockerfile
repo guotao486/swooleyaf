@@ -72,7 +72,7 @@ RUN cd freetype-2.6.5/ && ./configure --prefix=/usr/local/freetype --enable-shar
 RUN rm -rf freetype-2.6.5/ && rm -rf freetype-2.6.5.tar.bz2
 
 # jemalloc
-COPY ./resources/php7/jemalloc-4.5.0.tar.bz2 $SYDIR_DOWNLOAD/jemalloc-4.5.0.tar.bz2
+COPY ./resources/linux/jemalloc-4.5.0.tar.bz2 $SYDIR_DOWNLOAD/jemalloc-4.5.0.tar.bz2
 RUN mkdir /usr/local/jemalloc
 RUN tar -xjvf jemalloc-4.5.0.tar.bz2
 RUN cd jemalloc-4.5.0/ && ./configure --prefix=/usr/local/jemalloc --with-jemalloc-prefix=je_ && make -j 4 && make install

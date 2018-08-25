@@ -36,12 +36,13 @@ class FrontBackend(SyBase):
             7: SyTool.installJpeg,
             8: SyTool.installImageMagick,
             9: SyTool.installFreetype,
-            10: SyTool.installNginx,
-            11: SyTool.installPhp7,
-            12: SyTool.installJava,
-            13: SyTool.installRedis,
-            14: SyTool.installInotify,
-            15: SyTool.installEtcd
+            10: SyTool.installJemalloc,
+            11: SyTool.installNginx,
+            12: SyTool.installPhp7,
+            13: SyTool.installJava,
+            14: SyTool.installRedis,
+            15: SyTool.installInotify,
+            16: SyTool.installEtcd
         }
 
     def install(self, params):
