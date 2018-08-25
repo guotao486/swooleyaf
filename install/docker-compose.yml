@@ -6,18 +6,28 @@ services:
   basenginx:
     build: ./resources/docker/base/nginx/
     image: base-nginx
+    depends_on:
+      - basecommon
   basephp7:
     build: ./resources/docker/base/php7/
     image: base-php7
+    depends_on:
+      - basecommon
   systemnginx:
     build: ./resources/docker/system/nginx/
     image: system-nginx
+    depends_on:
+      - basenginx
   systemphp7:
     build: ./resources/docker/system/php7/
     image: system-php7
+    depends_on:
+      - basephp7
   businessphp7a01api:
     build: ./resources/docker/business/php7a01api/
     image: business-php7a01api
+    depends_on:
+      - systemphp7
     ports:
       - "7100"
     command: -n sy_api -s start -module a01api -port 7100
