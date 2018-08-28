@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . '/helper_defines.php';
+
 final class SyFrameLoader {
     /**
      * @var \SyFrameLoader
