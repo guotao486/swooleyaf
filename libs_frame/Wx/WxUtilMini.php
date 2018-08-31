@@ -20,6 +20,7 @@ class WxUtilMini extends WxUtilAloneBase {
     private static $urlAuthorize = 'https://api.weixin.qq.com/sns/jscode2session?grant_type=authorization_code&appid=';
     private static $urlQrcode = 'https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=';
     private static $urlMsgTemplateList = 'https://api.weixin.qq.com/cgi-bin/wxopen/template/library/list?access_token=';
+    private static $urlMsgTemplateKeywords = 'https://api.weixin.qq.com/cgi-bin/wxopen/template/library/get?access_token=';
 
     /**
      * 处理用户小程序授权
@@ -124,6 +125,32 @@ class WxUtilMini extends WxUtilAloneBase {
         $getRes = self::sendPostReq($url, 'json', $templateList->getDetail());
         $getData = Tool::jsonDecode($getRes);
         if(isset($getData['list'])){
+            $resArr['data'] = $getData;
+        } else {
+            $resArr['code'] = ErrorCode::WX_PARAM_ERROR;
+            $resArr['message'] = $getData['errmsg'];
+        }
+
+        return $resArr;
+    }
+
+    /**
+     * 获取小程序消息模板关键词库
+     * @param string $appId
+     * @param string $titleId 模板标题id
+     * @return array
+     */
+    public static function getMsgTemplateKeywords(string $appId,string $titleId){
+        $resArr = [
+            'code' => 0
+        ];
+
+        $url = self::$urlMsgTemplateKeywords . self::getAccessToken($appId);
+        $getRes = self::sendPostReq($url, 'json', [
+            'id' => $titleId,
+        ]);
+        $getData = Tool::jsonDecode($getRes);
+        if(isset($getData['id'])){
             $resArr['data'] = $getData;
         } else {
             $resArr['code'] = ErrorCode::WX_PARAM_ERROR;
