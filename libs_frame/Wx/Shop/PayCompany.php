@@ -13,13 +13,14 @@ use Exception\Wx\WxException;
 use Tool\Tool;
 use Wx\WxUtilShop;
 
-class PayCompany {
+class PayCompany extends ShopBase {
     private static $allowCheckOptions = [
         'NO_CHECK',
         'FORCE_CHECK',
     ];
 
     public function __construct(string $appId) {
+        parent::__construct();
         $shopConfig = WxConfigSingleton::getInstance()->getShopConfig($appId);
         $this->mch_appid = $shopConfig->getAppId();
         $this->mchid = $shopConfig->getPayMchId();

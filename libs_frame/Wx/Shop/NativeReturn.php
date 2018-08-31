@@ -12,8 +12,9 @@ use DesignPatterns\Singletons\WxConfigSingleton;
 use Exception\Wx\WxException;
 use Wx\WxUtilShop;
 
-class NativeReturn {
+class NativeReturn extends ShopBase {
     public function __construct(string $appId) {
+        parent::__construct();
         $shopConfig = WxConfigSingleton::getInstance()->getShopConfig($appId);
         $this->appid = $shopConfig->getAppId();
         $this->mch_id = $shopConfig->getPayMchId();

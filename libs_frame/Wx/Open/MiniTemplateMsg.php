@@ -10,7 +10,7 @@ namespace Wx\Open;
 use Constant\ErrorCode;
 use Exception\Wx\WxOpenException;
 
-class MiniTemplateMsg {
+class MiniTemplateMsg extends OpenBase {
     /**
      * 模板ID
      * @var string
@@ -43,6 +43,7 @@ class MiniTemplateMsg {
     private $formId = '';
 
     public function __construct(){
+        parent::__construct();
     }
 
     private function __clone(){

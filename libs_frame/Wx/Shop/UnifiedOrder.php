@@ -13,7 +13,7 @@ use Exception\Wx\WxException;
 use Tool\Tool;
 use Wx\WxUtilShop;
 
-class UnifiedOrder {
+class UnifiedOrder extends ShopBase {
     const TRADE_TYPE_JSAPI = 'JSAPI'; //支付方式-jsapi
     const TRADE_TYPE_NATIVE = 'NATIVE'; //支付方式-扫码
     const TRADE_TYPE_MWEB = 'MWEB'; //支付方式-h5
@@ -40,6 +40,8 @@ class UnifiedOrder {
      * @throws \Exception\Wx\WxException
      */
     public function __construct(string $tag,string $appId) {
+        parent::__construct();
+
         if(!in_array($tag, self::$tradeTypes)){
             throw new WxException('统一下单初始化错误', ErrorCode::WX_PARAM_ERROR);
         }

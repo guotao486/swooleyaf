@@ -13,8 +13,9 @@ use Exception\Wx\WxException;
 use Tool\Tool;
 use Wx\WxUtilShop;
 
-class OrderQuery {
+class OrderQuery extends ShopBase {
     public function __construct(string $appId) {
+        parent::__construct();
         $shopConfig = WxConfigSingleton::getInstance()->getShopConfig($appId);
         $this->appid = $shopConfig->getAppId();
         $this->mch_id = $shopConfig->getPayMchId();

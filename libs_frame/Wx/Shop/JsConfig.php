@@ -12,8 +12,9 @@ use Tool\Tool;
 use Wx\WxUtilOpenBase;
 use Wx\WxUtilShop;
 
-class JsConfig {
+class JsConfig extends ShopBase {
     public function __construct(string $appId) {
+        parent::__construct();
         $this->appId = $appId;
         $this->timestamp = Tool::getNowTime();
         $this->nonceStr = Tool::createNonceStr(32, 'numlower');

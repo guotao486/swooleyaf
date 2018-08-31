@@ -12,8 +12,9 @@ use Exception\Wx\WxException;
 use Tool\Tool;
 use Wx\WxUtilShop;
 
-class JsPayConfig {
+class JsPayConfig extends ShopBase {
     public function __construct(string $appId) {
+        parent::__construct();
         $this->appId = $appId;
         $this->signType = 'MD5';
         $this->nonceStr = Tool::createNonceStr(32, 'numlower');

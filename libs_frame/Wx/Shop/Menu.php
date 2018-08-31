@@ -10,7 +10,7 @@ namespace Wx\Shop;
 use Constant\ErrorCode;
 use Exception\Wx\WxException;
 
-class Menu {
+class Menu extends ShopBase {
     private static $typeList = [
         'pic_weixin',
         'pic_sysphoto',
@@ -25,6 +25,7 @@ class Menu {
     ];
 
     public function __construct() {
+        parent::__construct();
     }
 
     /**

@@ -10,8 +10,9 @@ namespace Wx\Shop;
 use Constant\ErrorCode;
 use Exception\Wx\WxException;
 
-class TemplateMsg {
+class TemplateMsg extends ShopBase {
     public function __construct() {
+        parent::__construct();
     }
 
     /**
