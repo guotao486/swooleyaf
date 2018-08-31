@@ -5,12 +5,12 @@
  * Date: 2018/1/26 0026
  * Time: 18:07
  */
-namespace Wx\Shop;
+namespace Wx\Mini;
 
 use Constant\ErrorCode;
 use Exception\Wx\WxException;
 
-class MiniProgramQrcode {
+class Qrcode {
     public function __construct(){
     }
 
