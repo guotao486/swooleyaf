@@ -29,6 +29,8 @@ class StringJson extends BaseValidator implements ValidatorService {
         $trueData = $this->verifyStringData($data);
         if ($trueData === null) {
             return '必须是字符串';
+        } else if((strlen($trueData) == 0) && !$compareData){
+            return '';
         } else {
             $arr = Tool::jsonDecode($trueData);
             if(is_array($arr)){

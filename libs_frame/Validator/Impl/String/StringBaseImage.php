@@ -28,6 +28,8 @@ class StringBaseImage extends BaseValidator implements ValidatorService {
         $trueData = $this->verifyStringData($data);
         if ($trueData === null) {
             return '必须是字符串';
+        } else if((strlen($trueData) == 0) && !$compareData){
+            return '';
         } else if(preg_match('/^(data\:image\/([A-Za-z]{3,4})\;base64\,)/', $trueData) > 0){
             return '';
         } else {

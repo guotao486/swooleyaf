@@ -28,6 +28,8 @@ class StringNoJs extends BaseValidator implements ValidatorService {
         $trueData = $this->verifyStringData($data);
         if ($trueData === null) {
             return '必须是字符串';
+        } else if(strlen($trueData) == 0){
+            return '';
         } else if(preg_match("'<script[^>]*?>.*?</script>'si", $trueData) == 0){
             return '';
         } else {
