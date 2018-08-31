@@ -11,7 +11,7 @@ use Constant\ErrorCode;
 use Exception\Wx\WxOpenException;
 use Tool\Tool;
 
-class MiniCodeUpload {
+class MiniCodeUpload extends OpenBase {
     /**
      * 代码模板ID
      * @var string
@@ -34,6 +34,7 @@ class MiniCodeUpload {
     private $extData = [];
 
     public function __construct(){
+        parent::__construct();
     }
 
     private function __clone(){

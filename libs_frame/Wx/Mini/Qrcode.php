@@ -10,8 +10,9 @@ namespace Wx\Mini;
 use Constant\ErrorCode;
 use Exception\Wx\WxException;
 
-class Qrcode {
+class Qrcode extends MiniBase {
     public function __construct(){
+        parent::__construct();
     }
 
     private function __clone(){

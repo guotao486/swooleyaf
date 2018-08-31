@@ -10,8 +10,9 @@ namespace Wx\Shop;
 use Constant\ErrorCode;
 use Exception\Wx\WxException;
 
-class UserInfo {
+class UserInfo extends ShopBase {
     public function __construct() {
+        parent::__construct();
     }
 
     /**
@@ -37,5 +38,11 @@ class UserInfo {
      */
     public function getOpenid() : string {
         return $this->openid;
+    }
+
+    public function getDetail() : array {
+        return [
+            'openid' => $this->openid,
+        ];
     }
 }

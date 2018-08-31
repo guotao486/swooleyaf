@@ -11,13 +11,15 @@ use Constant\ErrorCode;
 use DesignPatterns\Singletons\WxConfigSingleton;
 use Tool\Tool;
 use Traits\SimpleTrait;
+use Wx\Mini\MsgTemplateList;
 use Wx\Mini\Qrcode;
 
 class WxUtilMini extends WxUtilAloneBase {
     use SimpleTrait;
 
-    private static $urlAuthorizeMiniProgram = 'https://api.weixin.qq.com/sns/jscode2session?grant_type=authorization_code&appid=';
-    private static $urlMiniProgramQrcode = 'https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=';
+    private static $urlAuthorize = 'https://api.weixin.qq.com/sns/jscode2session?grant_type=authorization_code&appid=';
+    private static $urlQrcode = 'https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=';
+    private static $urlMsgTemplateList = 'https://api.weixin.qq.com/cgi-bin/wxopen/template/library/list?access_token=';
 
     /**
      * 处理用户小程序授权
@@ -31,7 +33,7 @@ class WxUtilMini extends WxUtilAloneBase {
         ];
 
         $shopConfig = WxConfigSingleton::getInstance()->getShopConfig($appId);
-        $url = self::$urlAuthorizeMiniProgram . $shopConfig->getAppId() . '&secret=' . $shopConfig->getSecret() . '&js_code=' . $code;
+        $url = self::$urlAuthorize . $shopConfig->getAppId() . '&secret=' . $shopConfig->getSecret() . '&js_code=' . $code;
         $getRes = self::sendGetReq($url);
         $getData = Tool::jsonDecode($getRes);
         if(isset($getData['openid'])){
@@ -55,7 +57,7 @@ class WxUtilMini extends WxUtilAloneBase {
             'code' => 0
         ];
 
-        $url = self::$urlMiniProgramQrcode . self::getAccessToken($appId);
+        $url = self::$urlQrcode . self::getAccessToken($appId);
         $getRes = self::sendPostReq($url, 'json', $qrcode->getDetail());
         $getData = Tool::jsonDecode($getRes);
         if(is_array($getData)){
@@ -102,6 +104,30 @@ class WxUtilMini extends WxUtilAloneBase {
         } else {
             $resArr['code'] = ErrorCode::WX_PARAM_ERROR;
             $resArr['message'] = '解密用户数据失败';
+        }
+
+        return $resArr;
+    }
+
+    /**
+     * 获取小程序消息模板列表
+     * @param string $appId
+     * @param \Wx\Mini\MsgTemplateList $templateList
+     * @return array
+     */
+    public static function getMsgTemplateList(string $appId,MsgTemplateList $templateList){
+        $resArr = [
+            'code' => 0
+        ];
+
+        $url = self::$urlMsgTemplateList . self::getAccessToken($appId);
+        $getRes = self::sendPostReq($url, 'json', $templateList->getDetail());
+        $getData = Tool::jsonDecode($getRes);
+        if(isset($getData['list'])){
+            $resArr['data'] = $getData;
+        } else {
+            $resArr['code'] = ErrorCode::WX_PARAM_ERROR;
+            $resArr['message'] = $getData['errmsg'];
         }
 
         return $resArr;
