@@ -28,6 +28,8 @@ class StringIP extends BaseValidator implements ValidatorService {
         $trueData = $this->verifyStringData($data);
         if ($trueData === null) {
             return '必须是字符串';
+        } else if((strlen($trueData) == 0) && !$compareData){
+            return '';
         } else if(preg_match('/^(\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])){4}$/', '.' . $trueData) > 0){
             return '';
         } else {

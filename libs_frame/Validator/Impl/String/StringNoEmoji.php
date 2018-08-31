@@ -28,6 +28,8 @@ class StringNoEmoji extends BaseValidator implements ValidatorService {
         $trueData = $this->verifyStringData($data);
         if ($trueData === null) {
             return '必须是字符串';
+        } else if(strlen($trueData) == 0){
+            return '';
         } else if(preg_match('/[\xf0-\xf7].{3}/', $trueData) == 0){
             return '';
         } else {

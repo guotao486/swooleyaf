@@ -28,6 +28,8 @@ class StringTel extends BaseValidator implements ValidatorService {
         $trueData = $this->verifyStringData($data);
         if ($trueData === null) {
             return '必须是字符串';
+        } else if((strlen($trueData) == 0) && !$compareData){
+            return '';
         } else if(preg_match('/^((\d{3,4}\-?)?\d{7,8}|1\d{10}|\d{5})$/', $trueData) > 0){
             return '';
         } else {

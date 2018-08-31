@@ -28,6 +28,8 @@ class StringZh extends BaseValidator implements ValidatorService {
         $trueData = $this->verifyStringData($data);
         if ($trueData === null) {
             return '必须是字符串';
+        } else if(strlen($trueData) == 0){
+            return '';
         } else if(preg_match('/[^0-9a-zA-Z\x{4e00}-\x{9fa5}]+/u', $trueData) == 0){
             return '';
         } else {

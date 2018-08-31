@@ -28,9 +28,9 @@ class StringRegex extends BaseValidator implements ValidatorService {
         $trueData = $this->verifyStringData($data);
         if ($trueData === null) {
             return '必须是字符串';
-        } else if(strlen(trim($compareData)) == 0){
+        } else if(strlen($compareData) == 0){
             return '规则不能为空';
-        } else if(preg_match(trim($compareData), $trueData) > 0){
+        } else if(preg_match($compareData, $trueData) > 0){
             return '';
         } else {
             return '格式不合法';
