@@ -11,7 +11,9 @@ use Constant\ErrorCode;
 use DesignPatterns\Singletons\WxConfigSingleton;
 use Tool\Tool;
 use Traits\SimpleTrait;
+use Wx\Mini\MsgTemplate;
 use Wx\Mini\MsgTemplateList;
+use Wx\Mini\MsgTemplateTitleList;
 use Wx\Mini\Qrcode;
 
 class WxUtilMini extends WxUtilAloneBase {
@@ -19,8 +21,11 @@ class WxUtilMini extends WxUtilAloneBase {
 
     private static $urlAuthorize = 'https://api.weixin.qq.com/sns/jscode2session?grant_type=authorization_code&appid=';
     private static $urlQrcode = 'https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=';
-    private static $urlMsgTemplateList = 'https://api.weixin.qq.com/cgi-bin/wxopen/template/library/list?access_token=';
-    private static $urlMsgTemplateKeywords = 'https://api.weixin.qq.com/cgi-bin/wxopen/template/library/get?access_token=';
+    private static $urlMsgTemplateTitleList = 'https://api.weixin.qq.com/cgi-bin/wxopen/template/library/list?access_token=';
+    private static $urlMsgTemplateTitleKeywords = 'https://api.weixin.qq.com/cgi-bin/wxopen/template/library/get?access_token=';
+    private static $urlAddMsgTemplate = 'https://api.weixin.qq.com/cgi-bin/wxopen/template/add?access_token=';
+    private static $urlMsgTemplateList = 'https://api.weixin.qq.com/cgi-bin/wxopen/template/list?access_token=';
+    private static $urlDelMsgTemplate = 'https://api.weixin.qq.com/cgi-bin/wxopen/template/del?access_token=';
 
     /**
      * 处理用户小程序授权
@@ -62,7 +67,7 @@ class WxUtilMini extends WxUtilAloneBase {
         $getRes = self::sendPostReq($url, 'json', $qrcode->getDetail());
         $getData = Tool::jsonDecode($getRes);
         if(is_array($getData)){
-            $resArr['code'] = ErrorCode::WX_PARAM_ERROR;
+            $resArr['code'] = ErrorCode::WX_POST_ERROR;
             $resArr['message'] = $getData['errmsg'];
         } else {
             $resArr['data'] = [
@@ -111,6 +116,80 @@ class WxUtilMini extends WxUtilAloneBase {
     }
 
     /**
+     * 获取小程序消息模板标题列表
+     * @param string $appId
+     * @param \Wx\Mini\MsgTemplateTitleList $templateList
+     * @return array
+     */
+    public static function getMsgTemplateTitleList(string $appId,MsgTemplateTitleList $titleList){
+        $resArr = [
+            'code' => 0
+        ];
+
+        $url = self::$urlMsgTemplateTitleList . self::getAccessToken($appId);
+        $getRes = self::sendPostReq($url, 'json', $titleList->getDetail());
+        $getData = Tool::jsonDecode($getRes);
+        if(isset($getData['list'])){
+            $resArr['data'] = $getData;
+        } else {
+            $resArr['code'] = ErrorCode::WX_POST_ERROR;
+            $resArr['message'] = $getData['errmsg'];
+        }
+
+        return $resArr;
+    }
+
+    /**
+     * 获取小程序消息模板标题关键词库
+     * @param string $appId
+     * @param string $titleId 模板标题id
+     * @return array
+     */
+    public static function getMsgTemplateTitleKeywords(string $appId,string $titleId){
+        $resArr = [
+            'code' => 0
+        ];
+
+        $url = self::$urlMsgTemplateTitleKeywords . self::getAccessToken($appId);
+        $getRes = self::sendPostReq($url, 'json', [
+            'id' => $titleId,
+        ]);
+        $getData = Tool::jsonDecode($getRes);
+        if(isset($getData['id'])){
+            $resArr['data'] = $getData;
+        } else {
+            $resArr['code'] = ErrorCode::WX_POST_ERROR;
+            $resArr['message'] = $getData['errmsg'];
+        }
+
+        return $resArr;
+    }
+
+    /**
+     * 添加小程序消息模板
+     * @param string $appId
+     * @param \Wx\Mini\MsgTemplate $msgTemplate
+     * @return array
+     */
+    public static function addMsgTemplate(string $appId,MsgTemplate $msgTemplate){
+        $resArr = [
+            'code' => 0
+        ];
+
+        $url = self::$urlAddMsgTemplate . self::getAccessToken($appId);
+        $addRes = self::sendPostReq($url, 'json', $msgTemplate->getDetail());
+        $addData = Tool::jsonDecode($addRes);
+        if(isset($addData['template_id'])){
+            $resArr['data'] = $addData;
+        } else {
+            $resArr['code'] = ErrorCode::WX_POST_ERROR;
+            $resArr['message'] = $addData['errmsg'];
+        }
+
+        return $resArr;
+    }
+
+    /**
      * 获取小程序消息模板列表
      * @param string $appId
      * @param \Wx\Mini\MsgTemplateList $templateList
@@ -127,7 +206,7 @@ class WxUtilMini extends WxUtilAloneBase {
         if(isset($getData['list'])){
             $resArr['data'] = $getData;
         } else {
-            $resArr['code'] = ErrorCode::WX_PARAM_ERROR;
+            $resArr['code'] = ErrorCode::WX_POST_ERROR;
             $resArr['message'] = $getData['errmsg'];
         }
 
@@ -135,26 +214,26 @@ class WxUtilMini extends WxUtilAloneBase {
     }
 
     /**
-     * 获取小程序消息模板关键词库
+     * 删除小程序模板
      * @param string $appId
-     * @param string $titleId 模板标题id
+     * @param string $templateId 模板ID
      * @return array
      */
-    public static function getMsgTemplateKeywords(string $appId,string $titleId){
+    public static function delMsgTemplate(string $appId,string $templateId){
         $resArr = [
             'code' => 0
         ];
 
-        $url = self::$urlMsgTemplateKeywords . self::getAccessToken($appId);
-        $getRes = self::sendPostReq($url, 'json', [
-            'id' => $titleId,
+        $url = self::$urlDelMsgTemplate . self::getAccessToken($appId);
+        $delRes = self::sendPostReq($url, 'json', [
+            'template_id' => $templateId,
         ]);
-        $getData = Tool::jsonDecode($getRes);
-        if(isset($getData['id'])){
-            $resArr['data'] = $getData;
+        $delData = Tool::jsonDecode($delRes);
+        if($delData['errcode'] == 0){
+            $resArr['data'] = $delData;
         } else {
-            $resArr['code'] = ErrorCode::WX_PARAM_ERROR;
-            $resArr['message'] = $getData['errmsg'];
+            $resArr['code'] = ErrorCode::WX_POST_ERROR;
+            $resArr['message'] = $delData['errmsg'];
         }
 
         return $resArr;

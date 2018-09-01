@@ -25,6 +25,9 @@ class OrderRefund extends ShopBase {
         $this->op_user_id = $shopConfig->getPayMchId();
     }
 
+    public function __clone(){
+    }
+
     /**
      * 公众号ID
      * @var string

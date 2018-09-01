@@ -20,6 +20,9 @@ class JsPayConfig extends ShopBase {
         $this->nonceStr = Tool::createNonceStr(32, 'numlower');
     }
 
+    public function __clone(){
+    }
+
     /**
      * 公众号ID
      * @var string

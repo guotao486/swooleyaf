@@ -11,6 +11,13 @@ use Constant\ErrorCode;
 use Exception\Wx\WxOpenException;
 
 class MiniTemplateMsg extends OpenBase {
+    public function __construct(){
+        parent::__construct();
+    }
+
+    private function __clone(){
+    }
+
     /**
      * 模板ID
      * @var string
@@ -36,18 +43,12 @@ class MiniTemplateMsg extends OpenBase {
      * @var string
      */
     private $redirectUrl = '';
+
     /**
      * 表单ID
      * @var string
      */
     private $formId = '';
-
-    public function __construct(){
-        parent::__construct();
-    }
-
-    private function __clone(){
-    }
 
     /**
      * @return string

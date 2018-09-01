@@ -23,6 +23,9 @@ class PayNativePre extends ShopBase {
         $this->nonce_str = Tool::createNonceStr(32);
     }
 
+    public function __clone(){
+    }
+
     /**
      * 公众号ID
      * @var string

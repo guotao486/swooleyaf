@@ -28,6 +28,9 @@ class PayCompany extends ShopBase {
         $this->spbill_create_ip = $shopConfig->getClientIp();
     }
 
+    public function __clone(){
+    }
+
     /**
      * 公众账号ID
      * @var string

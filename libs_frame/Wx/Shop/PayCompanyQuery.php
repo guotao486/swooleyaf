@@ -22,6 +22,9 @@ class PayCompanyQuery extends ShopBase {
         $this->nonce_str = Tool::createNonceStr(32, 'numlower');
     }
 
+    public function __clone(){
+    }
+
     /**
      * 公众账号ID
      * @var string

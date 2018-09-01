@@ -25,6 +25,9 @@ class OrderBill extends ShopBase {
         $this->bill_type = 'ALL';
     }
 
+    public function __clone(){
+    }
+
     /**
      * 公众号ID
      * @var string

@@ -22,6 +22,9 @@ class NativeReturn extends ShopBase {
         $this->return_code = 'SUCCESS';
     }
 
+    public function __clone(){
+    }
+
     /**
      * 返回状态码
      * @var string
