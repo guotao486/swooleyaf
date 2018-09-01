@@ -13,6 +13,7 @@ use Tool\Tool;
 use Traits\SimpleTrait;
 use Wx\Mini\MsgTemplateAdd;
 use Wx\Mini\MsgTemplateList;
+use Wx\Mini\MsgTemplateSend;
 use Wx\Mini\MsgTemplateTitleList;
 use Wx\Mini\Qrcode;
 
@@ -26,6 +27,7 @@ class WxUtilMini extends WxUtilAloneBase {
     private static $urlAddMsgTemplate = 'https://api.weixin.qq.com/cgi-bin/wxopen/template/add?access_token=';
     private static $urlMsgTemplateList = 'https://api.weixin.qq.com/cgi-bin/wxopen/template/list?access_token=';
     private static $urlDelMsgTemplate = 'https://api.weixin.qq.com/cgi-bin/wxopen/template/del?access_token=';
+    private static $urlSendMsgTemplate = 'https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=';
 
     /**
      * 处理用户小程序授权
@@ -127,7 +129,10 @@ class WxUtilMini extends WxUtilAloneBase {
         ];
 
         $url = self::$urlMsgTemplateTitleList . self::getAccessToken($appId);
-        $getRes = self::sendPostReq($url, 'json', $titleList->getDetail());
+        $getRes = self::sendPostReq($url, 'json', $titleList->getDetail(), [
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYHOST => false,
+        ]);
         $getData = Tool::jsonDecode($getRes);
         if(isset($getData['list'])){
             $resArr['data'] = $getData;
@@ -153,6 +158,9 @@ class WxUtilMini extends WxUtilAloneBase {
         $url = self::$urlMsgTemplateTitleKeywords . self::getAccessToken($appId);
         $getRes = self::sendPostReq($url, 'json', [
             'id' => $titleId,
+        ], [
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYHOST => false,
         ]);
         $getData = Tool::jsonDecode($getRes);
         if(isset($getData['id'])){
@@ -177,7 +185,10 @@ class WxUtilMini extends WxUtilAloneBase {
         ];
 
         $url = self::$urlAddMsgTemplate . self::getAccessToken($appId);
-        $addRes = self::sendPostReq($url, 'json', $templateAdd->getDetail());
+        $addRes = self::sendPostReq($url, 'json', $templateAdd->getDetail(), [
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYHOST => false,
+        ]);
         $addData = Tool::jsonDecode($addRes);
         if(isset($addData['template_id'])){
             $resArr['data'] = $addData;
@@ -201,7 +212,10 @@ class WxUtilMini extends WxUtilAloneBase {
         ];
 
         $url = self::$urlMsgTemplateList . self::getAccessToken($appId);
-        $getRes = self::sendPostReq($url, 'json', $templateList->getDetail());
+        $getRes = self::sendPostReq($url, 'json', $templateList->getDetail(), [
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYHOST => false,
+        ]);
         $getData = Tool::jsonDecode($getRes);
         if(isset($getData['list'])){
             $resArr['data'] = $getData;
@@ -227,6 +241,9 @@ class WxUtilMini extends WxUtilAloneBase {
         $url = self::$urlDelMsgTemplate . self::getAccessToken($appId);
         $delRes = self::sendPostReq($url, 'json', [
             'template_id' => $templateId,
+        ], [
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYHOST => false,
         ]);
         $delData = Tool::jsonDecode($delRes);
         if($delData['errcode'] == 0){
@@ -234,6 +251,33 @@ class WxUtilMini extends WxUtilAloneBase {
         } else {
             $resArr['code'] = ErrorCode::WX_POST_ERROR;
             $resArr['message'] = $delData['errmsg'];
+        }
+
+        return $resArr;
+    }
+
+    /**
+     * 发送模板消息
+     * @param string $appId
+     * @param \Wx\Mini\MsgTemplateSend $templateSend
+     * @return array
+     */
+    public static function sendMsgTemplate(string $appId,MsgTemplateSend $templateSend){
+        $resArr = [
+            'code' => 0
+        ];
+
+        $url = self::$urlSendMsgTemplate . self::getAccessToken($appId);
+        $sendRes = self::sendPostReq($url, 'json', $templateSend->getDetail(), [
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYHOST => false,
+        ]);
+        $sendData = Tool::jsonDecode($sendRes);
+        if($sendData['errcode'] == 0){
+            $resArr['data'] = $sendData;
+        } else {
+            $resArr['code'] = ErrorCode::WX_POST_ERROR;
+            $resArr['message'] = $sendData['errmsg'];
         }
 
         return $resArr;
