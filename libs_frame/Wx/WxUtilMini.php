@@ -168,7 +168,7 @@ class WxUtilMini extends WxUtilAloneBase {
     /**
      * 添加小程序消息模板
      * @param string $appId
-     * @param \Wx\Mini\MsgTemplateAdd $msgTemplate
+     * @param \Wx\Mini\MsgTemplateAdd $templateAdd
      * @return array
      */
     public static function addMsgTemplate(string $appId,MsgTemplateAdd $templateAdd){
