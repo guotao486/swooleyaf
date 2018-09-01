@@ -10,7 +10,7 @@ namespace Wx\Mini;
 use Constant\ErrorCode;
 use Exception\Wx\WxException;
 
-class MsgTemplate extends MiniBase {
+class MsgTemplateAdd extends MiniBase {
     public function __construct(){
         parent::__construct();
     }
