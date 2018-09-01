@@ -11,7 +11,7 @@ use Constant\ErrorCode;
 use DesignPatterns\Singletons\WxConfigSingleton;
 use Tool\Tool;
 use Traits\SimpleTrait;
-use Wx\Mini\MsgTemplate;
+use Wx\Mini\MsgTemplateAdd;
 use Wx\Mini\MsgTemplateList;
 use Wx\Mini\MsgTemplateTitleList;
 use Wx\Mini\Qrcode;
@@ -168,16 +168,16 @@ class WxUtilMini extends WxUtilAloneBase {
     /**
      * 添加小程序消息模板
      * @param string $appId
-     * @param \Wx\Mini\MsgTemplate $msgTemplate
+     * @param \Wx\Mini\MsgTemplateAdd $templateAdd
      * @return array
      */
-    public static function addMsgTemplate(string $appId,MsgTemplate $msgTemplate){
+    public static function addMsgTemplate(string $appId,MsgTemplateAdd $templateAdd){
         $resArr = [
             'code' => 0
         ];
 
         $url = self::$urlAddMsgTemplate . self::getAccessToken($appId);
-        $addRes = self::sendPostReq($url, 'json', $msgTemplate->getDetail());
+        $addRes = self::sendPostReq($url, 'json', $templateAdd->getDetail());
         $addData = Tool::jsonDecode($addRes);
         if(isset($addData['template_id'])){
             $resArr['data'] = $addData;
