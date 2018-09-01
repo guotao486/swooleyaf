@@ -33,6 +33,8 @@ class ProjectBase {
     const REDIS_PREFIX_WX_COMPONENT_ACCOUNT = 'sy002001_'; //前缀-微信开放平台账号
     const REDIS_PREFIX_WX_COMPONENT_AUTHORIZER = 'sy002002_'; //前缀-微信开放平台授权公众号
     const REDIS_PREFIX_WX_NATIVE_PRE = 'sy002003_'; //前缀-微信扫码预支付
+    const REDIS_PREFIX_TIMER_QUEUE = 'sy003000_'; //前缀-定时器队列
+    const REDIS_PREFIX_TIMER_CONTENT = 'sy003001_'; //前缀-定时器内容
 
     //校验器常量
     const VALIDATOR_STRING_TYPE_REQUIRED = 'string_required'; //字符串类型-必填
@@ -102,4 +104,5 @@ class ProjectBase {
     const TASK_TYPE_CLEAR_LOCAL_USER_CACHE = '0002'; //任务类型-清除本地用户信息缓存
     const TASK_TYPE_CLEAR_LOCAL_WXSHOP_TOKEN_CACHE = '0003'; //任务类型-清除本地微信商户号token缓存
     const TASK_TYPE_CLEAR_LOCAL_WXOPEN_AUTHORIZER_TOKEN_CACHE = '0004'; //任务类型-清除本地微信开放平台授权者token缓存
+    const TASK_TYPE_TIME_WHEEL_TASK = '0005'; //任务类型-时间轮任务
 }
