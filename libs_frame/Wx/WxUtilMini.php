@@ -121,14 +121,19 @@ class WxUtilMini extends WxUtilAloneBase {
      * 获取小程序消息模板标题列表
      * @param string $appId
      * @param \Wx\Mini\MsgTemplateTitleList $templateList
+     * @param string $platType 平台类型 mini：小程序 open：第三方平台
      * @return array
      */
-    public static function getMsgTemplateTitleList(string $appId,MsgTemplateTitleList $titleList){
+    public static function getMsgTemplateTitleList(string $appId,MsgTemplateTitleList $titleList,string $platType='mini'){
         $resArr = [
             'code' => 0
         ];
 
-        $url = self::$urlMsgTemplateTitleList . self::getAccessToken($appId);
+        if($platType == 'mini'){
+            $url = self::$urlMsgTemplateTitleList . self::getAccessToken($appId);
+        } else {
+            $url = self::$urlMsgTemplateTitleList . WxUtilOpenBase::getAuthorizerAccessToken($appId);
+        }
         $getRes = self::sendPostReq($url, 'json', $titleList->getDetail(), [
             CURLOPT_SSL_VERIFYPEER => false,
             CURLOPT_SSL_VERIFYHOST => false,
@@ -148,14 +153,19 @@ class WxUtilMini extends WxUtilAloneBase {
      * 获取小程序消息模板标题关键词库
      * @param string $appId
      * @param string $titleId 模板标题id
+     * @param string $platType 平台类型 mini：小程序 open：第三方平台
      * @return array
      */
-    public static function getMsgTemplateTitleKeywords(string $appId,string $titleId){
+    public static function getMsgTemplateTitleKeywords(string $appId,string $titleId,string $platType='mini'){
         $resArr = [
             'code' => 0
         ];
 
-        $url = self::$urlMsgTemplateTitleKeywords . self::getAccessToken($appId);
+        if($platType == 'mini'){
+            $url = self::$urlMsgTemplateTitleKeywords . self::getAccessToken($appId);
+        } else {
+            $url = self::$urlMsgTemplateTitleKeywords . WxUtilOpenBase::getAuthorizerAccessToken($appId);
+        }
         $getRes = self::sendPostReq($url, 'json', [
             'id' => $titleId,
         ], [
@@ -177,14 +187,19 @@ class WxUtilMini extends WxUtilAloneBase {
      * 添加小程序消息模板
      * @param string $appId
      * @param \Wx\Mini\MsgTemplateAdd $templateAdd
+     * @param string $platType 平台类型 mini：小程序 open：第三方平台
      * @return array
      */
-    public static function addMsgTemplate(string $appId,MsgTemplateAdd $templateAdd){
+    public static function addMsgTemplate(string $appId,MsgTemplateAdd $templateAdd,string $platType='mini'){
         $resArr = [
             'code' => 0
         ];
 
-        $url = self::$urlAddMsgTemplate . self::getAccessToken($appId);
+        if($platType == 'mini'){
+            $url = self::$urlAddMsgTemplate . self::getAccessToken($appId);
+        } else {
+            $url = self::$urlAddMsgTemplate . WxUtilOpenBase::getAuthorizerAccessToken($appId);
+        }
         $addRes = self::sendPostReq($url, 'json', $templateAdd->getDetail(), [
             CURLOPT_SSL_VERIFYPEER => false,
             CURLOPT_SSL_VERIFYHOST => false,
@@ -204,14 +219,19 @@ class WxUtilMini extends WxUtilAloneBase {
      * 获取小程序消息模板列表
      * @param string $appId
      * @param \Wx\Mini\MsgTemplateList $templateList
+     * @param string $platType 平台类型 mini：小程序 open：第三方平台
      * @return array
      */
-    public static function getMsgTemplateList(string $appId,MsgTemplateList $templateList){
+    public static function getMsgTemplateList(string $appId,MsgTemplateList $templateList,string $platType='mini'){
         $resArr = [
             'code' => 0
         ];
 
-        $url = self::$urlMsgTemplateList . self::getAccessToken($appId);
+        if($platType == 'mini'){
+            $url = self::$urlMsgTemplateList . self::getAccessToken($appId);
+        } else {
+            $url = self::$urlMsgTemplateList . WxUtilOpenBase::getAuthorizerAccessToken($appId);
+        }
         $getRes = self::sendPostReq($url, 'json', $templateList->getDetail(), [
             CURLOPT_SSL_VERIFYPEER => false,
             CURLOPT_SSL_VERIFYHOST => false,
@@ -231,14 +251,19 @@ class WxUtilMini extends WxUtilAloneBase {
      * 删除小程序模板
      * @param string $appId
      * @param string $templateId 模板ID
+     * @param string $platType 平台类型 mini：小程序 open：第三方平台
      * @return array
      */
-    public static function delMsgTemplate(string $appId,string $templateId){
+    public static function delMsgTemplate(string $appId,string $templateId,string $platType='mini'){
         $resArr = [
             'code' => 0
         ];
 
-        $url = self::$urlDelMsgTemplate . self::getAccessToken($appId);
+        if($platType == 'mini'){
+            $url = self::$urlDelMsgTemplate . self::getAccessToken($appId);
+        } else {
+            $url = self::$urlDelMsgTemplate . WxUtilOpenBase::getAuthorizerAccessToken($appId);
+        }
         $delRes = self::sendPostReq($url, 'json', [
             'template_id' => $templateId,
         ], [
