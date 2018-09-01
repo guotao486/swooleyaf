@@ -51,7 +51,7 @@ final class Server {
     const YAC_PREFIX_FUSE = '0000'; //前缀-熔断器
 
     //本地缓存标识
-    const CACHE_LOCAL_TAG_PREFIX_WX_COMPONENT_ACCESS_TOKEN = 'a101_'; //前缀-微信开放平台access token
+    const CACHE_LOCAL_PREFIX_WXOPEN_ACCESS_TOKEN = 'a101_'; //前缀-微信开放平台access token
 
     //熔断器常量
     const FUSE_STATE_OPEN = 'open'; //状态-开启

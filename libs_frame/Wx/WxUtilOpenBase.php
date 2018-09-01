@@ -50,7 +50,7 @@ abstract class WxUtilOpenBase extends WxUtilBase {
             ]);
             CacheSimpleFactory::getRedisInstance()->expire($redisKey, $wxExpireTime);
 
-            $localKey = Server::CACHE_LOCAL_TAG_PREFIX_WX_COMPONENT_ACCESS_TOKEN . $openCommonConfig->getAppId();
+            $localKey = Server::CACHE_LOCAL_PREFIX_WXOPEN_ACCESS_TOKEN . $openCommonConfig->getAppId();
             BaseServer::setProjectCache($localKey, [
                 'value' => $sendData['component_access_token'],
                 'expire_time' => $expireTime,
@@ -68,7 +68,7 @@ abstract class WxUtilOpenBase extends WxUtilBase {
      */
     public static function getComponentAccessToken(string $appId) : string {
         $nowTime = Tool::getNowTime();
-        $localKey = Server::CACHE_LOCAL_TAG_PREFIX_WX_COMPONENT_ACCESS_TOKEN . $appId;
+        $localKey = Server::CACHE_LOCAL_PREFIX_WXOPEN_ACCESS_TOKEN . $appId;
         $cacheData = BaseServer::getProjectCache($localKey, '', []);
         if(isset($cacheData['expire_time']) && ($cacheData['expire_time'] >= $nowTime)){
             return $cacheData['value'];
