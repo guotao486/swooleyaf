@@ -28,7 +28,7 @@ class PayCompany extends ShopBase {
         $this->spbill_create_ip = $shopConfig->getClientIp();
     }
 
-    public function __clone(){
+    private function __clone(){
     }
 
     /**
@@ -114,8 +114,8 @@ class PayCompany extends ShopBase {
      * @throws \Exception\Wx\WxException
      */
     public function setOpenid(string $openid) {
-        if (preg_match('/^[0-9a-zA-Z\-\_]{28}$/', $openid . '') > 0) {
-            $this->openid = $openid . '';
+        if (preg_match('/^[0-9a-zA-Z\-\_]{28}$/', $openid) > 0) {
+            $this->openid = $openid;
         } else {
             throw new WxException('用户openid不合法', ErrorCode::WX_PARAM_ERROR);
         }
