@@ -20,6 +20,9 @@ class JsConfig extends ShopBase {
         $this->nonceStr = Tool::createNonceStr(32, 'numlower');
     }
 
+    private function __clone(){
+    }
+
     /**
      * @var string
      */

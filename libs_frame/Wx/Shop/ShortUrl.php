@@ -23,6 +23,9 @@ class ShortUrl extends ShopBase {
         $this->sign_type = 'MD5';
     }
 
+    private function __clone(){
+    }
+
     /**
      * 公众号ID
      * @var string

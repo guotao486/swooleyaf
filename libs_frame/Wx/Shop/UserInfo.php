@@ -15,6 +15,9 @@ class UserInfo extends ShopBase {
         parent::__construct();
     }
 
+    private function __clone(){
+    }
+
     /**
      * 用户openid
      * @var string

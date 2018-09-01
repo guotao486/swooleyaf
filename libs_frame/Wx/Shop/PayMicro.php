@@ -25,6 +25,9 @@ class PayMicro extends ShopBase {
         $this->spbill_create_ip = $shopConfig->getClientIp();
     }
 
+    private function __clone(){
+    }
+
     /**
      * 公众号ID
      * @var string

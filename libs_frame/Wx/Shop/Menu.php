@@ -28,6 +28,9 @@ class Menu extends ShopBase {
         parent::__construct();
     }
 
+    private function __clone(){
+    }
+
     /**
      * 菜单标题
      * @var string

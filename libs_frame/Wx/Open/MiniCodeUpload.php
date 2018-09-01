@@ -12,6 +12,13 @@ use Exception\Wx\WxOpenException;
 use Tool\Tool;
 
 class MiniCodeUpload extends OpenBase {
+    public function __construct(){
+        parent::__construct();
+    }
+
+    private function __clone(){
+    }
+
     /**
      * 代码模板ID
      * @var string
@@ -27,18 +34,12 @@ class MiniCodeUpload extends OpenBase {
      * @var string
      */
     private $userDesc = '';
+
     /**
      * 自定义配置
      * @var array
      */
     private $extData = [];
-
-    public function __construct(){
-        parent::__construct();
-    }
-
-    private function __clone(){
-    }
 
     /**
      * @return string

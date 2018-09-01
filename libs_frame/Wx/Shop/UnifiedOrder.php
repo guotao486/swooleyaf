@@ -60,6 +60,9 @@ class UnifiedOrder extends ShopBase {
         }
     }
 
+    private function __clone(){
+    }
+
     /**
      * 公众账号ID
      * @var string

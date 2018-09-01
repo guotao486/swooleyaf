@@ -23,6 +23,9 @@ class OrderQuery extends ShopBase {
         $this->nonce_str = Tool::createNonceStr(32, 'numlower');
     }
 
+    private function __clone(){
+    }
+
     /**
      * 公众账号ID
      * @var string
