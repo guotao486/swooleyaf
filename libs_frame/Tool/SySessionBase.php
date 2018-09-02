@@ -43,7 +43,7 @@ class SySessionBase {
      * @return array
      */
     public static function refreshLocalCache(string $inToken=''){
-        $token = self::getSessionId($inToken);
+        $token = SySession::getSessionId($inToken);
         $redisKey = Project::REDIS_PREFIX_SESSION . $token;
         $cacheData = CacheSimpleFactory::getRedisInstance()->hGetAll($redisKey);
         if (isset($cacheData['session_id']) && ($cacheData['session_id'] == $token)) {
@@ -67,7 +67,7 @@ class SySessionBase {
      * @return bool
      */
     public static function set($key, $value,string $inToken=''){
-        $token = self::getSessionId($inToken);
+        $token = SySession::getSessionId($inToken);
         $redisKey = Project::REDIS_PREFIX_SESSION . $token;
         if (is_array($key)) {
             if (empty($key)) {
@@ -97,7 +97,7 @@ class SySessionBase {
      */
     public static function get(string $key=null, $default=null,string $inToken=''){
         $refreshTag = false;
-        $token = self::getSessionId($inToken);
+        $token = SySession::getSessionId($inToken);
         $cacheData = BaseServer::getLocalUserInfo($token);
         if(empty($cacheData)){
             $redisKey = Project::REDIS_PREFIX_SESSION . $token;
@@ -127,7 +127,7 @@ class SySessionBase {
      * @return int
      */
     public static function del(string $key,string $inToken=''){
-        $token = self::getSessionId($inToken);
+        $token = SySession::getSessionId($inToken);
         $redisKey = Project::REDIS_PREFIX_SESSION . $token;
         if($key === ''){
             return CacheSimpleFactory::getRedisInstance()->del($redisKey);
