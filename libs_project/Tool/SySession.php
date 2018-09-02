@@ -31,7 +31,7 @@ class SySession {
         }
 
         if (strlen($token) != 16) {
-            $token = Tool::createNonceStr(6) . Tool::getNowTime();
+            $token = Tool::createNonceStr(6, 'numlower') . Tool::getNowTime();
         }
 
         return $token;

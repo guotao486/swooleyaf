@@ -314,15 +314,13 @@ class HttpServer extends BaseServer {
                 }
             }
         }
-        if(isset($_SERVER['SY-DOMAIN'])){
-            $cookieDomain = trim($_SERVER['SY-DOMAIN']);
-            if(!in_array($cookieDomain, $this->_reqCookieDomains)){
-                return self::RESPONSE_RESULT_TYPE_FORBIDDEN;
-            }
-            $_SERVER['SY-DOMAIN'] = $cookieDomain;
-        } else {
-            $_SERVER['SY-DOMAIN'] = $this->_reqCookieDomains[0];
+
+        $domainTag = $_SERVER['SY-DOMAIN'] ?? 'base';
+        $cookieDomain = $this->_reqCookieDomains[$domainTag] ?? null;
+        if(is_null($cookieDomain)){
+            return self::RESPONSE_RESULT_TYPE_FORBIDDEN;
         }
+        $_SERVER['SY-DOMAIN'] = $cookieDomain;
 
         $reqMethod = strtoupper(Tool::getArrayVal($_SERVER, 'REQUEST_METHOD', 'GET'));
         if ($reqMethod == 'OPTIONS') {
