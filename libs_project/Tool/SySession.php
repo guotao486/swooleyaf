@@ -30,11 +30,11 @@ class SySession {
             $token = SyRequest::getParams('session_id', '');
         }
 
-        if (strlen($token) != 16) {
-            $token = Tool::createNonceStr(6, 'numlower') . Tool::getNowTime();
+        if ((strlen($token) == 16) && ctype_alnum($token)) {
+            return $token;
+        } else {
+            return Tool::createNonceStr(6, 'numlower') . Tool::getNowTime();
         }
-
-        return $token;
     }
 
     /**
