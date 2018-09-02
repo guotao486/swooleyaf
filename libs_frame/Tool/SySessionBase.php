@@ -5,7 +5,6 @@
  * Date: 18-9-2
  * Time: 上午11:07
  */
-
 namespace Tool;
 
 use Constant\Project;

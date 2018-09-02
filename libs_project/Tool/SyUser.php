@@ -11,23 +11,8 @@ use Constant\ProjectCode;
 use Exception\User\LoginException;
 use Traits\SimpleTrait;
 
-class SyUser {
+class SyUser extends SyUserBase {
     use SimpleTrait;
-
-    private static $info = null;
-
-    /**
-     * 获取用户信息
-     * @param bool $force 是否强制获取用户信息,true:是 false:否
-     * @return array
-     */
-    public static function getUserInfo($force=false){
-        if($force || is_null(self::$info)){
-            self::$info = SySession::refreshLocalCache();
-        }
-
-        return self::$info;
-    }
 
     /**
      * 检查是否已登录
