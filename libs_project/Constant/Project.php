@@ -43,8 +43,6 @@ final class Project extends ProjectBase {
     const REDIS_PREFIX_ROLE_POWERS = 'sya01005_'; //前缀-角色权限列表
     const REDIS_PREFIX_ROLE_LIST = 'sya01006_'; //前缀-角色列表
     const REDIS_PREFIX_REGION_LIST = 'sya01007_'; //前缀-地区缓存
-    const REDIS_PREFIX_TIMER_QUEUE = 'sya01008_'; //前缀-定时器队列
-    const REDIS_PREFIX_TIMER_CONTENT = 'sya01009_'; //前缀-定时器内容
 
     //消息队列常量
     const MESSAGE_QUEUE_TOPIC_REDIS_ADD_LOG = 'a000'; //redis主题-添加日志
