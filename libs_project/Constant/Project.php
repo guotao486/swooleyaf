@@ -22,6 +22,10 @@ final class Project extends ProjectBase {
     const MODULE_BASE_API = 'api';
     const MODULE_NAME_API = SY_PROJECT . self::MODULE_BASE_API;
 
+    //REDIS常量 以sy000开头的前缀为框架内部前缀,以sy+3位数字开头的前缀为公共模块前缀
+    const REDIS_PREFIX_TIMER_QUEUE = 'sya02000_'; //前缀-定时器队列
+    const REDIS_PREFIX_TIMER_CONTENT = 'sya02001_'; //前缀-定时器内容
+
     //任务常量
     public static $totalTaskStatus = [
         self::TASK_STATUS_DELETE => '已删除',
