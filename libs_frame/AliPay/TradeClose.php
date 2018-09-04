@@ -68,8 +68,7 @@ class TradeClose extends BaseTrade {
 
         $resArr = $this->getContentArr();
         $resArr['notify_url'] = $this->notify_url;
-        $sign = TradeUtil::createSign($resArr, $resArr['sign_type']);
-        $resArr['sign'] = $sign;
+        $resArr['sign'] = TradeUtil::createSign($resArr, $resArr['sign_type']);
 
         return $resArr;
     }

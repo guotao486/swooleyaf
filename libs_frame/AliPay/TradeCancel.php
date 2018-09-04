@@ -59,8 +59,7 @@ class TradeCancel extends BaseTrade {
         }
 
         $resArr = $this->getContentArr();
-        $sign = TradeUtil::createSign($resArr, $resArr['sign_type']);
-        $resArr['sign'] = $sign;
+        $resArr['sign'] = TradeUtil::createSign($resArr, $resArr['sign_type']);
 
         return $resArr;
     }
