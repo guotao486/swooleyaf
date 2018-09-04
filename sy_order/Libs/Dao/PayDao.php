@@ -7,44 +7,26 @@
  */
 namespace Dao;
 
-use AliPay\TradeUtil;
-use AliPay\PayQrCode;
-use AliPay\PayWap;
 use Constant\ErrorCode;
 use Constant\Project;
-use Constant\ProjectCode;
 use DesignPatterns\Factories\CacheSimpleFactory;
 use Exception\Common\CheckException;
 use Factories\SyBaseMysqlFactory;
 use Interfaces\Containers\PayContainer;
 use Log\Log;
-use Request\SyRequest;
-use Tool\SyUser;
 use Tool\Tool;
 use Traits\SimpleDaoTrait;
-use Wx\Shop\PayNativePre;
-use Wx\Shop\UnifiedOrder;
-use Wx\WxUtilBase;
-use Wx\WxUtilShop;
 
 class PayDao {
     use SimpleDaoTrait;
 
-    private static $payTypeCheckMap = [
-        Project::PAY_TYPE_WX_JS => 'payTypeCheckWxJs',
-        Project::PAY_TYPE_WX_NATIVE_DYNAMIC => 'payTypeCheckWxNativeDynamic',
-        Project::PAY_TYPE_WX_NATIVE_STATIC => 'payTypeCheckWxNativeStatic',
-        Project::PAY_TYPE_WX_MINI_JS => 'payTypeCheckWxMiniJs',
-        Project::PAY_TYPE_ALI_CODE => 'payTypeCheckAliCode',
-        Project::PAY_TYPE_ALI_WEB => 'payTypeCheckAliWeb',
-    ];
-    private static $payTypeHandleMap = [
-        Project::PAY_TYPE_WX_JS => 'payTypeHandleWxJs',
-        Project::PAY_TYPE_WX_NATIVE_DYNAMIC => 'payTypeHandleWxNativeDynamic',
-        Project::PAY_TYPE_WX_NATIVE_STATIC => 'payTypeHandleWxNativeStatic',
-        Project::PAY_TYPE_WX_MINI_JS => 'payTypeHandleWxMiniJs',
-        Project::PAY_TYPE_ALI_CODE => 'payTypeHandleAliCode',
-        Project::PAY_TYPE_ALI_WEB => 'payTypeHandleAliWeb',
+    private static $payApplyMap = [
+        Project::PAY_TYPE_WX_SHOP_JS => '\DesignPatterns\Facades\PayApply\WxShopJs',
+        Project::PAY_TYPE_WX_SHOP_NATIVE_DYNAMIC => '\DesignPatterns\Facades\PayApply\WxShopNativeDynamic',
+        Project::PAY_TYPE_WX_SHOP_NATIVE_STATIC => '\DesignPatterns\Facades\PayApply\WxShopNativeStatic',
+        Project::PAY_TYPE_WX_MINI_JS => '\DesignPatterns\Facades\PayApply\WxMiniJs',
+        Project::PAY_TYPE_ALI_CODE => '\DesignPatterns\Facades\PayApply\AliCode',
+        Project::PAY_TYPE_ALI_WEB => '\DesignPatterns\Facades\PayApply\AliWeb',
     ];
 
     /**
@@ -64,159 +46,6 @@ class PayDao {
         return self::$payContainer->getObj($payContent);
     }
 
-    private static function payTypeCheckWxJs(array &$data) {
-        $wxOpenid = SyUser::getOpenId();
-        if (strlen($wxOpenid) == 0) {
-            throw new CheckException('请先微信登录', ProjectCode::USER_NOT_LOGIN_WX_AUTH);
-        }
-
-        $data['a00_openid'] = $wxOpenid;
-        $data['a00_appid'] = Tool::getConfig('project.' . SY_ENV . SY_PROJECT . '.wx.appid.default');
-    }
-
-    private static function payTypeCheckWxNativeDynamic(array &$data) {
-        $data['a00_appid'] = Tool::getConfig('project.' . SY_ENV . SY_PROJECT . '.wx.appid.default');
-    }
-
-    private static function payTypeCheckWxNativeStatic(array &$data) {
-        $data['a00_appid'] = Tool::getConfig('project.' . SY_ENV . SY_PROJECT . '.wx.appid.default');
-    }
-
-    private static function payTypeCheckWxMiniJs(array &$data) {
-        $wxOpenid = SyUser::getOpenId();
-        if (strlen($wxOpenid) == 0) {
-            throw new CheckException('请先微信登录', ProjectCode::USER_NOT_LOGIN_WX_AUTH);
-        }
-
-        $data['a00_openid'] = $wxOpenid;
-        $data['a00_appid'] = Tool::getConfig('project.' . SY_ENV . SY_PROJECT . '.wx.appid.default');
-    }
-
-    private static function payTypeCheckAliCode(array &$data) {
-        $data['a01_appid'] = Tool::getConfig('project.' . SY_ENV . SY_PROJECT . '.alipay.appid.default');
-        $data['a01_timeout'] = (string)SyRequest::getParams('a01_timeout', '');
-    }
-
-    private static function payTypeCheckAliWeb(array &$data) {
-        $returnUrl = (string)SyRequest::getParams('a01_returnurl', '');
-        if(strlen($returnUrl) == 0){
-            throw new CheckException('同步通知链接不能为空', ErrorCode::COMMON_PARAM_ERROR);
-        }
-
-        $data['a01_appid'] = Tool::getConfig('project.' . SY_ENV . SY_PROJECT . '.alipay.appid.default');
-        $data['a01_timeout'] = (string)SyRequest::getParams('a01_timeout', '');
-        $data['a01_returnurl'] = $returnUrl;
-    }
-
-    private static function payTypeHandleWxJs(array $data) {
-        $order = new UnifiedOrder(UnifiedOrder::TRADE_TYPE_JSAPI, $data['a00_appid']);
-        $order->setBody($data['content_result']['pay_name']);
-        $order->setTotalFee($data['content_result']['pay_money']);
-        $order->setOutTradeNo($data['content_result']['pay_sn']);
-        $order->setAttach($data['content_result']['pay_attach']);
-        $order->setOpenid($data['a00_openid']);
-        $applyRes = WxUtilShop::applyJsPay($order, WxUtilBase::TYPE_SHOP);
-        unset($order);
-        if($applyRes['code'] > 0){
-            throw new CheckException($applyRes['message'], ErrorCode::COMMON_PARAM_ERROR);
-        }
-
-        return [
-            'api' => $applyRes['data']['pay'],
-            'config' => $applyRes['data']['config'],
-        ];
-    }
-
-    private static function payTypeHandleWxNativeDynamic(array $data) {
-        $order = new UnifiedOrder(UnifiedOrder::TRADE_TYPE_NATIVE, $data['a00_appid']);
-        $order->setBody($data['content_result']['pay_name']);
-        $order->setTotalFee($data['content_result']['pay_money']);
-        $order->setOutTradeNo($data['content_result']['pay_sn']);
-        $order->setAttach($data['content_result']['pay_attach']);
-        $applyRes = WxUtilShop::applyNativePay($order);
-        unset($order);
-        if($applyRes['code'] > 0){
-            throw new CheckException($applyRes['message'], ErrorCode::COMMON_PARAM_ERROR);
-        }
-
-        return [
-            'code_url' => $applyRes['data']['code_url']
-        ];
-    }
-
-    private static function payTypeHandleWxNativeStatic(array $data) {
-        $prePay = new PayNativePre($data['a00_appid']);
-        $prePay->setProductId($data['content_result']['pay_sn']);
-        $applyRes = WxUtilShop::applyPreNativePay($prePay);
-        unset($prePay);
-
-        $redisKey = Project::REDIS_PREFIX_WX_NATIVE_PRE . $data['content_result']['pay_sn'];
-        CacheSimpleFactory::getRedisInstance()->hMset($redisKey, [
-            'pay_name' => $data['content_result']['pay_name'],
-            'pay_money' => $data['content_result']['pay_money'],
-            'pay_attach' => $data['content_result']['pay_attach'],
-            'pay_sn' => $data['content_result']['pay_sn'],
-            'cache_key' => $redisKey,
-        ]);
-        CacheSimpleFactory::getRedisInstance()->expire($redisKey, 7200);
-
-        return [
-            'code_url' => $applyRes
-        ];
-    }
-
-    private static function payTypeHandleWxMiniJs(array $data) {
-        $order = new UnifiedOrder(UnifiedOrder::TRADE_TYPE_JSAPI, $data['a00_appid']);
-        $order->setBody($data['content_result']['pay_name']);
-        $order->setTotalFee($data['content_result']['pay_money']);
-        $order->setOutTradeNo($data['content_result']['pay_sn']);
-        $order->setAttach($data['content_result']['pay_attach']);
-        $order->setOpenid($data['a00_openid']);
-        $applyRes = WxUtilShop::applyJsPay($order, WxUtilBase::TYPE_MINI);
-        unset($order);
-        if($applyRes['code'] > 0){
-            throw new CheckException($applyRes['message'], ErrorCode::COMMON_PARAM_ERROR);
-        }
-
-        return [
-            'api' => $applyRes['data']['pay'],
-        ];
-    }
-
-    private static function payTypeHandleAliCode(array $data) {
-        $pay = new PayQrCode($data['a01_appid']);
-        $pay->setSubject($data['content_result']['pay_name']);
-        $pay->setTotalAmount($data['content_result']['pay_money']);
-        $pay->setAttach($data['content_result']['pay_attach']);
-        $pay->setTimeoutExpress($data['a01_timeout']);
-        $pay->setOutTradeNo($data['content_result']['pay_sn']);
-        $payRes = TradeUtil::applyQrCodePay($pay);
-        unset($pay);
-        if ($payRes['code'] > 0) {
-            throw new CheckException($payRes['message'], ErrorCode::COMMON_PARAM_ERROR);
-        }
-
-        return [
-            'qr_code' => $payRes['data']['qr_code'],
-        ];
-    }
-
-    private static function payTypeHandleAliWeb(array $data) {
-        $pay = new PayWap($data['a01_appid']);
-        $pay->setReturnUrl($data['a01_returnurl']);
-        $pay->setSubject($data['content_result']['pay_name']);
-        $pay->setTotalAmount($data['content_result']['pay_money']);
-        $pay->setAttach($data['content_result']['pay_attach']);
-        $pay->setTimeoutExpress($data['a01_timeout']);
-        $pay->setOutTradeNo($data['content_result']['pay_sn']);
-        $html = TradeUtil::createWapPayHtml($pay);
-        unset($pay);
-
-        return [
-            'html' => $html,
-        ];
-    }
-
     public static function applyPay(array $data) {
         $redisKey = Project::REDIS_PREFIX_PAY_HASH . $data['pay_hash'];
         $cacheData = CacheSimpleFactory::getRedisInstance()->get($redisKey);
@@ -224,23 +53,23 @@ class PayDao {
             throw new CheckException('支付处理中,请不要重复申请', ErrorCode::COMMON_PARAM_ERROR);
         }
 
-        $typeCheckFunc = Tool::getArrayVal(self::$payTypeCheckMap, $data['pay_type'], null);
-        if (is_null($typeCheckFunc)) {
+        $payApplyClass = Tool::getArrayVal(self::$payApplyMap, $data['pay_type'], null);
+        if(is_null($payApplyClass)){
             throw new CheckException('支付类型不支持', ErrorCode::COMMON_PARAM_ERROR);
         }
-        self::$typeCheckFunc($data);
+        $payCheckRes = $payApplyClass::handleCheckParams($data);
+        $nowData = array_merge($data, $payCheckRes);
 
-        $payService = self::getPayService($data['pay_content']);
+        $payService = self::getPayService($nowData['pay_content']);
         if (is_null($payService)) {
             throw new CheckException('支付内容不支持', ErrorCode::COMMON_PARAM_ERROR);
         }
         $contentParams = $payService->checkPayParams();
-        $data['content_result'] = $payService->getPayInfo($contentParams);
+        $nowData['content_result'] = $payService->getPayInfo($contentParams);
         CacheSimpleFactory::getRedisInstance()->set($redisKey, '1', 5);
         unset($payService);
 
-        $typeHandleFunc = Tool::getArrayVal(self::$payTypeHandleMap, $data['pay_type'], null);
-        return self::$typeHandleFunc($data);
+        return $payApplyClass::handleApply($nowData);
     }
 
     public static function completePay(array $data){
