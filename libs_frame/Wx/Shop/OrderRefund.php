@@ -25,7 +25,7 @@ class OrderRefund extends ShopBase {
         $this->op_user_id = $shopConfig->getPayMchId();
     }
 
-    public function __clone(){
+    private function __clone(){
     }
 
     /**
@@ -51,12 +51,6 @@ class OrderRefund extends ShopBase {
      * @var string
      */
     private $nonce_str = '';
-
-    /**
-     * 签名
-     * @var string
-     */
-    private $sign = '';
 
     /**
      * 签名类型
@@ -107,12 +101,19 @@ class OrderRefund extends ShopBase {
     private $op_user_id = '';
 
     /**
+     * @param string $device_info
+     */
+    public function setDeviceInfo(string $device_info) {
+        $this->device_info = $device_info;
+    }
+
+    /**
      * @param string $transactionId
      * @throws \Exception\Wx\WxException
      */
     public function setTransactionId(string $transactionId) {
-        if (preg_match('/^4[0-9]{27}$/', $transactionId . '') > 0) {
-            $this->transaction_id = $transactionId . '';
+        if (preg_match('/^4[0-9]{27}$/', $transactionId) > 0) {
+            $this->transaction_id = $transactionId;
         } else {
             throw new WxException('微信订单号不合法', ErrorCode::WX_PARAM_ERROR);
         }
@@ -123,8 +124,8 @@ class OrderRefund extends ShopBase {
      * @throws \Exception\Wx\WxException
      */
     public function setOutTradeNo(string $outTradeNo) {
-        if (preg_match('/^[a-zA-Z0-9]{1,32}$/', $outTradeNo . '') > 0) {
-            $this->out_trade_no = $outTradeNo . '';
+        if (preg_match('/^[a-zA-Z0-9]{1,32}$/', $outTradeNo) > 0) {
+            $this->out_trade_no = $outTradeNo;
         } else {
             throw new WxException('商户订单号不合法', ErrorCode::WX_PARAM_ERROR);
         }
@@ -135,8 +136,8 @@ class OrderRefund extends ShopBase {
      * @throws \Exception\Wx\WxException
      */
     public function setOutRefundNo(string $outRefundNo) {
-        if (preg_match('/^[a-zA-Z0-9]{1,32}$/', $outRefundNo . '') > 0) {
-            $this->out_refund_no = $outRefundNo . '';
+        if (preg_match('/^[a-zA-Z0-9]{1,32}$/', $outRefundNo) > 0) {
+            $this->out_refund_no = $outRefundNo;
         } else {
             throw new WxException('商户退款单号不合法', ErrorCode::WX_PARAM_ERROR);
         }
@@ -167,34 +168,39 @@ class OrderRefund extends ShopBase {
     }
 
     public function getDetail() : array {
-        $resArr = [];
-        $saveArr = get_object_vars($this);
-        foreach ($saveArr as $key => $value) {
-            if (strlen($value . '') > 0) {
-                $resArr[$key] = $value;
-            }
-        }
-
-        if (isset($resArr['transaction_id'])) {
-            unset($resArr['out_trade_no']);
-        } else if (isset($resArr['out_trade_no'])) {
-            unset($resArr['transaction_id']);
-        } else {
+        if((strlen($this->transaction_id) == 0) && (strlen($this->out_trade_no) == 0)){
             throw new WxException('微信订单号和商户订单号必须设置一个', ErrorCode::WX_PARAM_ERROR);
         }
-
-        if (!isset($resArr['out_refund_no'])) {
+        if(strlen($this->out_refund_no) == 0){
             throw new WxException('商户退款单号不能为空', ErrorCode::WX_PARAM_ERROR);
         }
-
-        if ($resArr['total_fee'] == 0) {
+        if($this->total_fee == 0){
             throw new WxException('订单金额必须大于0', ErrorCode::WX_PARAM_ERROR);
-        } else if ($resArr['refund_fee'] == 0) {
+        } else if($this->refund_fee == 0){
             throw new WxException('退款金额必须大于0', ErrorCode::WX_PARAM_ERROR);
-        } else if ($resArr['refund_fee'] > $resArr['total_fee']) {
+        } else if($this->refund_fee > $this->total_fee){
             throw new WxException('订单金额必须大于等于退款金额', ErrorCode::WX_PARAM_ERROR);
         }
 
+        $resArr = [
+            'appid' => $this->appid,
+            'mch_id' => $this->mch_id,
+            'sign_type' => $this->sign_type,
+            'nonce_str' => $this->nonce_str,
+            'op_user_id' => $this->op_user_id,
+            'refund_fee_type' => $this->refund_fee_type,
+            'out_refund_no' => $this->out_refund_no,
+            'total_fee' => $this->total_fee,
+            'refund_fee' => $this->refund_fee,
+        ];
+        if(strlen($this->transaction_id) > 0){
+            $resArr['transaction_id'] = $this->transaction_id;
+        } else {
+            $resArr['out_trade_no'] = $this->out_trade_no;
+        }
+        if(strlen($this->device_info) > 0){
+            $resArr['device_info'] = $this->device_info;
+        }
         $resArr['sign'] = WxUtilShop::createSign($resArr, $this->appid);
 
         return $resArr;

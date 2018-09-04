@@ -118,7 +118,7 @@ class UnifiedOrder extends ShopBase {
     private $fee_type = '';
 
     /**
-     * 标价金额，单位为分
+     * 标价金额,单位为分
      * @var int
      */
     private $total_fee = 0;
@@ -130,61 +130,55 @@ class UnifiedOrder extends ShopBase {
     private $spbill_create_ip = '';
 
     /**
-     * 交易起始时间，格式为yyyyMMddHHmmss，
+     * 交易起始时间,格式为yyyyMMddHHmmss
      * @var string
      */
     private $time_start = '';
 
     /**
-     * 交易结束时间，格式为yyyyMMddHHmmss，
+     * 交易结束时间,格式为yyyyMMddHHmmss
      * @var string
      */
     private $time_expire = '';
 
     /**
-     * 商品标记，使用代金券或立减优惠功能时需要的参数
+     * 商品标记,使用代金券或立减优惠功能时需要的参数
      * @var string
      */
     private $goods_tag = '';
 
     /**
-     * 异步接收微信支付结果通知的回调地址，通知url必须为外网可访问的url，不能携带参数
+     * 异步接收微信支付结果通知的回调地址,通知url必须为外网可访问的url,不能携带参数
      * @var string
      */
     private $notify_url = '';
 
     /**
-     * 交易类型，取值如下：JSAPI，NATIVE，APP等
+     * 交易类型,取值如下：JSAPI,NATIVE,APP等
      * @var string
      */
     private $trade_type = '';
 
     /**
-     * 商品ID trade_type=NATIVE时（即扫码支付），此参数必传
+     * 商品ID trade_type=NATIVE时（即扫码支付）,此参数必传
      * @var string
      */
     private $product_id = '';
 
     /**
-     * 用户标识 trade_type=JSAPI时（即公众号支付），此参数必传
+     * 用户标识 trade_type=JSAPI时（即公众号支付）,此参数必传
      * @var string
      */
     private $openid = '';
 
     /**
-     * 签名类型 签名类型，默认为MD5，支持HMAC-SHA256和MD5
+     * 签名类型 签名类型,默认为MD5,支持HMAC-SHA256和MD5
      * @var string
      */
     private $sign_type = '';
 
     /**
-     * 签名
-     * @var string
-     */
-    private $sign = '';
-
-    /**
-     * 场景信息，json格式
+     * 场景信息,json格式
      * @var string
      */
     private $scene_info = '';
@@ -194,8 +188,8 @@ class UnifiedOrder extends ShopBase {
      * @throws \Exception\Wx\WxException
      */
     public function setBody(string $body) {
-        if (mb_strlen($body . '') > 0) {
-            $this->body = mb_substr($body . '', 0, 40);
+        if (mb_strlen($body) > 0) {
+            $this->body = mb_substr($body, 0, 40);
         } else {
             throw new WxException('商品名称不能为空', ErrorCode::WX_PARAM_ERROR);
         }
@@ -206,8 +200,8 @@ class UnifiedOrder extends ShopBase {
      * @throws \Exception\Wx\WxException
      */
     public function setAttach(string $attach) {
-        if (strlen($attach . '') <= 127) {
-            $this->attach = $attach . '';
+        if (strlen($attach) <= 127) {
+            $this->attach = $attach;
         } else {
             throw new WxException('附加数据过长', ErrorCode::WX_PARAM_ERROR);
         }
@@ -218,10 +212,10 @@ class UnifiedOrder extends ShopBase {
      * @throws \Exception\Wx\WxException
      */
     public function setOutTradeNo(string $outTradeNo) {
-        if (preg_match('/^[0-9]{1,32}$/', $outTradeNo . '') > 0) {
-            $this->out_trade_no = $outTradeNo . '';
-            if($this->trade_type == 'NATIVE'){
-                $this->product_id = $outTradeNo . '';
+        if (preg_match('/^[0-9]{1,32}$/', $outTradeNo) > 0) {
+            $this->out_trade_no = $outTradeNo;
+            if ($this->trade_type == 'NATIVE') {
+                $this->product_id = $outTradeNo;
             }
         } else {
             throw new WxException('商户单号不合法', ErrorCode::WX_PARAM_ERROR);
@@ -321,39 +315,106 @@ class UnifiedOrder extends ShopBase {
         $this->scene_info = Tool::jsonEncode($sceneData, JSON_UNESCAPED_UNICODE);
     }
 
-    public function getDetail() : array {
-        $resArr = [];
-        $saveArr = get_object_vars($this);
-        foreach ($saveArr as $key => $value) {
-            if (strlen($value . '') > 0) {
-                $resArr[$key] = $value;
-            }
-        }
+    /**
+     * @param string $detail
+     */
+    public function setDetail(string $detail) {
+        $this->detail = $detail;
+    }
 
-        if (!isset($resArr['body'])) {
+    /**
+     * @param string $time_start 格式为yyyyMMddHHmmss
+     * @throws \Exception\Wx\WxException
+     */
+    public function setTimeStart(string $time_start) {
+        if(ctype_digit($time_start)){
+            $this->time_start = $time_start;
+        } else {
+            throw new WxException('交易起始时间不合法', ErrorCode::WX_PARAM_ERROR);
+        }
+    }
+
+    /**
+     * @param string $time_expire 格式为yyyyMMddHHmmss
+     * @throws \Exception\Wx\WxException
+     */
+    public function setTimeExpire(string $time_expire) {
+        if(ctype_digit($time_expire)){
+            $this->time_expire = $time_expire;
+        } else {
+            throw new WxException('交易结束时间不合法', ErrorCode::WX_PARAM_ERROR);
+        }
+    }
+
+    /**
+     * @param string $goods_tag
+     */
+    public function setGoodsTag(string $goods_tag) {
+        $this->goods_tag = $goods_tag;
+    }
+
+    public function getDetail() : array {
+        if(strlen($this->body) == 0){
             throw new WxException('商品名称不能为空', ErrorCode::WX_PARAM_ERROR);
         }
-        if (!isset($resArr['out_trade_no'])) {
+        if(strlen($this->out_trade_no) == 0){
             throw new WxException('商户单号不能为空', ErrorCode::WX_PARAM_ERROR);
         }
-        if ($resArr['total_fee'] <= 0) {
+        if($this->total_fee <= 0){
             throw new WxException('支付金额不能小于0', ErrorCode::WX_PARAM_ERROR);
         }
-        if (($resArr['trade_type'] == self::TRADE_TYPE_JSAPI) && (!isset($resArr['openid']))) {
+        if(($this->trade_type == self::TRADE_TYPE_JSAPI) && (strlen($this->openid) == 0)){
             throw new WxException('用户openid不能为空', ErrorCode::WX_PARAM_ERROR);
-        }
-        if (($resArr['trade_type'] == self::TRADE_TYPE_NATIVE) && (!isset($resArr['product_id']))) {
+        } else if(($this->trade_type == self::TRADE_TYPE_NATIVE) && (strlen($this->product_id) == 0)){
             throw new WxException('商品ID不能为空', ErrorCode::WX_PARAM_ERROR);
-        }
-        if (($resArr['trade_type'] == self::TRADE_TYPE_MWEB)) {
-            if (!isset($resArr['spbill_create_ip'])) {
+        } else if($this->trade_type == self::TRADE_TYPE_MWEB){
+            if(strlen($this->spbill_create_ip) == 0){
                 throw new WxException('终端IP不能为空', ErrorCode::WX_PARAM_ERROR);
-            }
-            if (!isset($resArr['scene_info'])) {
+            } else if(strlen($this->scene_info) == 0){
                 throw new WxException('场景信息不能为空', ErrorCode::WX_PARAM_ERROR);
             }
         }
 
+        $resArr = [
+            'fee_type' => $this->fee_type,
+            'nonce_str' => $this->nonce_str,
+            'appid' => $this->appid,
+            'mch_id' => $this->mch_id,
+            'notify_url' => $this->notify_url,
+            'device_info' => $this->device_info,
+            'sign_type' => $this->sign_type,
+            'trade_type' => $this->trade_type,
+            'body' => $this->body,
+            'out_trade_no' => $this->out_trade_no,
+            'total_fee' => $this->total_fee,
+        ];
+        if(strlen($this->spbill_create_ip) > 0){
+            $resArr['spbill_create_ip'] = $this->spbill_create_ip;
+        }
+        if(strlen($this->detail) > 0){
+            $resArr['detail'] = $this->detail;
+        }
+        if(strlen($this->attach) > 0){
+            $resArr['attach'] = $this->attach;
+        }
+        if(strlen($this->time_start) > 0){
+            $resArr['time_start'] = $this->time_start;
+        }
+        if(strlen($this->time_expire) > 0){
+            $resArr['time_expire'] = $this->time_expire;
+        }
+        if(strlen($this->goods_tag) > 0){
+            $resArr['goods_tag'] = $this->goods_tag;
+        }
+        if(strlen($this->product_id) > 0){
+            $resArr['product_id'] = $this->product_id;
+        }
+        if(strlen($this->openid) > 0){
+            $resArr['openid'] = $this->openid;
+        }
+        if(strlen($this->scene_info) > 0){
+            $resArr['scene_info'] = $this->scene_info;
+        }
         $resArr['sign'] = WxUtilShop::createSign($resArr, $this->appid);
 
         return $resArr;

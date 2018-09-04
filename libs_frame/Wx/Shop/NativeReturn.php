@@ -22,7 +22,7 @@ class NativeReturn extends ShopBase {
         $this->return_code = 'SUCCESS';
     }
 
-    public function __clone(){
+    private function __clone(){
     }
 
     /**
@@ -74,12 +74,6 @@ class NativeReturn extends ShopBase {
     private $err_code_des = '';
 
     /**
-     * 签名
-     * @var string
-     */
-    private $sign = '';
-
-    /**
      * @param string $nonceStr
      */
     public function setNonceStr(string $nonceStr) {
@@ -99,10 +93,9 @@ class NativeReturn extends ShopBase {
      * @throws \Exception\Wx\WxException
      */
     public function setErrorMsg(string $errDes,string $returnMsg) {
-        if (mb_strlen($errDes . '') == 0) {
+        if (strlen($errDes) == 0) {
             throw new WxException('错误描述不能为空', ErrorCode::WX_PARAM_ERROR);
-        }
-        if (mb_strlen($returnMsg . '') == 0) {
+        } else if (strlen($returnMsg) == 0) {
             throw new WxException('返回信息不能为空', ErrorCode::WX_PARAM_ERROR);
         }
 
@@ -113,21 +106,32 @@ class NativeReturn extends ShopBase {
     }
 
     public function getDetail() : array {
-        $resArr = [];
-        $saveArr = get_object_vars($this);
-        foreach ($saveArr as $key => $value) {
-            if (strlen($value . '') > 0) {
-                $resArr[$key] = $value;
+        if($this->return_code == 'SUCCESS'){
+            if(strlen($this->nonce_str) == 0){
+                throw new WxException('随机字符串不能为空', ErrorCode::WX_PARAM_ERROR);
+            } else if(strlen($this->prepay_id) == 0){
+                throw new WxException('预支付ID不能为空', ErrorCode::WX_PARAM_ERROR);
             }
         }
 
-        if (($this->return_code == 'SUCCESS') && !isset($resArr['nonce_str'])) {
-            throw new WxException('随机字符串不能为空', ErrorCode::WX_PARAM_ERROR);
+        $resArr = [
+            'return_code' => $this->return_code,
+            'result_code' => $this->result_code,
+            'appid' => $this->appid,
+            'mch_id' => $this->mch_id,
+        ];
+        if(strlen($this->nonce_str) > 0){
+            $resArr['nonce_str'] = $this->nonce_str;
         }
-        if (($this->return_code == 'SUCCESS') && !isset($resArr['prepay_id'])) {
-            throw new WxException('预支付ID不能为空', ErrorCode::WX_PARAM_ERROR);
+        if(strlen($this->prepay_id) > 0){
+            $resArr['prepay_id'] = $this->prepay_id;
         }
-
+        if(strlen($this->return_msg) > 0){
+            $resArr['return_msg'] = $this->return_msg;
+        }
+        if(strlen($this->err_code_des) > 0){
+            $resArr['err_code_des'] = $this->err_code_des;
+        }
         $resArr['sign'] = WxUtilShop::createSign($resArr, $this->appid);
 
         return $resArr;

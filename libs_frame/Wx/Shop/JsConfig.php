@@ -9,7 +9,8 @@ namespace Wx\Shop;
 
 use DesignPatterns\Singletons\WxConfigSingleton;
 use Tool\Tool;
-use Wx\WxUtilOpenBase;
+use Wx\WxUtilBase;
+use Wx\WxUtilOpenShop;
 use Wx\WxUtilShop;
 
 class JsConfig extends ShopBase {
@@ -20,7 +21,7 @@ class JsConfig extends ShopBase {
         $this->nonceStr = Tool::createNonceStr(32, 'numlower');
     }
 
-    public function __clone(){
+    private function __clone(){
     }
 
     /**
@@ -39,20 +40,20 @@ class JsConfig extends ShopBase {
     private $nonceStr = '';
 
     /**
-     * @param string $platType 平台类型 shop：公众号 open：第三方平台
+     * @param string $platType 平台类型 shop：公众号 openshop：第三方平台代理公众号
      * @return array
      */
-    public function getDetail(string $platType='shop') : array {
+    public function getDetail(string $platType=WxUtilBase::TYPE_SHOP) : array {
         $resArr = [
             'appId' => $this->appId,
             'timestamp' => $this->timestamp,
             'nonceStr' => $this->nonceStr,
         ];
 
-        if ($platType == 'shop') { //公众号获取jsapi_ticket
+        if ($platType == WxUtilBase::TYPE_SHOP) { //公众号获取jsapi_ticket
             $ticket = WxUtilShop::getJsTicket($this->appId);
         } else { //第三方平台获取jsapi_ticket
-            $ticket = WxUtilOpenBase::getAuthorizerJsTicket($this->appId);
+            $ticket = WxUtilOpenShop::getAuthorizerJsTicket($this->appId);
         }
 
         $needStr = 'jsapi_ticket=' . $ticket . '&noncestr=' . $this->nonceStr . '&timestamp=' . $this->timestamp . '&url=' . WxConfigSingleton::getInstance()->getShopConfig($this->appId)->getPayAuthUrl();

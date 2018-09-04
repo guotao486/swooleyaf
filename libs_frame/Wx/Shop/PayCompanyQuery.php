@@ -22,7 +22,7 @@ class PayCompanyQuery extends ShopBase {
         $this->nonce_str = Tool::createNonceStr(32, 'numlower');
     }
 
-    public function __clone(){
+    private function __clone(){
     }
 
     /**
@@ -36,12 +36,6 @@ class PayCompanyQuery extends ShopBase {
      * @var string
      */
     private $nonce_str = '';
-
-    /**
-     * 签名
-     * @var string
-     */
-    private $sign = '';
 
     /**
      * 商户订单号
@@ -60,26 +54,24 @@ class PayCompanyQuery extends ShopBase {
      * @throws \Exception\Wx\WxException
      */
     public function setOutTradeNo(string $outTradeNo) {
-        if (preg_match('/^[0-9]{1,32}$/', $outTradeNo . '') > 0) {
-            $this->partner_trade_no = $outTradeNo . '';
+        if (preg_match('/^[0-9]{1,32}$/', $outTradeNo) > 0) {
+            $this->partner_trade_no = $outTradeNo;
         } else {
             throw new WxException('商户单号不合法', ErrorCode::WX_PARAM_ERROR);
         }
     }
 
     public function getDetail() : array {
-        $resArr = [];
-        $saveArr = get_object_vars($this);
-        foreach ($saveArr as $key => $value) {
-            if (strlen($value . '') > 0) {
-                $resArr[$key] = $value;
-            }
-        }
-
-        if (!isset($resArr['partner_trade_no'])) {
+        if(strlen($this->partner_trade_no) == 0){
             throw new WxException('商户单号不能为空', ErrorCode::WX_PARAM_ERROR);
         }
 
+        $resArr = [
+            'appid' => $this->appid,
+            'mch_id' => $this->mch_id,
+            'nonce_str' => $this->nonce_str,
+            'partner_trade_no' => $this->partner_trade_no,
+        ];
         $resArr['sign'] = WxUtilShop::createSign($resArr, $this->appid);
 
         return $resArr;
