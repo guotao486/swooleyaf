@@ -9,10 +9,10 @@ namespace Map\Tencent;
 
 use Constant\ErrorCode;
 use Exception\Map\TencentMapException;
-use Map\SimpleTraitMap;
+use Map\MapSimpleTrait;
 
 class IpLocation extends MapBase {
-    use SimpleTraitMap;
+    use MapSimpleTrait;
 
     public function __construct() {
         parent::__construct();

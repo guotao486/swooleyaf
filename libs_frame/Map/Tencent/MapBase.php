@@ -10,10 +10,10 @@ namespace Map\Tencent;
 use Constant\ErrorCode;
 use DesignPatterns\Singletons\MapTencentSingleton;
 use Exception\Map\TencentMapException;
-use Map\SimpleTraitMapBase;
+use Map\MapBaseSimpleTrait;
 
 abstract class MapBase {
-    use SimpleTraitMapBase;
+    use MapBaseSimpleTrait;
 
     const GET_TYPE_SERVER = 'server'; //获取类型-服务端
     const GET_TYPE_MOBILE = 'mobile'; //获取类型-移动端

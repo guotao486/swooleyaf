@@ -9,7 +9,7 @@ namespace Map;
 
 use Tool\Tool;
 
-trait SimpleTraitMap {
+trait MapSimpleTrait {
     private function __clone(){
     }
 

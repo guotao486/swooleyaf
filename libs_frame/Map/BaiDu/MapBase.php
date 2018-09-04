@@ -10,10 +10,10 @@ namespace Map\BaiDu;
 use Constant\ErrorCode;
 use DesignPatterns\Singletons\MapBaiduSingleton;
 use Exception\Map\BaiduMapException;
-use Map\SimpleTraitMapBase;
+use Map\MapBaseSimpleTrait;
 
 abstract class MapBase {
-    use SimpleTraitMapBase;
+    use MapBaseSimpleTrait;
 
     const CHECK_TYPE_SERVER_IP = 'server-ip'; //校验类型-服务端ip
     const CHECK_TYPE_SERVER_SN = 'server-sn'; //校验类型-服务端签名

@@ -7,7 +7,7 @@
  */
 namespace Map;
 
-trait SimpleTraitMapBase {
+trait MapBaseSimpleTrait {
     private function __clone() {
     }
 
