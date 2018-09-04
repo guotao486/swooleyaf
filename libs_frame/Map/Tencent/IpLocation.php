@@ -9,20 +9,13 @@ namespace Map\Tencent;
 
 use Constant\ErrorCode;
 use Exception\Map\TencentMapException;
-use Tool\Tool;
+use Map\SimpleTraitMap;
 
 class IpLocation extends MapBase {
+    use SimpleTraitMap;
+
     public function __construct() {
         parent::__construct();
-    }
-
-    private function __clone() {
-    }
-
-    public function __toString() {
-        $vars = array_merge(get_object_vars($this), parent::getConfigs());
-
-        return Tool::jsonEncode($vars, JSON_UNESCAPED_UNICODE);
     }
 
     /**
@@ -43,7 +36,7 @@ class IpLocation extends MapBase {
      * @throws \Exception\Map\TencentMapException
      */
     public function setIp(string $ip) {
-        if (preg_match('/^(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])(\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])){3}$/', $ip) > 0) {
+        if (preg_match('/^(\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])){4}$/', '.' . $ip) > 0) {
             $this->ip = $ip;
         } else {
             throw new TencentMapException('ip不合法', ErrorCode::MAP_TENCENT_PARAM_ERROR);

@@ -9,9 +9,11 @@ namespace Map\BaiDu;
 
 use Constant\ErrorCode;
 use Exception\Map\BaiduMapException;
-use Tool\Tool;
+use Map\SimpleTraitMap;
 
 class CoordinateTranslate extends MapBase {
+    use SimpleTraitMap;
+
     const COORDINATE_TYPE_GPS = 1; //坐标类型-GPS角度
     const COORDINATE_TYPE_GPS_MS = 2; //坐标类型-GPS米制
     const COORDINATE_TYPE_GOOGLE = 3; //坐标类型-google
@@ -25,15 +27,6 @@ class CoordinateTranslate extends MapBase {
         parent::__construct();
         $this->fromType = self::COORDINATE_TYPE_GPS;
         $this->toType = self::COORDINATE_TYPE_BD;
-    }
-
-    private function __clone() {
-    }
-
-    public function __toString() {
-        $vars = array_merge(get_object_vars($this), parent::getConfigs());
-
-        return Tool::jsonEncode($vars, JSON_UNESCAPED_UNICODE);
     }
 
     /**

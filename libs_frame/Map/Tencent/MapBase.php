@@ -10,8 +10,11 @@ namespace Map\Tencent;
 use Constant\ErrorCode;
 use DesignPatterns\Singletons\MapTencentSingleton;
 use Exception\Map\TencentMapException;
+use Map\SimpleTraitMapBase;
 
 abstract class MapBase {
+    use SimpleTraitMapBase;
+
     const GET_TYPE_SERVER = 'server'; //获取类型-服务端
     const GET_TYPE_MOBILE = 'mobile'; //获取类型-移动端
     const GET_TYPE_BROWSE = 'browse'; //获取类型-网页端
@@ -19,13 +22,6 @@ abstract class MapBase {
     public function __construct() {
         $this->serverIp = MapTencentSingleton::getInstance()->getConfig()->getServerIp();
         $this->output = 'json';
-    }
-
-    private function __clone() {
-    }
-
-    public function getConfigs() : array {
-        return get_object_vars($this);
     }
 
     /**

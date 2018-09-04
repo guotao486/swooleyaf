@@ -9,24 +9,16 @@ namespace Map\BaiDu;
 
 use Constant\ErrorCode;
 use Exception\Map\BaiduMapException;
-use Tool\Tool;
+use Map\SimpleTraitMap;
 
 class PlaceSuggestion extends MapBase {
+    use SimpleTraitMap;
+
     public function __construct(){
         parent::__construct();
-
         $this->cityLimit = 'true';
         $this->coordType = 3;
         $this->coordTypeReturn = 'bd09ll';
-    }
-
-    private function __clone(){
-    }
-
-    public function __toString() {
-        $vars = array_merge(get_object_vars($this), parent::getConfigs());
-
-        return Tool::jsonEncode($vars, JSON_UNESCAPED_UNICODE);
     }
 
     /**
