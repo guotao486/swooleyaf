@@ -59,7 +59,7 @@ class TemplateMsg extends ShopBase {
      * @throws \Exception\Wx\WxException
      */
     public function setTemplateId(string $templateId) {
-        if (strlen($templateId . '') > 0) {
+        if (strlen($templateId ) > 0) {
             $this->template_id = $templateId;
         } else {
             throw new WxException('模版ID不能为空', ErrorCode::WX_PARAM_ERROR);
@@ -71,8 +71,8 @@ class TemplateMsg extends ShopBase {
      * @throws \Exception\Wx\WxException
      */
     public function setRedirectUrl(string $redirectUrl) {
-        if (preg_match('/^(http|https|ftp)\:\/\/\S+$/', $redirectUrl . '') > 0) {
-            $this->redirect_url = $redirectUrl . '';
+        if (preg_match('/^(http|https|ftp)\:\/\/\S+$/', $redirectUrl) > 0) {
+            $this->redirect_url = $redirectUrl;
         } else {
             throw new WxException('重定向链接不合法', ErrorCode::WX_PARAM_ERROR);
         }

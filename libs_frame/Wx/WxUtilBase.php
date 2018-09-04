@@ -14,7 +14,8 @@ use Tool\Tool;
 abstract class WxUtilBase {
     const TYPE_SHOP = 'shop'; //类型-公众号
     const TYPE_MINI = 'mini'; //类型-小程序
-    const TYPE_OPEN = 'open'; //类型-第三方平台
+    const TYPE_OPEN_SHOP = 'open'; //类型-第三方平台代理公众号
+    const TYPE_OPEN_MINI = 'openmini'; //类型-第三方平台代理小程序
 
     /**
      * 发送post请求

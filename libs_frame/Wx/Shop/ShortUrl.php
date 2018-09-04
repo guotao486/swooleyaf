@@ -57,12 +57,6 @@ class ShortUrl extends ShopBase {
     private $sign_type = '';
 
     /**
-     * 签名
-     * @var string
-     */
-    private $sign = '';
-
-    /**
      * @param string $longUrl
      * @throws \Exception\Wx\WxException
      */
@@ -75,18 +69,17 @@ class ShortUrl extends ShopBase {
     }
 
     public function getDetail() : array {
-        $resArr = [];
-        $saveArr = get_object_vars($this);
-        foreach ($saveArr as $key => $value) {
-            if (strlen($value . '') > 0) {
-                $resArr[$key] = $value;
-            }
-        }
-
-        if (!isset($resArr['long_url'])) {
+        if(strlen($this->long_url) == 0){
             throw  new WxException('长链接不能为空', ErrorCode::WX_PARAM_ERROR);
         }
 
+        $resArr = [
+            'appid' => $this->appid,
+            'mch_id' => $this->mch_id,
+            'nonce_str' => $this->nonce_str,
+            'sign_type' => $this->sign_type,
+            'long_url' => $this->long_url,
+        ];
         $resArr['sign'] = WxUtilShop::createSign($resArr, $this->appid);
 
         return $resArr;

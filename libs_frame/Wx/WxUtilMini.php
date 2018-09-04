@@ -124,12 +124,12 @@ final class WxUtilMini extends WxUtilAloneBase {
      * @param string $platType 平台类型 mini：小程序 open：第三方平台
      * @return array
      */
-    public static function getMsgTemplateTitleList(string $appId,MsgTemplateTitleList $titleList,string $platType='mini'){
+    public static function getMsgTemplateTitleList(string $appId,MsgTemplateTitleList $titleList,string $platType=self::TYPE_MINI){
         $resArr = [
             'code' => 0
         ];
 
-        if($platType == 'mini'){
+        if($platType == self::TYPE_MINI){
             $url = self::$urlMsgTemplateTitleList . self::getAccessToken($appId);
         } else {
             $url = self::$urlMsgTemplateTitleList . WxUtilOpenBase::getAuthorizerAccessToken($appId);
@@ -156,12 +156,12 @@ final class WxUtilMini extends WxUtilAloneBase {
      * @param string $platType 平台类型 mini：小程序 open：第三方平台
      * @return array
      */
-    public static function getMsgTemplateTitleKeywords(string $appId,string $titleId,string $platType='mini'){
+    public static function getMsgTemplateTitleKeywords(string $appId,string $titleId,string $platType=self::TYPE_MINI){
         $resArr = [
             'code' => 0
         ];
 
-        if($platType == 'mini'){
+        if($platType == self::TYPE_MINI){
             $url = self::$urlMsgTemplateTitleKeywords . self::getAccessToken($appId);
         } else {
             $url = self::$urlMsgTemplateTitleKeywords . WxUtilOpenBase::getAuthorizerAccessToken($appId);
@@ -190,12 +190,12 @@ final class WxUtilMini extends WxUtilAloneBase {
      * @param string $platType 平台类型 mini：小程序 open：第三方平台
      * @return array
      */
-    public static function addMsgTemplate(string $appId,MsgTemplateAdd $templateAdd,string $platType='mini'){
+    public static function addMsgTemplate(string $appId,MsgTemplateAdd $templateAdd,string $platType=self::TYPE_MINI){
         $resArr = [
             'code' => 0
         ];
 
-        if($platType == 'mini'){
+        if($platType == self::TYPE_MINI){
             $url = self::$urlAddMsgTemplate . self::getAccessToken($appId);
         } else {
             $url = self::$urlAddMsgTemplate . WxUtilOpenBase::getAuthorizerAccessToken($appId);
@@ -222,12 +222,12 @@ final class WxUtilMini extends WxUtilAloneBase {
      * @param string $platType 平台类型 mini：小程序 open：第三方平台
      * @return array
      */
-    public static function getMsgTemplateList(string $appId,MsgTemplateList $templateList,string $platType='mini'){
+    public static function getMsgTemplateList(string $appId,MsgTemplateList $templateList,string $platType=self::TYPE_MINI){
         $resArr = [
             'code' => 0
         ];
 
-        if($platType == 'mini'){
+        if($platType == self::TYPE_MINI){
             $url = self::$urlMsgTemplateList . self::getAccessToken($appId);
         } else {
             $url = self::$urlMsgTemplateList . WxUtilOpenBase::getAuthorizerAccessToken($appId);
@@ -254,12 +254,12 @@ final class WxUtilMini extends WxUtilAloneBase {
      * @param string $platType 平台类型 mini：小程序 open：第三方平台
      * @return array
      */
-    public static function delMsgTemplate(string $appId,string $templateId,string $platType='mini'){
+    public static function delMsgTemplate(string $appId,string $templateId,string $platType=self::TYPE_MINI){
         $resArr = [
             'code' => 0
         ];
 
-        if($platType == 'mini'){
+        if($platType == self::TYPE_MINI){
             $url = self::$urlDelMsgTemplate . self::getAccessToken($appId);
         } else {
             $url = self::$urlDelMsgTemplate . WxUtilOpenBase::getAuthorizerAccessToken($appId);
@@ -288,12 +288,12 @@ final class WxUtilMini extends WxUtilAloneBase {
      * @param string $platType 平台类型 mini：小程序 open：第三方平台
      * @return array
      */
-    public static function sendMsgTemplate(string $appId,MsgTemplateSend $templateSend,string $platType='mini'){
+    public static function sendMsgTemplate(string $appId,MsgTemplateSend $templateSend,string $platType=self::TYPE_MINI){
         $resArr = [
             'code' => 0
         ];
 
-        if($platType == 'mini'){
+        if($platType == self::TYPE_MINI){
             $url = self::$urlSendMsgTemplate . self::getAccessToken($appId);
         } else {
             $url = self::$urlSendMsgTemplate . WxUtilOpenBase::getAuthorizerAccessToken($appId);

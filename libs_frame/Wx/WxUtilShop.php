@@ -134,7 +134,7 @@ final class WxUtilShop extends WxUtilAloneBase {
             ];
             unset($payConfig);
 
-            if(in_array($platType, ['shop', 'open',])){
+            if(in_array($platType, [self::TYPE_SHOP, self::TYPE_OPEN_SHOP,])){
                 //获取js参数
                 $jsConfig = new JsConfig($orderDetail['appid']);
                 $resArr['data']['config'] = $jsConfig->getDetail($platType);
