@@ -59,7 +59,7 @@ class TemplateMsg extends ShopBase {
      * @throws \Exception\Wx\WxException
      */
     public function setTemplateId(string $templateId) {
-        if (strlen($templateId ) > 0) {
+        if (strlen($templateId) > 0) {
             $this->template_id = $templateId;
         } else {
             throw new WxException('模版ID不能为空', ErrorCode::WX_PARAM_ERROR);

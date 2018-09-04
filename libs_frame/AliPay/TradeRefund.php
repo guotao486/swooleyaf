@@ -93,6 +93,7 @@ class TradeRefund extends BaseTrade {
 
     /**
      * @param string $refundNo
+     * @throws \Exception\Ali\AliPayException
      */
     public function setRefundNo(string $refundNo) {
         if (preg_match('/^[0-9]{16,64}$/', $refundNo . '') > 0) {
@@ -115,8 +116,7 @@ class TradeRefund extends BaseTrade {
         }
 
         $resArr = $this->getContentArr();
-        $sign = TradeUtil::createSign($resArr, $resArr['sign_type']);
-        $resArr['sign'] = $sign;
+        $resArr['sign'] = TradeUtil::createSign($resArr, $resArr['sign_type']);
 
         return $resArr;
     }

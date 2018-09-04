@@ -214,7 +214,7 @@ class UnifiedOrder extends ShopBase {
     public function setOutTradeNo(string $outTradeNo) {
         if (preg_match('/^[0-9]{1,32}$/', $outTradeNo) > 0) {
             $this->out_trade_no = $outTradeNo;
-            if ($this->trade_type == 'NATIVE') {
+            if ($this->trade_type == self::TRADE_TYPE_NATIVE) {
                 $this->product_id = $outTradeNo;
             }
         } else {
