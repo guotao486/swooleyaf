@@ -104,7 +104,7 @@ final class WxUtilShop extends WxUtilAloneBase {
      * @param string $platType 平台类型
      *   shop:公众号
      *   mini:小程序
-     *   open:第三方平台代理公众号
+     *   openshop:第三方平台代理公众号
      *   openmini:第三方平台代理小程序
      * @return array
      */

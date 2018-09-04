@@ -24,6 +24,7 @@ use Tool\Tool;
 use Traits\SimpleDaoTrait;
 use Wx\Shop\PayNativePre;
 use Wx\Shop\UnifiedOrder;
+use Wx\WxUtilBase;
 use Wx\WxUtilShop;
 
 class PayDao {
@@ -114,7 +115,7 @@ class PayDao {
         $order->setOutTradeNo($data['content_result']['pay_sn']);
         $order->setAttach($data['content_result']['pay_attach']);
         $order->setOpenid($data['a00_openid']);
-        $applyRes = WxUtilShop::applyJsPay($order, 'shop');
+        $applyRes = WxUtilShop::applyJsPay($order, WxUtilBase::TYPE_SHOP);
         unset($order);
         if($applyRes['code'] > 0){
             throw new CheckException($applyRes['message'], ErrorCode::COMMON_PARAM_ERROR);
@@ -171,7 +172,7 @@ class PayDao {
         $order->setOutTradeNo($data['content_result']['pay_sn']);
         $order->setAttach($data['content_result']['pay_attach']);
         $order->setOpenid($data['a00_openid']);
-        $applyRes = WxUtilShop::applyJsPay($order, 'mini');
+        $applyRes = WxUtilShop::applyJsPay($order, WxUtilBase::TYPE_MINI);
         unset($order);
         if($applyRes['code'] > 0){
             throw new CheckException($applyRes['message'], ErrorCode::COMMON_PARAM_ERROR);
