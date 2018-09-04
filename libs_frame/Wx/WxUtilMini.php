@@ -17,7 +17,7 @@ use Wx\Mini\MsgTemplateSend;
 use Wx\Mini\MsgTemplateTitleList;
 use Wx\Mini\Qrcode;
 
-class WxUtilMini extends WxUtilAloneBase {
+final class WxUtilMini extends WxUtilAloneBase {
     use SimpleTrait;
 
     private static $urlAuthorize = 'https://api.weixin.qq.com/sns/jscode2session?grant_type=authorization_code&appid=';
@@ -285,14 +285,19 @@ class WxUtilMini extends WxUtilAloneBase {
      * 发送模板消息
      * @param string $appId
      * @param \Wx\Mini\MsgTemplateSend $templateSend
+     * @param string $platType 平台类型 mini：小程序 open：第三方平台
      * @return array
      */
-    public static function sendMsgTemplate(string $appId,MsgTemplateSend $templateSend){
+    public static function sendMsgTemplate(string $appId,MsgTemplateSend $templateSend,string $platType='mini'){
         $resArr = [
             'code' => 0
         ];
 
-        $url = self::$urlSendMsgTemplate . self::getAccessToken($appId);
+        if($platType == 'mini'){
+            $url = self::$urlSendMsgTemplate . self::getAccessToken($appId);
+        } else {
+            $url = self::$urlSendMsgTemplate . WxUtilOpenBase::getAuthorizerAccessToken($appId);
+        }
         $sendRes = self::sendPostReq($url, 'json', $templateSend->getDetail(), [
             CURLOPT_SSL_VERIFYPEER => false,
             CURLOPT_SSL_VERIFYHOST => false,

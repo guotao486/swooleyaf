@@ -9,6 +9,7 @@ namespace Wx\Shop;
 
 use DesignPatterns\Singletons\WxConfigSingleton;
 use Tool\Tool;
+use Wx\WxUtilBase;
 use Wx\WxUtilOpenShop;
 use Wx\WxUtilShop;
 
@@ -42,14 +43,14 @@ class JsConfig extends ShopBase {
      * @param string $platType 平台类型 shop：公众号 open：第三方平台
      * @return array
      */
-    public function getDetail(string $platType='shop') : array {
+    public function getDetail(string $platType=WxUtilBase::TYPE_SHOP) : array {
         $resArr = [
             'appId' => $this->appId,
             'timestamp' => $this->timestamp,
             'nonceStr' => $this->nonceStr,
         ];
 
-        if ($platType == 'shop') { //公众号获取jsapi_ticket
+        if ($platType == WxUtilBase::TYPE_SHOP) { //公众号获取jsapi_ticket
             $ticket = WxUtilShop::getJsTicket($this->appId);
         } else { //第三方平台获取jsapi_ticket
             $ticket = WxUtilOpenShop::getAuthorizerJsTicket($this->appId);

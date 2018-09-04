@@ -12,6 +12,10 @@ use Exception\Wx\WxException;
 use Tool\Tool;
 
 abstract class WxUtilBase {
+    const TYPE_SHOP = 'shop'; //类型-公众号
+    const TYPE_MINI = 'mini'; //类型-小程序
+    const TYPE_OPEN = 'open'; //类型-第三方平台
+
     /**
      * 发送post请求
      * @param string $url 请求地址

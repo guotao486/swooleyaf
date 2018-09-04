@@ -58,8 +58,8 @@ class JsPayConfig extends ShopBase {
      * @throws \Exception\Wx\WxException
      */
     public function setTimeStamp(string $timeStamp) {
-        if (preg_match('/^[1-9][0-9]{9}$/', $timeStamp . '') > 0) {
-            $this->timeStamp = $timeStamp . '';
+        if (preg_match('/^[1-9][0-9]{9}$/', $timeStamp) > 0) {
+            $this->timeStamp = $timeStamp;
         } else {
             throw new WxException('时间戳不合法', ErrorCode::WX_PARAM_ERROR);
         }
@@ -78,13 +78,20 @@ class JsPayConfig extends ShopBase {
     }
 
     public function getDetail() : array {
-        $resArr = [];
-        $saveArr = get_object_vars($this);
-        foreach ($saveArr as $key => $value) {
-            if (strlen($value . '') > 0) {
-                $resArr[$key] = $value;
-            }
+        if(strlen($this->timeStamp) == 0){
+            throw new WxException('时间戳不能为空', ErrorCode::WX_PARAM_ERROR);
         }
+        if(strlen($this->package) == 0){
+            throw new WxException('交易会话标识不能为空', ErrorCode::WX_PARAM_ERROR);
+        }
+
+        $resArr = [
+            'appId' => $this->appId,
+            'signType' => $this->signType,
+            'nonceStr' => $this->nonceStr,
+            'timeStamp' => $this->timeStamp,
+            'package' => $this->package,
+        ];
         $resArr['paySign'] = WxUtilShop::createSign($resArr, $this->appId);
 
         return $resArr;

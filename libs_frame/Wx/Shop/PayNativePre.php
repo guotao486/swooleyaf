@@ -57,18 +57,12 @@ class PayNativePre extends ShopBase {
     private $product_id = '';
 
     /**
-     * 签名
-     * @var string
-     */
-    private $sign = '';
-
-    /**
      * @param string $productId
      * @throws \Exception\Wx\WxException
      */
     public function setProductId(string $productId) {
-        if (preg_match('/^[a-zA-Z0-9]{1,32}$/', $productId . '') > 0) {
-            $this->product_id = $productId . '';
+        if (preg_match('/^[a-zA-Z0-9]{1,32}$/', $productId) > 0) {
+            $this->product_id = $productId;
         } else {
             throw  new WxException('商品ID不合法', ErrorCode::WX_PARAM_ERROR);
         }
@@ -80,18 +74,17 @@ class PayNativePre extends ShopBase {
      * @throws \Exception\Wx\WxException
      */
     public function getDetail() : array {
-        $resArr = [];
-        $saveArr = get_object_vars($this);
-        foreach ($saveArr as $key => $value) {
-            if (strlen($value . '') > 0) {
-                $resArr[$key] = $value;
-            }
-        }
-
-        if (!isset($resArr['product_id'])) {
+        if(strlen($this->product_id) == 0){
             throw  new WxException('商品ID不能为空', ErrorCode::WX_PARAM_ERROR);
         }
 
+        $resArr = [
+            'appid' => $this->appid,
+            'mch_id' => $this->mch_id,
+            'time_stamp' => $this->time_stamp,
+            'nonce_str' => $this->nonce_str,
+            'product_id' => $this->product_id,
+        ];
         $resArr['sign'] = WxUtilShop::createSign($resArr, $this->appid);
 
         return $resArr;

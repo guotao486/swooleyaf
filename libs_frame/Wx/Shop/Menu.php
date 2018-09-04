@@ -72,8 +72,8 @@ class Menu extends ShopBase {
      * @throws \Exception\Wx\WxException
      */
     public function setName(string $name) {
-        if (strlen($name . '') > 0) {
-            $this->name = mb_substr($name . '', 0, 5);
+        if (strlen($name) > 0) {
+            $this->name = mb_substr($name, 0, 5);
         } else {
             throw new WxException('菜单名称不合法', ErrorCode::WX_PARAM_ERROR);
         }
@@ -111,7 +111,7 @@ class Menu extends ShopBase {
      * @param string $key
      */
     public function setKey(string $key) {
-        $this->key = substr($key . '', 0, 128);
+        $this->key = substr($key, 0, 128);
     }
 
     /**
@@ -119,8 +119,8 @@ class Menu extends ShopBase {
      * @throws \Exception\Wx\WxException
      */
     public function setUrl(string $url) {
-        if (preg_match('/^(http|https)\:\/\/\S+$/', $url . '') > 0) {
-            $this->url = $url . '';
+        if (preg_match('/^(http|https)\:\/\/\S+$/', $url) > 0) {
+            $this->url = $url;
         } else {
             throw new WxException('网页链接不合法', ErrorCode::WX_PARAM_ERROR);
         }
@@ -131,26 +131,34 @@ class Menu extends ShopBase {
      * @throws \Exception\Wx\WxException
      */
     public function setMediaId(string $mediaId) {
-        if (strlen($mediaId . '') > 0) {
-            $this->media_id = $mediaId . '';
+        if (strlen($mediaId) > 0) {
+            $this->media_id = $mediaId;
         } else {
             throw new WxException('媒体ID不合法', ErrorCode::WX_PARAM_ERROR);
         }
     }
 
     public function getDetail() : array {
-        $resArr = [];
-        $saveArr = get_object_vars($this);
-        foreach ($saveArr as $key => $value) {
-            if (is_array($value)) {
-                $resArr[$key] = $value;
-            } else if (strlen($value . '') > 0) {
-                $resArr[$key] = $value;
-            }
+        if(strlen($this->name) == 0){
+            throw new WxException('菜单名称不能为空', ErrorCode::WX_PARAM_ERROR);
+        }
+        if(strlen($this->type) == 0){
+            throw new WxException('响应动作类型不能为空', ErrorCode::WX_PARAM_ERROR);
         }
 
-        if (!isset($resArr['name'])) {
-            throw new WxException('菜单名称不能为空', ErrorCode::WX_PARAM_ERROR);
+        $resArr = [
+            'name' => $this->name,
+            'type' => $this->type,
+            'sub_button' => $this->sub_button,
+        ];
+        if(strlen($this->key) > 0){
+            $resArr['key'] = $this->key;
+        }
+        if(strlen($this->url) > 0){
+            $resArr['url'] = $this->url;
+        }
+        if(strlen($this->media_id) > 0){
+            $resArr['media_id'] = $this->media_id;
         }
 
         return $resArr;

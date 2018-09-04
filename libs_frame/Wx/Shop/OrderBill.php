@@ -53,12 +53,6 @@ class OrderBill extends ShopBase {
     private $nonce_str = '';
 
     /**
-     * 签名
-     * @var string
-     */
-    private $sign = '';
-
-    /**
      * 签名类型
      * @var string
      */
@@ -83,12 +77,19 @@ class OrderBill extends ShopBase {
     private $tar_type = '';
 
     /**
+     * @param string $device_info
+     */
+    public function setDeviceInfo(string $device_info) {
+        $this->device_info = $device_info;
+    }
+
+    /**
      * @param string $billDate
      * @throws \Exception\Wx\WxException
      */
     public function setBillDate(string $billDate) {
-        if (preg_match('/^[0-9]{8}$/', $billDate . '') > 0) {
-            $this->bill_date = $billDate . '';
+        if (preg_match('/^[0-9]{8}$/', $billDate) > 0) {
+            $this->bill_date = $billDate;
         } else {
             throw new WxException('对账单日期不合法', ErrorCode::WX_PARAM_ERROR);
         }
@@ -107,18 +108,22 @@ class OrderBill extends ShopBase {
     }
 
     public function getDetail() : array {
-        $resArr = [];
-        $saveArr = get_object_vars($this);
-        foreach ($saveArr as $key => $value) {
-            if (strlen($value . '') > 0) {
-                $resArr[$key] = $value;
-            }
-        }
-
-        if (!isset($resArr['bill_date'])) {
+        if(strlen($this->bill_date) == 0){
             throw new WxException('对账单日期不能为空', ErrorCode::WX_PARAM_ERROR);
         }
 
+        $resArr = [
+            'appid' => $this->appid,
+            'mch_id' => $this->mch_id,
+            'sign_type' => $this->sign_type,
+            'nonce_str' => $this->nonce_str,
+            'tar_type' => $this->tar_type,
+            'bill_type' => $this->bill_type,
+            'bill_date' => $this->bill_date,
+        ];
+        if(strlen($this->device_info) > 0){
+            $resArr['device_info'] = $this->device_info;
+        }
         $resArr['sign'] = WxUtilShop::createSign($resArr, $this->appid);
 
         return $resArr;

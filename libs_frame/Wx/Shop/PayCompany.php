@@ -50,12 +50,6 @@ class PayCompany extends ShopBase {
     private $nonce_str = '';
 
     /**
-     * 签名
-     * @var string
-     */
-    private $sign = '';
-
-    /**
      * 商户订单号
      * @var string
      */
@@ -102,8 +96,8 @@ class PayCompany extends ShopBase {
      * @throws \Exception\Wx\WxException
      */
     public function setOutTradeNo(string $outTradeNo) {
-        if (preg_match('/^[0-9]{1,32}$/', $outTradeNo . '') > 0) {
-            $this->partner_trade_no = $outTradeNo . '';
+        if (preg_match('/^[0-9]{1,32}$/', $outTradeNo) > 0) {
+            $this->partner_trade_no = $outTradeNo;
         } else {
             throw new WxException('商户单号不合法', ErrorCode::WX_PARAM_ERROR);
         }
@@ -127,7 +121,7 @@ class PayCompany extends ShopBase {
      */
     public function setCheckName(string $checkName) {
         if (in_array($checkName, self::$allowCheckOptions)) {
-            $this->check_name = $checkName . '';
+            $this->check_name = $checkName;
         } else {
             throw new WxException('校验用户姓名选项不合法', ErrorCode::WX_PARAM_ERROR);
         }
@@ -137,7 +131,7 @@ class PayCompany extends ShopBase {
      * @param string $userName
      */
     public function setReUserName(string $userName) {
-        $this->re_user_name = $userName . '';
+        $this->re_user_name = $userName;
     }
 
     /**
@@ -158,41 +152,46 @@ class PayCompany extends ShopBase {
      * @throws \Exception\Wx\WxException
      */
     public function setDesc(string $desc) {
-        if (strlen($desc . '') > 0) {
-            $this->desc = $desc . '';
+        if (strlen($desc) > 0) {
+            $this->desc = $desc;
         } else {
             throw new WxException('付款描述信息不合法', ErrorCode::WX_PARAM_ERROR);
         }
     }
 
     public function getDetail() : array {
-        $resArr = [];
-        $saveArr = get_object_vars($this);
-        foreach ($saveArr as $key => $value) {
-            if (strlen($value . '') > 0) {
-                $resArr[$key] = $value;
-            }
-        }
-
-        if (!isset($resArr['partner_trade_no'])) {
+        if(strlen($this->partner_trade_no) == 0){
             throw new WxException('商户单号不能为空', ErrorCode::WX_PARAM_ERROR);
         }
-        if (!isset($resArr['openid'])) {
+        if(strlen($this->openid) == 0){
             throw new WxException('用户openid不能为空', ErrorCode::WX_PARAM_ERROR);
         }
-        if (!isset($resArr['check_name'])) {
+        if(strlen($this->check_name) == 0){
             throw new WxException('校验用户姓名选项不能为空', ErrorCode::WX_PARAM_ERROR);
-        }
-        if (!isset($resArr['desc'])) {
-            throw new WxException('付款描述信息不能为空', ErrorCode::WX_PARAM_ERROR);
-        }
-        if ($resArr['amount'] <= 0) {
-            throw new WxException('付款金额必须大于0', ErrorCode::WX_PARAM_ERROR);
-        }
-        if (($resArr['check_name'] == 'FORCE_CHECK') && (!isset($resArr['re_user_name']))) {
+        } else if(($this->check_name == 'FORCE_CHECK') && (strlen($this->re_user_name) == 0)){
             throw new WxException('收款用户姓名不能为空', ErrorCode::WX_PARAM_ERROR);
         }
+        if(strlen($this->desc) == 0){
+            throw new WxException('付款描述信息不能为空', ErrorCode::WX_PARAM_ERROR);
+        }
+        if($this->amount <= 0){
+            throw new WxException('付款金额必须大于0', ErrorCode::WX_PARAM_ERROR);
+        }
 
+        $resArr = [
+            'mch_appid' => $this->mch_appid,
+            'mchid' => $this->mchid,
+            'nonce_str' => $this->nonce_str,
+            'spbill_create_ip' => $this->spbill_create_ip,
+            'partner_trade_no' => $this->partner_trade_no,
+            'openid' => $this->openid,
+            'check_name' => $this->check_name,
+            'amount' => $this->amount,
+            'desc' => $this->desc,
+        ];
+        if(strlen($this->re_user_name) > 0){
+            $resArr['re_user_name'] = $this->re_user_name;
+        }
         $resArr['sign'] = WxUtilShop::createSign($resArr, $this->mch_appid);
 
         return $resArr;
