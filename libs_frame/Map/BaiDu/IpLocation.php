@@ -9,10 +9,10 @@ namespace Map\BaiDu;
 
 use Constant\ErrorCode;
 use Exception\Map\BaiduMapException;
-use Map\SimpleTraitMap;
+use Map\MapSimpleTrait;
 
 class IpLocation extends MapBase {
-    use SimpleTraitMap;
+    use MapSimpleTrait;
 
     const COORD_TYPE_BD_MC = ''; //坐标类型-百度墨卡托
     const COORD_TYPE_BD = 'bd09ll'; //坐标类型-百度

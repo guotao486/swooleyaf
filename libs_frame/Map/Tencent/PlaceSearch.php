@@ -9,10 +9,10 @@ namespace Map\Tencent;
 
 use Constant\ErrorCode;
 use Exception\Map\TencentMapException;
-use Map\SimpleTraitMap;
+use Map\MapSimpleTrait;
 
 class PlaceSearch extends MapBase {
-    use SimpleTraitMap;
+    use MapSimpleTrait;
 
     const REGION_AUTO_EXTENT_NO = 0;
     const REGION_AUTO_EXTENT_YES = 1;

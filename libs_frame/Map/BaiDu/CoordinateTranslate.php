@@ -9,10 +9,10 @@ namespace Map\BaiDu;
 
 use Constant\ErrorCode;
 use Exception\Map\BaiduMapException;
-use Map\SimpleTraitMap;
+use Map\MapSimpleTrait;
 
 class CoordinateTranslate extends MapBase {
-    use SimpleTraitMap;
+    use MapSimpleTrait;
 
     const COORDINATE_TYPE_GPS = 1; //坐标类型-GPS角度
     const COORDINATE_TYPE_GPS_MS = 2; //坐标类型-GPS米制

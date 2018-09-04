@@ -9,10 +9,10 @@ namespace Map\BaiDu;
 
 use Constant\ErrorCode;
 use Exception\Map\BaiduMapException;
-use Map\SimpleTraitMap;
+use Map\MapSimpleTrait;
 
 class PlaceSearch extends MapBase {
-    use SimpleTraitMap;
+    use MapSimpleTrait;
 
     const LL_COORDINATE_TYPE_WGS = 1; //经纬度坐标类型-GPS
     const LL_COORDINATE_TYPE_GCJ = 2; //经纬度坐标类型-国测局

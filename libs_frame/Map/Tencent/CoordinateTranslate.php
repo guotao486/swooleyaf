@@ -9,10 +9,10 @@ namespace Map\Tencent;
 
 use Constant\ErrorCode;
 use Exception\Map\TencentMapException;
-use Map\SimpleTraitMap;
+use Map\MapSimpleTrait;
 
 class CoordinateTranslate extends MapBase {
-    use SimpleTraitMap;
+    use MapSimpleTrait;
 
     const COORDINATE_TYPE_GPS = 1; //坐标类型-GPS
     const COORDINATE_TYPE_SOGOU = 2; //坐标类型-搜狗

@@ -9,10 +9,10 @@ namespace Map\BaiDu;
 
 use Constant\ErrorCode;
 use Exception\Map\BaiduMapException;
-use Map\SimpleTraitMap;
+use Map\MapSimpleTrait;
 
 class GeoCoder extends MapBase {
-    use SimpleTraitMap;
+    use MapSimpleTrait;
 
     public function __construct(){
         parent::__construct();

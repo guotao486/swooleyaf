@@ -9,10 +9,10 @@ namespace Map\BaiDu;
 
 use Constant\ErrorCode;
 use Exception\Map\BaiduMapException;
-use Map\SimpleTraitMap;
+use Map\MapSimpleTrait;
 
 class PlaceDetail extends MapBase {
-    use SimpleTraitMap;
+    use MapSimpleTrait;
 
     const SCOPE_BASE = 1; //结果详细程度-基本信息
     const SCOPE_DETAIL = 2; //结果详细程度-POI详细信息
