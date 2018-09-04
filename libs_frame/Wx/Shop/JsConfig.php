@@ -40,7 +40,7 @@ class JsConfig extends ShopBase {
     private $nonceStr = '';
 
     /**
-     * @param string $platType 平台类型 shop：公众号 open：第三方平台
+     * @param string $platType 平台类型 shop：公众号 openshop：第三方平台代理公众号
      * @return array
      */
     public function getDetail(string $platType=WxUtilBase::TYPE_SHOP) : array {

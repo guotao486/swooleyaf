@@ -121,7 +121,7 @@ final class WxUtilMini extends WxUtilAloneBase {
      * 获取小程序消息模板标题列表
      * @param string $appId
      * @param \Wx\Mini\MsgTemplateTitleList $templateList
-     * @param string $platType 平台类型 mini：小程序 open：第三方平台
+     * @param string $platType 平台类型 mini：小程序 openmini：第三方平台代理小程序
      * @return array
      */
     public static function getMsgTemplateTitleList(string $appId,MsgTemplateTitleList $titleList,string $platType=self::TYPE_MINI){
@@ -153,7 +153,7 @@ final class WxUtilMini extends WxUtilAloneBase {
      * 获取小程序消息模板标题关键词库
      * @param string $appId
      * @param string $titleId 模板标题id
-     * @param string $platType 平台类型 mini：小程序 open：第三方平台
+     * @param string $platType 平台类型 mini：小程序 openmini：第三方平台代理小程序
      * @return array
      */
     public static function getMsgTemplateTitleKeywords(string $appId,string $titleId,string $platType=self::TYPE_MINI){
@@ -187,7 +187,7 @@ final class WxUtilMini extends WxUtilAloneBase {
      * 添加小程序消息模板
      * @param string $appId
      * @param \Wx\Mini\MsgTemplateAdd $templateAdd
-     * @param string $platType 平台类型 mini：小程序 open：第三方平台
+     * @param string $platType 平台类型 mini：小程序 openmini：第三方平台代理小程序
      * @return array
      */
     public static function addMsgTemplate(string $appId,MsgTemplateAdd $templateAdd,string $platType=self::TYPE_MINI){
@@ -219,7 +219,7 @@ final class WxUtilMini extends WxUtilAloneBase {
      * 获取小程序消息模板列表
      * @param string $appId
      * @param \Wx\Mini\MsgTemplateList $templateList
-     * @param string $platType 平台类型 mini：小程序 open：第三方平台
+     * @param string $platType 平台类型 mini：小程序 openmini：第三方平台代理小程序
      * @return array
      */
     public static function getMsgTemplateList(string $appId,MsgTemplateList $templateList,string $platType=self::TYPE_MINI){
@@ -251,7 +251,7 @@ final class WxUtilMini extends WxUtilAloneBase {
      * 删除小程序模板
      * @param string $appId
      * @param string $templateId 模板ID
-     * @param string $platType 平台类型 mini：小程序 open：第三方平台
+     * @param string $platType 平台类型 mini：小程序 openmini：第三方平台代理小程序
      * @return array
      */
     public static function delMsgTemplate(string $appId,string $templateId,string $platType=self::TYPE_MINI){
@@ -285,7 +285,7 @@ final class WxUtilMini extends WxUtilAloneBase {
      * 发送模板消息
      * @param string $appId
      * @param \Wx\Mini\MsgTemplateSend $templateSend
-     * @param string $platType 平台类型 mini：小程序 open：第三方平台
+     * @param string $platType 平台类型 mini：小程序 openmini：第三方平台代理小程序
      * @return array
      */
     public static function sendMsgTemplate(string $appId,MsgTemplateSend $templateSend,string $platType=self::TYPE_MINI){
