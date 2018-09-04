@@ -9,9 +9,11 @@ namespace Map\BaiDu;
 
 use Constant\ErrorCode;
 use Exception\Map\BaiduMapException;
-use Tool\Tool;
+use Map\SimpleTraitMap;
 
 class PlaceSearch extends MapBase {
+    use SimpleTraitMap;
+
     const LL_COORDINATE_TYPE_WGS = 1; //经纬度坐标类型-GPS
     const LL_COORDINATE_TYPE_GCJ = 2; //经纬度坐标类型-国测局
     const LL_COORDINATE_TYPE_BD = 3; //经纬度坐标类型-百度
@@ -26,21 +28,11 @@ class PlaceSearch extends MapBase {
 
     public function __construct() {
         parent::__construct();
-
         $this->scope = self::SCOPE_BASE;
         $this->coordinateType = self::LL_COORDINATE_TYPE_BD;
         $this->pageSize = 10;
         $this->pageIndex = 1;
         $this->areaRegionCityLimit = self::PLACE_SEARCH_REGION_CITY_LIMIT_NO;
-    }
-
-    private function __clone() {
-    }
-
-    public function __toString() {
-        $vars = array_merge(get_object_vars($this), parent::getConfigs());
-
-        return Tool::jsonEncode($vars, JSON_UNESCAPED_UNICODE);
     }
 
     /**

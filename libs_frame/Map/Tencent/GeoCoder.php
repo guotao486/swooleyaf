@@ -9,20 +9,13 @@ namespace Map\Tencent;
 
 use Constant\ErrorCode;
 use Exception\Map\TencentMapException;
-use Tool\Tool;
+use Map\SimpleTraitMap;
 
 class GeoCoder extends MapBase {
+    use SimpleTraitMap;
+
     public function __construct() {
         parent::__construct();
-    }
-
-    private function __clone() {
-    }
-
-    public function __toString() {
-        $vars = array_merge(get_object_vars($this), parent::getConfigs());
-
-        return Tool::jsonEncode($vars, JSON_UNESCAPED_UNICODE);
     }
 
     /**

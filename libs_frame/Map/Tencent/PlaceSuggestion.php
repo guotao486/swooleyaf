@@ -9,26 +9,18 @@ namespace Map\Tencent;
 
 use Constant\ErrorCode;
 use Exception\Map\TencentMapException;
-use Tool\Tool;
+use Map\SimpleTraitMap;
 
 class PlaceSuggestion extends MapBase {
+    use SimpleTraitMap;
+
     public function __construct() {
         parent::__construct();
-
         $this->regionLimit = 0;
         $this->subLimit = 0;
         $this->policy = 0;
         $this->page = 1;
         $this->limit = 10;
-    }
-
-    private function __clone() {
-    }
-
-    public function __toString() {
-        $vars = array_merge(get_object_vars($this), parent::getConfigs());
-
-        return Tool::jsonEncode($vars, JSON_UNESCAPED_UNICODE);
     }
 
     /**

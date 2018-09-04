@@ -9,9 +9,11 @@ namespace Map\Tencent;
 
 use Constant\ErrorCode;
 use Exception\Map\TencentMapException;
-use Tool\Tool;
+use Map\SimpleTraitMap;
 
 class CoordinateTranslate extends MapBase {
+    use SimpleTraitMap;
+
     const COORDINATE_TYPE_GPS = 1; //坐标类型-GPS
     const COORDINATE_TYPE_SOGOU = 2; //坐标类型-搜狗
     const COORDINATE_TYPE_BD = 3; //坐标类型-百度
@@ -21,17 +23,7 @@ class CoordinateTranslate extends MapBase {
 
     public function __construct() {
         parent::__construct();
-
         $this->fromType = self::COORDINATE_TYPE_GOOGLE;
-    }
-
-    private function __clone() {
-    }
-
-    public function __toString() {
-        $vars = array_merge(get_object_vars($this), parent::getConfigs());
-
-        return Tool::jsonEncode($vars, JSON_UNESCAPED_UNICODE);
     }
 
     /**

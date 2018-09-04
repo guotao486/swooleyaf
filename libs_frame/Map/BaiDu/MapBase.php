@@ -10,8 +10,11 @@ namespace Map\BaiDu;
 use Constant\ErrorCode;
 use DesignPatterns\Singletons\MapBaiduSingleton;
 use Exception\Map\BaiduMapException;
+use Map\SimpleTraitMapBase;
 
 abstract class MapBase {
+    use SimpleTraitMapBase;
+
     const CHECK_TYPE_SERVER_IP = 'server-ip'; //校验类型-服务端ip
     const CHECK_TYPE_SERVER_SN = 'server-sn'; //校验类型-服务端签名
     const CHECK_TYPE_BROWSE = 'browse'; //校验类型-浏览器
@@ -21,13 +24,6 @@ abstract class MapBase {
         $this->checkType = self::CHECK_TYPE_SERVER_IP;
         $this->serverIp = MapBaiduSingleton::getInstance()->getConfig()->getServerIp();
         $this->reqMethod = 'GET';
-    }
-
-    private function __clone() {
-    }
-
-    public function getConfigs() : array {
-        return get_object_vars($this);
     }
 
     /**

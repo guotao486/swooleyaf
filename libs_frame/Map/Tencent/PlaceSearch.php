@@ -9,9 +9,11 @@ namespace Map\Tencent;
 
 use Constant\ErrorCode;
 use Exception\Map\TencentMapException;
-use Tool\Tool;
+use Map\SimpleTraitMap;
 
 class PlaceSearch extends MapBase {
+    use SimpleTraitMap;
+
     const REGION_AUTO_EXTENT_NO = 0;
     const REGION_AUTO_EXTENT_YES = 1;
     const PLACE_SEARCH_TYPE_REGION = 'region'; //区域搜索类型-地区
@@ -20,19 +22,9 @@ class PlaceSearch extends MapBase {
 
     public function __construct() {
         parent::__construct();
-
         $this->pageSize = 10;
         $this->pageIndex = 1;
         $this->areaRegionAutoExtend = self::REGION_AUTO_EXTENT_YES;
-    }
-
-    private function __clone() {
-    }
-
-    public function __toString() {
-        $vars = array_merge(get_object_vars($this), parent::getConfigs());
-
-        return Tool::jsonEncode($vars, JSON_UNESCAPED_UNICODE);
     }
 
     /**

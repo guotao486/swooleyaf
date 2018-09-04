@@ -9,26 +9,18 @@ namespace Map\BaiDu;
 
 use Constant\ErrorCode;
 use Exception\Map\BaiduMapException;
-use Tool\Tool;
+use Map\SimpleTraitMap;
 
 class IpLocation extends MapBase {
+    use SimpleTraitMap;
+
     const COORD_TYPE_BD_MC = ''; //坐标类型-百度墨卡托
     const COORD_TYPE_BD = 'bd09ll'; //坐标类型-百度
     const COORD_TYPE_GCJ = 'gcj02'; //坐标类型-国测局
 
     public function __construct() {
         parent::__construct();
-
         $this->returnCoordType = self::COORD_TYPE_BD;
-    }
-
-    private function __clone() {
-    }
-
-    public function __toString() {
-        $vars = array_merge(get_object_vars($this), parent::getConfigs());
-
-        return Tool::jsonEncode($vars, JSON_UNESCAPED_UNICODE);
     }
 
     /**
@@ -54,7 +46,7 @@ class IpLocation extends MapBase {
      * @throws \Exception\Map\BaiduMapException
      */
     public function setIp(string $ip) {
-        if (preg_match('/^(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])(\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])){3}$/', $ip) > 0) {
+        if (preg_match('/^(\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])){4}$/', '.' . $ip) > 0) {
             $this->ip = $ip;
         } else {
             throw new BaiduMapException('ip不合法', ErrorCode::MAP_BAIDU_PARAM_ERROR);
