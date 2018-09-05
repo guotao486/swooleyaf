@@ -13,6 +13,13 @@ use Exception\Wx\WxException;
 class Qrcode extends MiniBase {
     public function __construct(){
         parent::__construct();
+        $this->width = 430;
+        $this->line_color = [
+            'r' => '0',
+            'g' => '0',
+            'b' => '0',
+        ];
+        $this->is_hyaline = false;
     }
 
     private function __clone(){
@@ -32,7 +39,7 @@ class Qrcode extends MiniBase {
      * 二维码宽度
      * @var int
      */
-    private $width = 430;
+    private $width = 0;
     /**
      * 线条颜色配置
      * @var bool
@@ -42,11 +49,12 @@ class Qrcode extends MiniBase {
      * 线条rgb颜色
      * @var array
      */
-    private $line_color = [
-        'r' => '0',
-        'g' => '0',
-        'b' => '0',
-    ];
+    private $line_color = [];
+    /**
+     * 透明底色标识
+     * @var bool
+     */
+    private $is_hyaline = false;
 
     /**
      * @param string $scene
@@ -118,6 +126,13 @@ class Qrcode extends MiniBase {
         ];
     }
 
+    /**
+     * @param bool $isHyaline true:需要透明底色 false:不需要透明底色
+     */
+    public function setIsHyaline(bool $isHyaline){
+        $this->is_hyaline = $isHyaline;
+    }
+
     public function getDetail() : array {
         if(strlen($this->scene) == 0){
             throw new WxException('场景标识必须填写', ErrorCode::WX_PARAM_ERROR);
@@ -131,6 +146,7 @@ class Qrcode extends MiniBase {
             'width' => $this->width,
             'auto_color' => $this->auto_color,
             'line_color' => $this->line_color,
+            'is_hyaline' => $this->is_hyaline,
         ];
     }
 }

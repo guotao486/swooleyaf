@@ -38,6 +38,14 @@ class ImageController extends CommonController {
         $this->sendRsp($res);
     }
 
+    /**
+     * 生成微信小程序二维码图片
+     */
+    public function createQrImageWxMiniAction() {
+        $res = \SyModule\SyModuleService::getInstance()->sendApiReq('/Index/Image/createQrImageWxMini', $_GET);
+        $this->sendRsp($res);
+    }
+
     public function createCodeImageAction() {
         $data = $_GET;
         $data['session_id'] = \Tool\SySession::getSessionId();

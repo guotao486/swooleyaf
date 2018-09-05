@@ -45,6 +45,59 @@ class ImageController extends CommonController {
     }
 
     /**
+     * 生成微信小程序二维码图片
+     * @api {get} /Index/Image/createQrImageWxMini 生成微信小程序二维码图片
+     * @apiDescription 生成微信小程序二维码图片
+     * @apiGroup Image
+     * @apiParam {string{1..64}} wx_appid 小程序appid
+     * @apiParam {string{1..255}} page_url 页面地址
+     * @apiParam {string{1..32}} page_scene 页面场景
+     * @apiParam {number{50-5000}} [image_size=430] 图片大小
+     * @apiParam {number{0-1}} [hyaline=1] 透明背景标识 0:不透明 1:透明
+     * @SyFilter-{"field": "wx_appid","explain": "小程序appid","type": "string","rules": {"required": 1,"min": 1,"max": 64}}
+     * @SyFilter-{"field": "page_url","explain": "页面地址","type": "string","rules": {"required": 1,"min": 1}}
+     * @SyFilter-{"field": "page_scene","explain": "页面场景","type": "string","rules": {"required": 1,"min": 1,"max": 32}}
+     * @SyFilter-{"field": "image_size","explain": "图片大小","type": "int","rules": {"min": 50,"max": 5000}}
+     * @SyFilter-{"field": "hyaline","explain": "透明背景标识","type": "int","rules": {"min": 0,"max": 1}}
+     * @apiUse CommonSuccess
+     * @apiUse CommonFail
+     */
+    public function createQrImageWxMiniAction() {
+        $wxAppId = trim(\Request\SyRequest::getParams('wx_appid'));
+        $pageUrl = trim(\Request\SyRequest::getParams('page_url'));
+        $pageScene = trim(\Request\SyRequest::getParams('page_scene'));
+        if(strlen($wxAppId) == 0){
+            $this->SyResult->setCodeMsg(\Constant\ErrorCode::COMMON_PARAM_ERROR, '小程序appid不能为空');
+        } else if(strlen($pageUrl) == 0){
+            $this->SyResult->setCodeMsg(\Constant\ErrorCode::COMMON_PARAM_ERROR, '页面地址不能为空');
+        } else if(strlen($pageScene) == 0){
+            $this->SyResult->setCodeMsg(\Constant\ErrorCode::COMMON_PARAM_ERROR, '页面场景不能为空');
+        } else {
+            $imageSize = (int)\Request\SyRequest::getParams('image_size', 430);
+            $hyaline = (int)\Request\SyRequest::getParams('hyaline', 1);
+            $qrCode = new \Wx\Mini\Qrcode();
+            $qrCode->setPage($pageUrl);
+            $qrCode->setScene($pageScene);
+            $qrCode->setAutoColor(false);
+            $qrCode->setWidth($imageSize);
+            if($hyaline == 1){
+                $qrCode->setIsHyaline(true);
+            } else {
+                $qrCode->setIsHyaline(false);
+            }
+            $createRes = \Wx\WxUtilMini::getQrcode($wxAppId, $qrCode);
+            unset($qrCode);
+            if($createRes['code'] == 0){
+                $this->SyResult->setData($createRes['data']);
+            } else {
+                $this->SyResult->setCodeMsg($createRes['code'], $createRes['message']);
+            }
+        }
+
+        $this->sendRsp();
+    }
+
+    /**
      * 生成验证码图片
      * @api {get} /Index/Image/createCodeImage 生成验证码图片
      * @apiDescription 生成验证码图片
