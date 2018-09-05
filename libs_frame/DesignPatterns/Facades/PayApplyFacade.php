@@ -7,28 +7,17 @@
  */
 namespace DesignPatterns\Facades;
 
-use Constant\ErrorCode;
-use Exception\Common\CheckException;
 use Traits\SimpleFacadeTrait;
 
-abstract class PayApplyFacade extends SyBaseFacade {
+abstract class PayApplyFacade {
     use SimpleFacadeTrait;
 
-    public static function __callStatic($funcName, $args){
-        $data = parent::checkArgs($args);
+    public static function handleCheckParams(array $data){
+        return static::checkParams($data);
+    }
 
-        switch ($funcName) {
-            case 'handleCheckParams':
-                $res = static::checkParams($data);
-                break;
-            case 'handleApply':
-                $res = static::apply($data);
-                break;
-            default:
-                throw new CheckException('方法不支持', ErrorCode::COMMON_SERVER_ERROR);
-        }
-
-        return $res;
+    public static function handleApply(array $data){
+        return static::apply($data);
     }
 
     abstract protected static function checkParams(array $data) : array;
