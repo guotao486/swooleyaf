@@ -28,6 +28,7 @@ use Entities\SyBase\UserMoneyEntity;
 use Entities\SyBase\UserMoneyHistoryEntity;
 use Entities\SyBase\WithdrawBaseEntity;
 use Entities\SyBase\WithdrawHistoryEntity;
+use Entities\SyBase\WxminiConfigEntity;
 use Entities\SyBase\WxopenAuthorizerEntity;
 use Entities\SyBase\WxshopConfigEntity;
 use Traits\SimpleTrait;
@@ -195,5 +196,12 @@ class SyBaseMysqlFactory {
      */
     public static function RoleRelationEntity(string $dbName=''){
         return new RoleRelationEntity($dbName);
+    }
+    /**
+     * @param string $dbName 数据库名
+     * @return \Entities\SyBase\WxminiConfigEntity
+     */
+    public static function WxminiConfigEntity(string $dbName=''){
+        return new WxminiConfigEntity($dbName);
     }
 }

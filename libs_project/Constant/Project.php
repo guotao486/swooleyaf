@@ -103,4 +103,44 @@ final class Project extends ProjectBase {
     const LOGIN_TYPE_WX_AUTH_USER = 'a101'; //类型-微信手动授权
     const LOGIN_TYPE_WX_SCAN = 'a102'; //类型-微信扫码
     const LOGIN_TYPE_QQ = 'a200'; //类型-QQ
+
+    //微信小程序常量
+    public static $totalWxMiniStatus = [
+        self::WXMINI_STATUS_DISABLE => '无效',
+        self::WXMINI_STATUS_ENABLE => '有效',
+    ];
+    public static $totalWxMiniType = [
+        self::WXMINI_TYPE_PLAT_MINI => '平台小程序',
+        self::WXMINI_TYPE_SHOP_MINI => '商户小程序',
+    ];
+    public static $totalWxMiniAuditStatus = [
+        self::WXMINI_AUDIT_STATUS_UNDO => '未提交审核',
+        self::WXMINI_AUDIT_STATUS_SUCCESS => '审核成功',
+        self::WXMINI_AUDIT_STATUS_FAIL => '审核失败',
+        self::WXMINI_AUDIT_STATUS_HANDING => '审核中',
+    ];
+    public static $totalWxMiniOptionStatus = [
+        self::WXMINI_OPTION_STATUS_UN_UPLOAD => '未上传',
+        self::WXMINI_OPTION_STATUS_UPLOADED => '已上传',
+        self::WXMINI_OPTION_STATUS_APPLY_AUDIT => '审核中',
+        self::WXMINI_OPTION_STATUS_AUDIT_SUCCESS => '审核成功',
+        self::WXMINI_OPTION_STATUS_AUDIT_FAIL => '审核失败',
+        self::WXMINI_OPTION_STATUS_RELEASED => '已发布',
+    ];
+    const WXMINI_STATUS_DISABLE = 0; //小程序状态-无效
+    const WXMINI_STATUS_ENABLE = 1; //小程序状态-有效
+    const WXMINI_TYPE_PLAT_MINI = 1; //小程序类型-平台小程序
+    const WXMINI_TYPE_SHOP_MINI = 2; //小程序类型-商户小程序
+    const WXMINI_AUDIT_STATUS_UNDO = -1; //小程序审核状态-未提交审核
+    const WXMINI_AUDIT_STATUS_SUCCESS = 0; //小程序审核状态-审核成功
+    const WXMINI_AUDIT_STATUS_FAIL = 1; //小程序审核状态-审核失败
+    const WXMINI_AUDIT_STATUS_HANDING = 2; //小程序审核状态-审核中
+    const WXMINI_OPTION_STATUS_UN_UPLOAD = 1; //小程序操作状态-未上传
+    const WXMINI_OPTION_STATUS_UPLOADED = 2; //小程序操作状态-已上传
+    const WXMINI_OPTION_STATUS_APPLY_AUDIT = 3; //小程序操作状态-审核中
+    const WXMINI_OPTION_STATUS_AUDIT_SUCCESS = 4; //小程序操作状态-审核成功
+    const WXMINI_OPTION_STATUS_AUDIT_FAIL = 5; //小程序操作状态-审核失败
+    const WXMINI_OPTION_STATUS_RELEASED = 6; //小程序操作状态-已发布
+    const WXMINI_EXPIRE_TOKEN = 7000; //小程序token超时时间,单位为秒
+    const WXMINI_DEFAULT_CLIENT_IP = '127.0.0.1'; //默认客户端IP
 }
