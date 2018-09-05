@@ -7,23 +7,13 @@
  */
 namespace DesignPatterns\Facades;
 
-use Constant\ErrorCode;
-use Exception\Common\CheckException;
 use Traits\SimpleFacadeTrait;
 
-abstract class WxOpenNotifyWxFacade extends SyBaseFacade {
+abstract class WxOpenNotifyWxFacade {
     use SimpleFacadeTrait;
 
-    public static function __callStatic($funcName, $args){
-        $data = parent::checkArgs($args);
-
-        switch ($funcName) {
-            case 'acceptNotify':
-                static::handleNotify($data);
-                break;
-            default:
-                throw new CheckException('方法不支持', ErrorCode::COMMON_SERVER_ERROR);
-        }
+    public static function acceptNotify(array $data){
+        static::handleNotify($data);
     }
 
     abstract protected static function handleNotify(array $data);
