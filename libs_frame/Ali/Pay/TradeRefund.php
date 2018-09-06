@@ -1,16 +1,18 @@
 <?php
 /**
- * 订单退款
- * User: jw
- * Date: 17-4-12
- * Time: 下午10:48
+ * Created by PhpStorm.
+ * User: 姜伟
+ * Date: 2018/9/6 0006
+ * Time: 16:23
  */
-namespace AliPay;
+namespace Ali\Pay;
 
+use Ali\AliBase;
+use Ali\AliUtilBase;
 use Constant\ErrorCode;
 use Exception\Ali\AliPayException;
 
-class TradeRefund extends BaseTrade {
+class TradeRefund extends AliBase {
     /**
      * 商户订单号
      * @var string
@@ -43,7 +45,7 @@ class TradeRefund extends BaseTrade {
 
     public function __construct(string $appId) {
         parent::__construct($appId);
-        $this->method = 'alipay.trade.refund';
+        $this->setMethod('alipay.trade.refund');
     }
 
     private function __clone(){
@@ -119,8 +121,7 @@ class TradeRefund extends BaseTrade {
         }
 
         $resArr = $this->getContentArr();
-        $resArr['sign'] = TradeUtil::createSign($resArr, $resArr['sign_type']);
-
+        $resArr['sign'] = AliUtilBase::createSign($resArr, $resArr['sign_type']);
         return $resArr;
     }
 }

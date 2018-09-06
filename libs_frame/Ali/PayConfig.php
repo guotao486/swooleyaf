@@ -1,23 +1,17 @@
 <?php
 /**
- * 支付宝基础配置类
+ * Created by PhpStorm.
  * User: 姜伟
- * Date: 2017/6/17 0017
- * Time: 11:00
+ * Date: 2018/9/6 0006
+ * Time: 14:02
  */
-namespace AliPay;
+namespace Ali;
 
 use Constant\ErrorCode;
 use Exception\Ali\AliPayException;
 use Tool\Tool;
 
 class PayConfig {
-    public function __construct() {
-    }
-
-    private function __clone() {
-    }
-
     /**
      * AppId
      * @var string
@@ -83,6 +77,12 @@ class PayConfig {
      * @var int
      */
     private $expireTime = 0;
+
+    public function __construct() {
+    }
+
+    private function __clone() {
+    }
 
     /**
      * @return string

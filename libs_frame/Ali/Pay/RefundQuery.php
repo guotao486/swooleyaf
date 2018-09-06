@@ -1,23 +1,18 @@
 <?php
 /**
- * 订单关闭
- * User: jw
- * Date: 17-4-13
- * Time: 下午7:57
+ * Created by PhpStorm.
+ * User: 姜伟
+ * Date: 2018/9/6 0006
+ * Time: 16:24
  */
-namespace AliPay;
+namespace Ali\Pay;
 
+use Ali\AliBase;
+use Ali\AliUtilBase;
 use Constant\ErrorCode;
-use DesignPatterns\Singletons\AliConfigSingleton;
 use Exception\Ali\AliPayException;
 
-class TradeClose extends BaseTrade {
-    /**
-     * 支付宝服务器主动通知商户服务器里指定的页面http/https路径
-     * @var string
-     */
-    private $notify_url = '';
-
+class RefundQuery extends AliBase {
     /**
      * 商户订单号
      * @var string
@@ -30,10 +25,15 @@ class TradeClose extends BaseTrade {
      */
     private $trade_no = '';
 
+    /**
+     * 退款单号
+     * @var string
+     */
+    private $out_request_no = '';
+
     public function __construct(string $appId) {
         parent::__construct($appId);
-        $this->method = 'alipay.trade.close';
-        $this->notify_url = AliConfigSingleton::getInstance()->getPayConfig($appId)->getUrlNotify();
+        $this->setMethod('alipay.trade.fastpay.refund.query');
     }
 
     private function __clone(){
@@ -63,16 +63,29 @@ class TradeClose extends BaseTrade {
         }
     }
 
+    /**
+     * @param string $refundNo
+     * @throws \Exception\Ali\AliPayException
+     */
+    public function setRefundNo(string $refundNo) {
+        if (ctype_digit($refundNo)) {
+            $this->setBizContent('out_request_no', $refundNo);
+        } else {
+            throw new AliPayException('退款单号不合法', ErrorCode::ALIPAY_PARAM_ERROR);
+        }
+    }
+
     public function getDetail() : array {
         $bizContent = $this->getBizContent();
         if ((!isset($bizContent['out_trade_no'])) && (!isset($bizContent['trade_no']))) {
             throw new AliPayException('商户订单号和支付宝交易号不能都为空', ErrorCode::ALIPAY_PARAM_ERROR);
         }
+        if (!isset($bizContent['out_request_no'])) {
+            throw new AliPayException('退款单号不能为空', ErrorCode::ALIPAY_PARAM_ERROR);
+        }
 
         $resArr = $this->getContentArr();
-        $resArr['notify_url'] = $this->notify_url;
-        $resArr['sign'] = TradeUtil::createSign($resArr, $resArr['sign_type']);
-
+        $resArr['sign'] = AliUtilBase::createSign($resArr, $resArr['sign_type']);
         return $resArr;
     }
 }
