@@ -3,50 +3,56 @@ namespace Entities\SyTask;
 
 use DB\Entities\MysqlEntity;
 
-class WxshopConfigEntity extends MysqlEntity {
+class WxconfigBaseEntity extends MysqlEntity {
     public function __construct(string $dbName='') {
         $this->_dbName = isset($dbName{0}) ? $dbName : 'sy_task';
-        parent::__construct($this->_dbName, 'wxshop_config','id');
+        parent::__construct($this->_dbName, 'wxconfig_base', 'id');
     }
 
     /**
-     * 主键ID
+     * 
      * @var int
      */
     public $id = null;
 
     /**
-     * 公众号app id
+     * 微信公众号ID
      * @var string
      */
     public $app_id = '';
 
     /**
-     * 公众号密钥
+     * 微信公众号密钥
      * @var string
      */
     public $app_secret = '';
 
     /**
-     * 公众号客户端ip
+     * 客户端IP
      * @var string
      */
     public $app_clientip = '';
 
     /**
-     * 公众号模板列表
+     * 消息模板ID列表
      * @var string
      */
     public $app_templates = '';
 
     /**
-     * 公众号商户号
+     * 原始ID
+     * @var string
+     */
+    public $origin_id = '';
+
+    /**
+     * 微信商户号
      * @var string
      */
     public $pay_mchid = '';
 
     /**
-     * 公众号支付密钥
+     * 微信支付密钥
      * @var string
      */
     public $pay_key = '';
@@ -67,7 +73,7 @@ class WxshopConfigEntity extends MysqlEntity {
      * 状态
      * @var int
      */
-    public $status = 1;
+    public $status = 0;
 
     /**
      * 创建时间戳

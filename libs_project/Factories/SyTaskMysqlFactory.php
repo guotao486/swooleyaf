@@ -10,8 +10,9 @@ namespace Factories;
 use Entities\SyTask\AlipayConfigEntity;
 use Entities\SyTask\TaskBaseEntity;
 use Entities\SyTask\TaskLogEntity;
+use Entities\SyTask\WxconfigBaseEntity;
+use Entities\SyTask\WxconfigShopEntity;
 use Entities\SyTask\WxopenAuthorizerEntity;
-use Entities\SyTask\WxshopConfigEntity;
 use Traits\SimpleTrait;
 
 class SyTaskMysqlFactory {
@@ -40,16 +41,23 @@ class SyTaskMysqlFactory {
     }
     /**
      * @param string $dbName 数据库名
-     * @return \Entities\SyTask\WxshopConfigEntity
-     */
-    public static function WxshopConfigEntity(string $dbName=''){
-        return new WxshopConfigEntity($dbName);
-    }
-    /**
-     * @param string $dbName 数据库名
      * @return \Entities\SyTask\AlipayConfigEntity
      */
     public static function AlipayConfigEntity(string $dbName=''){
         return new AlipayConfigEntity($dbName);
+    }
+    /**
+     * @param string $dbName 数据库名
+     * @return \Entities\SyTask\WxconfigBaseEntity
+     */
+    public static function WxconfigBaseEntity(string $dbName=''){
+        return new WxconfigBaseEntity($dbName);
+    }
+    /**
+     * @param string $dbName 数据库名
+     * @return \Entities\SyTask\WxconfigShopEntity
+     */
+    public static function WxconfigShopEntity(string $dbName=''){
+        return new WxconfigShopEntity($dbName);
     }
 }
