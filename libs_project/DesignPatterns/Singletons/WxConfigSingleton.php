@@ -111,10 +111,10 @@ class WxConfigSingleton {
         $shopConfig->setAppId($appId);
         $shopConfig->setExpireTime($expireTime);
 
-        $wxshopConfigEntity = SyBaseMysqlFactory::WxshopConfigEntity();
-        $ormResult1 = $wxshopConfigEntity->getContainer()->getModel()->getOrmDbTable();
-        $ormResult1->where('`app_id`=? AND `status`=?', [$appId, Project::WX_SHOP_STATUS_ENABLE]);
-        $configInfo = $wxshopConfigEntity->getContainer()->getModel()->findOne($ormResult1);
+        $wxConfigEntity = SyBaseMysqlFactory::WxconfigBaseEntity();
+        $ormResult1 = $wxConfigEntity->getContainer()->getModel()->getOrmDbTable();
+        $ormResult1->where('`app_id`=? AND `status`=?', [$appId, Project::WX_CONFIG_BASE_STATUS_ENABLE]);
+        $configInfo = $wxConfigEntity->getContainer()->getModel()->findOne($ormResult1);
         if(empty($configInfo)){
             $shopConfig->setValid(false);
         } else {
@@ -133,7 +133,7 @@ class WxConfigSingleton {
                 $shopConfig->setTemplates($templates);
             }
         }
-        unset($configInfo, $ormResult1, $wxshopConfigEntity);
+        unset($configInfo, $ormResult1, $wxConfigEntity);
 
         $this->shopConfigs[$appId] = $shopConfig;
 

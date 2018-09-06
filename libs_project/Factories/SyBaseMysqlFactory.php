@@ -28,9 +28,10 @@ use Entities\SyBase\UserMoneyEntity;
 use Entities\SyBase\UserMoneyHistoryEntity;
 use Entities\SyBase\WithdrawBaseEntity;
 use Entities\SyBase\WithdrawHistoryEntity;
-use Entities\SyBase\WxminiConfigEntity;
+use Entities\SyBase\WxconfigBaseEntity;
+use Entities\SyBase\WxconfigMiniEntity;
+use Entities\SyBase\WxconfigShopEntity;
 use Entities\SyBase\WxopenAuthorizerEntity;
-use Entities\SyBase\WxshopConfigEntity;
 use Traits\SimpleTrait;
 
 class SyBaseMysqlFactory {
@@ -157,13 +158,6 @@ class SyBaseMysqlFactory {
     }
     /**
      * @param string $dbName 数据库名
-     * @return \Entities\SyBase\WxshopConfigEntity
-     */
-    public static function WxshopConfigEntity(string $dbName=''){
-        return new WxshopConfigEntity($dbName);
-    }
-    /**
-     * @param string $dbName 数据库名
      * @return \Entities\SyBase\AlipayConfigEntity
      */
     public static function AlipayConfigEntity(string $dbName=''){
@@ -199,9 +193,23 @@ class SyBaseMysqlFactory {
     }
     /**
      * @param string $dbName 数据库名
-     * @return \Entities\SyBase\WxminiConfigEntity
+     * @return \Entities\SyBase\WxconfigBaseEntity
      */
-    public static function WxminiConfigEntity(string $dbName=''){
-        return new WxminiConfigEntity($dbName);
+    public static function WxconfigBaseEntity(string $dbName=''){
+        return new WxconfigBaseEntity($dbName);
+    }
+    /**
+     * @param string $dbName 数据库名
+     * @return \Entities\SyBase\WxconfigShopEntity
+     */
+    public static function WxconfigShopEntity(string $dbName=''){
+        return new WxconfigShopEntity($dbName);
+    }
+    /**
+     * @param string $dbName 数据库名
+     * @return \Entities\SyBase\WxconfigMiniEntity
+     */
+    public static function WxconfigMiniEntity(string $dbName=''){
+        return new WxconfigMiniEntity($dbName);
     }
 }

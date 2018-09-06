@@ -105,10 +105,6 @@ final class Project extends ProjectBase {
     const LOGIN_TYPE_QQ = 'a200'; //类型-QQ
 
     //微信小程序常量
-    public static $totalWxMiniStatus = [
-        self::WXMINI_STATUS_DISABLE => '无效',
-        self::WXMINI_STATUS_ENABLE => '有效',
-    ];
     public static $totalWxMiniType = [
         self::WXMINI_TYPE_PLAT_MINI => '平台小程序',
         self::WXMINI_TYPE_SHOP_MINI => '商户小程序',
@@ -127,8 +123,6 @@ final class Project extends ProjectBase {
         self::WXMINI_OPTION_STATUS_AUDIT_FAIL => '审核失败',
         self::WXMINI_OPTION_STATUS_RELEASED => '已发布',
     ];
-    const WXMINI_STATUS_DISABLE = 0; //小程序状态-无效
-    const WXMINI_STATUS_ENABLE = 1; //小程序状态-有效
     const WXMINI_TYPE_PLAT_MINI = 1; //小程序类型-平台小程序
     const WXMINI_TYPE_SHOP_MINI = 2; //小程序类型-商户小程序
     const WXMINI_AUDIT_STATUS_UNDO = -1; //小程序审核状态-未提交审核
