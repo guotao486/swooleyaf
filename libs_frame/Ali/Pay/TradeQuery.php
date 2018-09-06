@@ -1,16 +1,18 @@
 <?php
 /**
- * 订单退款查询
- * User: jw
- * Date: 17-4-12
- * Time: 下午11:13
+ * Created by PhpStorm.
+ * User: 姜伟
+ * Date: 2018/9/6 0006
+ * Time: 16:07
  */
-namespace AliPay;
+namespace Ali\Pay;
 
+use Ali\AliBase;
+use Ali\AliUtilBase;
 use Constant\ErrorCode;
 use Exception\Ali\AliPayException;
 
-class TradeRefundQuery extends BaseTrade {
+class TradeQuery extends AliBase {
     /**
      * 商户订单号
      * @var string
@@ -23,15 +25,9 @@ class TradeRefundQuery extends BaseTrade {
      */
     private $trade_no = '';
 
-    /**
-     * 退款单号
-     * @var string
-     */
-    private $out_request_no = '';
-
     public function __construct(string $appId) {
         parent::__construct($appId);
-        $this->method = 'alipay.trade.fastpay.refund.query';
+        $this->setMethod('alipay.trade.query');
     }
 
     private function __clone(){
@@ -61,30 +57,14 @@ class TradeRefundQuery extends BaseTrade {
         }
     }
 
-    /**
-     * @param string $refundNo
-     * @throws \Exception\Ali\AliPayException
-     */
-    public function setRefundNo(string $refundNo) {
-        if (ctype_digit($refundNo)) {
-            $this->setBizContent('out_request_no', $refundNo);
-        } else {
-            throw new AliPayException('退款单号不合法', ErrorCode::ALIPAY_PARAM_ERROR);
-        }
-    }
-
     public function getDetail() : array {
         $bizContent = $this->getBizContent();
         if ((!isset($bizContent['out_trade_no'])) && (!isset($bizContent['trade_no']))) {
             throw new AliPayException('商户订单号和支付宝交易号不能都为空', ErrorCode::ALIPAY_PARAM_ERROR);
         }
-        if (!isset($bizContent['out_request_no'])) {
-            throw new AliPayException('退款单号不能为空', ErrorCode::ALIPAY_PARAM_ERROR);
-        }
 
         $resArr = $this->getContentArr();
-        $resArr['sign'] = TradeUtil::createSign($resArr, $resArr['sign_type']);
-
+        $resArr['sign'] = AliUtilBase::createSign($resArr, $resArr['sign_type']);
         return $resArr;
     }
 }

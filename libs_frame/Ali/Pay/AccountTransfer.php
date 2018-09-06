@@ -3,14 +3,16 @@
  * Created by PhpStorm.
  * User: 姜伟
  * Date: 2018/9/6 0006
- * Time: 12:11
+ * Time: 15:18
  */
-namespace AliPay;
+namespace Ali\Pay;
 
+use Ali\AliBase;
+use Ali\AliUtilBase;
 use Constant\ErrorCode;
 use Exception\Ali\AliPayException;
 
-class TradeAccountTransfer extends BaseTrade {
+class AccountTransfer extends AliBase {
     private $payeeTypes = [
         'ALIPAY_USERID' => 1,
         'ALIPAY_LOGONID' => 1,
@@ -54,7 +56,7 @@ class TradeAccountTransfer extends BaseTrade {
 
     public function __construct(string $appId){
         parent::__construct($appId);
-        $this->method = 'alipay.fund.trans.toaccount.transfer';
+        $this->setMethod('alipay.fund.trans.toaccount.transfer');
     }
 
     private function __clone(){
@@ -134,8 +136,7 @@ class TradeAccountTransfer extends BaseTrade {
         }
 
         $resArr = $this->getContentArr();
-        $resArr['sign'] = TradeUtil::createSign($resArr, $resArr['sign_type']);
-
+        $resArr['sign'] = AliUtilBase::createSign($resArr, $resArr['sign_type']);
         return $resArr;
     }
 }

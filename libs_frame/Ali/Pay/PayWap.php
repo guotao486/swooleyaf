@@ -1,62 +1,123 @@
 <?php
 /**
- * 二维码支付
- * User: jw
- * Date: 17-4-11
- * Time: 下午10:18
+ * Created by PhpStorm.
+ * User: 姜伟
+ * Date: 2018/9/6 0006
+ * Time: 14:41
  */
-namespace AliPay;
+namespace Ali\Pay;
 
+use Ali\AliBase;
+use Ali\AliUtilBase;
 use Constant\ErrorCode;
 use DesignPatterns\Singletons\AliConfigSingleton;
 use Exception\Ali\AliPayException;
+use Tool\Tool;
 
-class PayQrCode extends BaseTrade {
+class PayWap extends AliBase {
     /**
-     * 支付宝服务器主动通知商户服务器里指定的页面http/https路径
+     * 表单ID
+     * @var string
+     */
+    private $formId = '';
+    /**
+     * 跳转url地址
+     * @var string
+     */
+    private $return_url = '';
+
+    /**
+     * 跳转基础url地址
+     * @var string
+     */
+    private $return_baseurl = '';
+
+    /**
+     * 消息通知url地址
      * @var string
      */
     private $notify_url = '';
 
     /**
-     * 商户订单号
-     * @var string
-     */
-    private $out_trade_no = '';
-
-    /**
-     * 订单总金额，单位为元
-     * @var string
-     */
-    private $total_amount = '';
-
-    /**
-     * 订单标题
-     * @var string
-     */
-    private $subject = '';
-
-    /**
-     * 商品的描述
+     * 交易的具体描述信息
      * @var string
      */
     private $body = '';
 
     /**
-     * 订单允许的最晚付款时间，逾期将关闭交易
+     * 商品的标题
+     * @var string
+     */
+    private $subject = '';
+
+    /**
+     * 商户网站唯一订单号
+     * @var string
+     */
+    private $out_trade_no = '';
+
+    /**
+     * 该笔订单允许的最晚付款时间，逾期将关闭交易,取值范围：1m～15d。m-分钟，h-小时，d-天，1c-当天
      * @var string
      */
     private $timeout_express = '';
 
+    /**
+     * 订单总金额，单位为元，精确到小数点后两位
+     * @var string
+     */
+    private $total_amount = '';
+
+    /**
+     * 收款支付宝用户ID
+     * @var string
+     */
+    private $seller_id = '';
+
+    /**
+     * 销售产品码
+     * @var string
+     */
+    private $product_code = '';
+
+    /**
+     * 商品主类型：0—虚拟类商品，1—实物类商品
+     * @var string
+     */
+    private $goods_type = '';
+
     public function __construct(string $appId) {
         parent::__construct($appId);
         $payConfig = AliConfigSingleton::getInstance()->getPayConfig($appId);
-        $this->method = 'alipay.trade.precreate';
+        $this->formId = 'aliwappay' . Tool::getNowTime();
         $this->notify_url = $payConfig->getUrlNotify();
+        $this->return_baseurl = $payConfig->getUrlReturn();
+        $this->setMethod('alipay.trade.wap.pay');
         $this->setBizContent('seller_id', $payConfig->getSellerId());
+        $this->setBizContent('product_code', 'QUICK_WAP_PAY');
+        $this->setBizContent('goods_type', '1');
     }
 
     private function __clone(){
+    }
+
+    /**
+     * @return string
+     */
+    public function getFormId() : string {
+        return $this->formId;
+    }
+
+    /**
+     * @param string $returnUrl
+     * @throws \Exception\Ali\AliPayException
+     */
+    public function setReturnUrl(string $returnUrl) {
+        if(preg_match('/^(http|https)\:\/\/\S+$/', $returnUrl) > 0) {
+            $this->return_url = $this->return_baseurl . urlencode($returnUrl);
+        } else {
+            throw new AliPayException('同步通知地址不合法', ErrorCode::ALIPAY_PARAM_ERROR);
+        }
     }
 
     /**
@@ -118,6 +179,10 @@ class PayQrCode extends BaseTrade {
     }
 
     public function getDetail() : array {
+        if (strlen($this->return_url) == 0) {
+            throw new AliPayException('同步通知地址不能为空', ErrorCode::ALIPAY_PARAM_ERROR);
+        }
+
         $bizContent = $this->getBizContent();
         if (!isset($bizContent['subject'])) {
             throw new AliPayException('商品标题不能为空', ErrorCode::ALIPAY_PARAM_ERROR);
@@ -131,8 +196,8 @@ class PayQrCode extends BaseTrade {
 
         $resArr = $this->getContentArr();
         $resArr['notify_url'] = $this->notify_url;
-        $resArr['sign'] = TradeUtil::createSign($resArr, $resArr['sign_type']);
-
+        $resArr['return_url'] = $this->return_url;
+        $resArr['sign'] = AliUtilBase::createSign($resArr, $resArr['sign_type']);
         return $resArr;
     }
 }

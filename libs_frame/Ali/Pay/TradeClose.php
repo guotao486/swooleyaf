@@ -1,16 +1,25 @@
 <?php
 /**
- * 订单查询
- * User: jw
- * Date: 17-4-12
- * Time: 下午7:39
+ * Created by PhpStorm.
+ * User: 姜伟
+ * Date: 2018/9/6 0006
+ * Time: 16:06
  */
-namespace AliPay;
+namespace Ali\Pay;
 
+use Ali\AliBase;
+use Ali\AliUtilBase;
 use Constant\ErrorCode;
+use DesignPatterns\Singletons\AliConfigSingleton;
 use Exception\Ali\AliPayException;
 
-class TradeQuery extends BaseTrade {
+class TradeClose extends AliBase {
+    /**
+     * 支付宝服务器主动通知商户服务器里指定的页面http/https路径
+     * @var string
+     */
+    private $notify_url = '';
+
     /**
      * 商户订单号
      * @var string
@@ -25,7 +34,8 @@ class TradeQuery extends BaseTrade {
 
     public function __construct(string $appId) {
         parent::__construct($appId);
-        $this->method = 'alipay.trade.query';
+        $this->notify_url = AliConfigSingleton::getInstance()->getPayConfig($appId)->getUrlNotify();
+        $this->setMethod('alipay.trade.close');
     }
 
     private function __clone(){
@@ -62,8 +72,8 @@ class TradeQuery extends BaseTrade {
         }
 
         $resArr = $this->getContentArr();
-        $resArr['sign'] = TradeUtil::createSign($resArr, $resArr['sign_type']);
-
+        $resArr['notify_url'] = $this->notify_url;
+        $resArr['sign'] = AliUtilBase::createSign($resArr, $resArr['sign_type']);
         return $resArr;
     }
 }

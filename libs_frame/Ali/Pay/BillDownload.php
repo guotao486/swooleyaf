@@ -1,16 +1,18 @@
 <?php
 /**
- * 订单对账单下载
- * User: jw
- * Date: 17-4-13
- * Time: 下午8:10
+ * Created by PhpStorm.
+ * User: 姜伟
+ * Date: 2018/9/6 0006
+ * Time: 15:20
  */
-namespace AliPay;
+namespace Ali\Pay;
 
+use Ali\AliBase;
+use Ali\AliUtilBase;
 use Constant\ErrorCode;
 use Exception\Ali\AliPayException;
 
-class TradeBillDownload extends BaseTrade {
+class BillDownload extends AliBase {
     private static $billTypes = [
         'trade',
         'signcustomer',
@@ -30,7 +32,7 @@ class TradeBillDownload extends BaseTrade {
 
     public function __construct(string $appId) {
         parent::__construct($appId);
-        $this->method = 'alipay.data.dataservice.bill.downloadurl.query';
+        $this->setMethod('alipay.data.dataservice.bill.downloadurl.query');
     }
 
     private function __clone(){
@@ -70,8 +72,7 @@ class TradeBillDownload extends BaseTrade {
         }
 
         $resArr = $this->getContentArr();
-        $resArr['sign'] = TradeUtil::createSign($resArr, $resArr['sign_type']);
-
+        $resArr['sign'] = AliUtilBase::createSign($resArr, $resArr['sign_type']);
         return $resArr;
     }
 }
