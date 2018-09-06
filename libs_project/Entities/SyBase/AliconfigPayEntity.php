@@ -3,10 +3,10 @@ namespace Entities\SyBase;
 
 use DB\Entities\MysqlEntity;
 
-class AlipayConfigEntity extends MysqlEntity {
+class AliconfigPayEntity extends MysqlEntity {
     public function __construct(string $dbName='') {
         $this->_dbName = isset($dbName{0}) ? $dbName : 'sy_base';
-        parent::__construct($this->_dbName, 'alipay_config','id');
+        parent::__construct($this->_dbName, 'aliconfig_pay','id');
     }
 
     /**

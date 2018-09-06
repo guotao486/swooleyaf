@@ -7,7 +7,7 @@
  */
 namespace Factories;
 
-use Entities\SyBase\AlipayConfigEntity;
+use Entities\SyBase\AliconfigPayEntity;
 use Entities\SyBase\AttachmentBaseEntity;
 use Entities\SyBase\AttachmentReferEntity;
 use Entities\SyBase\ImBaseEntity;
@@ -158,13 +158,6 @@ class SyBaseMysqlFactory {
     }
     /**
      * @param string $dbName 数据库名
-     * @return \Entities\SyBase\AlipayConfigEntity
-     */
-    public static function AlipayConfigEntity(string $dbName=''){
-        return new AlipayConfigEntity($dbName);
-    }
-    /**
-     * @param string $dbName 数据库名
      * @return \Entities\SyBase\RegionBaseEntity
      */
     public static function RegionBaseEntity(string $dbName=''){
@@ -211,5 +204,12 @@ class SyBaseMysqlFactory {
      */
     public static function WxconfigMiniEntity(string $dbName=''){
         return new WxconfigMiniEntity($dbName);
+    }
+    /**
+     * @param string $dbName 数据库名
+     * @return \Entities\SyBase\AliconfigPayEntity
+     */
+    public static function AliconfigPayEntity(string $dbName=''){
+        return new AliconfigPayEntity($dbName);
     }
 }
