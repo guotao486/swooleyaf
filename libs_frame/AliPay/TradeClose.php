@@ -12,12 +12,6 @@ use DesignPatterns\Singletons\AliConfigSingleton;
 use Exception\Ali\AliPayException;
 
 class TradeClose extends BaseTrade {
-    public function __construct(string $appId) {
-        parent::__construct($appId);
-        $this->setMethod('alipay.trade.close');
-        $this->notify_url = AliConfigSingleton::getInstance()->getPayConfig($appId)->getUrlNotify();
-    }
-
     /**
      * 支付宝服务器主动通知商户服务器里指定的页面http/https路径
      * @var string
@@ -36,13 +30,22 @@ class TradeClose extends BaseTrade {
      */
     private $trade_no = '';
 
+    public function __construct(string $appId) {
+        parent::__construct($appId);
+        $this->method = 'alipay.trade.close';
+        $this->notify_url = AliConfigSingleton::getInstance()->getPayConfig($appId)->getUrlNotify();
+    }
+
+    private function __clone(){
+    }
+
     /**
      * @param string $outTradeNo
      * @throws \Exception\Ali\AliPayException
      */
     public function setOutTradeNo(string $outTradeNo) {
-        if (preg_match('/^[0-9]{16,64}$/', $outTradeNo . '') > 0) {
-            $this->setBizContent('out_trade_no', $outTradeNo . '');
+        if (ctype_digit($outTradeNo)) {
+            $this->setBizContent('out_trade_no', $outTradeNo);
         } else {
             throw new AliPayException('商户订单号不合法', ErrorCode::ALIPAY_PARAM_ERROR);
         }
@@ -53,8 +56,8 @@ class TradeClose extends BaseTrade {
      * @throws \Exception\Ali\AliPayException
      */
     public function setTradeNo(string $tradeNo) {
-        if (preg_match('/^[0-9]{16,64}$/', $tradeNo . '') > 0) {
-            $this->setBizContent('trade_no', $tradeNo . '');
+        if (ctype_digit($tradeNo)) {
+            $this->setBizContent('trade_no', $tradeNo);
         } else {
             throw new AliPayException('支付宝交易号不合法', ErrorCode::ALIPAY_PARAM_ERROR);
         }

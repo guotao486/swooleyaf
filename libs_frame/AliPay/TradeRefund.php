@@ -11,11 +11,6 @@ use Constant\ErrorCode;
 use Exception\Ali\AliPayException;
 
 class TradeRefund extends BaseTrade {
-    public function __construct(string $appId) {
-        parent::__construct($appId);
-        $this->setMethod('alipay.trade.refund');
-    }
-
     /**
      * 商户订单号
      * @var string
@@ -46,13 +41,21 @@ class TradeRefund extends BaseTrade {
      */
     private $out_request_no = '';
 
+    public function __construct(string $appId) {
+        parent::__construct($appId);
+        $this->method = 'alipay.trade.refund';
+    }
+
+    private function __clone(){
+    }
+
     /**
      * @param string $outTradeNo
      * @throws \Exception\Ali\AliPayException
      */
     public function setOutTradeNo(string $outTradeNo) {
-        if (preg_match('/^[0-9]{16,64}$/', $outTradeNo . '') > 0) {
-            $this->setBizContent('out_trade_no', $outTradeNo . '');
+        if (ctype_digit($outTradeNo)) {
+            $this->setBizContent('out_trade_no', $outTradeNo);
         } else {
             throw new AliPayException('商户订单号不合法', ErrorCode::ALIPAY_PARAM_ERROR);
         }
@@ -63,8 +66,8 @@ class TradeRefund extends BaseTrade {
      * @throws \Exception\Ali\AliPayException
      */
     public function setTradeNo(string $tradeNo) {
-        if (preg_match('/^[0-9]{16,64}$/', $tradeNo . '') > 0) {
-            $this->setBizContent('trade_no', $tradeNo . '');
+        if (ctype_digit($tradeNo)) {
+            $this->setBizContent('trade_no', $tradeNo);
         } else {
             throw new AliPayException('支付宝交易号不合法', ErrorCode::ALIPAY_PARAM_ERROR);
         }
@@ -86,8 +89,8 @@ class TradeRefund extends BaseTrade {
      * @param string $refundReason
      */
     public function setRefundReason(string $refundReason) {
-        if (strlen($refundReason . '') > 0) {
-            $this->setBizContent('refund_reason', mb_substr($refundReason . '', 0, 80));
+        if (strlen($refundReason) > 0) {
+            $this->setBizContent('refund_reason', mb_substr($refundReason, 0, 80));
         }
     }
 
@@ -96,8 +99,8 @@ class TradeRefund extends BaseTrade {
      * @throws \Exception\Ali\AliPayException
      */
     public function setRefundNo(string $refundNo) {
-        if (preg_match('/^[0-9]{16,64}$/', $refundNo . '') > 0) {
-            $this->setBizContent('out_request_no', $refundNo . '');
+        if (ctype_digit($refundNo)) {
+            $this->setBizContent('out_request_no', $refundNo);
         } else {
             throw new AliPayException('退款单号不合法', ErrorCode::ALIPAY_PARAM_ERROR);
         }

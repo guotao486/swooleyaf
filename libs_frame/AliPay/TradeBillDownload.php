@@ -16,10 +16,6 @@ class TradeBillDownload extends BaseTrade {
         'signcustomer',
     ];
 
-    public function __construct(string $appId) {
-        parent::__construct($appId);
-    }
-
     /**
      * 账单类型
      * @var string
@@ -31,6 +27,14 @@ class TradeBillDownload extends BaseTrade {
      * @var string
      */
     private $bill_date = '';
+
+    public function __construct(string $appId) {
+        parent::__construct($appId);
+        $this->method = 'alipay.data.dataservice.bill.downloadurl.query';
+    }
+
+    private function __clone(){
+    }
 
     /**
      * @param string $billType

@@ -12,18 +12,6 @@ use DesignPatterns\Singletons\AliConfigSingleton;
 use Exception\Ali\AliPayException;
 
 class PayWap extends BaseTrade {
-    public function __construct(string $appId) {
-        parent::__construct($appId);
-
-        $payConfig = AliConfigSingleton::getInstance()->getPayConfig($appId);
-        $this->setMethod('alipay.trade.wap.pay');
-        $this->notify_url = $payConfig->getUrlNotify();
-        $this->return_baseurl = $payConfig->getUrlReturn();
-        $this->setBizContent('seller_id', $payConfig->getSellerId());
-        $this->setBizContent('product_code', 'QUICK_WAP_PAY');
-        $this->setBizContent('goods_type', '1');
-    }
-
     /**
      * 跳转url地址
      * @var string
@@ -90,6 +78,20 @@ class PayWap extends BaseTrade {
      */
     private $goods_type = '';
 
+    public function __construct(string $appId) {
+        parent::__construct($appId);
+        $payConfig = AliConfigSingleton::getInstance()->getPayConfig($appId);
+        $this->method = 'alipay.trade.wap.pay';
+        $this->notify_url = $payConfig->getUrlNotify();
+        $this->return_baseurl = $payConfig->getUrlReturn();
+        $this->setBizContent('seller_id', $payConfig->getSellerId());
+        $this->setBizContent('product_code', 'QUICK_WAP_PAY');
+        $this->setBizContent('goods_type', '1');
+    }
+
+    private function __clone(){
+    }
+
     /**
      * @param string $returnUrl
      * @throws \Exception\Ali\AliPayException
@@ -107,8 +109,8 @@ class PayWap extends BaseTrade {
      * @throws \Exception\Ali\AliPayException
      */
     public function setSubject(string $subject) {
-        if (strlen($subject . '') > 0) {
-            $this->setBizContent('subject', mb_substr($subject . '', 0, 80));
+        if (strlen($subject) > 0) {
+            $this->setBizContent('subject', mb_substr($subject, 0, 80));
         } else {
             throw new AliPayException('商品标题不能为空', ErrorCode::ALIPAY_PARAM_ERROR);
         }
@@ -119,8 +121,8 @@ class PayWap extends BaseTrade {
      * @throws \Exception\Ali\AliPayException
      */
     public function setOutTradeNo(string $outTradeNo) {
-        if (preg_match('/^[0-9]{16,64}$/', $outTradeNo . '') > 0) {
-            $this->setBizContent('out_trade_no', $outTradeNo . '');
+        if (ctype_digit($outTradeNo)) {
+            $this->setBizContent('out_trade_no', $outTradeNo);
         } else {
             throw new AliPayException('商户订单号不合法', ErrorCode::ALIPAY_PARAM_ERROR);
         }
@@ -130,8 +132,8 @@ class PayWap extends BaseTrade {
      * @param string $timeoutExpress
      */
     public function setTimeoutExpress(string $timeoutExpress) {
-        if (strlen($timeoutExpress . '') > 0) {
-            $this->setBizContent('timeout_express', $timeoutExpress . '');
+        if (strlen($timeoutExpress) > 0) {
+            $this->setBizContent('timeout_express', $timeoutExpress);
         }
     }
 
@@ -152,11 +154,11 @@ class PayWap extends BaseTrade {
      * @throws \Exception\Ali\AliPayException
      */
     public function setAttach(string $attach) {
-        $length = strlen($attach . '');
+        $length = strlen($attach);
         if ($length > 128) {
             throw new AliPayException('附加数据不合法', ErrorCode::ALIPAY_PARAM_ERROR);
         } else if ($length > 0) {
-            $this->setBizContent('body', $attach . '');
+            $this->setBizContent('body', $attach);
         }
     }
 

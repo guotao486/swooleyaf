@@ -12,15 +12,6 @@ use DesignPatterns\Singletons\AliConfigSingleton;
 use Exception\Ali\AliPayException;
 
 class PayQrCode extends BaseTrade {
-    public function __construct(string $appId) {
-        parent::__construct($appId);
-
-        $payConfig = AliConfigSingleton::getInstance()->getPayConfig($appId);
-        $this->setMethod('alipay.trade.precreate');
-        $this->notify_url = $payConfig->getUrlNotify();
-        $this->setBizContent('seller_id', $payConfig->getSellerId());
-    }
-
     /**
      * 支付宝服务器主动通知商户服务器里指定的页面http/https路径
      * @var string
@@ -57,13 +48,24 @@ class PayQrCode extends BaseTrade {
      */
     private $timeout_express = '';
 
+    public function __construct(string $appId) {
+        parent::__construct($appId);
+        $payConfig = AliConfigSingleton::getInstance()->getPayConfig($appId);
+        $this->method = 'alipay.trade.precreate';
+        $this->notify_url = $payConfig->getUrlNotify();
+        $this->setBizContent('seller_id', $payConfig->getSellerId());
+    }
+
+    private function __clone(){
+    }
+
     /**
      * @param string $subject
      * @throws \Exception\Ali\AliPayException
      */
     public function setSubject(string $subject) {
-        if (strlen($subject . '') > 0) {
-            $this->setBizContent('subject', mb_substr($subject . '', 0, 80));
+        if (strlen($subject) > 0) {
+            $this->setBizContent('subject', mb_substr($subject, 0, 80));
         } else {
             throw new AliPayException('商品标题不能为空', ErrorCode::ALIPAY_PARAM_ERROR);
         }
@@ -74,8 +76,8 @@ class PayQrCode extends BaseTrade {
      * @throws \Exception\Ali\AliPayException
      */
     public function setOutTradeNo(string $outTradeNo) {
-        if (preg_match('/^[0-9]{16,64}$/', $outTradeNo . '') > 0) {
-            $this->setBizContent('out_trade_no', $outTradeNo . '');
+        if (ctype_digit($outTradeNo)) {
+            $this->setBizContent('out_trade_no', $outTradeNo);
         } else {
             throw new AliPayException('商户订单号不合法', ErrorCode::ALIPAY_PARAM_ERROR);
         }
@@ -85,8 +87,8 @@ class PayQrCode extends BaseTrade {
      * @param string $timeoutExpress
      */
     public function setTimeoutExpress(string $timeoutExpress) {
-        if (strlen($timeoutExpress . '') > 0) {
-            $this->setBizContent('timeout_express', $timeoutExpress . '');
+        if (strlen($timeoutExpress) > 0) {
+            $this->setBizContent('timeout_express', $timeoutExpress);
         }
     }
 
@@ -107,11 +109,11 @@ class PayQrCode extends BaseTrade {
      * @throws \Exception\Ali\AliPayException
      */
     public function setAttach(string $attach) {
-        $length = strlen($attach . '');
+        $length = strlen($attach);
         if ($length > 128) {
             throw new AliPayException('附加数据不合法', ErrorCode::ALIPAY_PARAM_ERROR);
         } else if ($length > 0) {
-            $this->setBizContent('body', $attach . '');
+            $this->setBizContent('body', $attach);
         }
     }
 

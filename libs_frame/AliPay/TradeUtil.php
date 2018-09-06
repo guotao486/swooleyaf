@@ -372,6 +372,38 @@ final class TradeUtil {
     }
 
     /**
+     * 发起账号转账
+     * @param \AliPay\TradeAccountTransfer $accountTransfer
+     * @return array
+     */
+    public static function applyAccountTransferTrade(TradeAccountTransfer $accountTransfer) : array {
+        $resArr = [
+            'code' => 0,
+        ];
+
+        $data = $accountTransfer->getDetail();
+        $sendRes = self::sendPostReq(self::$urlGateWay, $data);
+        $resData = Tool::jsonDecode($sendRes);
+        if (isset($resData['alipay_fund_trans_toaccount_transfer_response'])) {
+            if ($resData['alipay_fund_trans_toaccount_transfer_response']['code'] . '' == self::CODE_RESPONSE_SUCCESS) {
+                $resArr['data'] = $resData['alipay_fund_trans_toaccount_transfer_response'];
+            } else {
+                Log::error(Tool::jsonEncode($resData['alipay_fund_trans_toaccount_transfer_response'], JSON_UNESCAPED_UNICODE), ErrorCode::ALIPAY_POST_ERROR);
+
+                $resArr['code'] = ErrorCode::ALIPAY_POST_ERROR;
+                $resArr['message'] = $resData['alipay_fund_trans_toaccount_transfer_response']['sub_msg'];
+            }
+        } else {
+            Log::error($sendRes, ErrorCode::ALIPAY_POST_ERROR);
+
+            $resArr['code'] = ErrorCode::ALIPAY_POST_ERROR;
+            $resArr['message'] = '支付宝返回数据格式出错';
+        }
+
+        return $resArr;
+    }
+
+    /**
      * 发送POST请求
      * @param string $url 请求地址
      * @param array $data 请求参数

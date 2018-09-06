@@ -1,24 +1,15 @@
 <?php
 /**
  * Created by PhpStorm.
- * User: jw
- * Date: 17-4-11
- * Time: 上午12:25
+ * User: 姜伟
+ * Date: 2018/9/6 0006
+ * Time: 13:59
  */
-namespace AliPay;
+namespace Ali;
 
 use Tool\Tool;
 
-abstract class BaseTrade {
-    public function __construct(string $appId) {
-        $this->app_id = $appId;
-        $this->format = 'json';
-        $this->charset = 'utf-8';
-        $this->sign_type = 'RSA2';
-        $this->timestamp = date('Y-m-d H:i:s');
-        $this->version = '1.0';
-    }
-
+abstract class AliBase {
     /**
      * 支付宝分配给开发者的应用ID
      * @var string
@@ -67,6 +58,18 @@ abstract class BaseTrade {
      */
     private $biz_content = [];
 
+    public function __construct(string $appId) {
+        $this->app_id = $appId;
+        $this->format = 'json';
+        $this->charset = 'utf-8';
+        $this->sign_type = 'RSA2';
+        $this->timestamp = date('Y-m-d H:i:s');
+        $this->version = '1.0';
+    }
+
+    private function __clone(){
+    }
+
     /**
      * @return string
      */
@@ -103,7 +106,7 @@ abstract class BaseTrade {
     }
 
     /**
-     * 获取订单详情信息
+     * 获取详情信息
      * @return array
      */
     abstract public function getDetail() : array;
