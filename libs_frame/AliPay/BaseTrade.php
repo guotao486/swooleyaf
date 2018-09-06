@@ -29,7 +29,7 @@ abstract class BaseTrade {
      * 接口名称
      * @var string
      */
-    private $method = '';
+    protected $method = '';
 
     /**
      * 数据格式
@@ -48,12 +48,6 @@ abstract class BaseTrade {
      * @var string
      */
     private $sign_type = '';
-
-    /**
-     * 商户请求参数的签名串
-     * @var string
-     */
-    private $sign = '';
 
     /**
      * 发送请求的时间，格式"yyyy-MM-dd HH:mm:ss"
@@ -78,13 +72,6 @@ abstract class BaseTrade {
      */
     public function getAppId() : string {
         return $this->app_id;
-    }
-
-    /**
-     * @param string $method
-     */
-    protected function setMethod(string $method) {
-        $this->method = $method;
     }
 
     /**
