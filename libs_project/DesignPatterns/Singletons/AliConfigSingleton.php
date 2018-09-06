@@ -85,10 +85,10 @@ class AliConfigSingleton {
         $payConfig->setAppId($appId);
         $payConfig->setExpireTime($expireTime);
 
-        $alipayConfigEntity = SyTaskMysqlFactory::AlipayConfigEntity();
-        $ormResult1 = $alipayConfigEntity->getContainer()->getModel()->getOrmDbTable();
+        $aliConfigEntity = SyTaskMysqlFactory::AliconfigPayEntity();
+        $ormResult1 = $aliConfigEntity->getContainer()->getModel()->getOrmDbTable();
         $ormResult1->where('`app_id`=? AND `status`=?', [$appId, Project::ALI_PAY_STATUS_ENABLE]);
-        $configInfo = $alipayConfigEntity->getContainer()->getModel()->findOne($ormResult1);
+        $configInfo = $aliConfigEntity->getContainer()->getModel()->findOne($ormResult1);
         if(empty($configInfo)){
             $payConfig->setValid(false);
         } else {
@@ -100,8 +100,7 @@ class AliConfigSingleton {
             $payConfig->setPubRsaKey((string)$configInfo['pubkey_rsa']);
             $payConfig->setPubAliKey((string)$configInfo['pubkey_ali']);
         }
-        unset($configInfo, $ormResult1, $alipayConfigEntity);
-
+        unset($configInfo, $ormResult1, $aliConfigEntity);
         $this->payConfigs[$appId] = $payConfig;
 
         return $payConfig;
