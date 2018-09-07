@@ -8,24 +8,16 @@
 namespace Ali\Pay;
 
 use Ali\AliBase;
-use Ali\AliUtilBase;
 use Constant\ErrorCode;
 use DesignPatterns\Singletons\AliConfigSingleton;
 use Exception\Ali\AliPayException;
 
 class TradeClose extends AliBase {
     /**
-     * 支付宝服务器主动通知商户服务器里指定的页面http/https路径
-     * @var string
-     */
-    private $notify_url = '';
-
-    /**
      * 商户订单号
      * @var string
      */
     private $out_trade_no = '';
-
     /**
      * 支付宝交易号
      * @var string
@@ -66,14 +58,10 @@ class TradeClose extends AliBase {
     }
 
     public function getDetail() : array {
-        $bizContent = $this->getBizContent();
-        if ((!isset($bizContent['out_trade_no'])) && (!isset($bizContent['trade_no']))) {
+        if ((!isset($this->biz_content['out_trade_no'])) && !isset($this->biz_content['trade_no'])) {
             throw new AliPayException('商户订单号和支付宝交易号不能都为空', ErrorCode::ALIPAY_PARAM_ERROR);
         }
 
-        $resArr = $this->getContentArr();
-        $resArr['notify_url'] = $this->notify_url;
-        $resArr['sign'] = AliUtilBase::createSign($resArr, $resArr['sign_type']);
-        return $resArr;
+        return $this->getContent();
     }
 }

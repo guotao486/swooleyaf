@@ -8,7 +8,6 @@
 namespace Ali\Pay;
 
 use Ali\AliBase;
-use Ali\AliUtilBase;
 use Constant\ErrorCode;
 use Exception\Ali\AliPayException;
 
@@ -23,7 +22,6 @@ class BillDownload extends AliBase {
      * @var string
      */
     private $bill_type = '';
-
     /**
      * 账单时间：日账单格式为yyyy-MM-dd，月账单格式为yyyy-MM
      * @var string
@@ -63,16 +61,13 @@ class BillDownload extends AliBase {
     }
 
     public function getDetail() : array {
-        $bizContent = $this->getBizContent();
-        if (!isset($bizContent['bill_type'])) {
+        if (!isset($this->biz_content['bill_type'])) {
             throw new AliPayException('账单类型不能为空', ErrorCode::ALIPAY_PARAM_ERROR);
         }
-        if (!isset($bizContent['bill_date'])) {
+        if (!isset($this->biz_content['bill_date'])) {
             throw new AliPayException('账单时间不能为空', ErrorCode::ALIPAY_PARAM_ERROR);
         }
 
-        $resArr = $this->getContentArr();
-        $resArr['sign'] = AliUtilBase::createSign($resArr, $resArr['sign_type']);
-        return $resArr;
+        return $this->getContent();
     }
 }

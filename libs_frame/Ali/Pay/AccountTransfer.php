@@ -8,7 +8,6 @@
 namespace Ali\Pay;
 
 use Ali\AliBase;
-use Ali\AliUtilBase;
 use Constant\ErrorCode;
 use Exception\Ali\AliPayException;
 
@@ -124,19 +123,16 @@ class AccountTransfer extends AliBase {
     }
 
     public function getDetail() : array {
-        $bizContent = $this->getBizContent();
-        if(!isset($bizContent['out_biz_no'])){
+        if(!isset($this->biz_content['out_biz_no'])){
             throw new AliPayException('商户转账单号不能为空', ErrorCode::ALIPAY_PARAM_ERROR);
         }
-        if(!isset($bizContent['amount'])){
+        if(!isset($this->biz_content['amount'])){
             throw new AliPayException('转账金额不能为空', ErrorCode::ALIPAY_PARAM_ERROR);
         }
-        if(!isset($bizContent['payee_type'])){
+        if(!isset($this->biz_content['payee_type'])){
             throw new AliPayException('账户类型不能为空', ErrorCode::ALIPAY_PARAM_ERROR);
         }
 
-        $resArr = $this->getContentArr();
-        $resArr['sign'] = AliUtilBase::createSign($resArr, $resArr['sign_type']);
-        return $resArr;
+        return $this->getContent();
     }
 }

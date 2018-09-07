@@ -8,42 +8,31 @@
 namespace Ali\Pay;
 
 use Ali\AliBase;
-use Ali\AliUtilBase;
 use Constant\ErrorCode;
 use DesignPatterns\Singletons\AliConfigSingleton;
 use Exception\Ali\AliPayException;
 
 class PayQrCode extends AliBase {
     /**
-     * 支付宝服务器主动通知商户服务器里指定的页面http/https路径
-     * @var string
-     */
-    private $notify_url = '';
-
-    /**
      * 商户订单号
      * @var string
      */
     private $out_trade_no = '';
-
     /**
-     * 订单总金额，单位为元
+     * 订单总金额,单位为分
      * @var string
      */
     private $total_amount = '';
-
     /**
      * 订单标题
      * @var string
      */
     private $subject = '';
-
     /**
      * 商品的描述
      * @var string
      */
     private $body = '';
-
     /**
      * 订单允许的最晚付款时间，逾期将关闭交易
      * @var string
@@ -53,8 +42,8 @@ class PayQrCode extends AliBase {
     public function __construct(string $appId) {
         parent::__construct($appId);
         $payConfig = AliConfigSingleton::getInstance()->getPayConfig($appId);
-        $this->setMethod('alipay.trade.precreate');
         $this->notify_url = $payConfig->getUrlNotify();
+        $this->setMethod('alipay.trade.precreate');
         $this->setBizContent('seller_id', $payConfig->getSellerId());
     }
 
@@ -120,20 +109,16 @@ class PayQrCode extends AliBase {
     }
 
     public function getDetail() : array {
-        $bizContent = $this->getBizContent();
-        if (!isset($bizContent['subject'])) {
+        if (!isset($this->biz_content['subject'])) {
             throw new AliPayException('商品标题不能为空', ErrorCode::ALIPAY_PARAM_ERROR);
         }
-        if (!isset($bizContent['out_trade_no'])) {
+        if (!isset($this->biz_content['out_trade_no'])) {
             throw new AliPayException('商户订单号不能为空', ErrorCode::ALIPAY_PARAM_ERROR);
         }
-        if (!isset($bizContent['total_amount'])) {
+        if (!isset($this->biz_content['total_amount'])) {
             throw new AliPayException('订单总金额不能为空', ErrorCode::ALIPAY_PARAM_ERROR);
         }
 
-        $resArr = $this->getContentArr();
-        $resArr['notify_url'] = $this->notify_url;
-        $resArr['sign'] = AliUtilBase::createSign($resArr, $resArr['sign_type']);
-        return $resArr;
+        return $this->getContent();
     }
 }

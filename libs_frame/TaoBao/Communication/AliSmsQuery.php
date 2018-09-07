@@ -43,7 +43,7 @@ class AliSmsQuery extends TaoBaoBase {
         parent::__construct();
         $this->page = 1;
         $this->limit = 10;
-        $this->setMethod('alibaba.aliqin.ta.sms.num.query');
+        $this->setMethod('alibaba.aliqin.fc.sms.num.query');
     }
 
     private function __clone(){
