@@ -2,17 +2,18 @@
 /**
  * Created by PhpStorm.
  * User: 姜伟
- * Date: 2017/12/4 0004
- * Time: 11:34
+ * Date: 2018/9/7 0007
+ * Time: 10:14
  */
-
-namespace SySms\AliDaYu;
+namespace TaoBao\Communication;
 
 use Constant\ErrorCode;
 use Exception\Sms\AliDaYuException;
+use TaoBao\TaoBaoBase;
+use TaoBao\TaoBaoUtilBase;
 use Tool\Tool;
 
-class SmsSend extends SmsBase {
+class AliSmsSend extends TaoBaoBase {
     /**
      * 短信类型
      * @var string
@@ -44,7 +45,7 @@ class SmsSend extends SmsBase {
     private $badSmsSignNames = [];
 
     public function __construct() {
-        parent::__construct('alibaba.aliqin.fc.sms.num.send');
+        parent::__construct();
         $this->smsType = 'normal';
         $this->badSmsSignNames = [
             '大鱼测试',
@@ -54,6 +55,7 @@ class SmsSend extends SmsBase {
             '注册验证',
             '身份验证',
         ];
+        $this->setMethod('alibaba.aliqin.fc.sms.num.send');
     }
 
     private function __clone(){
@@ -123,7 +125,7 @@ class SmsSend extends SmsBase {
         if (!empty($this->smsParams)) {
             $resArr['sms_param'] = Tool::jsonEncode($this->smsParams, JSON_UNESCAPED_UNICODE);
         }
-        SmsUtil::createSmsSign($resArr);
+        TaoBaoUtilBase::createSign($resArr);
 
         return $resArr;
     }

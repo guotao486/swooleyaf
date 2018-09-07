@@ -2,15 +2,17 @@
 /**
  * Created by PhpStorm.
  * User: 姜伟
- * Date: 2017/12/4 0004
- * Time: 11:34
+ * Date: 2018/9/7 0007
+ * Time: 10:31
  */
-namespace SySms\AliDaYu;
+namespace TaoBao\Communication;
 
 use Constant\ErrorCode;
 use Exception\Sms\AliDaYuException;
+use TaoBao\TaoBaoBase;
+use TaoBao\TaoBaoUtilBase;
 
-class SmsQuery extends SmsBase {
+class AliSmsQuery extends TaoBaoBase {
     /**
      * 流水号
      * @var string
@@ -38,9 +40,10 @@ class SmsQuery extends SmsBase {
     private $limit = 10;
 
     public function __construct(){
-        parent::__construct('alibaba.aliqin.fc.sms.num.query');
+        parent::__construct();
         $this->page = 1;
         $this->limit = 10;
+        $this->setMethod('alibaba.aliqin.ta.sms.num.query');
     }
 
     private function __clone(){
@@ -119,7 +122,7 @@ class SmsQuery extends SmsBase {
         if(strlen($this->bizId) > 0){
             $resArr['biz_id'] = $this->bizId;
         }
-        SmsUtil::createSmsSign($resArr);
+        TaoBaoUtilBase::createSign($resArr);
 
         return $resArr;
     }

@@ -1,23 +1,17 @@
 <?php
 /**
  * Created by PhpStorm.
- * User: Administrator
- * Date: 2017-06-18
- * Time: 15:32
+ * User: 姜伟
+ * Date: 2018/9/7 0007
+ * Time: 9:43
  */
-namespace SySms\AliDaYu;
+namespace TaoBao;
 
 use Constant\ErrorCode;
 use Exception\Sms\AliDaYuException;
 use Tool\Tool;
 
-class SmsConfig {
-    public function __construct() {
-    }
-
-    private function __clone() {
-    }
-
+class ConfigDaYu {
     /**
      * APP KEY
      * @var string
@@ -28,6 +22,16 @@ class SmsConfig {
      * @var string
      */
     private $appSecret = '';
+
+    public function __construct() {
+    }
+
+    private function __clone() {
+    }
+
+    public function __toString() {
+        return Tool::jsonEncode($this->getConfigs(), JSON_UNESCAPED_UNICODE);
+    }
 
     /**
      * @return string
@@ -65,13 +69,6 @@ class SmsConfig {
         } else {
             throw new AliDaYuException('app secret不合法', ErrorCode::SMS_PARAM_ERROR);
         }
-    }
-
-    public function __toString() {
-        return Tool::jsonEncode([
-            'app.key' => $this->appKey,
-            'app.secret' => $this->appSecret,
-        ], JSON_UNESCAPED_UNICODE);
     }
 
     /**
