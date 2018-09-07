@@ -1,15 +1,15 @@
 <?php
 /**
  * Created by PhpStorm.
- * User: Administrator
- * Date: 2017-04-16
- * Time: 2:16
+ * User: 姜伟
+ * Date: 2018/9/7 0007
+ * Time: 9:42
  */
-namespace SySms\AliDaYu;
+namespace TaoBao;
 
 use DesignPatterns\Singletons\SmsConfigSingleton;
 
-abstract class SmsBase {
+abstract class TaoBaoBase {
     /**
      * API接口名称
      * @var string
@@ -40,9 +40,13 @@ abstract class SmsBase {
      * @var string
      */
     private $timestamp = '';
+    /**
+     * 响应标识
+     * @var string
+     */
+    private $responseTag = '';
 
-    public function __construct(string $method){
-        $this->method = $method;
+    public function __construct(){
         $this->appKey = SmsConfigSingleton::getInstance()->getDaYuConfig()->getAppKey();
         $this->signMethod = 'md5';
         $this->format = 'json';
@@ -51,6 +55,21 @@ abstract class SmsBase {
     }
 
     private function __clone(){
+    }
+
+    /**
+     * @param string $method
+     */
+    protected function setMethod(string $method) {
+        $this->method = $method;
+        $this->responseTag = str_replace('.', '_', $method) . '_response';
+    }
+
+    /**
+     * @return string
+     */
+    public function getResponseTag() : string {
+        return $this->responseTag;
     }
 
     public function getBaseDetail() : array {

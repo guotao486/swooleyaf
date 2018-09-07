@@ -7,8 +7,8 @@
  */
 namespace DesignPatterns\Singletons;
 
-use SySms\AliDaYu\SmsConfig as DaYuConfig;
 use SySms\Yun253\SmsConfig as Yun253Config;
+use TaoBao\ConfigDaYu;
 use Tool\Tool;
 use Traits\SingletonTrait;
 
@@ -17,7 +17,7 @@ class SmsConfigSingleton {
 
     /**
      * 大鱼配置
-     * @var \SySms\AliDaYu\SmsConfig
+     * @var \TaoBao\ConfigDaYu
      */
     private $dayuConfig = null;
     /**
@@ -30,7 +30,7 @@ class SmsConfigSingleton {
         $configs = Tool::getConfig('sms.' . SY_ENV . SY_PROJECT);
 
         //设置大鱼配置
-        $dayuConfig = new DaYuConfig();
+        $dayuConfig = new ConfigDaYu();
         $dayuConfig->setAppKey((string)Tool::getArrayVal($configs, 'dayu.app.key', '', true));
         $dayuConfig->setAppSecret((string)Tool::getArrayVal($configs, 'dayu.app.secret', '', true));
         $this->dayuConfig = $dayuConfig;
@@ -54,7 +54,7 @@ class SmsConfigSingleton {
     }
 
     /**
-     * @return \SySms\AliDaYu\SmsConfig
+     * @return \TaoBao\ConfigDaYu
      */
     public function getDayuConfig() {
         return $this->dayuConfig;
