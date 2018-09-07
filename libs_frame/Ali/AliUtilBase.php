@@ -17,8 +17,6 @@ use Traits\SimpleTrait;
 abstract class AliUtilBase {
     use SimpleTrait;
 
-    const CODE_RESPONSE_SUCCESS = '10000'; //状态码-响应成功
-
     protected static $urlGateWay = 'https://openapi.alipay.com/gateway.do';
 
     /**
@@ -156,19 +154,21 @@ abstract class AliUtilBase {
     }
 
     /**
-     * 解析响应数据
-     * @param string $responseData 响应数据
-     * @param string $responseTag 响应标识
+     * 发送服务请求
+     * @param \Ali\AliBase $aliBase
      * @return array
      */
-    protected static function analyzeResponse(string $responseData,string $responseTag) {
+    public static function sendServiceRequest(AliBase $aliBase){
         $resArr = [
             'code' => 0,
         ];
 
-        $rspData = Tool::jsonDecode($responseData);
+        $data = $aliBase->getDetail();
+        $responseTag = $aliBase->getResponseTag();
+        $sendRes = self::sendPostReq(self::$urlGateWay, $data);
+        $rspData = Tool::jsonDecode($sendRes);
         if (isset($rspData[$responseTag])) {
-            if ($rspData[$responseTag]['code'] == self::CODE_RESPONSE_SUCCESS) {
+            if ($rspData[$responseTag]['code'] == '10000') {
                 $resArr['data'] = $rspData[$responseTag];
             } else {
                 Log::error(Tool::jsonEncode($rspData[$responseTag], JSON_UNESCAPED_UNICODE), ErrorCode::ALIPAY_POST_ERROR);
@@ -177,23 +177,12 @@ abstract class AliUtilBase {
                 $resArr['message'] = $rspData[$responseTag]['sub_msg'];
             }
         } else {
-            Log::error($responseData, ErrorCode::ALIPAY_POST_ERROR);
+            Log::error($sendRes, ErrorCode::ALIPAY_POST_ERROR);
 
             $resArr['code'] = ErrorCode::ALIPAY_POST_ERROR;
             $resArr['message'] = '支付宝返回数据格式出错';
         }
 
         return $resArr;
-    }
-
-    /**
-     * 发送服务请求
-     * @param \Ali\AliBase $aliBase
-     * @return array
-     */
-    public static function sendServiceRequest(AliBase $aliBase){
-        $data = $aliBase->getDetail();
-        $sendRes = self::sendPostReq(self::$urlGateWay, $data);
-        return self::analyzeResponse($sendRes, $aliBase->getResponseTag());
     }
 }
