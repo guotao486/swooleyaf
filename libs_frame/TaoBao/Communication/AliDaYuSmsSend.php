@@ -10,7 +10,6 @@ namespace TaoBao\Communication;
 use Constant\ErrorCode;
 use Exception\Sms\AliDaYuException;
 use TaoBao\TaoBaoBase;
-use TaoBao\TaoBaoUtilBase;
 use Tool\Tool;
 
 class AliDaYuSmsSend extends TaoBaoBase {
@@ -20,10 +19,10 @@ class AliDaYuSmsSend extends TaoBaoBase {
      */
     private $smsType = '';
     /**
-     * 接收手机号码
-     * @var string
+     * 接收手机号码列表
+     * @var array
      */
-    private $recNum = '';
+    private $recNumList = [];
     /**
      * 签名名称
      * @var string
@@ -46,7 +45,7 @@ class AliDaYuSmsSend extends TaoBaoBase {
 
     public function __construct() {
         parent::__construct();
-        $this->smsType = 'normal';
+        $this->reqData['sms_type'] = 'normal';
         $this->badSmsSignNames = [
             '大鱼测试',
             '活动验证',
@@ -62,15 +61,25 @@ class AliDaYuSmsSend extends TaoBaoBase {
     }
 
     /**
-     * @param string $recNum
+     * @param array $recNumList
      * @throws \Exception\Sms\AliDaYuException
      */
-    public function setRecNum(string $recNum) {
-        if (preg_match('/^(\,1\d{10}){1,200}$/', ',' . $recNum) > 0) {
-            $this->recNum = $recNum;
-        } else {
-            throw new AliDaYuException('接收号码不合法', ErrorCode::SMS_PARAM_ERROR);
+    public function setRecNumList(array $recNumList) {
+        if(empty($recNumList)){
+            throw new AliDaYuException('接收号码不能为空', ErrorCode::SMS_PARAM_ERROR);
+        } else if(count($recNumList) > 200){
+            throw new AliDaYuException('接收号码不能超过200个', ErrorCode::SMS_PARAM_ERROR);
         }
+
+        foreach ($recNumList as $eRecNum) {
+            if(ctype_digit($eRecNum) && (strlen($eRecNum) == 11) && ($eRecNum{0} == '1')){
+                $this->recNumList[] = $eRecNum;
+            } else {
+                throw new AliDaYuException('接收号码不合法', ErrorCode::SMS_PARAM_ERROR);
+            }
+        }
+        array_unique($this->recNumList);
+        $this->reqData['rec_num'] = implode(',', $this->recNumList);
     }
 
     /**
@@ -84,7 +93,7 @@ class AliDaYuSmsSend extends TaoBaoBase {
             throw new AliDaYuException('签名名称不能为系统默认签名', ErrorCode::SMS_PARAM_ERROR);
         }
 
-        $this->signName = $signName;
+        $this->reqData['sms_free_sign_name'] = $signName;
     }
 
     /**
@@ -93,7 +102,7 @@ class AliDaYuSmsSend extends TaoBaoBase {
      */
     public function setTemplateId(string $templateId) {
         if (strlen($templateId) > 0) {
-            $this->templateCode = $templateId;
+            $this->reqData['sms_template_code'] = $templateId;
         } else {
             throw new AliDaYuException('模板ID不能为空', ErrorCode::SMS_PARAM_ERROR);
         }
@@ -103,30 +112,22 @@ class AliDaYuSmsSend extends TaoBaoBase {
      * @param array $params
      */
     public function setSmsParams(array $params) {
-        $this->smsParams = $params;
+        if(!empty($params)){
+            $this->reqData['sms_param'] = Tool::jsonEncode($params, JSON_UNESCAPED_UNICODE);
+        }
     }
 
     public function getDetail() : array {
-        if (strlen($this->recNum) == 0) {
+        if (!isset($this->reqData['rec_num'])) {
             throw new AliDaYuException('接收号码不能为空', ErrorCode::SMS_PARAM_ERROR);
         }
-        if (strlen($this->signName) == 0) {
+        if (!isset($this->reqData['sms_free_sign_name'])) {
             throw new AliDaYuException('签名名称不能为空', ErrorCode::SMS_PARAM_ERROR);
         }
-        if (strlen($this->templateCode) == 0) {
+        if (!isset($this->reqData['sms_template_code'])) {
             throw new AliDaYuException('模板ID不能为空', ErrorCode::SMS_PARAM_ERROR);
         }
 
-        $resArr = $this->getBaseDetail();
-        $resArr['sms_type'] = $this->smsType;
-        $resArr['sms_free_sign_name'] = $this->signName;
-        $resArr['rec_num'] = $this->recNum;
-        $resArr['sms_template_code'] = $this->templateCode;
-        if (!empty($this->smsParams)) {
-            $resArr['sms_param'] = Tool::jsonEncode($this->smsParams, JSON_UNESCAPED_UNICODE);
-        }
-        TaoBaoUtilBase::createSign($resArr);
-
-        return $resArr;
+        return $this->getContent();
     }
 }
