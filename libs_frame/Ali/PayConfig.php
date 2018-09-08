@@ -96,7 +96,7 @@ class PayConfig {
      * @throws \Exception\Ali\AliPayException
      */
     public function setAppId(string $appId) {
-        if(preg_match('/^\d{16}$/', $appId) > 0){
+        if(ctype_digit($appId) && (strlen($appId) == 16)){
             $this->appId = $appId;
         } else {
             throw new AliPayException('app id不合法', ErrorCode::ALIPAY_PARAM_ERROR);
@@ -115,7 +115,7 @@ class PayConfig {
      * @throws \Exception\Ali\AliPayException
      */
     public function setSellerId(string $sellerId) {
-        if(preg_match('/^2088\d{12}$/', $sellerId) > 0){
+        if(ctype_digit($sellerId) && (strlen($sellerId) == 16) && (substr($sellerId, 0, 4) == '2088')){
             $this->sellerId = $sellerId;
         } else {
             throw new AliPayException('卖家ID不合法', ErrorCode::ALIPAY_PARAM_ERROR);

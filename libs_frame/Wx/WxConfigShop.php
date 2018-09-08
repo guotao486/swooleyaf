@@ -102,7 +102,7 @@ class WxConfigShop {
      * @throws \Exception\WX\WxException
      */
     public function setClientIp(string $clientIp) {
-        if(preg_match('/^(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])(\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])){3}$/', $clientIp) > 0){
+        if(preg_match('/^(\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5]){4}$/', '.' . $clientIp) > 0){
             $this->clientIp = $clientIp;
         } else {
             throw new WxException('客户端IP不合法', ErrorCode::WX_PARAM_ERROR);
@@ -121,7 +121,7 @@ class WxConfigShop {
      * @throws \Exception\WX\WxException
      */
     public function setAppId(string $appId) {
-        if(preg_match('/^[0-9a-z]{18}$/', $appId) > 0){
+        if(ctype_alnum($appId) && (strlen($appId) == 18)){
             $this->appId = $appId;
         } else {
             throw new WxException('app id不合法', ErrorCode::WX_PARAM_ERROR);
@@ -140,7 +140,7 @@ class WxConfigShop {
      * @throws \Exception\WX\WxException
      */
     public function setSecret(string $secret) {
-        if(preg_match('/^[0-9a-z]{32}$/', $secret) > 0){
+        if(ctype_alnum($secret) && (strlen($secret) == 32)){
             $this->secret = $secret;
         } else {
             throw new WxException('secret不合法', ErrorCode::WX_PARAM_ERROR);
@@ -159,7 +159,7 @@ class WxConfigShop {
      * @throws \Exception\WX\WxException
      */
     public function setPayMchId(string $payMchId) {
-        if(preg_match('/^\d+$/', $payMchId) > 0){
+        if(ctype_digit($payMchId)){
             $this->payMchId = $payMchId;
         } else {
             throw new WxException('商户号不合法', ErrorCode::WX_PARAM_ERROR);
@@ -178,7 +178,7 @@ class WxConfigShop {
      * @throws \Exception\WX\WxException
      */
     public function setPayKey(string $payKey) {
-        if(preg_match('/^[0-9a-zA-Z]{32}$/', $payKey) > 0){
+        if(ctype_alnum($payKey) && (strlen($payKey) == 32)){
             $this->payKey = $payKey;
         } else {
             throw new WxException('支付密钥不合法', ErrorCode::WX_PARAM_ERROR);
