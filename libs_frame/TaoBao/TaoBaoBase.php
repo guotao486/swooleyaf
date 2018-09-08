@@ -7,19 +7,12 @@
  */
 namespace TaoBao;
 
-use DesignPatterns\Singletons\SmsConfigSingleton;
-
 abstract class TaoBaoBase {
     /**
      * API接口名称
      * @var string
      */
     private $method = '';
-    /**
-     * 应用标识
-     * @var string
-     */
-    private $appKey = '';
     /**
      * 签名的摘要算法
      * @var string
@@ -46,13 +39,22 @@ abstract class TaoBaoBase {
      */
     private $responseTag = '';
     /**
+     * 应用标识
+     * @var string
+     */
+    protected $appKey = '';
+    /**
+     * 应用密钥
+     * @var string
+     */
+    protected $appSecret = '';
+    /**
      * 请求数据
      * @var array
      */
     protected $reqData = [];
 
     public function __construct(){
-        $this->appKey = SmsConfigSingleton::getInstance()->getDaYuConfig()->getAppKey();
         $this->signMethod = 'md5';
         $this->format = 'json';
         $this->version = '2.0';
@@ -84,7 +86,7 @@ abstract class TaoBaoBase {
         $this->reqData['format'] = $this->format;
         $this->reqData['method'] = $this->method;
         $this->reqData['timestamp'] = $this->timestamp;
-        TaoBaoUtilBase::createSign($this->reqData);
+        TaoBaoUtilBase::createSign($this->reqData, $this->appSecret);
 
         return $this->reqData;
     }

@@ -8,7 +8,8 @@
 namespace TaoBao\Communication;
 
 use Constant\ErrorCode;
-use Exception\Sms\AliDaYuException;
+use DesignPatterns\Singletons\TaoBaoSingleton;
+use Exception\TaoBao\AliDaYu\SmsException;
 use TaoBao\TaoBaoBase;
 use Tool\Tool;
 
@@ -45,6 +46,8 @@ class AliDaYuSmsSend extends TaoBaoBase {
 
     public function __construct() {
         parent::__construct();
+        $this->appKey = TaoBaoSingleton::getInstance()->getDayuConfig()->getAppKey();
+        $this->appSecret = TaoBaoSingleton::getInstance()->getDayuConfig()->getAppSecret();
         $this->reqData['sms_type'] = 'normal';
         $this->badSmsSignNames = [
             '大鱼测试',
@@ -62,20 +65,20 @@ class AliDaYuSmsSend extends TaoBaoBase {
 
     /**
      * @param array $recNumList
-     * @throws \Exception\Sms\AliDaYuException
+     * @throws \Exception\TaoBao\AliDaYu\SmsException
      */
     public function setRecNumList(array $recNumList) {
         if(empty($recNumList)){
-            throw new AliDaYuException('接收号码不能为空', ErrorCode::SMS_PARAM_ERROR);
+            throw new SmsException('接收号码不能为空', ErrorCode::SMS_PARAM_ERROR);
         } else if(count($recNumList) > 200){
-            throw new AliDaYuException('接收号码不能超过200个', ErrorCode::SMS_PARAM_ERROR);
+            throw new SmsException('接收号码不能超过200个', ErrorCode::SMS_PARAM_ERROR);
         }
 
         foreach ($recNumList as $eRecNum) {
             if(ctype_digit($eRecNum) && (strlen($eRecNum) == 11) && ($eRecNum{0} == '1')){
                 $this->recNumList[] = $eRecNum;
             } else {
-                throw new AliDaYuException('接收号码不合法', ErrorCode::SMS_PARAM_ERROR);
+                throw new SmsException('接收号码不合法', ErrorCode::SMS_PARAM_ERROR);
             }
         }
         array_unique($this->recNumList);
@@ -84,13 +87,13 @@ class AliDaYuSmsSend extends TaoBaoBase {
 
     /**
      * @param string $signName
-     * @throws \Exception\Sms\AliDaYuException
+     * @throws \Exception\TaoBao\AliDaYu\SmsException
      */
     public function setSignName(string $signName) {
         if (strlen($signName) == 0) {
-            throw new AliDaYuException('签名名称不能为空', ErrorCode::SMS_PARAM_ERROR);
+            throw new SmsException('签名名称不能为空', ErrorCode::SMS_PARAM_ERROR);
         } else if (in_array($signName, $this->badSmsSignNames)) {
-            throw new AliDaYuException('签名名称不能为系统默认签名', ErrorCode::SMS_PARAM_ERROR);
+            throw new SmsException('签名名称不能为系统默认签名', ErrorCode::SMS_PARAM_ERROR);
         }
 
         $this->reqData['sms_free_sign_name'] = $signName;
@@ -98,13 +101,13 @@ class AliDaYuSmsSend extends TaoBaoBase {
 
     /**
      * @param string $templateId
-     * @throws \Exception\Sms\AliDaYuException
+     * @throws \Exception\TaoBao\AliDaYu\SmsException
      */
     public function setTemplateId(string $templateId) {
         if (strlen($templateId) > 0) {
             $this->reqData['sms_template_code'] = $templateId;
         } else {
-            throw new AliDaYuException('模板ID不能为空', ErrorCode::SMS_PARAM_ERROR);
+            throw new SmsException('模板ID不能为空', ErrorCode::SMS_PARAM_ERROR);
         }
     }
 
@@ -119,13 +122,13 @@ class AliDaYuSmsSend extends TaoBaoBase {
 
     public function getDetail() : array {
         if (!isset($this->reqData['rec_num'])) {
-            throw new AliDaYuException('接收号码不能为空', ErrorCode::SMS_PARAM_ERROR);
+            throw new SmsException('接收号码不能为空', ErrorCode::SMS_PARAM_ERROR);
         }
         if (!isset($this->reqData['sms_free_sign_name'])) {
-            throw new AliDaYuException('签名名称不能为空', ErrorCode::SMS_PARAM_ERROR);
+            throw new SmsException('签名名称不能为空', ErrorCode::SMS_PARAM_ERROR);
         }
         if (!isset($this->reqData['sms_template_code'])) {
-            throw new AliDaYuException('模板ID不能为空', ErrorCode::SMS_PARAM_ERROR);
+            throw new SmsException('模板ID不能为空', ErrorCode::SMS_PARAM_ERROR);
         }
 
         return $this->getContent();

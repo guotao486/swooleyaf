@@ -1,23 +1,17 @@
 <?php
 /**
  * Created by PhpStorm.
- * User: Administrator
- * Date: 2017-06-18
- * Time: 15:32
+ * User: 姜伟
+ * Date: 2018/9/8 0008
+ * Time: 15:51
  */
-namespace SySms\Yun253;
+namespace Yun253;
 
 use Constant\ErrorCode;
-use Exception\Sms\Yun253Exception;
+use Exception\Yun253\SmsException;
 use Tool\Tool;
 
-class SmsConfig {
-    public function __construct() {
-    }
-
-    private function __clone() {
-    }
-
+class ConfigCommon {
     /**
      * APP KEY
      * @var string
@@ -32,7 +26,13 @@ class SmsConfig {
      * APP短信下发链接
      * @var string
      */
-    private $appUrlSend = '';
+    private $urlSmsSend = '';
+
+    public function __construct() {
+    }
+
+    private function __clone() {
+    }
 
     /**
      * @return string
@@ -43,13 +43,13 @@ class SmsConfig {
 
     /**
      * @param string $appKey
-     * @throws \Exception\Sms\Yun253Exception
+     * @throws \Exception\Yun253\SmsException
      */
     public function setAppKey(string $appKey) {
         if (ctype_alnum($appKey)) {
             $this->appKey = $appKey;
         } else {
-            throw new Yun253Exception('app key不合法', ErrorCode::SMS_PARAM_ERROR);
+            throw new SmsException('app key不合法', ErrorCode::SMS_PARAM_ERROR);
         }
     }
 
@@ -62,41 +62,37 @@ class SmsConfig {
 
     /**
      * @param string $appSecret
-     * @throws \Exception\Sms\Yun253Exception
+     * @throws \Exception\Yun253\SmsException
      */
     public function setAppSecret(string $appSecret) {
         if (ctype_alnum($appSecret)) {
             $this->appSecret = $appSecret;
         } else {
-            throw new Yun253Exception('app secret不合法', ErrorCode::SMS_PARAM_ERROR);
+            throw new SmsException('app secret不合法', ErrorCode::SMS_PARAM_ERROR);
         }
     }
 
     /**
      * @return string
      */
-    public function getAppUrlSend() : string {
-        return $this->appUrlSend;
+    public function getUrlSmsSend() : string {
+        return $this->urlSmsSend;
     }
 
     /**
-     * @param string $appUrlSend
-     * @throws \Exception\Sms\Yun253Exception
+     * @param string $urlSmsSend
+     * @throws \Exception\Yun253\SmsException
      */
-    public function setAppUrlSend(string $appUrlSend){
-        if(preg_match('/^(http|https)\:\/\/\S+$/', $appUrlSend) > 0){
-            $this->appUrlSend = $appUrlSend;
+    public function setUrlSmsSend(string $urlSmsSend){
+        if(preg_match('/^(http|https)\:\/\/\S+$/', $urlSmsSend) > 0){
+            $this->urlSmsSend = $urlSmsSend;
         } else {
-            throw new Yun253Exception('短信下发链接不合法', ErrorCode::SMS_PARAM_ERROR);
+            throw new SmsException('短信下发链接不合法', ErrorCode::SMS_PARAM_ERROR);
         }
     }
 
     public function __toString() {
-        return Tool::jsonEncode([
-            'app.key' => $this->appKey,
-            'app.secret' => $this->appSecret,
-            'app.url.send' => $this->appUrlSend,
-        ], JSON_UNESCAPED_UNICODE);
+        return Tool::jsonEncode($this->getConfigs(), JSON_UNESCAPED_UNICODE);
     }
 
     /**
@@ -107,7 +103,7 @@ class SmsConfig {
         return [
             'app.key' => $this->appKey,
             'app.secret' => $this->appSecret,
-            'app.url.send' => $this->appUrlSend,
+            'url.sms.send' => $this->urlSmsSend,
         ];
     }
 }
