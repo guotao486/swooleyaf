@@ -30,15 +30,10 @@ class StringDigitUpper extends BaseValidator implements ValidatorService {
             return '必须是字符串';
         } else if((strlen($trueData) == 0) && !$compareData){
             return '';
-        } else if(ctype_alnum($trueData)){
-            $nowData = strtoupper($trueData);
-            if($nowData == $trueData){
-                return '';
-            } else {
-                return '格式必须都是数字和大写字母';
-            }
+        } else if(ctype_alnum($trueData) && (strtoupper($trueData) == $trueData)){
+            return '';
         } else {
-            return '格式必须都是数字和字母';
+            return '格式必须都是数字和大写字母';
         }
     }
 }
