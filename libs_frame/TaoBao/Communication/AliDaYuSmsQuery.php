@@ -10,7 +10,6 @@ namespace TaoBao\Communication;
 use Constant\ErrorCode;
 use Exception\Sms\AliDaYuException;
 use TaoBao\TaoBaoBase;
-use TaoBao\TaoBaoUtilBase;
 
 class AliDaYuSmsQuery extends TaoBaoBase {
     /**
@@ -41,8 +40,8 @@ class AliDaYuSmsQuery extends TaoBaoBase {
 
     public function __construct(){
         parent::__construct();
-        $this->page = 1;
-        $this->limit = 10;
+        $this->reqData['current_page'] = 1;
+        $this->reqData['page_size'] = 10;
         $this->setMethod('alibaba.aliqin.fc.sms.num.query');
     }
 
@@ -53,8 +52,9 @@ class AliDaYuSmsQuery extends TaoBaoBase {
      * @param string $bizId
      */
     public function setBizId(string $bizId){
-        if(strlen(trim($bizId)) > 0){
-            $this->bizId = trim($bizId);
+        $trueBizId = trim($bizId);
+        if(strlen($trueBizId) > 0){
+            $this->reqData['biz_id'] = $trueBizId;
         }
     }
 
@@ -63,8 +63,8 @@ class AliDaYuSmsQuery extends TaoBaoBase {
      * @throws \Exception\Sms\AliDaYuException
      */
     public function setRecNum(string $recNum){
-        if (preg_match('/^1\d{10}$/', $recNum) > 0) {
-            $this->recNum = $recNum;
+        if(ctype_digit($recNum) && (strlen($recNum) == 11) && ($recNum{0} == '1')){
+            $this->reqData['rec_num'] = $recNum;
         } else {
             throw new AliDaYuException('接收号码不合法', ErrorCode::SMS_PARAM_ERROR);
         }
@@ -76,7 +76,7 @@ class AliDaYuSmsQuery extends TaoBaoBase {
      */
     public function setQueryDate(string $queryDate){
         if(strlen($queryDate) == 8){
-            $this->queryDate = $queryDate;
+            $this->reqData['query_date'] = $queryDate;
         } else {
             throw new AliDaYuException('发送日期不合法', ErrorCode::SMS_PARAM_ERROR);
         }
@@ -88,7 +88,7 @@ class AliDaYuSmsQuery extends TaoBaoBase {
      */
     public function setPage(int $page){
         if($page >= 1){
-            $this->page = $page;
+            $this->reqData['current_page'] = $page;
         } else {
             throw new AliDaYuException('页码必须大于0', ErrorCode::SMS_PARAM_ERROR);
         }
@@ -100,30 +100,20 @@ class AliDaYuSmsQuery extends TaoBaoBase {
      */
     public function setLimit(int $limit){
         if(($limit >= 1) && ($limit <= 50)){
-            $this->limit = $limit;
+            $this->reqData['page_size'] = $limit;
         } else {
             throw new AliDaYuException('每页数量必须在1-50之间', ErrorCode::SMS_PARAM_ERROR);
         }
     }
 
     public function getDetail() : array {
-        if(strlen($this->recNum) == 0){
+        if(!isset($this->reqData['rec_num'])){
             throw new AliDaYuException('接收号码必须填写', ErrorCode::SMS_PARAM_ERROR);
         }
-        if(strlen($this->queryDate) == 0){
+        if(!isset($this->reqData['query_date'])){
             throw new AliDaYuException('发送日期必须填写', ErrorCode::SMS_PARAM_ERROR);
         }
 
-        $resArr = $this->getBaseDetail();
-        $resArr['rec_num'] = $this->recNum;
-        $resArr['query_date'] = $this->queryDate;
-        $resArr['current_page'] = $this->page;
-        $resArr['page_size'] = $this->limit;
-        if(strlen($this->bizId) > 0){
-            $resArr['biz_id'] = $this->bizId;
-        }
-        TaoBaoUtilBase::createSign($resArr);
-
-        return $resArr;
+        return $this->getContent();
     }
 }

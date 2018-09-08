@@ -30,7 +30,7 @@ class StringPhone extends BaseValidator implements ValidatorService {
             return '必须是字符串';
         } else if((strlen($trueData) == 0) && !$compareData){
             return '';
-        } else if(preg_match('/^1\d{10}$/', $trueData) > 0){
+        } else if(ctype_digit($trueData) && (strlen($trueData) == 11) && ($trueData{0} == '1')){
             return '';
         } else {
             return '格式必须是手机号码';

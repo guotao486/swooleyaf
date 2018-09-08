@@ -45,6 +45,11 @@ abstract class TaoBaoBase {
      * @var string
      */
     private $responseTag = '';
+    /**
+     * 请求数据
+     * @var array
+     */
+    protected $reqData = [];
 
     public function __construct(){
         $this->appKey = SmsConfigSingleton::getInstance()->getDaYuConfig()->getAppKey();
@@ -72,15 +77,16 @@ abstract class TaoBaoBase {
         return $this->responseTag;
     }
 
-    public function getBaseDetail() : array {
-        return [
-            'v' => $this->version,
-            'app_key' => $this->appKey,
-            'sign_method' => $this->signMethod,
-            'format' => $this->format,
-            'method' => $this->method,
-            'timestamp' => $this->timestamp,
-        ];
+    protected function getContent() {
+        $this->reqData['v'] = $this->version;
+        $this->reqData['app_key'] = $this->appKey;
+        $this->reqData['sign_method'] = $this->signMethod;
+        $this->reqData['format'] = $this->format;
+        $this->reqData['method'] = $this->method;
+        $this->reqData['timestamp'] = $this->timestamp;
+        TaoBaoUtilBase::createSign($this->reqData);
+
+        return $this->reqData;
     }
 
     abstract public function getDetail() : array;
