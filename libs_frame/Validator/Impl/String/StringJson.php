@@ -9,7 +9,7 @@ namespace Validator\Impl\String;
 
 use Constant\Project;
 use Tool\Tool;
-use Validator\Base\BaseValidator;
+use Validator\BaseValidator;
 use Validator\ValidatorService;
 
 class StringJson extends BaseValidator implements ValidatorService {

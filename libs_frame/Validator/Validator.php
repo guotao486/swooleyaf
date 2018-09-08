@@ -10,7 +10,7 @@ namespace Validator;
 use Traits\SimpleTrait;
 use Validator\Containers\ValidatorContainer;
 
-class Validator {
+final class Validator {
     use SimpleTrait;
 
     const ANNOTATION_NAME = '@SyFilter'; //校验注解名称

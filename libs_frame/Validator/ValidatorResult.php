@@ -12,9 +12,6 @@ class ValidatorResult {
     const TYPE_STRING = 'string'; //校验器类型-字符串校验器
     const TYPE_DOUBLE = 'double'; //校验器类型-浮点数校验器
 
-    public function __construct() {
-    }
-
     /**
      * 字段解释
      * @var string
@@ -39,11 +36,11 @@ class ValidatorResult {
      */
     private $rules = [];
 
-    /**
-     * 错误信息
-     * @var string
-     */
-    private $error = '';
+    public function __construct() {
+    }
+
+    private function __clone(){
+    }
 
     /**
      * @param string $explain
@@ -76,10 +73,6 @@ class ValidatorResult {
         return $this->field;
     }
 
-    public function setError(string $error) {
-        $this->error = $error;
-    }
-
     /**
      * @return array
      */
@@ -100,10 +93,12 @@ class ValidatorResult {
      * @return string
      */
     public function getFullError(string $error) : string {
-        if (strlen($error . '') > 0) {
-            return strlen($this->explain) > 0 ? $this->explain . $error : $this->field . $error;
+        if(strlen($error) == 0){
+            return '';
+        } else if(strlen($this->explain) > 0){
+            return $this->explain . $error;
+        } else {
+            return $this->field . $error;
         }
-
-        return '';
     }
 }

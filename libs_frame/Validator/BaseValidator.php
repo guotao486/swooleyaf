@@ -5,7 +5,7 @@
  * Date: 2016/12/31 0031
  * Time: 18:09
  */
-namespace Validator\Base;
+namespace Validator;
 
 abstract class BaseValidator {
     public $validatorType = ''; //校验器类型
