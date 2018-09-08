@@ -8,7 +8,6 @@
 namespace Ali\Pay;
 
 use Ali\AliBase;
-use Ali\AliUtilBase;
 use Constant\ErrorCode;
 use Exception\Ali\AliPayException;
 
@@ -18,25 +17,21 @@ class TradeRefund extends AliBase {
      * @var string
      */
     private $out_trade_no = '';
-
     /**
      * 支付宝交易号
      * @var string
      */
     private $trade_no = '';
-
     /**
-     * 退款的金额，该金额不能大于订单金额,单位为元
+     * 退款的金额,该金额不能大于订单金额,单位为分
      * @var string
      */
     private $refund_amount = '';
-
     /**
      * 退款的原因说明
      * @var string
      */
     private $refund_reason = '';
-
     /**
      * 退款单号
      * @var string
@@ -57,7 +52,7 @@ class TradeRefund extends AliBase {
      */
     public function setOutTradeNo(string $outTradeNo) {
         if (ctype_digit($outTradeNo)) {
-            $this->setBizContent('out_trade_no', $outTradeNo);
+            $this->biz_content['out_trade_no'] = $outTradeNo;
         } else {
             throw new AliPayException('商户订单号不合法', ErrorCode::ALIPAY_PARAM_ERROR);
         }
@@ -69,7 +64,7 @@ class TradeRefund extends AliBase {
      */
     public function setTradeNo(string $tradeNo) {
         if (ctype_digit($tradeNo)) {
-            $this->setBizContent('trade_no', $tradeNo);
+            $this->biz_content['trade_no'] = $tradeNo;
         } else {
             throw new AliPayException('支付宝交易号不合法', ErrorCode::ALIPAY_PARAM_ERROR);
         }
@@ -81,7 +76,7 @@ class TradeRefund extends AliBase {
      */
     public function setRefundAmount(int $refundAmount) {
         if ($refundAmount > 0) {
-            $this->setBizContent('refund_amount', number_format(($refundAmount / 100), 2, '.', ''));
+            $this->biz_content['refund_amount'] = number_format(($refundAmount / 100), 2, '.', '');
         } else {
             throw new AliPayException('退款金额必须大于0', ErrorCode::ALIPAY_PARAM_ERROR);
         }
@@ -92,7 +87,7 @@ class TradeRefund extends AliBase {
      */
     public function setRefundReason(string $refundReason) {
         if (strlen($refundReason) > 0) {
-            $this->setBizContent('refund_reason', mb_substr($refundReason, 0, 80));
+            $this->biz_content['refund_reason'] = mb_substr($refundReason, 0, 80);
         }
     }
 
@@ -102,26 +97,23 @@ class TradeRefund extends AliBase {
      */
     public function setRefundNo(string $refundNo) {
         if (ctype_digit($refundNo)) {
-            $this->setBizContent('out_request_no', $refundNo);
+            $this->biz_content['out_request_no'] = $refundNo;
         } else {
             throw new AliPayException('退款单号不合法', ErrorCode::ALIPAY_PARAM_ERROR);
         }
     }
 
     public function getDetail() : array {
-        $bizContent = $this->getBizContent();
-        if ((!isset($bizContent['out_trade_no'])) && (!isset($bizContent['trade_no']))) {
+        if ((!isset($this->biz_content['out_trade_no'])) && !isset($this->biz_content['trade_no'])) {
             throw new AliPayException('商户订单号和支付宝交易号不能都为空', ErrorCode::ALIPAY_PARAM_ERROR);
         }
-        if (!isset($bizContent['refund_amount'])) {
+        if (!isset($this->biz_content['refund_amount'])) {
             throw new AliPayException('退款金额不能为空', ErrorCode::ALIPAY_PARAM_ERROR);
         }
-        if (!isset($bizContent['out_request_no'])) {
+        if (!isset($this->biz_content['out_request_no'])) {
             throw new AliPayException('退款单号不能为空', ErrorCode::ALIPAY_PARAM_ERROR);
         }
 
-        $resArr = $this->getContentArr();
-        $resArr['sign'] = AliUtilBase::createSign($resArr, $resArr['sign_type']);
-        return $resArr;
+        return $this->getContent();
     }
 }

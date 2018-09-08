@@ -7,6 +7,8 @@
  */
 namespace Ali;
 
+use Constant\ErrorCode;
+use Exception\Ali\AliPayException;
 use Tool\Tool;
 
 abstract class AliBase {
@@ -41,11 +43,6 @@ abstract class AliBase {
      */
     private $version = '';
     /**
-     * 业务请求参数的集合
-     * @var array
-     */
-    private $biz_content = [];
-    /**
      * 接口名称
      * @var string
      */
@@ -54,7 +51,28 @@ abstract class AliBase {
      * 响应标识
      * @var string
      */
-    private $responseTag = '';
+    private $response_tag = '';
+    /**
+     * 业务请求参数的集合
+     * @var array
+     */
+    protected $biz_content = [];
+    /**
+     * 主动通知地址
+     * @var string
+     */
+    protected $notify_url = '';
+    /**
+     * 同步通知地址
+     * @var string
+     */
+    protected $return_url = '';
+
+    /**
+     * 跳转基础url地址
+     * @var string
+     */
+    protected $return_baseurl = '';
 
     public function __construct(string $appId) {
         $this->app_id = $appId;
@@ -76,22 +94,34 @@ abstract class AliBase {
     }
 
     /**
-     * @param string $key 键名
-     * @param mixed $value 键值
+     * @param string $method
      */
-    protected function setBizContent(string $key, $value) {
-        $this->biz_content[$key] = $value;
+    protected function setMethod(string $method) {
+        $this->method = $method;
+        $this->response_tag = str_replace('.', '_', $method) . '_response';
     }
 
     /**
-     * @return array
+     * @return string
      */
-    protected function getBizContent() : array {
-        return $this->biz_content;
+    public function getResponseTag() : string {
+        return $this->response_tag;
     }
 
-    protected function getContentArr() : array {
-        return [
+    /**
+     * @param string $returnUrl
+     * @throws \Exception\Ali\AliPayException
+     */
+    public function setReturnUrl(string $returnUrl) {
+        if(preg_match('/^(http|https)\:\/\/\S+$/', $returnUrl) > 0) {
+            $this->return_url = $this->return_baseurl . urlencode($returnUrl);
+        } else {
+            throw new AliPayException('同步通知地址不合法', ErrorCode::ALIPAY_PARAM_ERROR);
+        }
+    }
+
+    protected function getContent() : array {
+        $content = [
             'app_id' => $this->app_id,
             'method' => $this->method,
             'format' => $this->format,
@@ -101,21 +131,14 @@ abstract class AliBase {
             'version' => $this->version,
             'biz_content' => Tool::jsonEncode($this->biz_content, JSON_UNESCAPED_UNICODE),
         ];
-    }
-
-    /**
-     * @param string $method
-     */
-    protected function setMethod(string $method) {
-        $this->method = $method;
-        $this->responseTag = str_replace('.', '_', $method) . '_response';
-    }
-
-    /**
-     * @return string
-     */
-    public function getResponseTag() : string {
-        return $this->responseTag;
+        if(strlen($this->notify_url) > 0){
+            $content['notify_url'] = $this->notify_url;
+        }
+        if(strlen($this->return_url) > 0){
+            $content['return_url'] = $this->return_url;
+        }
+        $content['sign'] = AliUtilBase::createSign($content, $this->sign_type);
+        return $content;
     }
 
     /**
