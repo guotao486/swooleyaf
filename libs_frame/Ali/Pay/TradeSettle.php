@@ -47,7 +47,7 @@ class TradeSettle extends AliBase {
      */
     public function setOutRequestNo(string $outRequestNo){
         if(ctype_digit($outRequestNo)){
-            $this->setBizContent('out_request_no', $outRequestNo);
+            $this->biz_content['out_request_no'] = $outRequestNo;
         } else {
             throw new AliPayException('结算请求流水号不合法', ErrorCode::ALIPAY_PARAM_ERROR);
         }
@@ -59,7 +59,7 @@ class TradeSettle extends AliBase {
      */
     public function setTradeNo(string $tradeNo){
         if(ctype_digit($tradeNo)){
-            $this->setBizContent('trade_no', $tradeNo);
+            $this->biz_content['trade_no'] = $tradeNo;
         } else {
             throw new AliPayException('订单号不合法', ErrorCode::ALIPAY_PARAM_ERROR);
         }
@@ -71,7 +71,7 @@ class TradeSettle extends AliBase {
      */
     public function setRoyaltyParameters(array $royaltyParameters){
         if(!empty($royaltyParameters)){
-            $this->setBizContent('royalty_parameters', $royaltyParameters);
+            $this->biz_content['royalty_parameters'] = $royaltyParameters;
         } else {
             throw new AliPayException('分账明细信息不合法', ErrorCode::ALIPAY_PARAM_ERROR);
         }
@@ -81,7 +81,7 @@ class TradeSettle extends AliBase {
      * @param string $operatorId
      */
     public function setOperatorId(string $operatorId){
-        $this->setBizContent('operator_id', trim($operatorId));
+        $this->biz_content['operator_id'] = trim($operatorId);
     }
 
     public function getDetail() : array {

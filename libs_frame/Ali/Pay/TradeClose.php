@@ -39,7 +39,7 @@ class TradeClose extends AliBase {
      */
     public function setOutTradeNo(string $outTradeNo) {
         if (ctype_digit($outTradeNo)) {
-            $this->setBizContent('out_trade_no', $outTradeNo);
+            $this->biz_content['out_trade_no'] = $outTradeNo;
         } else {
             throw new AliPayException('商户订单号不合法', ErrorCode::ALIPAY_PARAM_ERROR);
         }
@@ -51,7 +51,7 @@ class TradeClose extends AliBase {
      */
     public function setTradeNo(string $tradeNo) {
         if (ctype_digit($tradeNo)) {
-            $this->setBizContent('trade_no', $tradeNo);
+            $this->biz_content['trade_no'] = $tradeNo;
         } else {
             throw new AliPayException('支付宝交易号不合法', ErrorCode::ALIPAY_PARAM_ERROR);
         }

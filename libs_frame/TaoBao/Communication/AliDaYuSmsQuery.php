@@ -12,7 +12,7 @@ use Exception\Sms\AliDaYuException;
 use TaoBao\TaoBaoBase;
 use TaoBao\TaoBaoUtilBase;
 
-class AliSmsQuery extends TaoBaoBase {
+class AliDaYuSmsQuery extends TaoBaoBase {
     /**
      * 流水号
      * @var string

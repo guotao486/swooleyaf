@@ -104,8 +104,8 @@ class TradeCreate extends AliBase {
         parent::__construct($appId);
         $payConfig = AliConfigSingleton::getInstance()->getPayConfig($appId);
         $this->notify_url = $payConfig->getUrlNotify();
+        $this->biz_content['seller_id'] = $payConfig->getSellerId();
         $this->setMethod('alipay.trade.create');
-        $this->setBizContent('seller_id', $payConfig->getSellerId());
     }
 
     public function __clone(){
@@ -117,7 +117,7 @@ class TradeCreate extends AliBase {
      */
     public function setOutTradeNo(string $outTradeNo){
         if(ctype_digit($outTradeNo)){
-            $this->setBizContent('out_trade_no', $outTradeNo);
+            $this->biz_content['out_trade_no'] = $outTradeNo;
         } else {
             throw new AliPayException('商户订单号不合法', ErrorCode::ALIPAY_PARAM_ERROR);
         }
@@ -130,7 +130,7 @@ class TradeCreate extends AliBase {
     public function setTotalAmount(int $totalAmount){
         if(($totalAmount > 0) && ($totalAmount <= 10000000000)){
             $this->total_amount = $totalAmount;
-            $this->setBizContent('total_amount', number_format(($totalAmount / 100), 2, '.', ''));
+            $this->biz_content['total_amount'] = number_format(($totalAmount / 100), 2, '.', '');
         } else {
             throw new AliPayException('订单总金额不合法', ErrorCode::ALIPAY_PARAM_ERROR);
         }
@@ -143,7 +143,7 @@ class TradeCreate extends AliBase {
     public function setDiscountableAmount(int $discountableAmount){
         if(($discountableAmount > 0) && ($discountableAmount <= 10000000000)){
             $this->discountable_amount = $discountableAmount;
-            $this->setBizContent('discountable_amount', number_format(($discountableAmount / 100), 2, '.', ''));
+            $this->biz_content['discountable_amount'] = number_format(($discountableAmount / 100), 2, '.', '');
         } else {
             throw new AliPayException('可打折金额不合法', ErrorCode::ALIPAY_PARAM_ERROR);
         }
@@ -156,7 +156,7 @@ class TradeCreate extends AliBase {
     public function setSubject(string $subject){
         $title = mb_substr(trim($subject), 0, 128);
         if(strlen($title) > 0){
-            $this->setBizContent('subject', $title);
+            $this->biz_content['subject'] = $title;
         } else {
             throw new AliPayException('订单标题不合法', ErrorCode::ALIPAY_PARAM_ERROR);
         }
@@ -166,7 +166,7 @@ class TradeCreate extends AliBase {
      * @param string $body
      */
     public function setBody(string $body){
-        $this->setBizContent('body', substr(trim($body), 0, 128));
+        $this->biz_content['body'] = substr(trim($body), 0, 128);
     }
 
     /**
@@ -175,7 +175,7 @@ class TradeCreate extends AliBase {
      */
     public function setBuyerId(string $buyerId){
         if(ctype_digit($buyerId)){
-            $this->setBizContent('buyer_id', $buyerId);
+            $this->biz_content['buyer_id'] = $buyerId;
         } else {
             throw new AliPayException('买家支付宝用户ID不合法', ErrorCode::ALIPAY_PARAM_ERROR);
         }
@@ -186,7 +186,7 @@ class TradeCreate extends AliBase {
      */
     public function setGoodsDetail(array $goodsDetail){
         if(!empty($goodsDetail)){
-            $this->setBizContent('goods_detail', $goodsDetail);
+            $this->biz_content['goods_detail'] = $goodsDetail;
         }
     }
 
@@ -194,21 +194,21 @@ class TradeCreate extends AliBase {
      * @param string $operatorId
      */
     public function setOperatorId(string $operatorId){
-        $this->setBizContent('operator_id', trim($operatorId));
+        $this->biz_content['operator_id'] = trim($operatorId);
     }
 
     /**
      * @param string $storeId
      */
     public function setStoreId(string $storeId){
-        $this->setBizContent('store_id', trim($storeId));
+        $this->biz_content['store_id'] = trim($storeId);
     }
 
     /**
      * @param string $terminalId
      */
     public function setTerminalId(string $terminalId){
-        $this->setBizContent('terminal_id', trim($terminalId));
+        $this->biz_content['terminal_id'] = trim($terminalId);
     }
 
     /**
@@ -216,7 +216,7 @@ class TradeCreate extends AliBase {
      */
     public function setExtendParams(array $extendParams){
         if(!empty($extendParams)){
-            $this->setBizContent('extend_params', $extendParams);
+            $this->biz_content['extend_params'] = $extendParams;
         }
     }
 
@@ -225,7 +225,7 @@ class TradeCreate extends AliBase {
      */
     public function setTimeoutExpress(string $timeoutExpress){
         if(strlen($timeoutExpress) > 0){
-            $this->setBizContent('timeout_express', $timeoutExpress);
+            $this->biz_content['timeout_express'] = $timeoutExpress;
         }
     }
 
@@ -234,7 +234,7 @@ class TradeCreate extends AliBase {
      */
     public function setSettleInfo(array $settleInfo){
         if(!empty($settleInfo)){
-            $this->setBizContent('settle_info', $settleInfo);
+            $this->biz_content['settle_info'] = $settleInfo;
         }
     }
 
@@ -243,7 +243,7 @@ class TradeCreate extends AliBase {
      */
     public function setBusinessParams(array $businessParams){
         if(!empty($businessParams)){
-            $this->setBizContent('business_params', Tool::jsonEncode($businessParams, JSON_UNESCAPED_UNICODE));
+            $this->biz_content['business_params'] = Tool::jsonEncode($businessParams, JSON_UNESCAPED_UNICODE);
         }
     }
 
@@ -252,7 +252,7 @@ class TradeCreate extends AliBase {
      */
     public function setReceiverAddressInfo(array $receiverAddressInfo){
         if(!empty($receiverAddressInfo)){
-            $this->setBizContent('receiver_address_info', $receiverAddressInfo);
+            $this->biz_content['receiver_address_info'] = $receiverAddressInfo;
         }
     }
 
@@ -261,7 +261,7 @@ class TradeCreate extends AliBase {
      */
     public function setLogisticsDetail(array $logisticsDetail){
         if(!empty($logisticsDetail)){
-            $this->setBizContent('logistics_detail', $logisticsDetail);
+            $this->biz_content['logistics_detail'] = $logisticsDetail;
         }
     }
 

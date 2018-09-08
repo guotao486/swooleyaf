@@ -42,7 +42,7 @@ class BillDownload extends AliBase {
      */
     public function setBillType(string $billType) {
         if (in_array($billType, self::$billTypes)) {
-            $this->setBizContent('bill_type', $billType);
+            $this->biz_content['bill_type'] = $billType;
         } else {
             throw new AliPayException('账单类型不合法', ErrorCode::ALIPAY_PARAM_ERROR);
         }
@@ -54,7 +54,7 @@ class BillDownload extends AliBase {
      */
     public function setBillDate(string $billDate) {
         if (preg_match('/^\d{4}(\-\d{2}){1,2}$/', $billDate) > 0) {
-            $this->setBizContent('bill_date', $billDate);
+            $this->biz_content['bill_date'] = $billDate;
         } else {
             throw new AliPayException('账单时间不合法', ErrorCode::ALIPAY_PARAM_ERROR);
         }

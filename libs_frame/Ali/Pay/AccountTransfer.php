@@ -67,7 +67,7 @@ class AccountTransfer extends AliBase {
      */
     public function setOutBizNo(string $outBizNo){
         if (ctype_digit($outBizNo)) {
-            $this->setBizContent('out_biz_no', $outBizNo);
+            $this->biz_content['out_biz_no'] = $outBizNo;
         } else {
             throw new AliPayException('商户转账单号不合法', ErrorCode::ALIPAY_PARAM_ERROR);
         }
@@ -85,8 +85,8 @@ class AccountTransfer extends AliBase {
             throw new AliPayException('账户不能为空', ErrorCode::ALIPAY_PARAM_ERROR);
         }
 
-        $this->setBizContent('payee_type', $payeeType);
-        $this->setBizContent('payee_account', $payeeAccount);
+        $this->biz_content['payee_type'] = $payeeType;
+        $this->biz_content['payee_account'] = $payeeAccount;
     }
 
     /**
@@ -95,7 +95,7 @@ class AccountTransfer extends AliBase {
      */
     public function setAmount(int $amount){
         if($amount >= 10){
-            $this->setBizContent('amount', number_format(($amount / 100), 2, '.', ''));
+            $this->biz_content['amount'] = number_format(($amount / 100), 2, '.', '');
         } else {
             throw new AliPayException('转账金额必须大于0.1元', ErrorCode::ALIPAY_PARAM_ERROR);
         }
@@ -105,21 +105,21 @@ class AccountTransfer extends AliBase {
      * @param string $payerShowName
      */
     public function setPayerShowName(string $payerShowName){
-        $this->setBizContent('payer_show_name', $payerShowName);
+        $this->biz_content['payer_show_name'] = $payerShowName;
     }
 
     /**
      * @param string $payeeRealName
      */
     public function setPayeeRealName(string $payeeRealName){
-        $this->setBizContent('payee_real_name', $payeeRealName);
+        $this->biz_content['payee_real_name'] = $payeeRealName;
     }
 
     /**
      * @param string $remark
      */
     public function setRemark(string $remark){
-        $this->setBizContent('remark', $remark);
+        $this->biz_content['remark'] = $remark;
     }
 
     public function getDetail() : array {

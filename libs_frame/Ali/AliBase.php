@@ -94,14 +94,6 @@ abstract class AliBase {
     }
 
     /**
-     * @param string $key 键名
-     * @param mixed $value 键值
-     */
-    protected function setBizContent(string $key, $value) {
-        $this->biz_content[$key] = $value;
-    }
-
-    /**
      * @param string $method
      */
     protected function setMethod(string $method) {

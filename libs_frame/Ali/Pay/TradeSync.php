@@ -48,7 +48,7 @@ class TradeSync extends AliBase {
      */
     public function setTradeNo(string $tradeNo){
         if(ctype_digit($tradeNo)){
-            $this->setBizContent('trade_no', $tradeNo);
+            $this->biz_content['trade_no'] = $tradeNo;
         } else {
             throw new AliPayException('支付宝交易号不合法', ErrorCode::ALIPAY_PARAM_ERROR);
         }
@@ -60,7 +60,7 @@ class TradeSync extends AliBase {
      */
     public function setOutRequestNo(string $outRequestNo){
         if(ctype_digit($outRequestNo)){
-            $this->setBizContent('out_request_no', $outRequestNo);
+            $this->biz_content['out_request_no'] = $outRequestNo;
         } else {
             throw new AliPayException('商户订单号不合法', ErrorCode::ALIPAY_PARAM_ERROR);
         }
@@ -72,7 +72,7 @@ class TradeSync extends AliBase {
      */
     public function setBizType(string $bizType){
         if(strlen($bizType) > 0){
-            $this->setBizContent('biz_type', $bizType);
+            $this->biz_content['biz_type'] = $bizType;
         } else {
             throw new AliPayException('业务类型不合法', ErrorCode::ALIPAY_PARAM_ERROR);
         }
@@ -86,7 +86,7 @@ class TradeSync extends AliBase {
         if(empty($orderBizInfo)){
             throw new AliPayException('同步信息不合法', ErrorCode::ALIPAY_PARAM_ERROR);
         } else {
-            $this->setBizContent('order_biz_info', Tool::jsonEncode($orderBizInfo, JSON_UNESCAPED_UNICODE));
+            $this->biz_content['order_biz_info'] = Tool::jsonEncode($orderBizInfo, JSON_UNESCAPED_UNICODE);
         }
     }
 

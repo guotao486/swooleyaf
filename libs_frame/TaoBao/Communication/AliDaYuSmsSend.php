@@ -13,7 +13,7 @@ use TaoBao\TaoBaoBase;
 use TaoBao\TaoBaoUtilBase;
 use Tool\Tool;
 
-class AliSmsSend extends TaoBaoBase {
+class AliDaYuSmsSend extends TaoBaoBase {
     /**
      * 短信类型
      * @var string
