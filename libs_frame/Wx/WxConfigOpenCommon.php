@@ -153,7 +153,7 @@ class WxConfigOpenCommon {
      * @throws \Exception\Wx\WxOpenException
      */
     public function setAppId(string $appId) {
-        if(preg_match('/^[0-9a-z]{18}$/', $appId) > 0){
+        if(ctype_alnum($appId) && (strlen($appId) == 18)){
             $this->appId = $appId;
         } else {
             throw new WxOpenException('appid不合法', ErrorCode::WXOPEN_PARAM_ERROR);
@@ -172,7 +172,7 @@ class WxConfigOpenCommon {
      * @throws \Exception\Wx\WxOpenException
      */
     public function setSecret(string $secret) {
-        if(preg_match('/^[0-9a-z]{32}$/', $secret) > 0){
+        if(ctype_alnum($secret) && (strlen($secret) == 32)){
             $this->secret = $secret;
         } else {
             throw new WxOpenException('secret不合法', ErrorCode::WXOPEN_PARAM_ERROR);
@@ -191,7 +191,7 @@ class WxConfigOpenCommon {
      * @throws \Exception\Wx\WxOpenException
      */
     public function setToken(string $token) {
-        if(preg_match('/^[0-9a-zA-Z]{1,32}$/', $token) > 0){
+        if(ctype_alnum($token) && (strlen($token) <= 32)){
             $this->token = $token;
         } else {
             throw new WxOpenException('消息校验Token不合法', ErrorCode::WXOPEN_PARAM_ERROR);
@@ -210,7 +210,7 @@ class WxConfigOpenCommon {
      * @throws \Exception\Wx\WxOpenException
      */
     public function setAesKeyBefore(string $aesKeyBefore) {
-        if(preg_match('/^[0-9a-zA-Z]{43}$/', $aesKeyBefore) > 0){
+        if(ctype_alnum($aesKeyBefore) && (strlen($aesKeyBefore) == 43)){
             $this->aesKeyBefore = $aesKeyBefore;
         } else {
             throw new WxOpenException('旧消息加解密Key不合法', ErrorCode::WXOPEN_PARAM_ERROR);
@@ -229,7 +229,7 @@ class WxConfigOpenCommon {
      * @throws \Exception\Wx\WxOpenException
      */
     public function setAesKeyNow(string $aesKeyNow) {
-        if(preg_match('/^[0-9a-zA-Z]{43}$/', $aesKeyNow) > 0){
+        if(ctype_alnum($aesKeyNow) && (strlen($aesKeyNow) == 43)){
             $this->aesKeyNow = $aesKeyNow;
         } else {
             throw new WxOpenException('新消息加解密Key不合法', ErrorCode::WXOPEN_PARAM_ERROR);
