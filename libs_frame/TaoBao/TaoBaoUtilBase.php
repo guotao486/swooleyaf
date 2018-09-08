@@ -8,7 +8,6 @@
 namespace TaoBao;
 
 use Constant\ErrorCode;
-use DesignPatterns\Singletons\SmsConfigSingleton;
 use Log\Log;
 use Tool\Tool;
 use Traits\SimpleTrait;
@@ -21,10 +20,10 @@ abstract class TaoBaoUtilBase {
     /**
      * 生成签名字符串
      * @param array $data 参数数组
+     * @param string $appSecret 应用密钥
      * @return void
      */
-    public static function createSign(array &$data){
-        $appSecret = SmsConfigSingleton::getInstance()->getDaYuConfig()->getAppSecret();
+    public static function createSign(array &$data,string $appSecret){
         unset($data['sign']);
         ksort($data);
         $needStr = $appSecret;

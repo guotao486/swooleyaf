@@ -8,7 +8,7 @@
 namespace TaoBao;
 
 use Constant\ErrorCode;
-use Exception\Sms\AliDaYuException;
+use Exception\TaoBao\AliDaYu\SmsException;
 use Tool\Tool;
 
 class ConfigDaYu {
@@ -42,13 +42,13 @@ class ConfigDaYu {
 
     /**
      * @param string $appKey
-     * @throws \Exception\Sms\AliDaYuException
+     * @throws \Exception\TaoBao\AliDaYu\SmsException
      */
     public function setAppKey(string $appKey) {
         if (ctype_alnum($appKey)) {
             $this->appKey = $appKey;
         } else {
-            throw new AliDaYuException('app key不合法', ErrorCode::SMS_PARAM_ERROR);
+            throw new SmsException('app key不合法', ErrorCode::SMS_PARAM_ERROR);
         }
     }
 
@@ -61,13 +61,13 @@ class ConfigDaYu {
 
     /**
      * @param string $appSecret
-     * @throws \Exception\Sms\AliDaYuException
+     * @throws \Exception\TaoBao\AliDaYu\SmsException
      */
     public function setAppSecret(string $appSecret) {
         if (ctype_alnum($appSecret)) {
             $this->appSecret = $appSecret;
         } else {
-            throw new AliDaYuException('app secret不合法', ErrorCode::SMS_PARAM_ERROR);
+            throw new SmsException('app secret不合法', ErrorCode::SMS_PARAM_ERROR);
         }
     }
 
