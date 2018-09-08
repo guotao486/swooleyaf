@@ -8,7 +8,7 @@
 namespace Validator\Impl\String;
 
 use Constant\Project;
-use Validator\Base\BaseValidator;
+use Validator\BaseValidator;
 use Validator\ValidatorService;
 
 class StringAlnum extends BaseValidator implements ValidatorService {

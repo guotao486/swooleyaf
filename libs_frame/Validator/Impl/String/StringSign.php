@@ -12,7 +12,7 @@ use Constant\Project;
 use Exception\Validator\ValidatorException;
 use Request\RequestSign;
 use SyServer\HttpServer;
-use Validator\Base\BaseValidator;
+use Validator\BaseValidator;
 use Validator\ValidatorService;
 
 class StringSign extends BaseValidator implements ValidatorService {

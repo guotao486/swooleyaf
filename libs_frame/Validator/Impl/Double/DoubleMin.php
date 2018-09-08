@@ -8,7 +8,7 @@
 namespace Validator\Impl\Double;
 
 use Constant\Project;
-use Validator\Base\BaseValidator;
+use Validator\BaseValidator;
 use Validator\ValidatorService;
 
 class DoubleMin  extends BaseValidator implements ValidatorService {

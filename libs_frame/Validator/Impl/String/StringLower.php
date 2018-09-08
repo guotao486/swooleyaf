@@ -8,7 +8,7 @@
 namespace Validator\Impl\String;
 
 use Constant\Project;
-use Validator\Base\BaseValidator;
+use Validator\BaseValidator;
 use Validator\ValidatorService;
 
 class StringLower extends BaseValidator implements ValidatorService {
