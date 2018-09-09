@@ -78,7 +78,7 @@ abstract class MapBaseBaiDu extends MapBase {
         $this->reqMethod = 'GET';
     }
 
-    public function getServiceUrl() {
+    protected function getServiceUrl() {
         return $this->serviceDomain . $this->serviceUri;
     }
 
