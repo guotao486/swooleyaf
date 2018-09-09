@@ -7,8 +7,125 @@
  */
 namespace Map;
 
+use Constant\ErrorCode;
+use DesignPatterns\Singletons\MapSingleton;
+use Exception\Map\BaiduMapException;
+
 abstract class MapBaseBaiDu extends MapBase {
+    const CHECK_TYPE_SERVER_IP = 'server-ip'; //校验类型-服务端ip
+    const CHECK_TYPE_SERVER_SN = 'server-sn'; //校验类型-服务端签名
+    const CHECK_TYPE_BROWSE = 'browse'; //校验类型-浏览器
+
+    public $checkTypes = [
+        self::CHECK_TYPE_SERVER_IP => 1,
+        self::CHECK_TYPE_SERVER_SN => 1,
+        self::CHECK_TYPE_BROWSE => 1,
+    ];
+
+    /**
+     * 应用密钥
+     * @var string
+     */
+    private $ak = '';
+    /**
+     * 输出格式
+     * @var string
+     */
+    private $output = '';
+    /**
+     * 服务域名
+     * @var string
+     */
+    private $serviceDomain = '';
+    /**
+     * 校验类型
+     * @var string
+     */
+    private $checkType = '';
+    /**
+     * 请求方式
+     * @var string
+     */
+    private $reqMethod = '';
+    /**
+     * 用户签名
+     * @var string
+     */
+    private $sk = '';
+    /**
+     * 请求引用地址
+     * @var string
+     */
+    private $reqReferer = '';
+    /**
+     * 服务uri
+     * @var string
+     */
+    protected $serviceUri = '';
+    /**
+     * 请求数据
+     * @var array
+     */
+    protected $reqData = [];
+
     public function __construct(){
         parent::__construct();
+        $this->serviceDomain = 'http://api.map.baidu.com';
+        $this->ak = MapSingleton::getInstance()->getBaiduConfig()->getAk();
+        $this->output = 'json';
+        $this->checkType = self::CHECK_TYPE_SERVER_IP;
+        $this->reqMethod = 'GET';
+    }
+
+    public function getServiceUrl() {
+        return $this->serviceDomain . $this->serviceUri;
+    }
+
+    /**
+     * @param string $checkType
+     * @throws \Exception\Map\BaiduMapException
+     */
+    public function setCheckType(string $checkType) {
+        if(isset($this->checkTypes[$checkType])){
+            $this->checkType = $checkType;
+        } else {
+            throw new BaiduMapException('校验类型不支持', ErrorCode::MAP_BAIDU_PARAM_ERROR);
+        }
+    }
+
+    /**
+     * @param string $reqMethod
+     * @throws \Exception\Map\BaiduMapException
+     */
+    public function setReqMethod(string $reqMethod) {
+        if(in_array($reqMethod, ['GET', 'POST'], true)){
+            $this->reqMethod = $reqMethod;
+        } else {
+            throw new BaiduMapException('请求方式不支持', ErrorCode::MAP_BAIDU_PARAM_ERROR);
+        }
+    }
+
+    /**
+     * @param string $sk
+     * @throws \Exception\Map\BaiduMapException
+     */
+    public function setSk(string $sk) {
+        if (ctype_alnum($sk) && (strlen($sk) == 32)) {
+            $this->sk = $sk;
+        } else {
+            throw new BaiduMapException('用户签名不合法', ErrorCode::MAP_BAIDU_PARAM_ERROR);
+        }
+    }
+
+    /**
+     * @param string $reqReferer
+     * @throws \Exception\Map\BaiduMapException
+     */
+    public function setReqReferer(string $reqReferer) {
+        if(preg_match('/^(http|https)\:\/\/\S+$/', $reqReferer) > 0){
+            $this->reqReferer = $reqReferer;
+        } else {
+            throw new BaiduMapException('请求引用地址不合法', ErrorCode::MAP_BAIDU_PARAM_ERROR);
+        }
     }
 }
