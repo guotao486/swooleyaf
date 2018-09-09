@@ -28,6 +28,11 @@ abstract class MapBaseBaiDu extends MapBase {
      */
     private $ak = '';
     /**
+     * 服务端IP
+     * @var string
+     */
+    private $serverIp = '';
+    /**
      * 输出格式
      * @var string
      */
@@ -62,16 +67,12 @@ abstract class MapBaseBaiDu extends MapBase {
      * @var string
      */
     protected $serviceUri = '';
-    /**
-     * 请求数据
-     * @var array
-     */
-    protected $reqData = [];
 
     public function __construct(){
         parent::__construct();
         $this->serviceDomain = 'http://api.map.baidu.com';
         $this->ak = MapSingleton::getInstance()->getBaiduConfig()->getAk();
+        $this->serverIp = MapSingleton::getInstance()->getBaiduConfig()->getServerIp();
         $this->output = 'json';
         $this->checkType = self::CHECK_TYPE_SERVER_IP;
         $this->reqMethod = 'GET';
@@ -127,5 +128,41 @@ abstract class MapBaseBaiDu extends MapBase {
         } else {
             throw new BaiduMapException('请求引用地址不合法', ErrorCode::MAP_BAIDU_PARAM_ERROR);
         }
+    }
+
+    protected function getContent() : array {
+        $this->reqData['ak'] = $this->ak;
+        $this->reqData['output'] = $this->output;
+        switch ($this->checkType) {
+            case self::CHECK_TYPE_SERVER_IP:
+                $this->curlConfigs[CURLOPT_HTTPHEADER] = [
+                    'X-FORWARDED-FOR: ' . $this->serverIp,
+                    'CLIENT-IP: ' . $this->serverIp,
+                ];
+                break;
+            case self::CHECK_TYPE_SERVER_SN:
+                if(strlen($this->sk) == 0){
+                    throw new BaiduMapException('签名校验码不能为空', ErrorCode::MAP_BAIDU_PARAM_ERROR);
+                }
+                if ($this->reqMethod === 'POST'){
+                    ksort($this->reqData);
+                }
+
+                $snStr = $this->serviceUri . '?' . http_build_query($this->reqData) . $this->sk;
+                $this->reqData['sn'] = md5(urlencode($snStr));
+                break;
+            case self::CHECK_TYPE_BROWSE:
+                if(strlen($this->reqReferer) == 0){
+                    throw new BaiduMapException('请求引用地址不能为空', ErrorCode::MAP_BAIDU_PARAM_ERROR);
+                }
+
+                $this->curlConfigs[CURLOPT_REFERER] = $this->reqReferer;
+                $this->curlConfigs[CURLOPT_USERAGENT] = 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/536.11 (KHTML, like Gecko) Chrome/20.0.1132.57 Safari/536.11';
+                break;
+            default:
+                break;
+        }
+
+        return $this->reqData;
     }
 }

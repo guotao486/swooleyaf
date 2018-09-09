@@ -8,7 +8,25 @@
 namespace Map;
 
 abstract class MapBase {
+    /**
+     * curl配置
+     * @var array
+     */
+    protected $curlConfigs = [];
+    /**
+     * 请求数据
+     * @var array
+     */
+    protected $reqData = [];
+
     public function __construct(){
+    }
+
+    /**
+     * @return array
+     */
+    public function getCurlConfigs() : array {
+        return $this->curlConfigs;
     }
 
     abstract protected function getContent() : array;
