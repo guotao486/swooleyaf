@@ -2,28 +2,25 @@
 /**
  * Created by PhpStorm.
  * User: 姜伟
- * Date: 2017/6/20 0020
- * Time: 14:05
+ * Date: 18-9-9
+ * Time: 下午12:40
  */
-namespace Map\Tencent;
+namespace Map;
 
 use Constant\ErrorCode;
-use DesignPatterns\Singletons\MapTencentSingleton;
+use DesignPatterns\Singletons\MapSingleton;
 use Exception\Map\TencentMapException;
-use Map\MapBaseSimpleTrait;
 
-abstract class MapBase {
-    use MapBaseSimpleTrait;
-
+abstract class MapBaseTencent extends MapBase {
     const GET_TYPE_SERVER = 'server'; //获取类型-服务端
     const GET_TYPE_MOBILE = 'mobile'; //获取类型-移动端
     const GET_TYPE_BROWSE = 'browse'; //获取类型-网页端
 
-    public function __construct() {
-        $this->serverIp = MapTencentSingleton::getInstance()->getConfig()->getServerIp();
-        $this->output = 'json';
-    }
-
+    /**
+     * 返回格式,默认JSON
+     * @var string
+     */
+    private $key = '';
     /**
      * 服务端IP
      * @var string
@@ -44,19 +41,23 @@ abstract class MapBase {
      * @var string
      */
     private $output = '';
-
     /**
-     * @return string
+     * 获取类型
+     * @var string
      */
-    public function getServerIp() : string {
-        return $this->serverIp;
-    }
-
+    private $getType = '';
     /**
-     * @return string
+     * 服务请求地址
+     * @var string
      */
-    public function getWebUrl() : string {
-        return $this->webUrl;
+    protected $serviceUrl = '';
+
+    public function __construct(){
+        parent::__construct();
+        $this->serverIp = MapSingleton::getInstance()->getTencentConfig()->getServerIp();
+        $this->getType = self::GET_TYPE_SERVER;
+        $this->reqData['output'] = 'json';
+        $this->reqData['key'] = MapSingleton::getInstance()->getTencentConfig()->getKey();
     }
 
     /**
@@ -69,13 +70,6 @@ abstract class MapBase {
         } else {
             throw new TencentMapException('页面URL不合法', ErrorCode::MAP_TENCENT_PARAM_ERROR);
         }
-    }
-
-    /**
-     * @return string
-     */
-    public function getAppIdentifier() : string {
-        return $this->appIdentifier;
     }
 
     /**
@@ -92,48 +86,43 @@ abstract class MapBase {
     }
 
     /**
-     * @return string
-     */
-    public function getOutput() : string {
-        return $this->output;
-    }
-
-    /**
-     * 通过类型获取内容
      * @param string $getType
-     * @param array $configs
-     * @return void
      * @throws \Exception\Map\TencentMapException
      */
-    public function getContentByType(string $getType,array &$configs) {
-        switch ($getType) {
+    public function setGetType(string $getType){
+        if(in_array($getType, [self::GET_TYPE_MOBILE, self::GET_TYPE_SERVER, self::GET_TYPE_BROWSE])){
+            $this->getType = $getType;
+        } else {
+            throw new TencentMapException('获取类型不合法', ErrorCode::MAP_TENCENT_PARAM_ERROR);
+        }
+    }
+
+    protected function getContent() : array {
+        switch ($this->getType) {
             case self::GET_TYPE_BROWSE:
                 if(strlen($this->webUrl) == 0){
                     throw new TencentMapException('页面URL不能为空', ErrorCode::MAP_TENCENT_PARAM_ERROR);
                 }
 
-                $configs['referer'] = $this->webUrl;
+                $this->curlConfigs[CURLOPT_REFERER] = $this->webUrl;
+                $this->curlConfigs[CURLOPT_USERAGENT] = 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/536.11 (KHTML, like Gecko) Chrome/20.0.1132.57 Safari/536.11';
                 break;
             case self::GET_TYPE_SERVER:
-                if(isset($configs['headers']) && is_array($configs['headers'])){
-                    $configs['headers'][] = 'X-FORWARDED-FOR:' . $this->serverIp;
-                    $configs['headers'][] = 'CLIENT-IP:' . $this->serverIp;
-                } else {
-                    $configs['headers'] = [
-                        'X-FORWARDED-FOR:' . $this->serverIp,
-                        'CLIENT-IP:' . $this->serverIp,
-                    ];
-                }
+                $this->curlConfigs[CURLOPT_HTTPHEADER] = [
+                    'X-FORWARDED-FOR: ' . $this->serverIp,
+                    'CLIENT-IP: ' . $this->serverIp,
+                ];
                 break;
             case self::GET_TYPE_MOBILE:
                 if(strlen($this->appIdentifier) == 0){
                     throw new TencentMapException('应用标识符不能为空', ErrorCode::MAP_TENCENT_PARAM_ERROR);
                 }
 
-                $configs['referer'] = $this->appIdentifier;
+                $this->curlConfigs[CURLOPT_REFERER] = $this->appIdentifier;
                 break;
-            default:
-                throw new TencentMapException('获取类型不支持', ErrorCode::MAP_TENCENT_PARAM_ERROR);
         }
+        $this->curlConfigs[CURLOPT_CUSTOMREQUEST] = 'POST';
+        $this->curlConfigs[CURLOPT_URL] = $this->serviceUrl . '?' . http_build_query($this->reqData);
+        return $this->curlConfigs;
     }
 }

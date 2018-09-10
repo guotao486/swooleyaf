@@ -2,15 +2,15 @@
 /**
  * Created by PhpStorm.
  * User: 姜伟
- * Date: 2018/8/17 0017
- * Time: 15:14
+ * Date: 18-9-9
+ * Time: 下午12:27
  */
-namespace Map\BaiDu;
+namespace Map;
 
 use Constant\ErrorCode;
 use Exception\Map\BaiduMapException;
 
-class MapConfig {
+class ConfigBaiDu {
     /**
      * 开发密钥
      * @var string
@@ -40,7 +40,7 @@ class MapConfig {
      * @throws \Exception\Map\BaiduMapException
      */
     public function setAk(string $ak){
-        if(preg_match('/^[0-9a-zA-Z]{32}$/', $ak) > 0){
+        if(ctype_alnum($ak) && (strlen($ak) == 32)){
             $this->ak = $ak;
         } else {
             throw new BaiduMapException('密钥不合法', ErrorCode::MAP_BAIDU_PARAM_ERROR);

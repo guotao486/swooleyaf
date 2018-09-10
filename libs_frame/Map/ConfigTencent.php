@@ -2,15 +2,15 @@
 /**
  * Created by PhpStorm.
  * User: 姜伟
- * Date: 2018/8/17 0017
- * Time: 15:14
+ * Date: 18-9-9
+ * Time: 下午12:28
  */
-namespace Map\Tencent;
+namespace Map;
 
 use Constant\ErrorCode;
 use Exception\Map\TencentMapException;
 
-class MapConfig {
+class ConfigTencent {
     /**
      * 开发密钥
      * @var string

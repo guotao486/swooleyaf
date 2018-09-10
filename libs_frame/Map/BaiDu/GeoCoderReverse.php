@@ -2,26 +2,16 @@
 /**
  * Created by PhpStorm.
  * User: 姜伟
- * Date: 2018/8/17 0017
- * Time: 11:41
+ * Date: 2018/9/10 0010
+ * Time: 9:20
  */
 namespace Map\BaiDu;
 
 use Constant\ErrorCode;
 use Exception\Map\BaiduMapException;
-use Map\MapSimpleTrait;
+use Map\MapBaseBaiDu;
 
-class GeoCoderReverse extends MapBase {
-    use MapSimpleTrait;
-
-    public function __construct(){
-        parent::__construct();
-        $this->coordType = 'bd09ll';
-        $this->coordTypeReturn = 'bd09ll';
-        $this->poiStatus = 0;
-        $this->poiRadius = 1000;
-    }
-
+class GeoCoderReverse extends MapBaseBaiDu {
     /**
      * 坐标地址
      * @var string
@@ -48,11 +38,12 @@ class GeoCoderReverse extends MapBase {
      */
     private $poiRadius = 0;
 
-    /**
-     * @return string
-     */
-    public function getLocation() : string {
-        return $this->location;
+    public function __construct(){
+        parent::__construct();
+        $this->serviceUri = '/geocoder/v2/';
+    }
+
+    public function __clone(){
     }
 
     /**
@@ -60,73 +51,44 @@ class GeoCoderReverse extends MapBase {
      * @param double $lng 经度
      */
     public function setLocation($lat, $lng){
-        $this->location = $lat . ',' . $lng;
-    }
-
-    /**
-     * @return string
-     */
-    public function getCoordType() : string {
-        return $this->coordType;
+        $this->reqData['location'] = $lat . ',' . $lng;
     }
 
     /**
      * @param string $coordType
      */
     public function setCoordType(string $coordType){
-        $this->coordType = $coordType;
-        $this->coordTypeReturn = $coordType;
-    }
-
-    /**
-     * @return string
-     */
-    public function getCoordTypeReturn() : string {
-        return $this->coordTypeReturn;
+        $this->reqData['coordtype'] = $coordType;
+        $this->reqData['ret_coordtype'] = $coordType;
     }
 
     /**
      * @param string $coordTypeReturn
      */
     public function setCoordTypeReturn(string $coordTypeReturn){
-        $this->coordTypeReturn = $coordTypeReturn;
-    }
-
-    /**
-     * @return int
-     */
-    public function getPoiStatus() : int {
-        return $this->poiStatus;
+        $this->reqData['ret_coordtype'] = $coordTypeReturn;
     }
 
     /**
      * @param int $poiStatus
      * @throws \Exception\Map\BaiduMapException
      */
-    public function setPoiStatus(int $poiStatus){
-        if(in_array($poiStatus, [0, 1])){
-            $this->poiStatus = $poiStatus;
-        } else {
+    public function setPoiStatusAndRadius(int $poiStatus,int $poiRadius){
+        if(!in_array($poiStatus, [0, 1])){
             throw new BaiduMapException('poi召回状态不合法', ErrorCode::MAP_BAIDU_PARAM_ERROR);
-        }
-    }
-
-    /**
-     * @return int
-     */
-    public function getPoiRadius() : int {
-        return $this->poiRadius;
-    }
-
-    /**
-     * @param int $poiRadius
-     * @throws \Exception\Map\BaiduMapException
-     */
-    public function setPoiRadius(int $poiRadius){
-        if(($poiRadius >= 0) && ($poiRadius <= 1000)){
-            $this->poiRadius = $poiRadius;
-        } else {
+        } else if(($poiRadius < 0) || ($poiRadius > 1000)){
             throw new BaiduMapException('poi召回半径不合法', ErrorCode::MAP_BAIDU_PARAM_ERROR);
         }
+
+        $this->reqData['pois'] = $poiStatus;
+        $this->reqData['radius'] = $poiRadius;
+    }
+
+    public function getDetail() : array {
+        if(!isset($this->reqData['location'])){
+            throw new BaiduMapException('坐标地址不能为空', ErrorCode::MAP_BAIDU_PARAM_ERROR);
+        }
+
+        return $this->getContent();
     }
 }

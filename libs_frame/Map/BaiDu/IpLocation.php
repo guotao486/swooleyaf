@@ -1,27 +1,20 @@
 <?php
 /**
- * IP定位
- * User: jw
- * Date: 17-6-21
- * Time: 上午12:07
+ * Created by PhpStorm.
+ * User: 姜伟
+ * Date: 2018/9/10 0010
+ * Time: 9:39
  */
 namespace Map\BaiDu;
 
 use Constant\ErrorCode;
 use Exception\Map\BaiduMapException;
-use Map\MapSimpleTrait;
+use Map\MapBaseBaiDu;
 
-class IpLocation extends MapBase {
-    use MapSimpleTrait;
-
+class IpLocation extends MapBaseBaiDu {
     const COORD_TYPE_BD_MC = ''; //坐标类型-百度墨卡托
     const COORD_TYPE_BD = 'bd09ll'; //坐标类型-百度
     const COORD_TYPE_GCJ = 'gcj02'; //坐标类型-国测局
-
-    public function __construct() {
-        parent::__construct();
-        $this->returnCoordType = self::COORD_TYPE_BD;
-    }
 
     /**
      * IP
@@ -34,11 +27,12 @@ class IpLocation extends MapBase {
      */
     private $returnCoordType = '';
 
-    /**
-     * @return string
-     */
-    public function getIp() : string {
-        return $this->ip;
+    public function __construct(){
+        parent::__construct();
+        $this->serviceUri = '/location/ip';
+    }
+
+    public function __clone(){
     }
 
     /**
@@ -47,17 +41,10 @@ class IpLocation extends MapBase {
      */
     public function setIp(string $ip) {
         if (preg_match('/^(\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])){4}$/', '.' . $ip) > 0) {
-            $this->ip = $ip;
+            $this->reqData['ip'] = $ip;
         } else {
             throw new BaiduMapException('ip不合法', ErrorCode::MAP_BAIDU_PARAM_ERROR);
         }
-    }
-
-    /**
-     * @return string
-     */
-    public function getReturnCoordType() : string {
-        return $this->returnCoordType;
     }
 
     /**
@@ -66,9 +53,17 @@ class IpLocation extends MapBase {
      */
     public function setReturnCoordType(string $returnCoordType) {
         if (in_array($returnCoordType, [self::COORD_TYPE_BD_MC, self::COORD_TYPE_BD, self::COORD_TYPE_GCJ], true)) {
-            $this->returnCoordType = $returnCoordType;
+            $this->reqData['coor'] = $returnCoordType;
         } else {
             throw new BaiduMapException('返回坐标类型不支持', ErrorCode::MAP_BAIDU_PARAM_ERROR);
         }
+    }
+
+    public function getDetail() : array {
+        if(!isset($this->reqData['ip'])){
+            throw new BaiduMapException('ip不能为空', ErrorCode::MAP_BAIDU_PARAM_ERROR);
+        }
+
+        return $this->getContent();
     }
 }
