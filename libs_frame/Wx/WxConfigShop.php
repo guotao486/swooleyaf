@@ -102,7 +102,7 @@ class WxConfigShop {
      * @throws \Exception\WX\WxException
      */
     public function setClientIp(string $clientIp) {
-        if(preg_match('/^(\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5]){4}$/', '.' . $clientIp) > 0){
+        if(preg_match('/^(\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])){4}$/', '.' . $clientIp) > 0){
             $this->clientIp = $clientIp;
         } else {
             throw new WxException('客户端IP不合法', ErrorCode::WX_PARAM_ERROR);

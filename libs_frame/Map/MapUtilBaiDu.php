@@ -32,12 +32,13 @@ final class MapUtilBaiDu extends MapUtilBase {
 
         $sendData = Tool::jsonDecode($sendRes);
         if(isset($sendData['status']) && ($sendData['status'] == 0)){
-            $resArr['data'] = $sendData;
+            $rspKey = $mapBase->getRspDataKey();
+            $resArr['data'] = strlen($rspKey) > 0 ? $sendData[$rspKey] : $sendData;
         } else if(isset($sendData['message'])){
             $resArr['code'] = ErrorCode::MAP_BAIDU_PARAM_ERROR;
             $resArr['message'] = $sendData['message'];
         } else {
-            $resArr['code'] = ErrorCode::MAP_BAIDU_GET_ERROR;
+            $resArr['code'] = ErrorCode::MAP_BAIDU_PARAM_ERROR;
             $resArr['message'] = '解析响应数据出错';
         }
 

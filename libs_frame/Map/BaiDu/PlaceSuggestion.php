@@ -2,25 +2,17 @@
 /**
  * Created by PhpStorm.
  * User: 姜伟
- * Date: 2018/8/18 0018
- * Time: 9:02
+ * Date: 2018/9/10 0010
+ * Time: 11:37
  */
 namespace Map\BaiDu;
 
 use Constant\ErrorCode;
 use Exception\Map\BaiduMapException;
-use Map\MapSimpleTrait;
+use Map\MapBaseBaiDu;
+use Tool\Tool;
 
-class PlaceSuggestion extends MapBase {
-    use MapSimpleTrait;
-
-    public function __construct(){
-        parent::__construct();
-        $this->cityLimit = 'true';
-        $this->coordType = 3;
-        $this->coordTypeReturn = 'bd09ll';
-    }
-
+class PlaceSuggestion extends MapBaseBaiDu {
     /**
      * 关键词
      * @var string
@@ -52,11 +44,16 @@ class PlaceSuggestion extends MapBase {
      */
     private $coordTypeReturn = '';
 
-    /**
-     * @return string
-     */
-    public function getKeyword() : string {
-        return $this->keyword;
+    public function __construct(){
+        parent::__construct();
+        $this->serviceUri = '/place/v2/suggestion';
+        $this->reqData['city_limit'] = 'true';
+        $this->reqData['coord_type'] = 3;
+        $this->reqData['ret_coordtype'] = 'bd09ll';
+        $this->reqData['timestamp'] = Tool::getNowTime();
+    }
+
+    public function __clone(){
     }
 
     /**
@@ -65,17 +62,10 @@ class PlaceSuggestion extends MapBase {
      */
     public function setKeyword(string $keyword){
         if(strlen($keyword) > 0){
-            $this->keyword = $keyword;
+            $this->reqData['query'] = $keyword;
         } else {
             throw new BaiduMapException('关键词不能为空', ErrorCode::MAP_BAIDU_PARAM_ERROR);
         }
-    }
-
-    /**
-     * @return string
-     */
-    public function getRegion() : string {
-        return $this->region;
     }
 
     /**
@@ -84,17 +74,10 @@ class PlaceSuggestion extends MapBase {
      */
     public function setRegion(string $region){
         if(strlen($region) > 0){
-            $this->region = $region;
+            $this->reqData['region'] = $region;
         } else {
             throw new BaiduMapException('区域不能为空', ErrorCode::MAP_BAIDU_PARAM_ERROR);
         }
-    }
-
-    /**
-     * @return string
-     */
-    public function getCityLimit() : string {
-        return $this->cityLimit;
     }
 
     /**
@@ -103,17 +86,10 @@ class PlaceSuggestion extends MapBase {
      */
     public function setCityLimit(string $cityLimit){
         if(in_array($cityLimit, ['true', 'false'])){
-            $this->cityLimit = $cityLimit;
+            $this->reqData['city_limit'] = $cityLimit;
         } else {
             throw new BaiduMapException('区域限制不合法', ErrorCode::MAP_BAIDU_PARAM_ERROR);
         }
-    }
-
-    /**
-     * @return string
-     */
-    public function getLocation() : string {
-        return $this->location;
     }
 
     /**
@@ -121,14 +97,7 @@ class PlaceSuggestion extends MapBase {
      * @param double $lng
      */
     public function setLocation($lat, $lng){
-        $this->location = $lat . ',' . $lng;
-    }
-
-    /**
-     * @return int
-     */
-    public function getCoordType() : int {
-        return $this->coordType;
+        $this->reqData['location'] = $lat . ',' . $lng;
     }
 
     /**
@@ -137,17 +106,10 @@ class PlaceSuggestion extends MapBase {
      */
     public function setCoordType(int $coordType){
         if(in_array($coordType, [1, 2, 3, 4,])){
-            $this->coordType = $coordType;
+            $this->reqData['coord_type'] = $coordType;
         } else {
             throw new BaiduMapException('坐标类型不合法', ErrorCode::MAP_BAIDU_PARAM_ERROR);
         }
-    }
-
-    /**
-     * @return string
-     */
-    public function getCoordTypeReturn() : string {
-        return $this->coordTypeReturn;
     }
 
     /**
@@ -156,9 +118,19 @@ class PlaceSuggestion extends MapBase {
      */
     public function setCoordTypeReturn(string $coordTypeReturn){
         if(strlen($coordTypeReturn) > 0){
-            $this->coordTypeReturn = $coordTypeReturn;
+            $this->reqData['ret_coordtype'] = $coordTypeReturn;
         } else {
             throw new BaiduMapException('返回坐标类型不能为空', ErrorCode::MAP_BAIDU_PARAM_ERROR);
         }
+    }
+
+    public function getDetail() : array {
+        if(!isset($this->reqData['query'])){
+            throw new BaiduMapException('关键词不能为空', ErrorCode::MAP_BAIDU_PARAM_ERROR);
+        } else if(!isset($this->reqData['region'])){
+            throw new BaiduMapException('地区不能为空', ErrorCode::MAP_BAIDU_PARAM_ERROR);
+        }
+
+        return $this->getContent();
     }
 }

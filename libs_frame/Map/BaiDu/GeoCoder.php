@@ -2,23 +2,16 @@
 /**
  * Created by PhpStorm.
  * User: 姜伟
- * Date: 2018/8/17 0017
- * Time: 11:40
+ * Date: 18-9-9
+ * Time: 下午3:14
  */
 namespace Map\BaiDu;
 
 use Constant\ErrorCode;
 use Exception\Map\BaiduMapException;
-use Map\MapSimpleTrait;
+use Map\MapBaseBaiDu;
 
-class GeoCoder extends MapBase {
-    use MapSimpleTrait;
-
-    public function __construct(){
-        parent::__construct();
-        $this->coordTypeReturn = 'bd09ll';
-    }
-
+class GeoCoder extends MapBaseBaiDu {
     /**
      * 地址
      * @var string
@@ -35,11 +28,12 @@ class GeoCoder extends MapBase {
      */
     private $coordTypeReturn = '';
 
-    /**
-     * @return string
-     */
-    public function getAddress() : string {
-        return $this->address;
+    public function __construct(){
+        parent::__construct();
+        $this->serviceUri = '/geocoder/v2/';
+    }
+
+    public function __clone(){
     }
 
     /**
@@ -48,37 +42,31 @@ class GeoCoder extends MapBase {
      */
     public function setAddress(string $address){
         if(strlen($address) > 0){
-            $this->address = mb_substr($address, 0, 42);
+            $this->reqData['address'] = mb_substr($address, 0, 42);
         } else {
             throw new BaiduMapException('地址不能为空', ErrorCode::MAP_BAIDU_PARAM_ERROR);
         }
     }
 
     /**
-     * @return string
-     */
-    public function getCityName() : string {
-        return $this->cityName;
-    }
-
-    /**
      * @param string $cityName
      */
     public function setCityName(string $cityName){
-        $this->cityName = $cityName;
-    }
-
-    /**
-     * @return string
-     */
-    public function getCoordTypeReturn() : string {
-        return $this->coordTypeReturn;
+        $this->reqData['city'] = trim($cityName);
     }
 
     /**
      * @param string $coordTypeReturn
      */
     public function setCoordTypeReturn(string $coordTypeReturn){
-        $this->coordTypeReturn = $coordTypeReturn;
+        $this->reqData['ret_coordtype'] = trim($coordTypeReturn);
+    }
+
+    public function getDetail() : array {
+        if(!isset($this->reqData['address'])){
+            throw new BaiduMapException('地址不能为空', ErrorCode::MAP_BAIDU_PARAM_ERROR);
+        }
+
+        return $this->getContent();
     }
 }

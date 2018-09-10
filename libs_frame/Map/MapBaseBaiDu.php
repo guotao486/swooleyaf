@@ -162,7 +162,8 @@ abstract class MapBaseBaiDu extends MapBase {
             default:
                 break;
         }
+        $this->curlConfigs[CURLOPT_URL] = $this->getServiceUrl() . '?' . http_build_query($this->reqData);
 
-        return $this->reqData;
+        return $this->curlConfigs;
     }
 }

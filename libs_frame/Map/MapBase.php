@@ -18,6 +18,11 @@ abstract class MapBase {
      * @var array
      */
     protected $reqData = [];
+    /**
+     * 响应数据键名
+     * @var string
+     */
+    protected $rspDataKey = '';
 
     public function __construct(){
     }
@@ -27,6 +32,13 @@ abstract class MapBase {
      */
     public function getCurlConfigs() : array {
         return $this->curlConfigs;
+    }
+
+    /**
+     * @return string
+     */
+    public function getRspDataKey() : string {
+        return $this->rspDataKey;
     }
 
     abstract protected function getContent() : array;

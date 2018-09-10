@@ -1,19 +1,17 @@
 <?php
 /**
- * 坐标转换类
+ * Created by PhpStorm.
  * User: 姜伟
- * Date: 2017/6/20 0020
- * Time: 19:56
+ * Date: 2018/9/10 0010
+ * Time: 15:58
  */
 namespace Map\Tencent;
 
 use Constant\ErrorCode;
 use Exception\Map\TencentMapException;
-use Map\MapSimpleTrait;
+use Map\MapBaseTencent;
 
-class CoordinateTranslate extends MapBase {
-    use MapSimpleTrait;
-
+class CoordinateTranslate extends MapBaseTencent {
     const COORDINATE_TYPE_GPS = 1; //坐标类型-GPS
     const COORDINATE_TYPE_SOGOU = 2; //坐标类型-搜狗
     const COORDINATE_TYPE_BD = 3; //坐标类型-百度
@@ -21,10 +19,14 @@ class CoordinateTranslate extends MapBase {
     const COORDINATE_TYPE_GOOGLE = 5; //坐标类型-google
     const COORDINATE_TYPE_SOGOU_MC = 6; //坐标类型-搜狗墨卡托
 
-    public function __construct() {
-        parent::__construct();
-        $this->fromType = self::COORDINATE_TYPE_GOOGLE;
-    }
+    private $totalCoordinateTypes = [
+        self::COORDINATE_TYPE_GPS => 1,
+        self::COORDINATE_TYPE_SOGOU => 1,
+        self::COORDINATE_TYPE_BD => 1,
+        self::COORDINATE_TYPE_MAPBAR => 1,
+        self::COORDINATE_TYPE_GOOGLE => 1,
+        self::COORDINATE_TYPE_SOGOU_MC => 1,
+    ];
 
     /**
      * 源坐标数组
@@ -36,6 +38,16 @@ class CoordinateTranslate extends MapBase {
      * @var int
      */
     private $fromType = 0;
+
+    public function __construct(){
+        parent::__construct();
+        $this->serviceUrl = 'https://apis.map.qq.com/ws/coord/v1/translate';
+        $this->rspDataKey = 'locations';
+        $this->reqData['type'] = self::COORDINATE_TYPE_GOOGLE;
+    }
+
+    public function __clone(){
+    }
 
     /**
      * 添加坐标
@@ -51,24 +63,8 @@ class CoordinateTranslate extends MapBase {
             throw new TencentMapException('源坐标纬度不合法', ErrorCode::MAP_TENCENT_PARAM_ERROR);
         }
 
-        $str = $lat . ',' . $lng;
-        if(!in_array($str, $this->coords, true)){
-            $this->coords[] = $str;
-        }
-    }
-
-    /**
-     * @return array
-     */
-    public function getCoords() : array {
-        return $this->coords;
-    }
-
-    /**
-     * @return int
-     */
-    public function getFromType() : int {
-        return $this->fromType;
+        $key = $lat . ',' . $lng;
+        $this->coords[$key] = 1;
     }
 
     /**
@@ -76,10 +72,19 @@ class CoordinateTranslate extends MapBase {
      * @throws \Exception\Map\TencentMapException
      */
     public function setFromType(int $fromType) {
-        if(in_array($fromType, [self::COORDINATE_TYPE_GPS, self::COORDINATE_TYPE_SOGOU, self::COORDINATE_TYPE_BD, self::COORDINATE_TYPE_MAPBAR, self::COORDINATE_TYPE_GOOGLE, self::COORDINATE_TYPE_SOGOU_MC,], true)){
-            $this->fromType = $fromType;
+        if(isset($this->totalCoordinateTypes[$fromType])){
+            $this->reqData['type'] = $fromType;
         } else {
             throw new TencentMapException('源坐标类型不合法', ErrorCode::MAP_TENCENT_PARAM_ERROR);
         }
+    }
+
+    public function getDetail() : array {
+        if (empty($this->coords)) {
+            throw new TencentMapException('源坐标不能为空', ErrorCode::MAP_TENCENT_PARAM_ERROR);
+        }
+        $this->reqData['locations'] = implode(';', array_keys($this->coords));
+
+        return $this->getContent();
     }
 }

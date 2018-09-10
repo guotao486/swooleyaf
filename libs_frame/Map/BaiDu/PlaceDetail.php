@@ -1,26 +1,20 @@
 <?php
 /**
- * 地区详情
+ * Created by PhpStorm.
  * User: 姜伟
- * Date: 2017/6/19 0019
- * Time: 21:19
+ * Date: 2018/9/10 0010
+ * Time: 11:09
  */
 namespace Map\BaiDu;
 
 use Constant\ErrorCode;
 use Exception\Map\BaiduMapException;
-use Map\MapSimpleTrait;
+use Map\MapBaseBaiDu;
+use Tool\Tool;
 
-class PlaceDetail extends MapBase {
-    use MapSimpleTrait;
-
+class PlaceDetail extends MapBaseBaiDu {
     const SCOPE_BASE = 1; //结果详细程度-基本信息
     const SCOPE_DETAIL = 2; //结果详细程度-POI详细信息
-
-    public function __construct() {
-        parent::__construct();
-        $this->scope = self::SCOPE_BASE;
-    }
 
     /**
      * poi的uid数组
@@ -33,37 +27,31 @@ class PlaceDetail extends MapBase {
      */
     private $scope = 0;
 
+    public function __construct(){
+        parent::__construct();
+        $this->serviceUri = '/place/v2/detail';
+        $this->rspDataKey = 'result';
+        $this->reqData['scope'] = self::SCOPE_BASE;
+        $this->reqData['timestamp'] = Tool::getNowTime();
+    }
+
+    public function __clone(){
+    }
+
     /**
      * 添加uid
      * @param string $uid
      * @throws \Exception\Map\BaiduMapException
      */
     public function addUid(string $uid) {
-        if (preg_match('/^[0-9a-z]{24}$/', $uid) == 0) {
+        if (count($this->uids) >= 10) {
+            throw new BaiduMapException('uid数量超过限制', ErrorCode::MAP_BAIDU_PARAM_ERROR);
+        }
+        if(ctype_alnum($uid) && (strlen($uid) == 24)){
+            $this->uids[$uid] = 1;
+        } else {
             throw new BaiduMapException('uid不合法', ErrorCode::MAP_BAIDU_PARAM_ERROR);
         }
-
-        if(!in_array($uid, $this->uids, true)){
-            if (count($this->uids) >= 10) {
-                throw new BaiduMapException('uid数量超过限制', ErrorCode::MAP_BAIDU_PARAM_ERROR);
-            }
-
-            $this->uids[] = $uid;
-        }
-    }
-
-    /**
-     * @return array
-     */
-    public function getUids() : array {
-        return $this->uids;
-    }
-
-    /**
-     * @return int
-     */
-    public function getScope() : int {
-        return $this->scope;
     }
 
     /**
@@ -72,9 +60,18 @@ class PlaceDetail extends MapBase {
      */
     public function setScope(int $scope) {
         if(in_array($scope, [self::SCOPE_BASE, self::SCOPE_DETAIL], true)){
-            $this->scope = $scope;
+            $this->reqData['scope'] = $scope;
         } else {
             throw new BaiduMapException('结果详细程度不合法', ErrorCode::MAP_BAIDU_PARAM_ERROR);
         }
+    }
+
+    public function getDetail() : array {
+        if(empty($this->uids)){
+            throw new BaiduMapException('uid不能为空', ErrorCode::MAP_BAIDU_PARAM_ERROR);
+        }
+        $this->reqData['uids'] = implode(',', array_keys($this->uids));
+
+        return $this->getContent();
     }
 }

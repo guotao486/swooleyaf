@@ -2,27 +2,16 @@
 /**
  * Created by PhpStorm.
  * User: 姜伟
- * Date: 2018/8/18 0018
- * Time: 14:06
+ * Date: 2018/9/10 0010
+ * Time: 16:16
  */
 namespace Map\Tencent;
 
 use Constant\ErrorCode;
 use Exception\Map\TencentMapException;
-use Map\MapSimpleTrait;
+use Map\MapBaseTencent;
 
-class PlaceSuggestion extends MapBase {
-    use MapSimpleTrait;
-
-    public function __construct() {
-        parent::__construct();
-        $this->regionLimit = 0;
-        $this->subLimit = 0;
-        $this->policy = 0;
-        $this->page = 1;
-        $this->limit = 10;
-    }
-
+class PlaceSuggestion extends MapBaseTencent {
     /**
      * 关键词
      * @var string
@@ -69,11 +58,17 @@ class PlaceSuggestion extends MapBase {
      */
     private $limit = 0;
 
-    /**
-     * @return string
-     */
-    public function getKeyword() : string {
-        return $this->keyword;
+    public function __construct(){
+        parent::__construct();
+        $this->serviceUrl = 'https://apis.map.qq.com/ws/place/v1/suggestion';
+        $this->reqData['region_fix'] = 0;
+        $this->reqData['get_subpois'] = 0;
+        $this->reqData['policy'] = 0;
+        $this->reqData['page_index'] = 1;
+        $this->reqData['page_size'] = 10;
+    }
+
+    public function __clone(){
     }
 
     /**
@@ -82,17 +77,10 @@ class PlaceSuggestion extends MapBase {
      */
     public function setKeyword(string $keyword){
         if(strlen($keyword) > 0){
-            $this->keyword = $keyword;
+            $this->reqData['keyword'] = $keyword;
         } else {
             throw new TencentMapException('关键词不能为空', ErrorCode::MAP_TENCENT_PARAM_ERROR);
         }
-    }
-
-    /**
-     * @return string
-     */
-    public function getRegion() : string {
-        return $this->region;
     }
 
     /**
@@ -101,17 +89,10 @@ class PlaceSuggestion extends MapBase {
      */
     public function setRegion(string $region){
         if(strlen($region) > 0){
-            $this->region = $region;
+            $this->reqData['region'] = $region;
         } else {
             throw new TencentMapException('地区不能为空', ErrorCode::MAP_TENCENT_PARAM_ERROR);
         }
-    }
-
-    /**
-     * @return int
-     */
-    public function getRegionLimit() : int {
-        return $this->regionLimit;
     }
 
     /**
@@ -120,17 +101,10 @@ class PlaceSuggestion extends MapBase {
      */
     public function setRegionLimit(int $regionLimit){
         if(in_array($regionLimit, [0, 1])){
-            $this->regionLimit = $regionLimit;
+            $this->reqData['region_fix'] = $regionLimit;
         } else {
             throw new TencentMapException('地区限制不合法', ErrorCode::MAP_TENCENT_PARAM_ERROR);
         }
-    }
-
-    /**
-     * @return string
-     */
-    public function getLocation() : string {
-        return $this->location;
     }
 
     /**
@@ -138,14 +112,7 @@ class PlaceSuggestion extends MapBase {
      * @param double $lng
      */
     public function setLocation($lat, $lng){
-        $this->location = $lat . ',' . $lng;
-    }
-
-    /**
-     * @return int
-     */
-    public function getSubLimit() : int {
-        return $this->subLimit;
+        $this->reqData['location'] = $lat . ',' . $lng;
     }
 
     /**
@@ -154,31 +121,17 @@ class PlaceSuggestion extends MapBase {
      */
     public function setSubLimit(int $subLimit){
         if(in_array($subLimit, [0, 1])){
-            $this->subLimit = $subLimit;
+            $this->reqData['get_subpois'] = $subLimit;
         } else {
             throw new TencentMapException('子地点限制不合法', ErrorCode::MAP_TENCENT_PARAM_ERROR);
         }
     }
 
     /**
-     * @return int
-     */
-    public function getPolicy() : int {
-        return $this->policy;
-    }
-
-    /**
      * @param int $policy
      */
     public function setPolicy(int $policy){
-        $this->policy = $policy;
-    }
-
-    /**
-     * @return array
-     */
-    public function getFilters() : array {
-        return $this->filters;
+        $this->reqData['policy'] = $policy;
     }
 
     /**
@@ -198,24 +151,10 @@ class PlaceSuggestion extends MapBase {
     }
 
     /**
-     * @return int
-     */
-    public function getPage() : int {
-        return $this->page;
-    }
-
-    /**
      * @param int $page
      */
     public function setPage(int $page){
-        $this->page = $page > 0 ? $page : 1;
-    }
-
-    /**
-     * @return int
-     */
-    public function getLimit() : int {
-        return $this->limit;
+        $this->reqData['page_index'] = $page > 0 ? $page : 1;
     }
 
     /**
@@ -224,9 +163,27 @@ class PlaceSuggestion extends MapBase {
      */
     public function setLimit(int $limit){
         if(($limit > 0) && ($limit <= 20)){
-            $this->limit = $limit;
+            $this->reqData['page_size'] = $limit;
         } else {
             throw new TencentMapException('每页条数不合法', ErrorCode::MAP_TENCENT_PARAM_ERROR);
         }
+    }
+
+    public function getDetail() : array {
+        if(!isset($this->reqData['keyword'])){
+            throw new TencentMapException('关键词不能为空', ErrorCode::MAP_TENCENT_PARAM_ERROR);
+        } else if(!isset($this->reqData['region'])){
+            throw new TencentMapException('地区不能为空', ErrorCode::MAP_TENCENT_PARAM_ERROR);
+        }
+
+        if(!empty($this->filters)){
+            $filterStr = '';
+            foreach ($this->filters as $key => $val) {
+                $filterStr .= ',' . $key . '=' . $val;
+            }
+            $this->reqData['filter'] = substr($filterStr, 1);
+        }
+
+        return $this->getContent();
     }
 }

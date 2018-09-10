@@ -2,22 +2,16 @@
 /**
  * Created by PhpStorm.
  * User: 姜伟
- * Date: 2018/8/18 0018
- * Time: 14:07
+ * Date: 2018/9/10 0010
+ * Time: 14:08
  */
 namespace Map\Tencent;
 
 use Constant\ErrorCode;
 use Exception\Map\TencentMapException;
-use Map\MapSimpleTrait;
+use Map\MapBaseTencent;
 
-class GeoCoder extends MapBase {
-    use MapSimpleTrait;
-
-    public function __construct() {
-        parent::__construct();
-    }
-
+class GeoCoder extends MapBaseTencent {
     /**
      * 地址
      * @var string
@@ -29,11 +23,13 @@ class GeoCoder extends MapBase {
      */
     private $region = '';
 
-    /**
-     * @return string
-     */
-    public function getAddress() : string {
-        return $this->address;
+    public function __construct(){
+        parent::__construct();
+        $this->serviceUrl = 'https://apis.map.qq.com/ws/geocoder/v1/';
+        $this->rspDataKey = 'result';
+    }
+
+    public function __clone(){
     }
 
     /**
@@ -42,23 +38,24 @@ class GeoCoder extends MapBase {
      */
     public function setAddress(string $address){
         if(strlen($address) > 0){
-            $this->address = $address;
+            $this->reqData['address'] = $address;
         } else {
             throw new TencentMapException('地址不能为空', ErrorCode::MAP_TENCENT_PARAM_ERROR);
         }
     }
 
     /**
-     * @return string
-     */
-    public function getRegion() : string {
-        return $this->region;
-    }
-
-    /**
      * @param string $region
      */
     public function setRegion(string $region){
-        $this->region = $region;
+        $this->reqData['region'] = $region;
+    }
+
+    public function getDetail() : array {
+        if(!isset($this->reqData['address'])){
+            throw new TencentMapException('地址不能为空', ErrorCode::MAP_TENCENT_PARAM_ERROR);
+        }
+
+        return $this->getContent();
     }
 }
