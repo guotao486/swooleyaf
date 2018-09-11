@@ -12,8 +12,7 @@ use DesignPatterns\Facades\PayApplyFacade;
 use DesignPatterns\Factories\CacheSimpleFactory;
 use Tool\Tool;
 use Traits\SimpleFacadeTrait;
-use Wx\Shop\PayNativePre;
-use Wx\WxUtilShop;
+use Wx2\Shop\PayNativePre;
 
 class WxShopNativeStatic extends PayApplyFacade {
     use SimpleFacadeTrait;
@@ -27,7 +26,7 @@ class WxShopNativeStatic extends PayApplyFacade {
     protected static function apply(array $data) : array {
         $prePay = new PayNativePre($data['a00_appid']);
         $prePay->setProductId($data['content_result']['pay_sn']);
-        $applyRes = WxUtilShop::applyPreNativePay($prePay);
+        $preDetail = $prePay->getDetail();
         unset($prePay);
 
         $redisKey = Project::REDIS_PREFIX_WX_NATIVE_PRE . $data['content_result']['pay_sn'];
@@ -41,7 +40,7 @@ class WxShopNativeStatic extends PayApplyFacade {
         CacheSimpleFactory::getRedisInstance()->expire($redisKey, 7200);
 
         return [
-            'code_url' => $applyRes
+            'code_url' => $preDetail['url']
         ];
     }
 }

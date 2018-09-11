@@ -17,14 +17,10 @@ use Wx\Shop\JsPayConfig;
 use Wx\Shop\Menu;
 use Wx\Shop\OrderBill;
 use Wx\Shop\OrderClose;
-use Wx\Shop\OrderQuery;
 use Wx\Shop\OrderRefund;
-use Wx\Shop\PayCompany;
 use Wx\Shop\PayCompanyQuery;
 use Wx\Shop\PayMicro;
-use Wx\Shop\PayNativePre;
 use Wx\Shop\RefundQuery;
-use Wx\Shop\ShortUrl;
 use Wx\Shop\TemplateMsg;
 use Wx\Shop\UnifiedOrder;
 use Wx\Shop\UserInfo;
@@ -33,10 +29,8 @@ final class WxUtilShop extends WxUtilAloneBase {
     use SimpleTrait;
 
     private static $urlUnifiedOrder = 'https://api.mch.weixin.qq.com/pay/unifiedorder';
-    private static $urlShorturl = 'https://api.mch.weixin.qq.com/tools/shorturl';
     private static $urlQrCode = 'http://paysdk.weixin.qq.com/example/qrcode.php?data=';
     private static $urlOrderClose = 'https://api.mch.weixin.qq.com/pay/closeorder';
-    private static $urlOrderQuery = 'https://api.mch.weixin.qq.com/pay/orderquery';
     private static $urlOrderRefund = 'https://api.mch.weixin.qq.com/secapi/pay/refund';
     private static $urlRefundQuery = 'https://api.mch.weixin.qq.com/pay/refundquery';
     private static $urlDownloadBill = 'https://api.mch.weixin.qq.com/pay/downloadbill';
@@ -50,20 +44,8 @@ final class WxUtilShop extends WxUtilAloneBase {
     private static $urlCreateMenu = 'https://api.weixin.qq.com/cgi-bin/menu/create?access_token=';
     private static $urlDeleteMenu = 'https://api.weixin.qq.com/cgi-bin/menu/delete?access_token=';
     private static $urlIpList = 'https://api.weixin.qq.com/cgi-bin/getcallbackip?access_token=';
-    private static $urlCompanyPay = 'https://api.mch.weixin.qq.com/mmpaymkttransfers/promotion/transfers';
     private static $urlQueryCompanyPay = 'https://api.mch.weixin.qq.com/mmpaymkttransfers/gettransferinfo';
     private static $urlDownloadMedia = 'http://file.api.weixin.qq.com/cgi-bin/media/get?access_token=';
-
-    private static $errorsShortUrl = [
-        'XML_FORMAT_ERROR' => 'XML格式错误',
-        'POST_DATA_EMPTY' => 'post数据为空',
-        'LACK_PARAMS' => '缺少参数',
-        'APPID_NOT_EXIST' => 'APPID不存在',
-        'MCHID_NOT_EXIST' => 'MCHID不存在',
-        'APPID_MCHID_NOT_MATCH' => 'appid和mch_id不匹配',
-        'REQUIRE_POST_METHOD' => '请使用post方法',
-        'SIGNERROR' => '签名错误',
-    ];
 
     /**
      * 数组格式化成url参数
@@ -177,86 +159,6 @@ final class WxUtilShop extends WxUtilAloneBase {
     }
 
     /**
-     * 发起扫码支付模式一的预支付请求
-     * @param \Wx\Shop\PayNativePre $prePay 预支付信息
-     * @return string
-     */
-    public static function applyPreNativePay(PayNativePre $prePay) : string {
-        //生成支付链接
-        $payDetail = $prePay->getDetail();
-        $codeUrl = 'weixin://wxpay/bizpayurl?sign=' . $payDetail['sign']
-                   . '&appid=' . $payDetail['appid']
-                   . '&mch_id=' . $payDetail['mch_id']
-                   . '&product_id=' . $payDetail['product_id']
-                   . '&time_stamp=' . $payDetail['time_stamp']
-                   . '&nonce_str=' . $payDetail['nonce_str'];
-        //转换成短链接
-        $shortUrl = new ShortUrl($payDetail['appid']);
-        $shortUrl->setLongUrl($codeUrl);
-        $urlDetail = $shortUrl->getDetail();
-        $reqXml = Tool::arrayToXml($urlDetail);
-        $resXml = self::sendPostReq(self::$urlShorturl, 'string', $reqXml);
-        $resData = Tool::xmlToArray($resXml);
-        if ($resData['return_code'] == 'FAIL') {
-            Log::error($resData['return_msg'], ErrorCode::WX_PARAM_ERROR);
-            $url = self::$urlQrCode . urlencode($codeUrl);
-        } else if ($resData['result_code'] == 'FAIL') {
-            $error = Tool::getArrayVal(self::$errorsShortUrl, $resData['err_code'], $resData['err_code']);
-            Log::error($error, ErrorCode::WX_PARAM_ERROR);
-            $url = self::$urlQrCode . urlencode($codeUrl);
-        } else {
-            $url = self::$urlQrCode . urlencode($resData['short_url']);
-        }
-
-        return $url;
-    }
-
-    /**
-     * 发起企业付款
-     * @param \Wx\Shop\PayCompany $companyPay 企业付款对象
-     * @return array
-     */
-    public static function applyCompanyPay(PayCompany $companyPay) : array {
-        $resArr = [
-            'code' => 0,
-        ];
-
-        $companyDetail = $companyPay->getDetail();
-        $shopConfig = WxConfigSingleton::getInstance()->getShopConfig($companyDetail['mch_appid']);
-        $tmpKey = tmpfile();
-        fwrite($tmpKey, $shopConfig->getSslKey());
-        $tmpKeyData = stream_get_meta_data($tmpKey);
-        $tmpCert = tmpfile();
-        fwrite($tmpCert, $shopConfig->getSslCert());
-        $tmpCertData = stream_get_meta_data($tmpCert);
-        $reqXml = Tool::arrayToXml($companyDetail);
-        $resXml = self::sendPostReq(self::$urlCompanyPay, 'string', $reqXml, [
-            CURLOPT_SSLCERTTYPE => 'PEM',
-            CURLOPT_SSLCERT => $tmpCertData['uri'],
-            CURLOPT_SSLKEYTYPE => 'PEM',
-            CURLOPT_SSLKEY => $tmpKeyData['uri'],
-        ]);
-        fclose($tmpKey);
-        fclose($tmpCert);
-        $resData = Tool::xmlToArray($resXml);
-        if ($resData['return_code'] == 'FAIL') {
-            Log::error($resData['return_msg'], ErrorCode::WX_PARAM_ERROR);
-
-            $resArr['code'] = ErrorCode::WX_POST_ERROR;
-            $resArr['message'] = $resData['return_msg'];
-        } else if ($resData['result_code'] == 'FAIL') {
-            Log::error($resData['err_code'], ErrorCode::WX_PARAM_ERROR);
-
-            $resArr['code'] = ErrorCode::WX_POST_ERROR;
-            $resArr['message'] = $resData['err_code_des'];
-        } else {
-            $resArr['data'] = $resData;
-        }
-
-        return $resArr;
-    }
-
-    /**
      * 发起企业付款查询
      * @param \Wx\Shop\PayCompanyQuery $query 企业付款查询对象
      * @return array
@@ -317,33 +219,6 @@ final class WxUtilShop extends WxUtilAloneBase {
         }
 
         return false;
-    }
-
-    /**
-     * 查询订单详情
-     * @param \Wx\Shop\OrderQuery $query 查询对象
-     * @return array
-     */
-    public static function queryOrder(OrderQuery $query) : array {
-        $resArr = [
-            'code' => 0
-        ];
-
-        $queryDetail = $query->getDetail();
-        $reqXml = Tool::arrayToXml($queryDetail);
-        $resXml = self::sendPostReq(self::$urlOrderQuery, 'string', $reqXml);
-        $resData = Tool::xmlToArray($resXml);
-        if ($resData['return_code'] == 'FAIL') {
-            $resArr['code'] = ErrorCode::WX_POST_ERROR;
-            $resArr['message'] = $resData['return_msg'];
-        } else if ($resData['result_code'] == 'FAIL') {
-            $resArr['code'] = ErrorCode::WX_POST_ERROR;
-            $resArr['message'] = $resData['err_code_des'];
-        } else {
-            $resArr['data'] = $resData;
-        }
-
-        return $resArr;
     }
 
     /**
