@@ -21,13 +21,9 @@ final class WxUtilShop extends WxUtilAloneBase {
 
     private static $urlUnifiedOrder = 'https://api.mch.weixin.qq.com/pay/unifiedorder';
     private static $urlQrCode = 'http://paysdk.weixin.qq.com/example/qrcode.php?data=';
-    private static $urlAuthorizeBase = 'https://api.weixin.qq.com/sns/oauth2/access_token?grant_type=authorization_code&appid=';
-    private static $urlAuthorizeInfo = 'https://api.weixin.qq.com/sns/userinfo?lang=zh_CN&access_token=';
-    private static $urlUserInfo = 'https://api.weixin.qq.com/cgi-bin/user/info?lang=zh_CN&access_token=';
     private static $urlGetMenu = 'https://api.weixin.qq.com/cgi-bin/menu/get?access_token=';
     private static $urlCreateMenu = 'https://api.weixin.qq.com/cgi-bin/menu/create?access_token=';
     private static $urlDeleteMenu = 'https://api.weixin.qq.com/cgi-bin/menu/delete?access_token=';
-    private static $urlIpList = 'https://api.weixin.qq.com/cgi-bin/getcallbackip?access_token=';
     private static $urlDownloadMedia = 'http://file.api.weixin.qq.com/cgi-bin/media/get?access_token=';
 
     /**
@@ -221,72 +217,6 @@ final class WxUtilShop extends WxUtilAloneBase {
     }
 
     /**
-     * 处理用户静默授权
-     * @param string $code 换取授权access_token的票据
-     * @param string $appId
-     * @return array
-     */
-    public static function handleUserAuthorizeBase(string $code,string $appId) : array {
-        $resArr = [
-            'code' => 0
-        ];
-
-        $shopConfig = WxConfigSingleton::getInstance()->getShopConfig($appId);
-        $url = self::$urlAuthorizeBase . $shopConfig->getAppId() . '&secret=' . $shopConfig->getSecret() . '&code=' . $code;
-        $getRes = self::sendGetReq($url);
-        $getData = Tool::jsonDecode($getRes);
-        if (isset($getData['access_token'])) {
-            $resArr['data'] = $getData;
-        } else {
-            $resArr['code'] = ErrorCode::WX_GET_ERROR;
-            $resArr['message'] = $getData['errmsg'];
-        }
-
-        return $resArr;
-    }
-
-    /**
-     * 处理用户手动授权
-     * @param string $code 换取授权access_token的票据
-     * @param string $appId
-     * @return array
-     */
-    public static function handleUserAuthorizeInfo(string $code,string $appId) : array {
-        $resArr = [
-            'code' => 0
-        ];
-
-        $shopConfig = WxConfigSingleton::getInstance()->getShopConfig($appId);
-        $url = self::$urlAuthorizeBase . $shopConfig->getAppId() . '&secret=' . $shopConfig->getSecret() . '&code=' . $code;
-        $getRes = self::sendGetReq($url);
-        $getData = Tool::jsonDecode($getRes);
-        if (!isset($getData['access_token'])) {
-            $resArr['code'] = ErrorCode::WX_GET_ERROR;
-            $resArr['message'] = $getData['errmsg'];
-            return $resArr;
-        }
-
-        $openid = $getData['openid'];
-        $url = self::$urlAuthorizeInfo . $getData['access_token'] . '&openid=' . $openid;
-        $getRes = self::sendGetReq($url);
-        $getData = Tool::jsonDecode($getRes);
-        if(isset($getData['errcode']) && ($getData['errcode'] == 40001)){
-            $url = self::$urlUserInfo . self::getAccessToken($appId) . '&openid=' . $openid;
-            $getRes = self::sendGetReq($url);
-            $getData = Tool::jsonDecode($getRes);
-        }
-
-        if(isset($getData['openid'])){
-            $resArr['data'] = $getData;
-        } else {
-            $resArr['code'] = ErrorCode::WX_GET_ERROR;
-            $resArr['message'] = $getData['errmsg'];
-        }
-
-        return $resArr;
-    }
-
-    /**
      * 获取菜单
      * @param string $appId
      * @return array
@@ -369,29 +299,6 @@ final class WxUtilShop extends WxUtilAloneBase {
         } else {
             $resArr['code'] = ErrorCode::WX_POST_ERROR;
             $resArr['message'] = $resData['errmsg'];
-        }
-
-        return $resArr;
-    }
-
-    /**
-     * 获取微信服务器IP列表
-     * @param string $appId
-     * @return array
-     */
-    public static function getIpList(string $appId) : array {
-        $resArr = [
-            'code' => 0
-        ];
-
-        $url = self::$urlIpList . self::getAccessToken($appId);
-        $getRes = self::sendGetReq($url);
-        $getData = Tool::jsonDecode($getRes);
-        if (isset($getData['ip_list'])) {
-            $resArr['data'] = $getData;
-        } else {
-            $resArr['code'] = ErrorCode::WX_GET_ERROR;
-            $resArr['message'] = $getData['errmsg'];
         }
 
         return $resArr;
