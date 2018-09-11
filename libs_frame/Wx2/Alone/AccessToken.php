@@ -15,28 +15,20 @@ use Wx2\WxBaseAlone;
 use Wx2\WxUtilBase;
 
 class AccessToken extends WxBaseAlone {
-    /**
-     * 应用ID
-     * @var string
-     */
-    private $appId = '';
-
     public function __construct(string $appId){
         parent::__construct();
-        $this->appId = $appId;
-        $this->serviceUrl = 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential';
+        $this->serviceUrl = 'https://api.weixin.qq.com/cgi-bin/token';
+        $shopConfig = WxConfigSingleton::getInstance()->getShopConfig($appId);
+        $this->reqData['appid'] = $shopConfig->getAppId();
+        $this->reqData['secret'] = $shopConfig->getSecret();
+        $this->reqData['grant_type'] = 'client_credential';
     }
 
     public function __clone(){
     }
 
     public function getDetail() : array {
-        $shopConfig = WxConfigSingleton::getInstance()->getShopConfig($this->appId);
-        if(is_null($shopConfig)){
-            throw new WxException('微信appid不支持', ErrorCode::WX_PARAM_ERROR);
-        }
-
-        $this->curlConfigs[CURLOPT_URL] = $this->serviceUrl . '&appid=' . $shopConfig->getAppId() . '&secret=' . $shopConfig->getSecret();
+        $this->curlConfigs[CURLOPT_URL] = $this->serviceUrl . '?' . http_build_query($this->reqData);
         $sendRes = WxUtilBase::sendGetReq($this->curlConfigs);
         $sendData = Tool::jsonDecode($sendRes);
         if(!is_array($sendData)){
