@@ -21,49 +21,41 @@ class RefundQuery extends WxBaseShop {
      * @var string
      */
     private $appid = '';
-
     /**
      * 商户号
      * @var string
      */
     private $mch_id = '';
-
     /**
      * 设备号
      * @var string
      */
     private $device_info = '';
-
     /**
      * 随机字符串
      * @var string
      */
     private $nonce_str = '';
-
     /**
      * 签名类型
      * @var string
      */
     private $sign_type = '';
-
     /**
      * 微信订单号
      * @var string
      */
     private $transaction_id = '';
-
     /**
      * 商户订单号
      * @var string
      */
     private $out_trade_no = '';
-
     /**
      * 微信退款单号
      * @var string
      */
     private $refund_id = '';
-
     /**
      * 商户退款单号
      * @var string

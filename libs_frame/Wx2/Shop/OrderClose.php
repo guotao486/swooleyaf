@@ -2,8 +2,8 @@
 /**
  * Created by PhpStorm.
  * User: 姜伟
- * Date: 2018/9/11 0011
- * Time: 17:32
+ * Date: 18-9-11
+ * Time: 下午11:38
  */
 namespace Wx2\Shop;
 
@@ -15,17 +15,17 @@ use Wx2\WxBaseShop;
 use Wx2\WxUtilBase;
 use Wx2\WxUtilShop;
 
-class OrderQuery extends WxBaseShop {
+class OrderClose extends WxBaseShop {
+    /**
+     * 公众号ID
+     * @var string
+     */
+    private $appid = '';
     /**
      * 商户号
      * @var string
      */
     private $mch_id = '';
-    /**
-     * 微信订单号
-     * @var string
-     */
-    private $transaction_id = '';
     /**
      * 商户订单号
      * @var string
@@ -44,7 +44,7 @@ class OrderQuery extends WxBaseShop {
 
     public function __construct(string $appId){
         parent::__construct();
-        $this->serviceUrl = 'https://api.mch.weixin.qq.com/pay/orderquery';
+        $this->serviceUrl = 'https://api.mch.weixin.qq.com/pay/closeorder';
         $shopConfig = WxConfigSingleton::getInstance()->getShopConfig($appId);
         $this->reqData['appid'] = $shopConfig->getAppId();
         $this->reqData['mch_id'] = $shopConfig->getPayMchId();
@@ -56,42 +56,27 @@ class OrderQuery extends WxBaseShop {
     }
 
     /**
-     * @param string $transactionId
-     * @throws \Exception\Wx\WxException
-     */
-    public function setTransactionId(string $transactionId) {
-        if(ctype_digit($transactionId) && (strlen($transactionId) == 27)){
-            $this->transaction_id = $transactionId;
-        } else {
-            throw new WxException('微信订单号不合法', ErrorCode::WX_PARAM_ERROR);
-        }
-    }
-
-    /**
      * @param string $outTradeNo
      * @throws \Exception\Wx\WxException
      */
     public function setOutTradeNo(string $outTradeNo) {
-        if(ctype_alnum($outTradeNo) && (strlen($outTradeNo) <= 32)){
-            $this->out_trade_no = $outTradeNo;
+        if(ctype_digit($outTradeNo) && (strlen($outTradeNo) <= 32)){
+            $this->reqData['out_trade_no'] = $outTradeNo;
         } else {
-            throw new WxException('商户订单号不合法', ErrorCode::WX_PARAM_ERROR);
+            throw new WxException('商户单号不合法', ErrorCode::WX_PARAM_ERROR);
         }
     }
 
     public function getDetail() : array {
+        if(!isset($this->reqData['out_trade_no'])){
+            throw new WxException('商户单号不能为空', ErrorCode::WX_PARAM_ERROR);
+        }
+        $this->reqData['sign'] = WxUtilShop::createSign($this->reqData, $this->reqData['appid']);
+
         $resArr = [
             'code' => 0
         ];
 
-        if(strlen($this->transaction_id) > 0){
-            $this->reqData['transaction_id'] = $this->transaction_id;
-        } else if(strlen($this->out_trade_no) > 0){
-            $this->reqData['out_trade_no'] = $this->out_trade_no;
-        } else {
-            throw new WxException('微信订单号与商户订单号不能同时为空', ErrorCode::WX_PARAM_ERROR);
-        }
-        $this->reqData['sign'] = WxUtilShop::createSign($this->reqData, $this->reqData['appid']);
         $this->curlConfigs[CURLOPT_URL] = $this->serviceUrl;
         $this->curlConfigs[CURLOPT_POSTFIELDS] = Tool::arrayToXml($this->reqData);
         $sendRes = WxUtilBase::sendPostReq($this->curlConfigs);

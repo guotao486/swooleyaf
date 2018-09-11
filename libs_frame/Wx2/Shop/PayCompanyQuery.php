@@ -22,19 +22,16 @@ class PayCompanyQuery extends WxBaseShop {
      * @var string
      */
     private $appid = '';
-
     /**
      * 随机字符串
      * @var string
      */
     private $nonce_str = '';
-
     /**
      * 商户订单号
      * @var string
      */
     private $partner_trade_no = '';
-
     /**
      * 商户号
      * @var string

@@ -19,19 +19,16 @@ class JsPayConfig extends WxBaseShop {
      * @var string
      */
     private $timeStamp = '';
-
     /**
      * 随机字符串
      * @var string
      */
     private $nonceStr = '';
-
     /**
      * 预支付交易会话标识
      * @var string
      */
     private $package = '';
-
     /**
      * 签名类型
      * @var string

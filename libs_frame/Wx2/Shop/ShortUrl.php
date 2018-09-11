@@ -22,19 +22,16 @@ class ShortUrl extends WxBaseShop {
      * @var string
      */
     private $mch_id = '';
-
     /**
      * URL链接
      * @var string
      */
     private $long_url = '';
-
     /**
      * 随机字符串
      * @var string
      */
     private $nonce_str = '';
-
     /**
      * 签名类型
      * @var string

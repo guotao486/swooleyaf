@@ -20,19 +20,16 @@ class PayNativePre extends WxBaseShop {
      * @var string
      */
     private $mch_id = '';
-
     /**
      * 当前时间戳
      * @var int
      */
     private $time_stamp = 0;
-
     /**
      * 随机字符串，不长于32位
      * @var string
      */
     private $nonce_str = '';
-
     /**
      * 商户定义的商品id
      * @var string

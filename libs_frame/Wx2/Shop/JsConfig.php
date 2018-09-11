@@ -21,7 +21,6 @@ class JsConfig extends WxBaseShop {
      * @var int
      */
     private $timestamp = 0;
-
     /**
      * @var string
      */

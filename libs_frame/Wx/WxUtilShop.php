@@ -14,28 +14,16 @@ use Traits\SimpleTrait;
 use Wx\Shop\JsConfig;
 use Wx\Shop\JsPayConfig;
 use Wx\Shop\Menu;
-use Wx\Shop\OrderBill;
-use Wx\Shop\OrderClose;
-use Wx\Shop\OrderRefund;
-use Wx\Shop\PayMicro;
-use Wx\Shop\TemplateMsg;
 use Wx\Shop\UnifiedOrder;
-use Wx\Shop\UserInfo;
 
 final class WxUtilShop extends WxUtilAloneBase {
     use SimpleTrait;
 
     private static $urlUnifiedOrder = 'https://api.mch.weixin.qq.com/pay/unifiedorder';
     private static $urlQrCode = 'http://paysdk.weixin.qq.com/example/qrcode.php?data=';
-    private static $urlOrderClose = 'https://api.mch.weixin.qq.com/pay/closeorder';
-    private static $urlOrderRefund = 'https://api.mch.weixin.qq.com/secapi/pay/refund';
-    private static $urlDownloadBill = 'https://api.mch.weixin.qq.com/pay/downloadbill';
-    private static $urlMicroPay = 'https://api.mch.weixin.qq.com/pay/micropay';
     private static $urlAuthorizeBase = 'https://api.weixin.qq.com/sns/oauth2/access_token?grant_type=authorization_code&appid=';
     private static $urlAuthorizeInfo = 'https://api.weixin.qq.com/sns/userinfo?lang=zh_CN&access_token=';
-    private static $urlSendTemplateMsg = 'https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=';
     private static $urlUserInfo = 'https://api.weixin.qq.com/cgi-bin/user/info?lang=zh_CN&access_token=';
-    private static $urlUserInfoList = 'https://api.weixin.qq.com/cgi-bin/user/info/batchget?access_token=';
     private static $urlGetMenu = 'https://api.weixin.qq.com/cgi-bin/menu/get?access_token=';
     private static $urlCreateMenu = 'https://api.weixin.qq.com/cgi-bin/menu/create?access_token=';
     private static $urlDeleteMenu = 'https://api.weixin.qq.com/cgi-bin/menu/delete?access_token=';
@@ -172,128 +160,6 @@ final class WxUtilShop extends WxUtilAloneBase {
     }
 
     /**
-     * 申请订单退款
-     * @param \Wx\Shop\OrderRefund $refund 退款对象
-     * @return array
-     */
-    public static function applyOrderRefund(OrderRefund $refund) : array {
-        $resArr = [
-            'code' => 0
-        ];
-
-        $refundDetail = $refund->getDetail();
-        $shopConfig = WxConfigSingleton::getInstance()->getShopConfig($refundDetail['appid']);
-        $tmpKey = tmpfile();
-        fwrite($tmpKey, $shopConfig->getSslKey());
-        $tmpKeyData = stream_get_meta_data($tmpKey);
-        $tmpCert = tmpfile();
-        fwrite($tmpCert, $shopConfig->getSslCert());
-        $tmpCertData = stream_get_meta_data($tmpCert);
-        $reqXml = Tool::arrayToXml($refundDetail);
-        $resXml = self::sendPostReq(self::$urlOrderRefund, 'string', $reqXml, [
-            CURLOPT_SSLCERTTYPE => 'PEM',
-            CURLOPT_SSLCERT => $tmpCertData['uri'],
-            CURLOPT_SSLKEYTYPE => 'PEM',
-            CURLOPT_SSLKEY => $tmpKeyData['uri'],
-        ]);
-        fclose($tmpKey);
-        fclose($tmpCert);
-        $resData = Tool::xmlToArray($resXml);
-        if ($resData['return_code'] == 'FAIL') {
-            $resArr['code'] = ErrorCode::WX_POST_ERROR;
-            $resArr['message'] = $resData['return_msg'];
-        } else if ($resData['result_code'] == 'FAIL') {
-            $resArr['code'] = ErrorCode::WX_POST_ERROR;
-            $resArr['message'] = $resData['err_code_des'];
-        }
-        $resArr['data'] = $resData;
-
-        return $resArr;
-    }
-
-    /**
-     * 下载对账单
-     * @param \Wx\Shop\OrderBill $bill 对账单对象
-     * @return array
-     */
-    public static function downloadBill(OrderBill $bill) : array {
-        $resArr = [
-            'code' => 0
-        ];
-
-        $billDetail = $bill->getDetail();
-        $reqXml = Tool::arrayToXml($billDetail);
-        $resXml = self::sendPostReq(self::$urlDownloadBill, 'string', $reqXml);
-        if (substr($resXml, 0, 5) == '<xml>') {
-            $resData = Tool::xmlToArray($resXml);
-            $resArr['code'] = ErrorCode::WX_POST_ERROR;
-            $resArr['message'] = $resData['return_msg'];
-        } else {
-            echo $resXml;
-
-            $resArr['data'] = [
-                'return_code' => 'SUCCESS',
-            ];
-        }
-
-        return $resArr;
-    }
-
-    /**
-     * 关闭订单
-     * @param \Wx\Shop\OrderClose $close
-     * @return array
-     */
-    public static function closeOrder(OrderClose $close) : array {
-        $resArr = [
-            'code' => 0
-        ];
-
-        $closeDetail = $close->getDetail();
-        $reqXml = Tool::arrayToXml($closeDetail);
-        $resXml = self::sendPostReq(self::$urlOrderClose, 'string', $reqXml);
-        $resData = Tool::xmlToArray($resXml);
-        if ($resData['return_code'] == 'FAIL') {
-            $resArr['code'] = ErrorCode::WX_POST_ERROR;
-            $resArr['message'] = $resData['return_msg'];
-        } else if ($resData['result_code'] == 'FAIL') {
-            $resArr['code'] = ErrorCode::WX_POST_ERROR;
-            $resArr['message'] = $resData['err_code_des'];
-        } else {
-            $resArr['data'] = $resData;
-        }
-
-        return $resArr;
-    }
-
-    /**
-     * 发起刷卡支付
-     * @param \Wx\Shop\PayMicro $pay
-     * @return array
-     */
-    public static function applyMicroPay(PayMicro $pay) : array {
-        $resArr = [
-            'code' => 0
-        ];
-
-        $payDetail = $pay->getDetail();
-        $reqXml = Tool::arrayToXml($payDetail);
-        $resXml = self::sendPostReq(self::$urlMicroPay, 'string', $reqXml);
-        $resData = Tool::xmlToArray($resXml);
-        if ($resData['return_code'] == 'FAIL') {
-            $resArr['code'] = ErrorCode::WX_POST_ERROR;
-            $resArr['message'] = $resData['return_msg'];
-        } else if ($resData['result_code'] == 'FAIL') {
-            $resArr['code'] = ErrorCode::WX_POST_ERROR;
-            $resArr['message'] = $resData['err_code_des'];
-        } else {
-            $resArr['data'] = $resData;
-        }
-
-        return $resArr;
-    }
-
-    /**
      * 获取用户授权地址
      * @param string $redirectUrl 跳转地址
      * @param string $type 授权类型 base：静默授权 user：手动授权
@@ -415,101 +281,6 @@ final class WxUtilShop extends WxUtilAloneBase {
         } else {
             $resArr['code'] = ErrorCode::WX_GET_ERROR;
             $resArr['message'] = $getData['errmsg'];
-        }
-
-        return $resArr;
-    }
-
-    /**
-     * 发送模版消息
-     * @param \Wx\Shop\TemplateMsg $msg
-     * @param string $appId
-     * @return array
-     */
-    public static function sendTemplateMsg(TemplateMsg $msg,string $appId) : array {
-        $resArr = [
-            'code' => 0
-        ];
-
-        $msgDetail = $msg->getDetail();
-        $url = self::$urlSendTemplateMsg . self::getAccessToken($appId);
-        $sendRes = self::sendPostReq($url, 'json', $msgDetail);
-        $resData = Tool::jsonDecode($sendRes);
-        if ($resData['errcode'] == 0) {
-            $resData['data'] = $resData;
-        } else {
-            $resArr['code'] = ErrorCode::WX_POST_ERROR;
-            $resArr['message'] = $resData['errmsg'];
-        }
-
-        return $resArr;
-    }
-
-    /**
-     * 获取单个用户信息详情
-     * @param \Wx\Shop\UserInfo $userInfo
-     * @param string $appId
-     * @return array
-     */
-    public static function getUserInfo(UserInfo $userInfo,string $appId) : array {
-        $resArr = [
-            'code' => 0
-        ];
-
-        if ($userInfo->getOpenid() != '') {
-            $url = self::$urlUserInfo . self::getAccessToken($appId);
-            $getRes = self::sendGetReq($url);
-            $getData = Tool::jsonDecode($getRes);
-            if (isset($getData['openid'])) {
-                $resArr['data'] = $getData;
-            } else {
-                $resArr['code'] = ErrorCode::WX_GET_ERROR;
-                $resArr['message'] = $getData['errmsg'];
-            }
-        } else {
-            $resArr['code'] = ErrorCode::WX_GET_ERROR;
-            $resArr['message'] = '用户openid不能为空';
-        }
-
-        return $resArr;
-    }
-
-    /**
-     * 批量获取用户信息详情
-     * @param array $infoList
-     * @param string $appId
-     * @return array
-     */
-    public static function getUserInfoList(array $infoList,string $appId) : array {
-        $resArr = [
-            'code' => 0
-        ];
-
-        $saveArr = [
-            'user_list' => [],
-        ];
-        foreach ($infoList as $eInfo) {
-            if (($eInfo instanceof UserInfo) && ($eInfo->getOpenid() != '')) {
-                $saveArr['user_list'][] = [
-                    'openid' => $eInfo->getOpenid(),
-                    'lang' => 'zh-CN',
-                ];
-            }
-        }
-        if (empty($saveArr['user_list'])) {
-            $resArr['code'] = ErrorCode::WX_PARAM_ERROR;
-            $resArr['message'] = '用户信息列表不能为空';
-            return $resArr;
-        }
-
-        $url = self::$urlUserInfoList . self::getAccessToken($appId);
-        $sendRes = self::sendPostReq($url, 'json', $saveArr);
-        $resData = Tool::jsonDecode($sendRes);
-        if (isset($resData['user_info_list'])) {
-            $resArr['data'] = $resData['user_info_list'];
-        } else {
-            $resArr['code'] = ErrorCode::WX_POST_ERROR;
-            $resArr['message'] = $resData['errmsg'];
         }
 
         return $resArr;

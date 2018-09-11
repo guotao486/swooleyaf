@@ -27,49 +27,41 @@ class PayCompany extends WxBaseShop {
      * @var string
      */
     private $mchid = '';
-
     /**
      * 随机字符串
      * @var string
      */
     private $nonce_str = '';
-
     /**
      * 商户订单号
      * @var string
      */
     private $partner_trade_no = '';
-
     /**
      * 用户openid
      * @var string
      */
     private $openid = '';
-
     /**
      * 校验用户姓名选项
      * @var string
      */
     private $check_name = '';
-
     /**
      * 收款用户姓名
      * @var string
      */
     private $re_user_name = '';
-
     /**
      * 金额
      * @var int
      */
     private $amount = 0;
-
     /**
      * 企业付款描述信息
      * @var string
      */
     private $desc = '';
-
     /**
      * Ip地址
      * @var string
