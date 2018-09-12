@@ -46,11 +46,11 @@ class WxOpenController extends CommonController {
      * @apiUse CommonFail
      */
     public function getComponentAuthUrlAction() {
-        $authUrl = \Wx\WxUtilOpenBase::getAuthUrl();
-        if(strlen($authUrl) > 0){
-            $this->SyResult->setData([
-                'url' => $authUrl,
-            ]);
+        $authorizerUrl = new \Wx2\OpenCommon\AuthorizerUrl();
+        $detail = $authorizerUrl->getDetail();
+        unset($authorizerUrl);
+        if(strlen($detail['url']) > 0){
+            $this->SyResult->setData($detail);
         } else {
             $this->SyResult->setCodeMsg(\Constant\ErrorCode::COMMON_PARAM_ERROR, '获取授权地址失败');
         }

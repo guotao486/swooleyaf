@@ -12,7 +12,6 @@ use DesignPatterns\Singletons\WxConfigSingleton;
 use Exception\Wx\WxOpenException;
 use Tool\Tool;
 use Traits\SimpleTrait;
-use Wx\Open\MiniCodeUpload;
 
 final class WxUtilOpenMini extends WxUtilOpenBase {
     use SimpleTrait;
@@ -24,7 +23,6 @@ final class WxUtilOpenMini extends WxUtilOpenBase {
     private static $urlModifyMiniServerDomain = 'https://api.weixin.qq.com/wxa/modify_domain?access_token=';
     private static $urlSetMiniWebViewDomain = 'https://api.weixin.qq.com/wxa/setwebviewdomain?access_token=';
     private static $urlRebindMiniAdmin = 'https://api.weixin.qq.com/cgi-bin/account/componentrebindadmin?access_token=';
-    private static $urlUploadMiniCode = 'https://api.weixin.qq.com/wxa/commit?access_token=';
     private static $urlGetMiniCategory = 'https://api.weixin.qq.com/wxa/get_category?access_token=';
     private static $urlGetMiniPageConfig = 'https://api.weixin.qq.com/wxa/get_page?access_token=';
     private static $urlAuditMiniCode = 'https://api.weixin.qq.com/wxa/submit_audit?access_token=';
@@ -263,34 +261,6 @@ final class WxUtilOpenMini extends WxUtilOpenBase {
         } else {
             $resArr['code'] = ErrorCode::WXOPEN_POST_ERROR;
             $resArr['message'] = $rebindData['errmsg'];
-        }
-
-        return $resArr;
-    }
-
-    /**
-     * 上传小程序代码
-     * @param string $appId 小程序app id
-     * @param \Wx\Open\MiniCodeUpload $codeUpload
-     * @return array
-     */
-    public static function uploadMiniCode(string $appId,MiniCodeUpload $codeUpload){
-        $resArr = [
-            'code' => 0,
-        ];
-
-        $uploadData = $codeUpload->getDetail();
-        $url = self::$urlUploadMiniCode . self::getAuthorizerAccessToken($appId);
-        $uploadRes = self::sendPostReq($url, 'json', $uploadData, [
-            CURLOPT_SSL_VERIFYPEER => false,
-            CURLOPT_SSL_VERIFYHOST => false,
-        ]);
-        $uploadData = Tool::jsonDecode($uploadRes);
-        if($uploadData['errcode'] == 0){
-            $resArr['data'] = $uploadData;
-        } else {
-            $resArr['code'] = ErrorCode::WXOPEN_POST_ERROR;
-            $resArr['message'] = $uploadData['errmsg'];
         }
 
         return $resArr;

@@ -12,17 +12,12 @@ use Exception\Wx\WxOpenException;
 use Tool\Tool;
 
 class WxConfigOpenCommon {
-    public function __construct(){
-    }
-
-    private function __clone() {
-    }
-
     /**
      * 开放平台access token超时时间,单位为秒
      * @var int
      */
     private $expireComponentAccessToken = 0;
+
     /**
      * 授权者access token超时时间,单位为秒
      * @var int
@@ -83,6 +78,12 @@ class WxConfigOpenCommon {
      * @var array
      */
     private $domainMiniWebViews = [];
+
+    public function __construct(){
+    }
+
+    private function __clone() {
+    }
 
     /**
      * @return int

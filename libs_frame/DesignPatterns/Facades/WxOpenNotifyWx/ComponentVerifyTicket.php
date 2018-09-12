@@ -9,12 +9,15 @@ namespace DesignPatterns\Facades\WxOpenNotifyWx;
 
 use DesignPatterns\Facades\WxOpenNotifyWxFacade;
 use Traits\SimpleFacadeTrait;
-use Wx\WxUtilOpenBase;
+use Wx2\OpenCommon\ComponentAccessToken;
 
 class ComponentVerifyTicket extends WxOpenNotifyWxFacade {
     use SimpleFacadeTrait;
 
     protected static function handleNotify(array $data) {
-        WxUtilOpenBase::refreshComponentAccessToken($data['ComponentVerifyTicket']);
+        $accessToken = new ComponentAccessToken();
+        $accessToken->setVerifyTicket($data['ComponentVerifyTicket']);
+        $accessToken->getDetail();
+        unset($accessToken);
     }
 }

@@ -13,8 +13,8 @@ use Exception\Common\CheckException;
 use Factories\SyBaseMysqlFactory;
 use Tool\Tool;
 use Traits\SimpleDaoTrait;
-use Wx\Open\MiniCodeUpload;
 use Wx\WxUtilOpenMini;
+use Wx2\OpenMini\CodeUpload;
 
 class WxOpenMiniDao {
     use SimpleDaoTrait;
@@ -96,12 +96,13 @@ class WxOpenMiniDao {
     }
 
     public static function uploadMiniCode(array $data){
-        $codeUpload = new MiniCodeUpload();
+        $codeUpload = new CodeUpload($data['wxmini_appid']);
         $codeUpload->setTemplateId($data['template_id']);
         $codeUpload->setExtData($data['ext_json']);
         $codeUpload->setUserVersion($data['user_version']);
         $codeUpload->setUserDesc($data['user_desc']);
-        $uploadRes = WxUtilOpenMini::uploadMiniCode($data['wxmini_appid'], $codeUpload);
+        $uploadRes = $codeUpload->getDetail();
+        unset($codeUpload);
         if($uploadRes['code'] > 0){
             throw new CheckException($uploadRes['message'], $uploadRes['code']);
         }
@@ -117,7 +118,7 @@ class WxOpenMiniDao {
             'option_status' => Project::WXMINI_OPTION_STATUS_UPLOADED,
             'updated' => Tool::getNowTime(),
         ]);
-        unset($codeUpload, $ormResult1, $wxMiniConfig);
+        unset($ormResult1, $wxMiniConfig);
 
         return [
             'msg' => '上传小程序代码成功',

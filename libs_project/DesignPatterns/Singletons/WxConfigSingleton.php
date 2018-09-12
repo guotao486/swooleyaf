@@ -11,8 +11,8 @@ use Constant\Project;
 use Factories\SyBaseMysqlFactory;
 use Tool\Tool;
 use Traits\SingletonTrait;
-use Wx\WxConfigOpenCommon;
-use Wx\WxConfigShop;
+use Wx2\WxConfigOpenCommon;
+use Wx2\WxConfigShop;
 
 class WxConfigSingleton {
     use SingletonTrait;
@@ -24,7 +24,7 @@ class WxConfigSingleton {
     private $shopConfigs = [];
     /**
      * 开放平台公共配置
-     * @var \Wx\WxConfigOpenCommon
+     * @var \Wx2\WxConfigOpenCommon
      */
     private $openCommonConfig = null;
     /**
@@ -79,7 +79,7 @@ class WxConfigSingleton {
     /**
      * 获取本地商户平台配置
      * @param string $appId
-     * @return \Wx\WxConfigShop|null
+     * @return \Wx2\WxConfigShop|null
      */
     private function getLocalShopConfig(string $appId) {
         $nowTime = Tool::getNowTime();
@@ -103,7 +103,7 @@ class WxConfigSingleton {
     /**
      * 更新商户平台配置
      * @param string $appId
-     * @return \Wx\WxConfigShop
+     * @return \Wx2\WxConfigShop
      */
     public function refreshShopConfig(string $appId) {
         $expireTime = Tool::getNowTime() + Project::TIME_EXPIRE_LOCAL_WXSHOP_REFRESH;
@@ -143,7 +143,7 @@ class WxConfigSingleton {
     /**
      * 获取商户平台配置
      * @param string $appId
-     * @return \Wx\WxConfigShop|null
+     * @return \Wx2\WxConfigShop|null
      */
     public function getShopConfig(string $appId) {
         $nowTime = Tool::getNowTime();
@@ -182,7 +182,7 @@ class WxConfigSingleton {
 
     /**
      * 获取开放平台公共配置
-     * @return \Wx\WxConfigOpenCommon
+     * @return \Wx2\WxConfigOpenCommon
      */
     public function getOpenCommonConfig(){
         return $this->openCommonConfig;
@@ -190,7 +190,7 @@ class WxConfigSingleton {
 
     /**
      * 设置开放平台公共配置
-     * @param \Wx\WxConfigOpenCommon $config
+     * @param \Wx2\WxConfigOpenCommon $config
      */
     public function setOpenCommonConfig(WxConfigOpenCommon $config) {
         $this->openCommonConfig = $config;

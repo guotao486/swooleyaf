@@ -11,7 +11,7 @@ use DesignPatterns\Facades\WxOpenNotifyAuthorizerFacade;
 use DesignPatterns\Singletons\WxConfigSingleton;
 use Tool\Tool;
 use Traits\SimpleFacadeTrait;
-use Wx\WxUtilOpenBase;
+use Wx2\OpenCommon\AuthorizerInfo;
 
 class TextQueryAuthCode extends WxOpenNotifyAuthorizerFacade {
     use SimpleFacadeTrait;
@@ -20,7 +20,10 @@ class TextQueryAuthCode extends WxOpenNotifyAuthorizerFacade {
         $openCommonConfig = WxConfigSingleton::getInstance()->getOpenCommonConfig();
         $authCode = str_replace('QUERY_AUTH_CODE:', '', $data['Content']);
         //使用授权码换取公众号的授权信息
-        $authInfo = WxUtilOpenBase::getAuthorizerAuth($openCommonConfig->getAppId(), $authCode);
+        $authorizerInfo = new AuthorizerInfo($openCommonConfig->getAppId());
+        $authorizerInfo->setAuthCode($authCode);
+        $authInfo = $authorizerInfo->getDetail();
+        unset($authorizerInfo);
         //调用发送客服消息api回复文本消息
         $url = 'https://api.weixin.qq.com/cgi-bin/message/custom/send?access_token=' . $authInfo['data']['authorization_info']['authorizer_access_token'];
         Tool::sendCurlReq([
