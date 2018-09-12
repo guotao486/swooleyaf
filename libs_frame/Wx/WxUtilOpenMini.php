@@ -16,10 +16,6 @@ use Traits\SimpleTrait;
 final class WxUtilOpenMini extends WxUtilOpenBase {
     use SimpleTrait;
 
-    private static $urlGetMiniDraftCodeList = 'https://api.weixin.qq.com/wxa/gettemplatedraftlist?access_token=';
-    private static $urlGetMiniTemplateCodeList = 'https://api.weixin.qq.com/wxa/gettemplatelist?access_token=';
-    private static $urlAddMiniTemplateCode = 'https://api.weixin.qq.com/wxa/addtotemplate?access_token=';
-    private static $urlDelMiniTemplateCode = 'https://api.weixin.qq.com/wxa/deletetemplate?access_token=';
     private static $urlModifyMiniServerDomain = 'https://api.weixin.qq.com/wxa/modify_domain?access_token=';
     private static $urlSetMiniWebViewDomain = 'https://api.weixin.qq.com/wxa/setwebviewdomain?access_token=';
     private static $urlRebindMiniAdmin = 'https://api.weixin.qq.com/cgi-bin/account/componentrebindadmin?access_token=';
@@ -38,106 +34,6 @@ final class WxUtilOpenMini extends WxUtilOpenBase {
     private static $urlChangeMiniSearchStatus = 'https://api.weixin.qq.com/wxa/changewxasearchstatus?access_token=';
     private static $urlGetMiniSearchStatus = 'https://api.weixin.qq.com/wxa/getwxasearchstatus?access_token=';
     private static $urlMiniPlugin = 'https://api.weixin.qq.com/wxa/plugin?access_token=';
-
-    /**
-     * 获取草稿代码列表
-     * @return array
-     */
-    public static function getDraftCodeList() : array {
-        $resArr = [
-            'code' => 0,
-        ];
-
-        $url = self::$urlGetMiniDraftCodeList . self::getComponentAccessToken(WxConfigSingleton::getInstance()->getOpenCommonConfig()->getAppId());
-        $getRes = self::sendGetReq($url);
-        $getData = Tool::jsonDecode($getRes);
-        if($getData['errcode'] == 0){
-            $resArr['data'] = $getData;
-        } else {
-            $resArr['code'] = ErrorCode::WXOPEN_GET_ERROR;
-            $resArr['message'] = $getData['errmsg'];
-        }
-
-        return $resArr;
-    }
-
-    /**
-     * 获取模板代码列表
-     * @return array
-     */
-    public static function getTemplateCodeList() : array {
-        $resArr = [
-            'code' => 0,
-        ];
-
-        $url = self::$urlGetMiniTemplateCodeList . self::getComponentAccessToken(WxConfigSingleton::getInstance()->getOpenCommonConfig()->getAppId());
-        $getRes = self::sendGetReq($url);
-        $getData = Tool::jsonDecode($getRes);
-        if($getData['errcode'] == 0){
-            $resArr['data'] = $getData;
-        } else {
-            $resArr['code'] = ErrorCode::WXOPEN_GET_ERROR;
-            $resArr['message'] = $getData['errmsg'];
-        }
-
-        return $resArr;
-    }
-
-    /**
-     * 添加模板代码
-     * @param string $draftId 草稿ID
-     * @return array
-     */
-    public static function addTemplateCode(string $draftId) : array {
-        $resArr = [
-            'code' => 0,
-        ];
-
-        $url = self::$urlAddMiniTemplateCode . self::getComponentAccessToken(WxConfigSingleton::getInstance()->getOpenCommonConfig()->getAppId());
-        $addRes = self::sendPostReq($url, 'json', [
-            'draft_id' => $draftId,
-        ], [
-            CURLOPT_SSL_VERIFYPEER => false,
-            CURLOPT_SSL_VERIFYHOST => false,
-        ]);
-        $addData = Tool::jsonDecode($addRes);
-        if($addData['errcode'] == 0){
-            $resArr['data'] = $addData;
-        } else {
-            $resArr['code'] = ErrorCode::WXOPEN_POST_ERROR;
-            $resArr['message'] = $addData['errmsg'];
-        }
-
-        return $resArr;
-    }
-
-    /**
-     * 删除模板代码
-     * @param string $templateId 模板ID
-     * @return array
-     */
-    public static function deleteTemplateCode(string $templateId) : array {
-        $resArr = [
-            'code' => 0,
-        ];
-
-        $url = self::$urlDelMiniTemplateCode . self::getComponentAccessToken(WxConfigSingleton::getInstance()->getOpenCommonConfig()->getAppId());
-        $delRes = self::sendPostReq($url, 'json', [
-            'template_id' => $templateId,
-        ], [
-            CURLOPT_SSL_VERIFYPEER => false,
-            CURLOPT_SSL_VERIFYHOST => false,
-        ]);
-        $delData = Tool::jsonDecode($delRes);
-        if($delData['errcode'] == 0){
-            $resArr['data'] = $delData;
-        } else {
-            $resArr['code'] = ErrorCode::WXOPEN_POST_ERROR;
-            $resArr['message'] = $delData['errmsg'];
-        }
-
-        return $resArr;
-    }
 
     /**
      * 设置小程序服务器域名

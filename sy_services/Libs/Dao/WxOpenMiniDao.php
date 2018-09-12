@@ -15,12 +15,18 @@ use Tool\Tool;
 use Traits\SimpleDaoTrait;
 use Wx\WxUtilOpenMini;
 use Wx2\OpenMini\CodeUpload;
+use Wx2\OpenMini\DraftCodeList;
+use Wx2\OpenMini\TemplateCodeAdd;
+use Wx2\OpenMini\TemplateCodeDelete;
+use Wx2\OpenMini\TemplateCodeList;
 
 class WxOpenMiniDao {
     use SimpleDaoTrait;
 
     public static function getDraftCodeList(array $data){
-        $codeList = WxUtilOpenMini::getDraftCodeList();
+        $draftCodeList = new DraftCodeList();
+        $codeList = $draftCodeList->getDetail();
+        unset($draftCodeList);
         if($codeList['code'] > 0){
             throw new CheckException($codeList['message'], $codeList['code']);
         }
@@ -29,7 +35,9 @@ class WxOpenMiniDao {
     }
 
     public static function getTemplateCodeList(array $data){
-        $codeList = WxUtilOpenMini::getTemplateCodeList();
+        $templateCodeList = new TemplateCodeList();
+        $codeList = $templateCodeList->getDetail();
+        unset($templateCodeList);
         if($codeList['code'] > 0){
             throw new CheckException($codeList['message'], $codeList['code']);
         }
@@ -38,7 +46,10 @@ class WxOpenMiniDao {
     }
 
     public static function addTemplateCode(array $data){
-        $addRes = WxUtilOpenMini::addTemplateCode($data['draft_id']);
+        $templateCodeAdd = new TemplateCodeAdd();
+        $templateCodeAdd->setDraftId($data['draft_id']);
+        $addRes = $templateCodeAdd->getDetail();
+        unset($templateCodeAdd);
         if($addRes['code'] > 0){
             throw new CheckException($addRes['message'], $addRes['code']);
         }
@@ -49,7 +60,10 @@ class WxOpenMiniDao {
     }
 
     public static function delTemplateCode(array $data){
-        $delRes = WxUtilOpenMini::deleteTemplateCode($data['template_id']);
+        $templateCodeDelete = new TemplateCodeDelete();
+        $templateCodeDelete->setTemplateId($data['template_id']);
+        $delRes = $templateCodeDelete->getDetail();
+        unset($templateCodeDelete);
         if($delRes['code'] > 0){
             throw new CheckException($delRes['message'], $delRes['code']);
         }
