@@ -16,9 +16,11 @@ use Traits\SimpleDaoTrait;
 use Wx\WxUtilOpenMini;
 use Wx2\OpenMini\CodeUpload;
 use Wx2\OpenMini\DraftCodeList;
+use Wx2\OpenMini\ServerDomain;
 use Wx2\OpenMini\TemplateCodeAdd;
 use Wx2\OpenMini\TemplateCodeDelete;
 use Wx2\OpenMini\TemplateCodeList;
+use Wx2\OpenMini\WebViewDomain;
 
 class WxOpenMiniDao {
     use SimpleDaoTrait;
@@ -74,7 +76,10 @@ class WxOpenMiniDao {
     }
 
     public static function modifyServerDomain(array $data){
-        $modifyRes = WxUtilOpenMini::modifyMiniServerDomain($data['wxmini_appid'], $data['action_type'], $data['domains']);
+        $serverDomain = new ServerDomain($data['wxmini_appid']);
+        $serverDomain->setModifyData($data['action_type'], $data['domains']);
+        $modifyRes = $serverDomain->getDetail();
+        unset($serverDomain);
         if($modifyRes['code'] > 0){
             throw new CheckException($modifyRes['message'], $modifyRes['code']);
         }
@@ -83,7 +88,10 @@ class WxOpenMiniDao {
     }
 
     public static function setWebViewDomain(array $data){
-        $setRes = WxUtilOpenMini::setMiniWebViewDomain($data['wxmini_appid'], $data['action_type'], $data['domains']);
+        $webViewDomain = new WebViewDomain($data['wxmini_appid']);
+        $webViewDomain->setData($data['action_type'], $data['domains']);
+        $setRes = $webViewDomain->getDetail();
+        unset($webViewDomain);
         if($setRes['code'] > 0){
             throw new CheckException($setRes['message'], $setRes['code']);
         }
