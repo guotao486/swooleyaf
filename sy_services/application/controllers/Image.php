@@ -75,7 +75,7 @@ class ImageController extends CommonController {
         } else {
             $imageSize = (int)\Request\SyRequest::getParams('image_size', 430);
             $hyaline = (int)\Request\SyRequest::getParams('hyaline', 1);
-            $qrCode = new \Wx\Mini\Qrcode();
+            $qrCode = new \Wx2\Mini\Qrcode($wxAppId);
             $qrCode->setPage($pageUrl);
             $qrCode->setScene($pageScene);
             $qrCode->setAutoColor(false);
@@ -85,7 +85,7 @@ class ImageController extends CommonController {
             } else {
                 $qrCode->setIsHyaline(false);
             }
-            $createRes = \Wx\WxUtilMini::getQrcode($wxAppId, $qrCode);
+            $createRes = $qrCode->getDetail();
             unset($qrCode);
             if($createRes['code'] == 0){
                 $this->SyResult->setData($createRes['data']);

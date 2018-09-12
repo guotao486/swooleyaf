@@ -81,7 +81,7 @@ class PayController extends CommonController {
     public function handleWxPrePayNotifyAction() {
         $appId = (string)\Request\SyRequest::getParams('appid');
         $productId = (string)\Request\SyRequest::getParams('product_id', '');
-        $returnObj = new \Wx\Shop\NativeReturn($appId);
+        $returnObj = new \Wx2\Shop\NativeReturn($appId);
         $redisKey = \Constant\Project::REDIS_PREFIX_WX_NATIVE_PRE . $productId;
         $cacheData = \DesignPatterns\Factories\CacheSimpleFactory::getRedisInstance()->hGetAll($redisKey);
         if (is_array($cacheData) && isset($cacheData['cache_key']) && ($cacheData['cache_key'] == $redisKey)) {
@@ -89,12 +89,13 @@ class PayController extends CommonController {
             //生成一条新的单号记录
             $orderSn = substr($productId, 0, 4) . \Tool\Tool::createUniqueId();
             //统一下单
-            $order = new \Wx\Shop\UnifiedOrder(\Wx\Shop\UnifiedOrder::TRADE_TYPE_NATIVE, $appId);
+            $order = new \Wx2\Shop\UnifiedOrder($appId, \Wx2\Shop\UnifiedOrder::TRADE_TYPE_NATIVE);
             $order->setBody($cacheData['pay_name']);
             $order->setOutTradeNo($orderSn);
             $order->setTotalFee($cacheData['pay_money']);
             $order->setAttach($cacheData['pay_attach']);
-            $applyRes = \Wx\WxUtilShop::applyNativePay($order);
+            $applyRes = $order->getDetail();
+            unset($order);
             if($applyRes['code'] == 0){
                 $returnObj->setNonceStr($nonceStr);
                 $returnObj->setPrepayId($applyRes['data']['prepay_id']);

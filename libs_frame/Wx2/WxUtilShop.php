@@ -42,4 +42,19 @@ final class WxUtilShop extends WxUtilBaseAlone {
         //签名步骤四：所有字符转为大写
         return strtoupper($needStr2);
     }
+
+    /**
+     * 校验数据签名合法性
+     * @param array $data 待校验数据
+     * @param string $appId
+     * @return bool
+     */
+    public static function checkSign(array $data,string $appId) : bool {
+        if (isset($data['sign']) && is_string($data['sign'])) {
+            $nowSign = self::createSign($data, $appId);
+            return $nowSign === $data['sign'];
+        }
+
+        return false;
+    }
 }

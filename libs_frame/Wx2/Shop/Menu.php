@@ -1,16 +1,17 @@
 <?php
 /**
  * Created by PhpStorm.
- * User: Administrator
- * Date: 2017-04-04
- * Time: 18:14
+ * User: 姜伟
+ * Date: 2018/9/12 0012
+ * Time: 15:52
  */
-namespace Wx\Shop;
+namespace Wx2\Shop;
 
 use Constant\ErrorCode;
 use Exception\Wx\WxException;
+use Wx2\WxBaseShop;
 
-class Menu extends ShopBase {
+class Menu extends WxBaseShop {
     private static $typeList = [
         'pic_weixin',
         'pic_sysphoto',
@@ -23,13 +24,6 @@ class Menu extends ShopBase {
         'scancode_push',
         'scancode_waitmsg',
     ];
-
-    public function __construct() {
-        parent::__construct();
-    }
-
-    private function __clone(){
-    }
 
     /**
      * 菜单标题
@@ -67,13 +61,20 @@ class Menu extends ShopBase {
      */
     private $media_id = '';
 
+    public function __construct(){
+        parent::__construct();
+    }
+
+    public function __clone(){
+    }
+
     /**
      * @param string $name
      * @throws \Exception\Wx\WxException
      */
     public function setName(string $name) {
         if (strlen($name) > 0) {
-            $this->name = mb_substr($name, 0, 5);
+            $this->reqData['name'] = mb_substr($name, 0, 5);
         } else {
             throw new WxException('菜单名称不合法', ErrorCode::WX_PARAM_ERROR);
         }
@@ -101,7 +102,7 @@ class Menu extends ShopBase {
      */
     public function setType(string $type) {
         if (in_array($type, self::$typeList)) {
-            $this->type = $type;
+            $this->reqData['type'] = $type;
         } else {
             throw  new WxException('响应动作类型不合法', ErrorCode::WX_PARAM_ERROR);
         }
@@ -111,7 +112,9 @@ class Menu extends ShopBase {
      * @param string $key
      */
     public function setKey(string $key) {
-        $this->key = substr($key, 0, 128);
+        if(strlen($key) > 0){
+            $this->reqData['key'] = substr($key, 0, 128);
+        }
     }
 
     /**
@@ -120,7 +123,7 @@ class Menu extends ShopBase {
      */
     public function setUrl(string $url) {
         if (preg_match('/^(http|https)\:\/\/\S+$/', $url) > 0) {
-            $this->url = $url;
+            $this->reqData['url'] = $url;
         } else {
             throw new WxException('网页链接不合法', ErrorCode::WX_PARAM_ERROR);
         }
@@ -132,35 +135,21 @@ class Menu extends ShopBase {
      */
     public function setMediaId(string $mediaId) {
         if (strlen($mediaId) > 0) {
-            $this->media_id = $mediaId;
+            $this->reqData['media_id'] = $mediaId;
         } else {
             throw new WxException('媒体ID不合法', ErrorCode::WX_PARAM_ERROR);
         }
     }
 
     public function getDetail() : array {
-        if(strlen($this->name) == 0){
+        if(!isset($this->reqData['name'])){
             throw new WxException('菜单名称不能为空', ErrorCode::WX_PARAM_ERROR);
         }
-        if(strlen($this->type) == 0){
+        if(!isset($this->reqData['type'])){
             throw new WxException('响应动作类型不能为空', ErrorCode::WX_PARAM_ERROR);
         }
+        $this->reqData['sub_button'] = $this->sub_button;
 
-        $resArr = [
-            'name' => $this->name,
-            'type' => $this->type,
-            'sub_button' => $this->sub_button,
-        ];
-        if(strlen($this->key) > 0){
-            $resArr['key'] = $this->key;
-        }
-        if(strlen($this->url) > 0){
-            $resArr['url'] = $this->url;
-        }
-        if(strlen($this->media_id) > 0){
-            $resArr['media_id'] = $this->media_id;
-        }
-
-        return $resArr;
+        return $this->reqData;
     }
 }

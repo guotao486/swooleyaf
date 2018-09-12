@@ -138,22 +138,4 @@ abstract class WxUtilAloneBase extends WxUtilBase {
         $cacheData = self::refreshWxAccountCache($appId);
         return $cacheData['access_token'];
     }
-
-    /**
-     * 获取jsapi ticket
-     * @param string $appId
-     * @return string
-     */
-    public static function getJsTicket(string $appId) : string {
-        if(SY_CACHE_WXSHOP){
-            $nowTime = Tool::getNowTime();
-            $localCacheData = BaseServer::getWxShopTokenCache($appId, '', []);
-            if (isset($localCacheData['expire_time']) && ($localCacheData['expire_time'] >= $nowTime)) {
-                return $localCacheData['js_ticket'];
-            }
-        }
-
-        $cacheData = self::refreshWxAccountCache($appId);
-        return $cacheData['js_ticket'];
-    }
 }

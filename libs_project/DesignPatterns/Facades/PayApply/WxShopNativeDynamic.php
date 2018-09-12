@@ -12,8 +12,7 @@ use DesignPatterns\Facades\PayApplyFacade;
 use Exception\Common\CheckException;
 use Tool\Tool;
 use Traits\SimpleFacadeTrait;
-use Wx\Shop\UnifiedOrder;
-use Wx\WxUtilShop;
+use Wx2\Shop\UnifiedOrder;
 
 class WxShopNativeDynamic extends PayApplyFacade {
     use SimpleFacadeTrait;
@@ -25,12 +24,12 @@ class WxShopNativeDynamic extends PayApplyFacade {
     }
 
     protected static function apply(array $data) : array {
-        $order = new UnifiedOrder(UnifiedOrder::TRADE_TYPE_NATIVE, $data['a00_appid']);
+        $order = new UnifiedOrder($data['a00_appid'], UnifiedOrder::TRADE_TYPE_NATIVE);
         $order->setBody($data['content_result']['pay_name']);
         $order->setTotalFee($data['content_result']['pay_money']);
         $order->setOutTradeNo($data['content_result']['pay_sn']);
         $order->setAttach($data['content_result']['pay_attach']);
-        $applyRes = WxUtilShop::applyNativePay($order);
+        $applyRes = $order->getDetail();
         unset($order);
         if($applyRes['code'] > 0){
             throw new CheckException($applyRes['message'], ErrorCode::COMMON_PARAM_ERROR);

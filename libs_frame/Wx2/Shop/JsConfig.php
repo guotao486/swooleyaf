@@ -26,6 +26,10 @@ class JsConfig extends WxBaseShop {
      */
     private $nonceStr = '';
     /**
+     * @var string
+     */
+    private $url = '';
+    /**
      * 平台类型 shop：公众号 openshop：第三方平台代理公众号
      * @var string
      */
@@ -33,13 +37,45 @@ class JsConfig extends WxBaseShop {
 
     public function __construct(string $appId) {
         parent::__construct();
-        $this->reqData['appId'] = $appId;
+        $shopConfig = WxConfigSingleton::getInstance()->getShopConfig($appId);
+        $this->reqData['appId'] = $shopConfig->getAppId();
         $this->reqData['timestamp'] = Tool::getNowTime();
         $this->reqData['nonceStr'] = Tool::createNonceStr(32, 'numlower');
-        $this->platType = WxUtilBase::TYPE_SHOP;
+        $this->url = $shopConfig->getPayAuthUrl();
+        $this->platType = WxUtilBase::PLAT_TYPE_SHOP;
     }
 
     private function __clone(){
+    }
+
+    /**
+     * @param int $timestamp
+     */
+    public function setTimestamp(int $timestamp) {
+        if(($timestamp > 0) && (strlen($timestamp) == 10)){
+            $this->reqData['timestamp'] = $timestamp;
+        }
+    }
+
+    /**
+     * @param string $nonceStr
+     */
+    public function setNonceStr(string $nonceStr) {
+        if(ctype_alnum($nonceStr) && (strlen($nonceStr) >= 16) && (strlen($nonceStr) <= 32)){
+            $this->reqData['nonceStr'] = $nonceStr;
+        }
+    }
+
+    /**
+     * @param string $url
+     * @throws \Exception\Wx\WxException
+     */
+    public function setUrl(string $url) {
+        if (preg_match('/^(http|https|ftp)\:\/\/\S+$/', $url) > 0) {
+            $this->url = $url;
+        } else {
+            throw new WxException('链接不合法', ErrorCode::WX_PARAM_ERROR);
+        }
     }
 
     /**
@@ -47,7 +83,7 @@ class JsConfig extends WxBaseShop {
      * @throws \Exception\Wx\WxException
      */
     public function setPlatType(string $platType){
-        if(in_array($platType, [WxUtilBase::TYPE_SHOP, WxUtilBase::TYPE_OPEN_SHOP])){
+        if(in_array($platType, [WxUtilBase::PLAT_TYPE_SHOP, WxUtilBase::PLAT_TYPE_OPEN_SHOP])){
             $this->platType = $platType;
         } else {
             throw new WxException('平台类型不支持', ErrorCode::WX_PARAM_ERROR);
@@ -59,13 +95,13 @@ class JsConfig extends WxBaseShop {
      * @return array
      */
     public function getDetail() : array {
-        if ($this->platType == WxUtilBase::TYPE_SHOP) { //公众号获取jsapi_ticket
+        if ($this->platType == WxUtilBase::PLAT_TYPE_SHOP) { //公众号获取jsapi_ticket
             $ticket = WxUtilShop::getJsTicket($this->reqData['appId']);
         } else { //第三方平台获取jsapi_ticket
             $ticket = WxUtilOpenBase::getAuthorizerJsTicket($this->reqData['appId']);
         }
 
-        $needStr = 'jsapi_ticket=' . $ticket . '&noncestr=' . $this->reqData['nonceStr'] . '&timestamp=' . $this->reqData['nonceStr'] . '&url=' . WxConfigSingleton::getInstance()->getShopConfig($this->reqData['appId'])->getPayAuthUrl();
+        $needStr = 'jsapi_ticket=' . $ticket . '&noncestr=' . $this->reqData['nonceStr'] . '&timestamp=' . $this->reqData['nonceStr'] . '&url=' . $this->url;
         $this->reqData['signature'] = sha1($needStr);
         return $this->reqData;
     }

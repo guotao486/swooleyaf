@@ -2,29 +2,24 @@
 /**
  * Created by PhpStorm.
  * User: 姜伟
- * Date: 2018/1/26 0026
- * Time: 18:07
+ * Date: 2018/9/12 0012
+ * Time: 17:21
  */
-namespace Wx\Mini;
+namespace Wx2\Mini;
 
 use Constant\ErrorCode;
 use Exception\Wx\WxException;
+use Tool\Tool;
+use Wx2\WxBaseMini;
+use Wx2\WxUtilBase;
+use Wx2\WxUtilBaseAlone;
 
-class Qrcode extends MiniBase {
-    public function __construct(){
-        parent::__construct();
-        $this->width = 430;
-        $this->line_color = [
-            'r' => '0',
-            'g' => '0',
-            'b' => '0',
-        ];
-        $this->is_hyaline = false;
-    }
-
-    private function __clone(){
-    }
-
+class Qrcode extends WxBaseMini {
+    /**
+     * 应用ID
+     * @var string
+     */
+    private $app_id = '';
     /**
      * 场景
      * @var string
@@ -56,6 +51,23 @@ class Qrcode extends MiniBase {
      */
     private $is_hyaline = false;
 
+    public function __construct(string $appId){
+        parent::__construct();
+        $this->serviceUrl = 'https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=';
+        $this->app_id = $appId;
+        $this->reqData['width'] = 430;
+        $this->reqData['auto_color'] = false;
+        $this->reqData['line_color'] = [
+            'r' => '0',
+            'g' => '0',
+            'b' => '0',
+        ];
+        $this->reqData['is_hyaline'] = false;
+    }
+
+    public function __clone(){
+    }
+
     /**
      * @param string $scene
      * @throws \Exception\Wx\WxException
@@ -69,7 +81,7 @@ class Qrcode extends MiniBase {
             throw new WxException('场景标识不能超过32个字符', ErrorCode::WX_PARAM_ERROR);
         }
 
-        $this->scene = $trueScene;
+        $this->reqData['scene'] = $trueScene;
     }
 
     /**
@@ -79,7 +91,7 @@ class Qrcode extends MiniBase {
     public function setPage(string $page){
         $truePage = trim($page);
         if(strlen($truePage) > 0){
-            $this->page = $truePage;
+            $this->reqData['page'] = $truePage;
         } else {
             throw new WxException('页面地址不能为空', ErrorCode::WX_PARAM_ERROR);
         }
@@ -91,7 +103,7 @@ class Qrcode extends MiniBase {
      */
     public function setWidth(int $width){
         if ($width > 0) {
-            $this->width = $width;
+            $this->reqData['width'] = $width;
         } else {
             throw new WxException('二维码宽度必须大于0', ErrorCode::WX_PARAM_ERROR);
         }
@@ -101,7 +113,7 @@ class Qrcode extends MiniBase {
      * @param bool $autoColor
      */
     public function setAutoColor(bool $autoColor){
-        $this->auto_color = $autoColor;
+        $this->reqData['auto_color'] = $autoColor;
     }
 
     /**
@@ -119,7 +131,7 @@ class Qrcode extends MiniBase {
             throw new WxException('线条颜色blue不合法', ErrorCode::WX_PARAM_ERROR);
         }
 
-        $this->line_color = [
+        $this->reqData['line_color'] = [
             'r' => (string)$red,
             'g' => (string)$green,
             'b' => (string)$blue,
@@ -130,23 +142,33 @@ class Qrcode extends MiniBase {
      * @param bool $isHyaline true:需要透明底色 false:不需要透明底色
      */
     public function setIsHyaline(bool $isHyaline){
-        $this->is_hyaline = $isHyaline;
+        $this->reqData['is_hyaline'] = $isHyaline;
     }
 
     public function getDetail() : array {
-        if(strlen($this->scene) == 0){
+        if(!isset($this->reqData['scene'])){
             throw new WxException('场景标识必须填写', ErrorCode::WX_PARAM_ERROR);
-        } else if(strlen($this->page) == 0){
+        } else if(!isset($this->reqData['page'])){
             throw new WxException('页面地址必须填写', ErrorCode::WX_PARAM_ERROR);
         }
 
-        return [
-            'scene' => $this->scene,
-            'page' => $this->page,
-            'width' => $this->width,
-            'auto_color' => $this->auto_color,
-            'line_color' => $this->line_color,
-            'is_hyaline' => $this->is_hyaline,
+        $resArr = [
+            'code' => 0
         ];
+
+        $this->curlConfigs[CURLOPT_URL] = $this->serviceUrl . WxUtilBaseAlone::getAccessToken($this->app_id);
+        $this->curlConfigs[CURLOPT_POSTFIELDS] = Tool::jsonEncode($this->reqData, JSON_UNESCAPED_UNICODE);
+        $sendRes = WxUtilBase::sendPostReq($this->curlConfigs);
+        $sendData = Tool::jsonDecode($sendRes);
+        if(is_array($sendData)){
+            $resArr['code'] = ErrorCode::WX_POST_ERROR;
+            $resArr['message'] = $sendData['errmsg'];
+        } else {
+            $resArr['data'] = [
+                'image' => base64_encode($sendData),
+            ];
+        }
+
+        return $resArr;
     }
 }

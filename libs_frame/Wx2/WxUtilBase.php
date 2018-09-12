@@ -12,12 +12,18 @@ use Exception\Wx\WxException;
 use Tool\Tool;
 
 abstract class WxUtilBase {
-    const TYPE_SHOP = 'shop'; //类型-公众号
-    const TYPE_MINI = 'mini'; //类型-小程序
-    const TYPE_OPEN_SHOP = 'openshop'; //类型-第三方平台代理公众号
-    const TYPE_OPEN_MINI = 'openmini'; //类型-第三方平台代理小程序
+    const PLAT_TYPE_SHOP = 'shop'; //平台类型-公众号
+    const PLAT_TYPE_MINI = 'mini'; //平台类型-小程序
+    const PLAT_TYPE_OPEN_SHOP = 'openshop'; //平台类型-第三方平台代理公众号
+    const PLAT_TYPE_OPEN_MINI = 'openmini'; //平台类型-第三方平台代理小程序
     const URL_QRCODE = 'http://paysdk.weixin.qq.com/example/qrcode.php?data=';
 
+    public static $totalPlatTypes = [
+        self::PLAT_TYPE_SHOP => 1,
+        self::PLAT_TYPE_MINI => 1,
+        self::PLAT_TYPE_OPEN_SHOP => 1,
+        self::PLAT_TYPE_OPEN_MINI => 1,
+    ];
     public static $errorsShortUrl = [
         'XML_FORMAT_ERROR' => 'XML格式错误',
         'POST_DATA_EMPTY' => 'post数据为空',
