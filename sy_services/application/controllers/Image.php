@@ -75,7 +75,7 @@ class ImageController extends CommonController {
         } else {
             $imageSize = (int)\Request\SyRequest::getParams('image_size', 430);
             $hyaline = (int)\Request\SyRequest::getParams('hyaline', 1);
-            $qrCode = new \Wx2\Mini\Qrcode($wxAppId);
+            $qrCode = new \Wx\Mini\Qrcode($wxAppId);
             $qrCode->setPage($pageUrl);
             $qrCode->setScene($pageScene);
             $qrCode->setAutoColor(false);

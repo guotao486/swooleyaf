@@ -14,8 +14,8 @@ use Exception\Common\CheckException;
 use Tool\SyUser;
 use Tool\Tool;
 use Traits\SimpleFacadeTrait;
-use Wx2\Shop\UnifiedOrder;
-use Wx2\WxUtilBase;
+use Wx\Shop\UnifiedOrder;
+use Wx\WxUtilBase;
 
 class WxMiniJs extends PayApplyFacade {
     use SimpleFacadeTrait;

@@ -12,7 +12,7 @@ use DesignPatterns\Facades\PayApplyFacade;
 use Exception\Common\CheckException;
 use Tool\Tool;
 use Traits\SimpleFacadeTrait;
-use Wx2\Shop\UnifiedOrder;
+use Wx\Shop\UnifiedOrder;
 
 class WxShopNativeDynamic extends PayApplyFacade {
     use SimpleFacadeTrait;

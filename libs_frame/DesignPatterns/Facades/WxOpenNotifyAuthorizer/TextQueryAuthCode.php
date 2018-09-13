@@ -10,8 +10,8 @@ namespace DesignPatterns\Facades\WxOpenNotifyAuthorizer;
 use DesignPatterns\Facades\WxOpenNotifyAuthorizerFacade;
 use DesignPatterns\Singletons\WxConfigSingleton;
 use Traits\SimpleFacadeTrait;
-use Wx2\OpenCommon\AuthorizerInfo;
-use Wx2\Shop\CustomMsg;
+use Wx\OpenCommon\AuthorizerInfo;
+use Wx\Shop\CustomMsg;
 
 class TextQueryAuthCode extends WxOpenNotifyAuthorizerFacade {
     use SimpleFacadeTrait;

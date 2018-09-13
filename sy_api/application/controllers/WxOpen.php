@@ -46,7 +46,7 @@ class WxOpenController extends CommonController {
      * @apiUse CommonFail
      */
     public function getComponentAuthUrlAction() {
-        $authorizerUrl = new \Wx2\OpenCommon\AuthorizerUrl();
+        $authorizerUrl = new \Wx\OpenCommon\AuthorizerUrl();
         $detail = $authorizerUrl->getDetail();
         unset($authorizerUrl);
         if(strlen($detail['url']) > 0){
