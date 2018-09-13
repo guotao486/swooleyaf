@@ -59,7 +59,7 @@ class CodeUpload extends WxBaseOpenMini {
         if(strlen($templateId) > 0){
             $this->reqData['template_id'] = $templateId;
         } else {
-            throw new WxOpenException('代码模板ID不能为空', ErrorCode::WX_PARAM_ERROR);
+            throw new WxOpenException('代码模板ID不能为空', ErrorCode::WXOPEN_PARAM_ERROR);
         }
     }
 
@@ -71,7 +71,7 @@ class CodeUpload extends WxBaseOpenMini {
         if(strlen($userVersion) > 0){
             $this->reqData['user_version'] = $userVersion;
         } else {
-            throw new WxOpenException('自定义代码版本号不能为空', ErrorCode::WX_PARAM_ERROR);
+            throw new WxOpenException('自定义代码版本号不能为空', ErrorCode::WXOPEN_PARAM_ERROR);
         }
     }
 
@@ -83,7 +83,7 @@ class CodeUpload extends WxBaseOpenMini {
         if(strlen($userDesc) > 0){
             $this->reqData['user_desc'] = $userDesc;
         } else {
-            throw new WxOpenException('自定义代码描述不能为空', ErrorCode::WX_PARAM_ERROR);
+            throw new WxOpenException('自定义代码描述不能为空', ErrorCode::WXOPEN_PARAM_ERROR);
         }
     }
 
@@ -93,7 +93,7 @@ class CodeUpload extends WxBaseOpenMini {
      */
     public function setExtData(array $extData){
         if(empty($extData)){
-            throw new WxOpenException('自定义配置不能为空', ErrorCode::WX_PARAM_ERROR);
+            throw new WxOpenException('自定义配置不能为空', ErrorCode::WXOPEN_PARAM_ERROR);
         }
 
         $this->extData = $extData;

@@ -42,10 +42,10 @@ class WebViewDomain extends WxBaseOpenMini {
      */
     public function setData(string $action,array $domains=[]){
         if(!in_array($action, ['add', 'delete', 'set', 'get'])){
-            throw new WxOpenException('操作类型不支持', ErrorCode::COMMON_PARAM_ERROR);
+            throw new WxOpenException('操作类型不支持', ErrorCode::WXOPEN_PARAM_ERROR);
         } else if($action != 'get'){
             if(empty($domains)){
-                throw new WxOpenException('域名不能为空', ErrorCode::COMMON_PARAM_ERROR);
+                throw new WxOpenException('域名不能为空', ErrorCode::WXOPEN_PARAM_ERROR);
             }
 
             $this->data = $domains;
@@ -59,7 +59,7 @@ class WebViewDomain extends WxBaseOpenMini {
 
     public function getDetail() : array {
         if(empty($this->data)){
-            throw new WxOpenException('数据不能为空', ErrorCode::COMMON_PARAM_ERROR);
+            throw new WxOpenException('数据不能为空', ErrorCode::WXOPEN_PARAM_ERROR);
         }
 
         $resArr = [

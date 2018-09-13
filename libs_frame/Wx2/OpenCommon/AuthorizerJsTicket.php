@@ -35,13 +35,13 @@ class AuthorizerJsTicket extends WxBaseOpenCommon {
         if(strlen($accessToken) > 0){
             $this->accessToken = $accessToken;
         } else {
-            throw new WxOpenException('令牌不合法', ErrorCode::WX_PARAM_ERROR);
+            throw new WxOpenException('令牌不合法', ErrorCode::WXOPEN_PARAM_ERROR);
         }
     }
 
     public function getDetail() : array {
         if(strlen($this->accessToken) == 0){
-            throw new WxOpenException('令牌不能为空', ErrorCode::WX_PARAM_ERROR);
+            throw new WxOpenException('令牌不能为空', ErrorCode::WXOPEN_PARAM_ERROR);
         }
 
         $this->curlConfigs[CURLOPT_URL] = $this->serviceUrl . $this->accessToken;

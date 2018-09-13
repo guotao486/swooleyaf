@@ -38,13 +38,13 @@ class TemplateCodeDelete extends WxBaseOpenMini {
         if(strlen($templateId) > 0){
             $this->reqData['template_id'] = $templateId;
         } else {
-            throw new WxOpenException('模板ID不合法', ErrorCode::WX_PARAM_ERROR);
+            throw new WxOpenException('模板ID不合法', ErrorCode::WXOPEN_PARAM_ERROR);
         }
     }
 
     public function getDetail() : array {
         if(!isset($this->reqData['template_id'])){
-            throw new WxOpenException('模板ID不能为空', ErrorCode::WX_PARAM_ERROR);
+            throw new WxOpenException('模板ID不能为空', ErrorCode::WXOPEN_PARAM_ERROR);
         }
 
         $resArr = [

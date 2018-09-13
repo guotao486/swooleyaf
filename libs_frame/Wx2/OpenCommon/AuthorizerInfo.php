@@ -38,13 +38,13 @@ class AuthorizerInfo extends WxBaseOpenCommon {
         if (strlen($authCode) > 0) {
             $this->reqData['authorization_code'] = $authCode;
         } else {
-            throw new WxOpenException('授权码不合法', ErrorCode::WX_PARAM_ERROR);
+            throw new WxOpenException('授权码不合法', ErrorCode::WXOPEN_PARAM_ERROR);
         }
     }
 
     public function getDetail() : array {
         if(!isset($this->reqData['authorization_code'])){
-            throw new WxOpenException('授权码不能为空', ErrorCode::WX_PARAM_ERROR);
+            throw new WxOpenException('授权码不能为空', ErrorCode::WXOPEN_PARAM_ERROR);
         }
 
         $resArr = [

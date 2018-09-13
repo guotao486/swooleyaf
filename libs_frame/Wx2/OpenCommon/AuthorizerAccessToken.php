@@ -40,13 +40,13 @@ class AuthorizerAccessToken extends WxBaseOpenCommon {
         if(strlen($refreshToken) > 0){
             $this->reqData['authorizer_refresh_token'] = $refreshToken;
         } else {
-            throw new WxOpenException('刷新令牌不合法', ErrorCode::WX_PARAM_ERROR);
+            throw new WxOpenException('刷新令牌不合法', ErrorCode::WXOPEN_PARAM_ERROR);
         }
     }
 
     public function getDetail() : array {
         if(!isset($this->reqData['authorizer_refresh_token'])){
-            throw new WxOpenException('刷新令牌不能为空', ErrorCode::WX_PARAM_ERROR);
+            throw new WxOpenException('刷新令牌不能为空', ErrorCode::WXOPEN_PARAM_ERROR);
         }
 
         $this->curlConfigs[CURLOPT_URL] = $this->serviceUrl . WxUtilOpenBase::getComponentAccessToken($this->reqData['component_appid']);

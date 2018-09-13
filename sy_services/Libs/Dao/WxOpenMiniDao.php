@@ -13,9 +13,13 @@ use Exception\Common\CheckException;
 use Factories\SyBaseMysqlFactory;
 use Tool\Tool;
 use Traits\SimpleDaoTrait;
-use Wx\WxUtilOpenMini;
+use Wx2\OpenMini\CategoryGet;
+use Wx2\OpenMini\CodeAudit;
+use Wx2\OpenMini\CodeAuditStatus;
+use Wx2\OpenMini\CodeRelease;
 use Wx2\OpenMini\CodeUpload;
 use Wx2\OpenMini\DraftCodeList;
+use Wx2\OpenMini\PageGet;
 use Wx2\OpenMini\ServerDomain;
 use Wx2\OpenMini\TemplateCodeAdd;
 use Wx2\OpenMini\TemplateCodeDelete;
@@ -100,7 +104,9 @@ class WxOpenMiniDao {
     }
 
     public static function getMiniCategoryList(array $data){
-        $getRes = WxUtilOpenMini::getMiniCategory($data['wxmini_appid']);
+        $categoryGet = new CategoryGet($data['wxmini_appid']);
+        $getRes = $categoryGet->getDetail();
+        unset($categoryGet);
         if($getRes['code'] > 0){
             throw new CheckException($getRes['message'], $getRes['code']);
         }
@@ -109,7 +115,9 @@ class WxOpenMiniDao {
     }
 
     public static function getMiniPageConfig(array $data){
-        $getRes = WxUtilOpenMini::getMiniPageConfig($data['wxmini_appid']);
+        $pageGet = new PageGet($data['wxmini_appid']);
+        $getRes = $pageGet->getDetail();
+        unset($pageGet);
         if($getRes['code'] > 0){
             throw new CheckException($getRes['message'], $getRes['code']);
         }
@@ -158,7 +166,10 @@ class WxOpenMiniDao {
             throw new CheckException('未上传代码', ErrorCode::COMMON_PARAM_ERROR);
         }
 
-        $auditRes = WxUtilOpenMini::auditMiniCode($data['wxmini_appid'], $data['audit_items']);
+        $codeAudit = new CodeAudit($data['wxmini_appid']);
+        $codeAudit->setAuditList($data['audit_items']);
+        $auditRes = $codeAudit->getDetail();
+        unset($codeAudit);
         if($auditRes['code'] > 0){
             throw new CheckException($auditRes['message'], $auditRes['code']);
         }
@@ -198,7 +209,10 @@ class WxOpenMiniDao {
             ];
         }
 
-        $getRes = WxUtilOpenMini::getMiniAuditStatus($data['wxmini_appid'], $data['audit_id']);
+        $codeAuditStatus = new CodeAuditStatus($data['wxmini_appid']);
+        $codeAuditStatus->setAuditId($data['audit_id']);
+        $getRes = $codeAuditStatus->getDetail();
+        unset($codeAuditStatus);
         if($getRes['code'] > 0){
             throw new CheckException($getRes['message'], $getRes['code']);
         }
@@ -240,7 +254,9 @@ class WxOpenMiniDao {
             throw new CheckException('只有审核成功才允许发布', ErrorCode::COMMON_PARAM_ERROR);
         }
 
-        $releaseRes = WxUtilOpenMini::releaseMiniCode($data['wxmini_appid']);
+        $codeRelease = new CodeRelease($data['wxmini_appid']);
+        $releaseRes = $codeRelease->getDetail();
+        unset($codeRelease);
         if($releaseRes['code'] > 0){
             throw new CheckException($releaseRes['message'], $releaseRes['code']);
         }
@@ -287,13 +303,13 @@ class WxOpenMiniDao {
         $wxInfo = $wxMiniConfig->getContainer()->getModel()->findOne($ormResult1);
         if(empty($wxInfo)){
             unset($ormResult1, $wxMiniConfig);
-
             return $resArr;
         }
-
         $resArr['app_id'] = $wxInfo['app_id'];
 
-        $getRes = WxUtilOpenMini::getMiniCategory($wxInfo['app_id']);
+        $categoryGet = new CategoryGet($wxInfo['app_id']);
+        $getRes = $categoryGet->getDetail();
+        unset($categoryGet);
         if($getRes['code'] > 0){
             throw new CheckException($getRes['message'], $getRes['code']);
         } else if(empty($getRes['data']['category_list'])){
@@ -307,7 +323,6 @@ class WxOpenMiniDao {
         $resArr['items'][0]['address'] = 'pages/index/index';
         $resArr['items'][0]['tag'] = '小名片';
         $resArr['items'][0]['title'] = '小名片商城';
-
         return $resArr;
     }
 

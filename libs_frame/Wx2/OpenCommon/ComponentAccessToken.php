@@ -44,13 +44,13 @@ class ComponentAccessToken extends WxBaseOpenCommon {
         if(strlen($verifyTicket) > 0){
             $this->reqData['component_verify_ticket'] = $verifyTicket;
         } else {
-            throw new WxOpenException('校验令牌不合法', ErrorCode::WX_PARAM_ERROR);
+            throw new WxOpenException('校验令牌不合法', ErrorCode::WXOPEN_PARAM_ERROR);
         }
     }
 
     public function getDetail() : array {
         if(!isset($this->reqData['component_verify_ticket'])){
-            throw new WxOpenException('校验令牌不能为空', ErrorCode::WX_PARAM_ERROR);
+            throw new WxOpenException('校验令牌不能为空', ErrorCode::WXOPEN_PARAM_ERROR);
         }
 
         $this->curlConfigs[CURLOPT_URL] = $this->serviceUrl;
@@ -76,5 +76,7 @@ class ComponentAccessToken extends WxBaseOpenCommon {
             'value' => $sendData['component_access_token'],
             'expire_time' => $expireTime,
         ]);
+
+        return $sendData;
     }
 }

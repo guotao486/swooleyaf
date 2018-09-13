@@ -2,56 +2,61 @@
 /**
  * Created by PhpStorm.
  * User: 姜伟
- * Date: 18-9-12
- * Time: 下午11:59
+ * Date: 2018/9/13 0013
+ * Time: 8:16
  */
 namespace Wx2\OpenMini;
 
 use Constant\ErrorCode;
-use DesignPatterns\Singletons\WxConfigSingleton;
 use Exception\Wx\WxOpenException;
 use Tool\Tool;
 use Wx2\WxBaseOpenMini;
 use Wx2\WxUtilBase;
 use Wx2\WxUtilOpenBase;
 
-class TemplateCodeAdd extends WxBaseOpenMini {
+class MiniVersionSet extends WxBaseOpenMini {
     /**
-     * 草稿ID
+     * 应用ID
      * @var string
      */
-    private $draftId = '';
+    private $appId = '';
+    /**
+     * 最低版本号
+     * @var string
+     */
+    private $version = '';
 
-    public function __construct(){
+    public function __construct(string $appId){
         parent::__construct();
-        $this->serviceUrl = 'https://api.weixin.qq.com/wxa/addtotemplate?access_token=';
+        $this->serviceUrl = 'https://api.weixin.qq.com/cgi-bin/wxopen/setweappsupportversion?access_token=';
+        $this->appId = $appId;
     }
 
     public function __clone(){
     }
 
     /**
-     * @param string $draftId
+     * @param string $version
      * @throws \Exception\Wx\WxOpenException
      */
-    public function setDraftId(string $draftId){
-        if(strlen($draftId) > 0){
-            $this->reqData['draft_id'] = $draftId;
+    public function setVersion(string $version){
+        if(strlen($version) > 0){
+            $this->reqData['version'] = $version;
         } else {
-            throw new WxOpenException('草稿ID不合法', ErrorCode::WXOPEN_PARAM_ERROR);
+            throw new WxOpenException('最低版本号不合法', ErrorCode::WXOPEN_PARAM_ERROR);
         }
     }
 
     public function getDetail() : array {
-        if(!isset($this->reqData['draft_id'])){
-            throw new WxOpenException('草稿ID不能为空', ErrorCode::WXOPEN_PARAM_ERROR);
+        if(!isset($this->reqData['version'])){
+            throw new WxOpenException('最低版本号不能为空', ErrorCode::WXOPEN_PARAM_ERROR);
         }
 
         $resArr = [
             'code' => 0,
         ];
 
-        $this->curlConfigs[CURLOPT_URL] = $this->serviceUrl . WxUtilOpenBase::getComponentAccessToken(WxConfigSingleton::getInstance()->getOpenCommonConfig()->getAppId());
+        $this->curlConfigs[CURLOPT_URL] = $this->serviceUrl . WxUtilOpenBase::getAuthorizerAccessToken($this->appId);
         $this->curlConfigs[CURLOPT_POSTFIELDS] = Tool::jsonEncode($this->reqData, JSON_UNESCAPED_UNICODE);
         $this->curlConfigs[CURLOPT_SSL_VERIFYPEER] = false;
         $this->curlConfigs[CURLOPT_SSL_VERIFYHOST] = false;

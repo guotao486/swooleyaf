@@ -49,7 +49,6 @@ class AuthorizerUrl extends WxBaseOpenCommon {
             ];
         } else {
             Log::error('wxopen get auth url error:' . $sendRes, ErrorCode::WXOPEN_POST_ERROR);
-
             return [
                 'url' => '',
             ];

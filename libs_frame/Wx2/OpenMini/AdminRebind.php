@@ -38,13 +38,13 @@ class AdminRebind extends WxBaseOpenMini {
         if(strlen($taskId) > 0){
             $this->reqData['taskid'] = $taskId;
         } else {
-            throw new WxOpenException('任务ID不合法', ErrorCode::WX_PARAM_ERROR);
+            throw new WxOpenException('任务ID不合法', ErrorCode::WXOPEN_PARAM_ERROR);
         }
     }
 
     public function getDetail() : array {
         if(!isset($this->reqData['taskid'])){
-            throw new WxOpenException('任务ID不能为空', ErrorCode::COMMON_PARAM_ERROR);
+            throw new WxOpenException('任务ID不能为空', ErrorCode::WXOPEN_PARAM_ERROR);
         }
 
         $resArr = [

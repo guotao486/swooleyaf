@@ -11,7 +11,7 @@ use Constant\Project;
 use DesignPatterns\Facades\WxOpenNotifyWxFacade;
 use Tool\ProjectTool;
 use Traits\SimpleFacadeTrait;
-use Wx\WxUtilOpenBase;
+use Wx2\WxUtilOpenBase;
 
 class Authorized extends WxOpenNotifyWxFacade {
     use SimpleFacadeTrait;

@@ -2,8 +2,8 @@
 /**
  * Created by PhpStorm.
  * User: 姜伟
- * Date: 18-9-13
- * Time: 上午12:17
+ * Date: 2018/9/13 0013
+ * Time: 8:58
  */
 namespace Wx2\OpenMini;
 
@@ -14,21 +14,21 @@ use Wx2\WxBaseOpenMini;
 use Wx2\WxUtilBase;
 use Wx2\WxUtilOpenBase;
 
-class ServerDomain extends WxBaseOpenMini {
+class Plugin extends WxBaseOpenMini {
     /**
      * 应用ID
      * @var string
      */
     private $appId = '';
     /**
-     * 修改数据
+     * 数据
      * @var array
      */
-    private $modifyData = [];
+    private $data = [];
 
     public function __construct(string $appId){
         parent::__construct();
-        $this->serviceUrl = 'https://api.weixin.qq.com/wxa/modify_domain?access_token=';
+        $this->serviceUrl = 'https://api.weixin.qq.com/wxa/plugin?access_token=';
         $this->appId = $appId;
     }
 
@@ -36,30 +36,32 @@ class ServerDomain extends WxBaseOpenMini {
     }
 
     /**
-     * @param string $action
-     * @param array $domains
+     * @param string $action 操作类型
+     * @param string $pluginAppId 插件appid
      * @throws \Exception\Wx\WxOpenException
      */
-    public function setModifyData(string $action,array $domains=[]){
-        if(!in_array($action, ['add', 'delete', 'set', 'get'])){
+    public function setData(string $action,string $pluginAppId=''){
+        if(!in_array($action, ['apply', 'list', 'unbind'])){
             throw new WxOpenException('操作类型不支持', ErrorCode::WXOPEN_PARAM_ERROR);
-        } else if($action != 'get'){
-            if(empty($domains)){
-                throw new WxOpenException('域名不能为空', ErrorCode::WXOPEN_PARAM_ERROR);
+        } else if($action != 'list'){
+            if(strlen($pluginAppId) == 0){
+                throw new WxOpenException('插件appid不能为空', ErrorCode::WXOPEN_PARAM_ERROR);
             }
 
-            $this->modifyData = $domains;
-            $this->modifyData['action'] = $action;
+            $this->data = [
+                'action' => $action,
+                'plugin_appid' => $pluginAppId,
+            ];
         } else {
-            $this->modifyData = [
+            $this->data = [
                 'action' => $action,
             ];
         }
     }
 
     public function getDetail() : array {
-        if(empty($this->modifyData)){
-            throw new WxOpenException('修改数据不能为空', ErrorCode::WXOPEN_PARAM_ERROR);
+        if(empty($this->data)){
+            throw new WxOpenException('数据不能为空', ErrorCode::WXOPEN_PARAM_ERROR);
         }
 
         $resArr = [
@@ -67,7 +69,7 @@ class ServerDomain extends WxBaseOpenMini {
         ];
 
         $this->curlConfigs[CURLOPT_URL] = $this->serviceUrl . WxUtilOpenBase::getAuthorizerAccessToken($this->appId);
-        $this->curlConfigs[CURLOPT_POSTFIELDS] = Tool::jsonEncode($this->modifyData, JSON_UNESCAPED_UNICODE);
+        $this->curlConfigs[CURLOPT_POSTFIELDS] = Tool::jsonEncode($this->data, JSON_UNESCAPED_UNICODE);
         $this->curlConfigs[CURLOPT_SSL_VERIFYPEER] = false;
         $this->curlConfigs[CURLOPT_SSL_VERIFYHOST] = false;
         $sendRes = WxUtilBase::sendPostReq($this->curlConfigs);
