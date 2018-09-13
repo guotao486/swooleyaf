@@ -12,12 +12,6 @@ use Exception\Wx\WxException;
 use Tool\Tool;
 
 class WxConfigShop {
-    public function __construct() {
-    }
-
-    private function __clone() {
-    }
-
     /**
      * 客户端IP
      * @var string
@@ -89,6 +83,12 @@ class WxConfigShop {
      * @var int
      */
     private $expireTime = 0;
+
+    public function __construct() {
+    }
+
+    private function __clone() {
+    }
 
     /**
      * @return string

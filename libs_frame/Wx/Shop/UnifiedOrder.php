@@ -1,9 +1,9 @@
 <?php
 /**
  * Created by PhpStorm.
- * User: jw
- * Date: 17-3-31
- * Time: 上午7:42
+ * User: 姜伟
+ * Date: 2018/9/12 0012
+ * Time: 8:55
  */
 namespace Wx\Shop;
 
@@ -11,9 +11,11 @@ use Constant\ErrorCode;
 use DesignPatterns\Singletons\WxConfigSingleton;
 use Exception\Wx\WxException;
 use Tool\Tool;
+use Wx\WxBaseShop;
+use Wx\WxUtilBase;
 use Wx\WxUtilShop;
 
-class UnifiedOrder extends ShopBase {
+class UnifiedOrder extends WxBaseShop {
     const TRADE_TYPE_JSAPI = 'JSAPI'; //支付方式-jsapi
     const TRADE_TYPE_NATIVE = 'NATIVE'; //支付方式-扫码
     const TRADE_TYPE_MWEB = 'MWEB'; //支付方式-h5
@@ -21,47 +23,11 @@ class UnifiedOrder extends ShopBase {
     const SCENE_TYPE_ANDROID = 'Android'; //场景类型-android
     const SCENE_TYPE_WAP = 'Wap'; //场景类型-wap
 
-    private static $tradeTypes = [
+    private static $totalTradeTypes = [
         self::TRADE_TYPE_JSAPI,
         self::TRADE_TYPE_NATIVE,
         self::TRADE_TYPE_MWEB,
     ];
-
-    private static $sceneTypes = [
-        self::SCENE_TYPE_IOS,
-        self::SCENE_TYPE_ANDROID,
-        self::SCENE_TYPE_WAP,
-    ];
-
-    /**
-     * UnifiedOrder constructor.
-     * @param string $tag 初始化标识
-     * @param string $appId
-     * @throws \Exception\Wx\WxException
-     */
-    public function __construct(string $tag,string $appId) {
-        parent::__construct();
-
-        if(!in_array($tag, self::$tradeTypes)){
-            throw new WxException('统一下单初始化错误', ErrorCode::WX_PARAM_ERROR);
-        }
-
-        $shopConfig = WxConfigSingleton::getInstance()->getShopConfig($appId);
-        $this->fee_type = 'CNY';
-        $this->nonce_str = Tool::createNonceStr(32, 'numlower');
-        $this->appid = $shopConfig->getAppId();
-        $this->mch_id = $shopConfig->getPayMchId();
-        $this->notify_url = $shopConfig->getPayNotifyUrl();
-        $this->device_info = 'WEB';
-        $this->sign_type = 'MD5';
-        $this->trade_type = $tag;
-        if ($tag != self::TRADE_TYPE_MWEB) {
-            $this->spbill_create_ip = $shopConfig->getClientIp();
-        }
-    }
-
-    private function __clone(){
-    }
 
     /**
      * 公众账号ID
@@ -182,6 +148,37 @@ class UnifiedOrder extends ShopBase {
      * @var string
      */
     private $scene_info = '';
+    /**
+     * 平台类型
+     * @var string
+     */
+    private $plat_type = '';
+
+    public function __construct(string $appId,string $tradeType){
+        parent::__construct();
+        if(!in_array($tradeType, self::$totalTradeTypes)){
+            throw new WxException('交易类型不合法', ErrorCode::WX_PARAM_ERROR);
+        }
+
+        $this->serviceUrl = 'https://api.mch.weixin.qq.com/pay/unifiedorder';
+        $shopConfig = WxConfigSingleton::getInstance()->getShopConfig($appId);
+        $this->reqData['appid'] = $shopConfig->getAppId();
+        $this->reqData['mch_id'] = $shopConfig->getPayMchId();
+        $this->reqData['notify_url'] = $shopConfig->getPayNotifyUrl();
+        $this->reqData['fee_type'] = 'CNY';
+        $this->reqData['nonce_str'] = Tool::createNonceStr(32, 'numlower');
+        $this->reqData['device_info'] = 'WEB';
+        $this->reqData['sign_type'] = 'MD5';
+        $this->reqData['total_fee'] = 0;
+        $this->reqData['trade_type'] = $tradeType;
+        if ($tradeType != self::TRADE_TYPE_MWEB) {
+            $this->reqData['spbill_create_ip'] = $shopConfig->getClientIp();
+        }
+        $this->plat_type = WxUtilBase::PLAT_TYPE_SHOP;
+    }
+
+    public function __clone(){
+    }
 
     /**
      * @param string $body
@@ -189,7 +186,7 @@ class UnifiedOrder extends ShopBase {
      */
     public function setBody(string $body) {
         if (mb_strlen($body) > 0) {
-            $this->body = mb_substr($body, 0, 40);
+            $this->reqData['body'] = mb_substr($body, 0, 40);
         } else {
             throw new WxException('商品名称不能为空', ErrorCode::WX_PARAM_ERROR);
         }
@@ -201,7 +198,7 @@ class UnifiedOrder extends ShopBase {
      */
     public function setAttach(string $attach) {
         if (strlen($attach) <= 127) {
-            $this->attach = $attach;
+            $this->reqData['attach'] = $attach;
         } else {
             throw new WxException('附加数据过长', ErrorCode::WX_PARAM_ERROR);
         }
@@ -212,10 +209,10 @@ class UnifiedOrder extends ShopBase {
      * @throws \Exception\Wx\WxException
      */
     public function setOutTradeNo(string $outTradeNo) {
-        if (preg_match('/^[0-9]{1,32}$/', $outTradeNo) > 0) {
-            $this->out_trade_no = $outTradeNo;
-            if ($this->trade_type == self::TRADE_TYPE_NATIVE) {
-                $this->product_id = $outTradeNo;
+        if(ctype_digit($outTradeNo) && (strlen($outTradeNo) <= 32)){
+            $this->reqData['out_trade_no'] = $outTradeNo;
+            if ($this->reqData['trade_type'] == self::TRADE_TYPE_NATIVE) {
+                $this->reqData['product_id'] = $outTradeNo;
             }
         } else {
             throw new WxException('商户单号不合法', ErrorCode::WX_PARAM_ERROR);
@@ -228,7 +225,7 @@ class UnifiedOrder extends ShopBase {
      */
     public function setTotalFee(int $totalFee) {
         if ($totalFee > 0) {
-            $this->total_fee = $totalFee;
+            $this->reqData['total_fee'] = $totalFee;
         } else {
             throw new WxException('支付金额不能小于0', ErrorCode::WX_PARAM_ERROR);
         }
@@ -240,7 +237,7 @@ class UnifiedOrder extends ShopBase {
      */
     public function setOpenid(string $openid) {
         if (preg_match('/^[0-9a-zA-Z\-\_]{28}$/', $openid) > 0) {
-            $this->openid = $openid;
+            $this->reqData['openid'] = $openid;
         } else {
             throw new WxException('用户openid不合法', ErrorCode::WX_PARAM_ERROR);
         }
@@ -252,7 +249,7 @@ class UnifiedOrder extends ShopBase {
      */
     public function setTerminalIp(string $ip) {
         if (preg_match('/^(\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])){4}$/', '.' . $ip) > 0) {
-            $this->spbill_create_ip = $ip;
+            $this->reqData['spbill_create_ip'] = $ip;
         } else {
             throw new WxException('终端IP不合法', ErrorCode::WX_PARAM_ERROR);
         }
@@ -265,61 +262,66 @@ class UnifiedOrder extends ShopBase {
      * @throws \Exception\Wx\WxException
      */
     public function setSceneInfo(string $type,string $name,string $desc) {
-        if (!in_array($type, self::$sceneTypes)) {
-            throw new WxException('场景类型不支持', ErrorCode::WX_PARAM_ERROR);
-        }
-
         $trueName = preg_replace('/\s+/', '', $name);
-        if (($type == self::SCENE_TYPE_WAP) && (preg_match('/^(http|https)\:\/\/\S+$/', $trueName) == 0)) {
-            throw new WxException('网站地址不合法', ErrorCode::WX_PARAM_ERROR);
-        } else if (($type != self::SCENE_TYPE_WAP) && (strlen($trueName) == 0)) {
-            throw new WxException('应用名不合法', ErrorCode::WX_PARAM_ERROR);
+        $trueDesc = trim($desc);
+        switch ($type) {
+            case self::SCENE_TYPE_IOS:
+                if(strlen($trueName) == 0){
+                    throw new WxException('应用名不合法', ErrorCode::WX_PARAM_ERROR);
+                }
+                if(strlen($trueDesc) == 0){
+                    throw new WxException('bundle id不能为空', ErrorCode::WX_PARAM_ERROR);
+                }
+                $this->reqData['scene_info'] = Tool::jsonEncode([
+                    'h5_info' => [
+                        'type' => self::SCENE_TYPE_IOS,
+                        'app_name' => $trueName,
+                        'bundle_id' => $trueDesc,
+                    ],
+                ], JSON_UNESCAPED_UNICODE);
+                break;
+            case self::SCENE_TYPE_ANDROID:
+                if(strlen($trueName) == 0){
+                    throw new WxException('应用名不合法', ErrorCode::WX_PARAM_ERROR);
+                }
+                if(strlen($trueDesc) == 0){
+                    throw new WxException('包名不能为空', ErrorCode::WX_PARAM_ERROR);
+                }
+                $this->reqData['scene_info'] = Tool::jsonEncode([
+                    'h5_info' => [
+                        'type' => self::SCENE_TYPE_ANDROID,
+                        'app_name' => $trueName,
+                        'package_name' => $trueDesc,
+                    ],
+                ], JSON_UNESCAPED_UNICODE);
+                break;
+            case self::SCENE_TYPE_WAP:
+                if(preg_match('/^(http|https)\:\/\/\S+$/', $trueName) == 0){
+                    throw new WxException('网站地址不合法', ErrorCode::WX_PARAM_ERROR);
+                }
+                if(strlen($trueDesc) == 0){
+                    throw new WxException('网站名不能为空', ErrorCode::WX_PARAM_ERROR);
+                }
+                $this->reqData['scene_info'] = Tool::jsonEncode([
+                    'h5_info' => [
+                        'type' => self::SCENE_TYPE_WAP,
+                        'wap_url' => $trueName,
+                        'wap_name' => $trueDesc,
+                    ],
+                ], JSON_UNESCAPED_UNICODE);
+                break;
+            default:
+                throw new WxException('场景类型不支持', ErrorCode::WX_PARAM_ERROR);
         }
-
-        if (strlen(trim($desc)) == 0) {
-            if ($type == self::SCENE_TYPE_IOS) {
-                throw new WxException('bundle id不能为空', ErrorCode::WX_PARAM_ERROR);
-            } else if ($type == self::SCENE_TYPE_ANDROID) {
-                throw new WxException('包名不能为空', ErrorCode::WX_PARAM_ERROR);
-            } else if ($type == self::SCENE_TYPE_WAP) {
-                throw new WxException('网站名不能为空', ErrorCode::WX_PARAM_ERROR);
-            }
-        }
-
-        if ($type == self::SCENE_TYPE_IOS) {
-            $sceneData = [
-                'h5_info' => [
-                    'type' => $type,
-                    'app_name' => $trueName,
-                    'bundle_id' => trim($desc),
-                ],
-            ];
-        } else if ($type == self::SCENE_TYPE_ANDROID) {
-            $sceneData = [
-                'h5_info' => [
-                    'type' => $type,
-                    'app_name' => $trueName,
-                    'package_name' => trim($desc),
-                ],
-            ];
-        } else {
-            $sceneData = [
-                'h5_info' => [
-                    'type' => $type,
-                    'wap_url' => $trueName,
-                    'wap_name' => trim($desc),
-                ],
-            ];
-        }
-
-        $this->scene_info = Tool::jsonEncode($sceneData, JSON_UNESCAPED_UNICODE);
     }
 
     /**
      * @param string $detail
      */
     public function setDetail(string $detail) {
-        $this->detail = $detail;
+        if(strlen($detail) > 0){
+            $this->reqData['detail'] = $detail;
+        }
     }
 
     /**
@@ -328,7 +330,7 @@ class UnifiedOrder extends ShopBase {
      */
     public function setTimeStart(string $time_start) {
         if(ctype_digit($time_start)){
-            $this->time_start = $time_start;
+            $this->reqData['time_start'] = $time_start;
         } else {
             throw new WxException('交易起始时间不合法', ErrorCode::WX_PARAM_ERROR);
         }
@@ -340,7 +342,7 @@ class UnifiedOrder extends ShopBase {
      */
     public function setTimeExpire(string $time_expire) {
         if(ctype_digit($time_expire)){
-            $this->time_expire = $time_expire;
+            $this->reqData['time_expire'] = $time_expire;
         } else {
             throw new WxException('交易结束时间不合法', ErrorCode::WX_PARAM_ERROR);
         }
@@ -350,72 +352,88 @@ class UnifiedOrder extends ShopBase {
      * @param string $goods_tag
      */
     public function setGoodsTag(string $goods_tag) {
-        $this->goods_tag = $goods_tag;
+        if(strlen($goods_tag) > 0){
+            $this->reqData['goods_tag'] = $goods_tag;
+        }
+    }
+
+    /**
+     * @param string $plat_type
+     * @throws \Exception\Wx\WxException
+     */
+    public function setPlatType(string $plat_type){
+        if(isset(WxUtilBase::$totalPlatTypes[$plat_type])){
+            $this->plat_type = $plat_type;
+        } else {
+            throw new WxException('平台类型不合法', ErrorCode::WX_PARAM_ERROR);
+        }
     }
 
     public function getDetail() : array {
-        if(strlen($this->body) == 0){
+        if(!isset($this->reqData['trade_type'])){
+            throw new WxException('交易类型不能为空', ErrorCode::WX_PARAM_ERROR);
+        }
+        if(!isset($this->reqData['body'])){
             throw new WxException('商品名称不能为空', ErrorCode::WX_PARAM_ERROR);
         }
-        if(strlen($this->out_trade_no) == 0){
+        if(!isset($this->reqData['out_trade_no'])){
             throw new WxException('商户单号不能为空', ErrorCode::WX_PARAM_ERROR);
         }
-        if($this->total_fee <= 0){
+        if($this->reqData['total_fee'] <= 0){
             throw new WxException('支付金额不能小于0', ErrorCode::WX_PARAM_ERROR);
         }
-        if(($this->trade_type == self::TRADE_TYPE_JSAPI) && (strlen($this->openid) == 0)){
+        if(($this->reqData['trade_type'] == self::TRADE_TYPE_JSAPI) && !isset($this->reqData['openid'])){
             throw new WxException('用户openid不能为空', ErrorCode::WX_PARAM_ERROR);
-        } else if(($this->trade_type == self::TRADE_TYPE_NATIVE) && (strlen($this->product_id) == 0)){
+        } else if(($this->reqData['trade_type'] == self::TRADE_TYPE_NATIVE) && !isset($this->reqData['product_id'])){
             throw new WxException('商品ID不能为空', ErrorCode::WX_PARAM_ERROR);
-        } else if($this->trade_type == self::TRADE_TYPE_MWEB){
-            if(strlen($this->spbill_create_ip) == 0){
+        } else if($this->reqData['trade_type'] == self::TRADE_TYPE_MWEB){
+            if(!isset($this->reqData['spbill_create_ip'])){
                 throw new WxException('终端IP不能为空', ErrorCode::WX_PARAM_ERROR);
-            } else if(strlen($this->scene_info) == 0){
+            } else if(!isset($this->reqData['scene_info'])){
                 throw new WxException('场景信息不能为空', ErrorCode::WX_PARAM_ERROR);
             }
         }
+        $this->reqData['sign'] = WxUtilShop::createSign($this->reqData, $this->reqData['appid']);
 
         $resArr = [
-            'fee_type' => $this->fee_type,
-            'nonce_str' => $this->nonce_str,
-            'appid' => $this->appid,
-            'mch_id' => $this->mch_id,
-            'notify_url' => $this->notify_url,
-            'device_info' => $this->device_info,
-            'sign_type' => $this->sign_type,
-            'trade_type' => $this->trade_type,
-            'body' => $this->body,
-            'out_trade_no' => $this->out_trade_no,
-            'total_fee' => $this->total_fee,
+            'code' => 0,
         ];
-        if(strlen($this->spbill_create_ip) > 0){
-            $resArr['spbill_create_ip'] = $this->spbill_create_ip;
+
+        $this->curlConfigs[CURLOPT_URL] = $this->serviceUrl;
+        $this->curlConfigs[CURLOPT_POSTFIELDS] = Tool::arrayToXml($this->reqData);
+        $sendRes = WxUtilBase::sendPostReq($this->curlConfigs);
+        $sendData = Tool::xmlToArray($sendRes);
+        if($sendData['return_code'] == 'FAIL'){
+            $resArr['code'] = ErrorCode::WX_PARAM_ERROR;
+            $resArr['message'] = $sendData['return_msg'];
+        } else if($sendData['result_code'] == 'FAIL'){
+            $resArr['code'] = ErrorCode::WX_PARAM_ERROR;
+            $resArr['message'] = $sendData['err_code_des'];
+        } else if($this->reqData['trade_type'] == self::TRADE_TYPE_JSAPI){
+            //获取支付参数
+            $payConfig = new JsPayConfig($this->reqData['appid']);
+            $payConfig->setTimeStamp((string)Tool::getNowTime());
+            $payConfig->setPackage($sendData['prepay_id']);
+            $resArr['data'] = [
+                'pay' => $payConfig->getDetail(),
+            ];
+            unset($payConfig);
+
+            if(in_array($this->plat_type, [WxUtilBase::PLAT_TYPE_SHOP, WxUtilBase::PLAT_TYPE_OPEN_SHOP,])){
+                //获取js参数
+                $jsConfig = new JsConfig($this->reqData['appid']);
+                $jsConfig->setPlatType($this->plat_type);
+                $resArr['data']['config'] = $jsConfig->getDetail();
+                unset($jsConfig);
+            }
+        } else if($this->reqData['trade_type'] == self::TRADE_TYPE_NATIVE){
+            $resArr['data'] = [
+                'code_url' => WxUtilBase::URL_QRCODE . urlencode($sendData['code_url']),
+                'prepay_id' => $sendData['prepay_id'],
+            ];
+        } else {
+            $resArr['data'] = $sendData;
         }
-        if(strlen($this->detail) > 0){
-            $resArr['detail'] = $this->detail;
-        }
-        if(strlen($this->attach) > 0){
-            $resArr['attach'] = $this->attach;
-        }
-        if(strlen($this->time_start) > 0){
-            $resArr['time_start'] = $this->time_start;
-        }
-        if(strlen($this->time_expire) > 0){
-            $resArr['time_expire'] = $this->time_expire;
-        }
-        if(strlen($this->goods_tag) > 0){
-            $resArr['goods_tag'] = $this->goods_tag;
-        }
-        if(strlen($this->product_id) > 0){
-            $resArr['product_id'] = $this->product_id;
-        }
-        if(strlen($this->openid) > 0){
-            $resArr['openid'] = $this->openid;
-        }
-        if(strlen($this->scene_info) > 0){
-            $resArr['scene_info'] = $this->scene_info;
-        }
-        $resArr['sign'] = WxUtilShop::createSign($resArr, $this->appid);
 
         return $resArr;
     }

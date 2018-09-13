@@ -1,30 +1,19 @@
 <?php
 /**
- * 扫码支付模式一返回微信数据类
- * User: Administrator
- * Date: 2017-04-03
- * Time: 2:53
+ * Created by PhpStorm.
+ * User: 姜伟
+ * Date: 2018/9/12 0012
+ * Time: 16:31
  */
 namespace Wx\Shop;
 
 use Constant\ErrorCode;
 use DesignPatterns\Singletons\WxConfigSingleton;
 use Exception\Wx\WxException;
+use Wx\WxBaseShop;
 use Wx\WxUtilShop;
 
-class NativeReturn extends ShopBase {
-    public function __construct(string $appId) {
-        parent::__construct();
-        $shopConfig = WxConfigSingleton::getInstance()->getShopConfig($appId);
-        $this->appid = $shopConfig->getAppId();
-        $this->mch_id = $shopConfig->getPayMchId();
-        $this->result_code = 'SUCCESS';
-        $this->return_code = 'SUCCESS';
-    }
-
-    private function __clone(){
-    }
-
+class NativeReturn extends WxBaseShop {
     /**
      * 返回状态码
      * @var string
@@ -73,18 +62,40 @@ class NativeReturn extends ShopBase {
      */
     private $err_code_des = '';
 
+    public function __construct(string $appId){
+        parent::__construct();
+        $shopConfig = WxConfigSingleton::getInstance()->getShopConfig($appId);
+        $this->reqData['appid'] = $shopConfig->getAppId();
+        $this->reqData['mch_id'] = $shopConfig->getPayMchId();
+        $this->reqData['result_code'] = 'SUCCESS';
+        $this->reqData['return_code'] = 'SUCCESS';
+    }
+
+    public function __clone(){
+    }
+
     /**
      * @param string $nonceStr
+     * @throws \Exception\Wx\WxException
      */
     public function setNonceStr(string $nonceStr) {
-        $this->nonce_str = $nonceStr;
+        if(ctype_alnum($nonceStr)){
+            $this->reqData['nonce_str'] = $nonceStr;
+        } else {
+            throw new WxException('随机字符串不合法', ErrorCode::WX_PARAM_ERROR);
+        }
     }
 
     /**
      * @param string $prepayId
+     * @throws \Exception\Wx\WxException
      */
     public function setPrepayId(string $prepayId) {
-        $this->prepay_id = $prepayId;
+        if(ctype_alnum($prepayId)){
+            $this->reqData['prepay_id'] = $prepayId;
+        } else {
+            throw new WxException('预支付ID不合法', ErrorCode::WX_PARAM_ERROR);
+        }
     }
 
     /**
@@ -99,41 +110,21 @@ class NativeReturn extends ShopBase {
             throw new WxException('返回信息不能为空', ErrorCode::WX_PARAM_ERROR);
         }
 
-        $this->return_code = 'FAIL';
-        $this->return_msg = mb_substr($returnMsg, 0, 40);
-        $this->result_code = 'FAIL';
-        $this->err_code_des = mb_substr($errDes, 0, 40);
+        $this->reqData['return_code'] = 'FAIL';
+        $this->reqData['return_msg'] = mb_substr($returnMsg, 0, 40);
+        $this->reqData['result_code'] = 'FAIL';
+        $this->reqData['err_code_des'] = mb_substr($errDes, 0, 40);
     }
 
     public function getDetail() : array {
-        if($this->return_code == 'SUCCESS'){
-            if(strlen($this->nonce_str) == 0){
+        if($this->reqData['return_code'] == 'SUCCESS'){
+            if(!isset($this->reqData['nonce_str'])){
                 throw new WxException('随机字符串不能为空', ErrorCode::WX_PARAM_ERROR);
-            } else if(strlen($this->prepay_id) == 0){
+            } else if(!isset($this->reqData['prepay_id'])){
                 throw new WxException('预支付ID不能为空', ErrorCode::WX_PARAM_ERROR);
             }
         }
-
-        $resArr = [
-            'return_code' => $this->return_code,
-            'result_code' => $this->result_code,
-            'appid' => $this->appid,
-            'mch_id' => $this->mch_id,
-        ];
-        if(strlen($this->nonce_str) > 0){
-            $resArr['nonce_str'] = $this->nonce_str;
-        }
-        if(strlen($this->prepay_id) > 0){
-            $resArr['prepay_id'] = $this->prepay_id;
-        }
-        if(strlen($this->return_msg) > 0){
-            $resArr['return_msg'] = $this->return_msg;
-        }
-        if(strlen($this->err_code_des) > 0){
-            $resArr['err_code_des'] = $this->err_code_des;
-        }
-        $resArr['sign'] = WxUtilShop::createSign($resArr, $this->appid);
-
-        return $resArr;
+        $this->reqData['sign'] = WxUtilShop::createSign($this->reqData, $this->reqData['appid']);
+        return $this->reqData;
     }
 }

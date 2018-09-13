@@ -1,9 +1,9 @@
 <?php
 /**
  * Created by PhpStorm.
- * User: Administrator
- * Date: 2017-04-03
- * Time: 23:08
+ * User: 姜伟
+ * Date: 18-9-11
+ * Time: 下午7:56
  */
 namespace Wx\Shop;
 
@@ -11,80 +11,77 @@ use Constant\ErrorCode;
 use DesignPatterns\Singletons\WxConfigSingleton;
 use Exception\Wx\WxException;
 use Tool\Tool;
+use Wx\WxBaseShop;
+use Wx\WxUtilBase;
 use Wx\WxUtilShop;
 
-class RefundQuery extends ShopBase {
-    public function __construct(string $appId) {
-        parent::__construct();
-        $shopConfig = WxConfigSingleton::getInstance()->getShopConfig($appId);
-        $this->appid = $shopConfig->getAppId();
-        $this->mch_id = $shopConfig->getPayMchId();
-        $this->sign_type = 'MD5';
-        $this->nonce_str = Tool::createNonceStr(32, 'numlower');
-    }
-
-    private function __clone(){
-    }
-
+class RefundQuery extends WxBaseShop {
     /**
      * 公众账号ID
      * @var string
      */
     private $appid = '';
-
     /**
      * 商户号
      * @var string
      */
     private $mch_id = '';
-
     /**
      * 设备号
      * @var string
      */
     private $device_info = '';
-
     /**
      * 随机字符串
      * @var string
      */
     private $nonce_str = '';
-
     /**
      * 签名类型
      * @var string
      */
     private $sign_type = '';
-
     /**
      * 微信订单号
      * @var string
      */
     private $transaction_id = '';
-
     /**
      * 商户订单号
      * @var string
      */
     private $out_trade_no = '';
-
     /**
      * 微信退款单号
      * @var string
      */
     private $refund_id = '';
-
     /**
      * 商户退款单号
      * @var string
      */
     private $out_refund_no = '';
 
+    public function __construct(string $appId){
+        parent::__construct();
+        $this->serviceUrl = 'https://api.mch.weixin.qq.com/pay/refundquery';
+        $shopConfig = WxConfigSingleton::getInstance()->getShopConfig($appId);
+        $this->reqData['appid'] = $shopConfig->getAppId();
+        $this->reqData['mch_id'] = $shopConfig->getPayMchId();
+        $this->reqData['sign_type'] = 'MD5';
+        $this->reqData['nonce_str'] = Tool::createNonceStr(32, 'numlower');
+    }
+
+    public function __clone(){
+    }
+
     /**
-     * @param string $device_info
+     * @param string $deviceInfo
      */
-    public function setDeviceInfo(string $device_info) {
-        $this->device_info = $device_info;
+    public function setDeviceInfo(string $deviceInfo) {
+        if(strlen($deviceInfo) > 0){
+            $this->reqData['device_info'] = $deviceInfo;
+        }
     }
 
     /**
@@ -92,7 +89,7 @@ class RefundQuery extends ShopBase {
      * @throws \Exception\Wx\WxException
      */
     public function setTransactionId(string $transactionId) {
-        if (preg_match('/^4[0-9]{27}$/', $transactionId) > 0) {
+        if(ctype_digit($transactionId) && (strlen($transactionId) == 27)){
             $this->transaction_id = $transactionId;
         } else {
             throw new WxException('微信订单号不合法', ErrorCode::WX_PARAM_ERROR);
@@ -104,7 +101,7 @@ class RefundQuery extends ShopBase {
      * @throws \Exception\Wx\WxException
      */
     public function setOutTradeNo(string $outTradeNo) {
-        if (preg_match('/^[a-zA-Z0-9]{1,32}$/', $outTradeNo) > 0) {
+        if(ctype_alnum($outTradeNo) && (strlen($outTradeNo) <= 32)){
             $this->out_trade_no = $outTradeNo;
         } else {
             throw new WxException('商户订单号不合法', ErrorCode::WX_PARAM_ERROR);
@@ -116,7 +113,7 @@ class RefundQuery extends ShopBase {
      * @throws \Exception\Wx\WxException
      */
     public function setRefundId(string $refundId) {
-        if (preg_match('/^[0-9]{28}$/', $refundId) > 0) {
+        if(ctype_digit($refundId) && (strlen($refundId) == 28)){
             $this->refund_id = $refundId;
         } else {
             throw new WxException('微信退款单号不合法', ErrorCode::WX_PARAM_ERROR);
@@ -128,7 +125,7 @@ class RefundQuery extends ShopBase {
      * @throws \Exception\Wx\WxException
      */
     public function setOutRefundNo(string $outRefundNo) {
-        if (preg_match('/^[a-zA-Z0-9]{1,32}$/', $outRefundNo) > 0) {
+        if(ctype_alnum($outRefundNo) && (strlen($outRefundNo) <= 32)){
             $this->out_refund_no = $outRefundNo;
         } else {
             throw new WxException('商户退款单号不合法', ErrorCode::WX_PARAM_ERROR);
@@ -136,27 +133,36 @@ class RefundQuery extends ShopBase {
     }
 
     public function getDetail() : array {
-        $resArr = [];
         if(strlen($this->transaction_id) > 0){
-            $resArr['transaction_id'] = $this->transaction_id;
+            $this->reqData['transaction_id'] = $this->transaction_id;
         } else if(strlen($this->out_trade_no) > 0){
-            $resArr['out_trade_no'] = $this->out_trade_no;
+            $this->reqData['out_trade_no'] = $this->out_trade_no;
         } else if(strlen($this->refund_id) > 0){
-            $resArr['refund_id'] = $this->refund_id;
+            $this->reqData['refund_id'] = $this->refund_id;
         } else if(strlen($this->out_refund_no) > 0){
-            $resArr['out_refund_no'] = $this->out_refund_no;
+            $this->reqData['out_refund_no'] = $this->out_refund_no;
         } else {
             throw new WxException('微信订单号,商户订单号,微信退款单号,商户退款单号必须设置其中一个', ErrorCode::WX_PARAM_ERROR);
         }
+        $this->reqData['sign'] = WxUtilShop::createSign($this->reqData, $this->reqData['appid']);
 
-        $resArr['appid'] = $this->appid;
-        $resArr['mch_id'] = $this->mch_id;
-        $resArr['nonce_str'] = $this->nonce_str;
-        $resArr['sign_type'] = $this->sign_type;
-        if(strlen($this->device_info) > 0){
-            $resArr['device_info'] = $this->device_info;
+        $resArr = [
+            'code' => 0
+        ];
+
+        $this->curlConfigs[CURLOPT_URL] = $this->serviceUrl;
+        $this->curlConfigs[CURLOPT_POSTFIELDS] = Tool::arrayToXml($this->reqData);
+        $sendRes = WxUtilBase::sendPostReq($this->curlConfigs);
+        $sendData = Tool::xmlToArray($sendRes);
+        if ($sendData['return_code'] == 'FAIL') {
+            $resArr['code'] = ErrorCode::WX_POST_ERROR;
+            $resArr['message'] = $sendData['return_msg'];
+        } else if ($sendData['result_code'] == 'FAIL') {
+            $resArr['code'] = ErrorCode::WX_POST_ERROR;
+            $resArr['message'] = $sendData['err_code_des'];
+        } else {
+            $resArr['data'] = $sendData;
         }
-        $resArr['sign'] = WxUtilShop::createSign($resArr, $this->appid);
 
         return $resArr;
     }
