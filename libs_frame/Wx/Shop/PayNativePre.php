@@ -13,7 +13,6 @@ use Exception\Wx\WxException;
 use Tool\Tool;
 use Wx\WxBaseShop;
 use Wx\WxUtilShop;
-use Wx\Shop\ShortUrl;
 
 class PayNativePre extends WxBaseShop {
     /**
