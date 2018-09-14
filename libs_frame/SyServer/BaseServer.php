@@ -425,6 +425,7 @@ abstract class BaseServer {
     /**
      * 启动主进程服务
      * @param \swoole_server $server
+     * @throws \Exception\Swoole\ServerException
      */
     public function onStart(\swoole_server $server) {
         @cli_set_process_title(Server::PROCESS_TYPE_MAIN . SY_MODULE . $this->_port);
