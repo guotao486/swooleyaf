@@ -165,7 +165,7 @@ class Qrcode extends WxBaseMini {
             $resArr['message'] = $sendData['errmsg'];
         } else {
             $resArr['data'] = [
-                'image' => base64_encode($sendData),
+                'image' => base64_encode($sendRes),
             ];
         }
 
