@@ -62,13 +62,26 @@ class SmsSend extends YunBase {
 
         foreach ($phoneList as $ePhone) {
             if(ctype_digit($ePhone) && (strlen($ePhone) == 11) && ($ePhone{0} == '1')){
-                $this->phoneList[] = $ePhone;
+                $this->phoneList[$ePhone] = 1;
             } else {
                 throw new SmsException('接收号码不合法', ErrorCode::SMS_PARAM_ERROR);
             }
         }
-        array_unique($this->phoneList);
-        $this->reqData['phone'] = implode(',', $this->phoneList);
+    }
+
+    /**
+     * @param string $phoneNum
+     * @throws \Exception\Yun253\SmsException
+     */
+    public function addPhoneNum(string $phoneNum){
+        if(count($this->phoneList) >= 200){
+            throw new SmsException('接收号码不能超过200个', ErrorCode::SMS_PARAM_ERROR);
+        }
+        if(ctype_digit($phoneNum) && (strlen($phoneNum) == 11) && ($phoneNum{0} == '1')){
+            $this->phoneList[$phoneNum] = 1;
+        } else {
+            throw new SmsException('接收号码不合法', ErrorCode::SMS_PARAM_ERROR);
+        }
     }
 
     /**
@@ -87,12 +100,13 @@ class SmsSend extends YunBase {
     }
 
     public function getDetail() : array {
-        if (!isset($this->reqData['phone'])) {
+        if (empty($this->phoneList)) {
             throw new SmsException('接收号码不能为空', ErrorCode::SMS_PARAM_ERROR);
         }
         if (!isset($this->reqData['msg'])) {
             throw new SmsException('短信内容不能为空', ErrorCode::SMS_PARAM_ERROR);
         }
+        $this->reqData['phone'] = implode(',', array_keys($this->phoneList));
 
         return $this->getContent();
     }
