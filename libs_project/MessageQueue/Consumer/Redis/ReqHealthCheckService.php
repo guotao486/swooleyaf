@@ -16,7 +16,7 @@ use MessageQueue\Consumer\RedisConsumerService;
 class ReqHealthCheckService extends RedisConsumerBase implements RedisConsumerService {
     public function __construct() {
         parent::__construct();
-        $this->topic = Project::MESSAGE_QUEUE_TOPIC_REDIS_REQ_HEALTH_CHECK;
+        $this->topic = Project::MESSAGE_QUEUE_TOPIC_REQ_HEALTH_CHECK;
     }
 
     private function __clone() {

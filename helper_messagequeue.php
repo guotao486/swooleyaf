@@ -16,11 +16,6 @@ function syMessageQueueHelp(){
     print_r('-t 消息队列类型: redis kafka' . PHP_EOL);
 }
 
-function startRedisConsumer() {
-    global $consumer;
-    $consumer->start();
-}
-
 function handleKafkaMessage() {
     global $kafka;
     $kafka->refresh();
@@ -30,14 +25,8 @@ function handleKafkaMessage() {
 $type = \Tool\Tool::getClientOption('-t');
 switch ($type) {
     case 'redis':
-        $consumer = new \MessageQueue\Consumer\RedisConsumer();
-        pcntl_signal(SIGALRM, 'startRedisConsumer');
-
-        while (true) {
-            pcntl_alarm(1);
-            pcntl_signal_dispatch();
-            sleep(1);
-        }
+        $redis = new \Helper\MessageQueueRedis();
+        $redis->handleOption();
         break;
     case 'kafka':
         $kafka = new \Helper\MessageQueueKafka();

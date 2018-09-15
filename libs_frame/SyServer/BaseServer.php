@@ -13,7 +13,6 @@ use Constant\Server;
 use DesignPatterns\Factories\CacheSimpleFactory;
 use Exception\Swoole\ServerException;
 use Log\Log;
-use MessageQueue\Producer\RedisProducer;
 use Tool\Dir;
 use Tool\Tool;
 use Traits\BaseServerTrait;
@@ -261,7 +260,6 @@ abstract class BaseServer {
             $checkData = self::$_syHealths->get($tag);
             if($checkData !== false){
                 self::$_syHealths->del($tag);
-                RedisProducer::getInstance()->addTopicData(Project::MESSAGE_QUEUE_TOPIC_REDIS_REQ_HEALTH_CHECK, $checkData);
             }
         });
 
