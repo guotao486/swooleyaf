@@ -45,8 +45,8 @@ final class Project extends ProjectBase {
     const REDIS_PREFIX_REGION_LIST = 'sya01007_'; //前缀-地区缓存
 
     //消息队列常量
-    const MESSAGE_QUEUE_TOPIC_ADD_LOG = 'a000'; //redis主题-添加日志
-    const MESSAGE_QUEUE_TOPIC_REQ_HEALTH_CHECK = 'a001'; //redis主题-请求健康检查
+    const MESSAGE_QUEUE_TOPIC_ADD_LOG = 'a000'; //主题-添加日志
+    const MESSAGE_QUEUE_TOPIC_REQ_HEALTH_CHECK = 'a001'; //主题-请求健康检查
 
     //支付常量
     const PAY_WAY_WX = 1; //方式-微信
