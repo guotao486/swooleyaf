@@ -2,31 +2,26 @@
 /**
  * Created by PhpStorm.
  * User: 姜伟
- * Date: 2017/8/24 0024
- * Time: 11:05
+ * Date: 2018/9/15 0015
+ * Time: 15:34
  */
 namespace MessageQueue\Consumer;
 
-use Constant\ErrorCode;
 use Constant\Project;
 use DesignPatterns\Factories\CacheSimpleFactory;
-use DesignPatterns\Singletons\MysqlSingleton;
-use DesignPatterns\Singletons\RedisSingleton;
-use Exception\MessageQueue\MessageQueueException;
 use Log\Log;
 use Tool\Tool;
 
 class RedisConsumer {
     /**
+     * @var \MessageQueue\Consumer\RedisConsumer
+     */
+    private static $instance = null;
+    /**
      * 管理缓存键名
      * @var string
      */
-    private $managerKey = '';
-    /**
-     * 消费者列表
-     * @var array
-     */
-    private $consumers = [];
+    private $keyManager = '';
     /**
      * 主题列表
      * @var array
@@ -37,88 +32,81 @@ class RedisConsumer {
      * @var int
      */
     private $continueTimes = 0;
-    /**
-     * 处理次数
-     * @var int
-     */
-    private $handleTimes = 0;
 
-    public function __construct() {
-        $this->managerKey = Project::REDIS_PREFIX_MESSAGE_QUEUE . 'manager_redis';
-        Log::setPath(SY_LOG_PATH);
+    private function __construct(){
+        $this->keyManager = Project::REDIS_PREFIX_MESSAGE_QUEUE . 'manager';
         $this->init();
     }
 
-    private function __clone() {
+    private function __clone(){
     }
 
     /**
-     * 初始化
+     * @return \MessageQueue\Consumer\RedisConsumer
      */
+    public static function getInstance() {
+        if (is_null(self::$instance)) {
+            self::$instance = new self();
+        }
+
+        return self::$instance;
+    }
+
     private function init() {
         $this->continueTimes = 0;
-        $this->topics = CacheSimpleFactory::getRedisInstance()->hGetAll($this->managerKey);
-        $diffs = array_diff(array_keys($this->consumers), array_keys($this->topics));
-        foreach ($diffs as $eDiff) {
-            unset($this->consumers[$eDiff]);
+        $this->topics = [];
+        $cacheData = CacheSimpleFactory::getRedisInstance()->hGetAll($this->keyManager);
+        if(isset($cacheData['unique_key']) && ($cacheData['unique_key'] == $this->keyManager)){
+            unset($cacheData['unique_key']);
+            $this->topics = $cacheData;
         }
     }
 
     /**
      * 获取消费者
-     * @param string $topic 主题
-     * @return \MessageQueue\Consumer\RedisConsumerService
-     * @throws \Exception\MessageQueue\MessageQueueException
+     * @param string $topic
+     * @return \MessageQueue\Consumer\RedisConsumerService|null
      */
     private function getConsumer(string $topic) {
-        if(isset($this->consumers[$topic])){
-            return $this->consumers[$topic];
+        if(isset($this->topics[$topic])){
+            $className = $this->topics[$topic];
+            return new $className();
+        } else {
+            return null;
         }
-        if(!isset($this->topics[$topic])){
-            throw new MessageQueueException('主题不存在', ErrorCode::MESSAGE_QUEUE_TOPIC_ERROR);
-        }
-
-        $className = $this->topics[$topic];
-        $consumer = new $className();
-        $this->consumers[$topic] = $consumer;
-
-        return $consumer;
     }
 
-    /**
-     * 处理数据
-     */
-    private function handleData() {
+    public function handleData(){
+        $this->continueTimes++;
+        if($this->continueTimes >= 100){
+            $this->init();
+        }
+
         foreach ($this->topics as $topic => $className) {
+            $consumer = $this->getConsumer($topic);
+            if(is_null($consumer)){
+                continue;
+            }
+
             $redisKey = Project::REDIS_PREFIX_MESSAGE_QUEUE . $topic;
             $dataList = CacheSimpleFactory::getRedisInstance()->lRange($redisKey, 0, 99);
             $dataNum = count($dataList);
             if($dataNum > 0){
                 CacheSimpleFactory::getRedisInstance()->lTrim($redisKey, $dataNum, -1);
-                $consumer = $this->getConsumer($topic);
                 foreach ($dataList as $eData) {
                     $consumerData = Tool::jsonDecode($eData);
                     if(is_array($consumerData)){
-                        $consumer->handleMessage($consumerData);
+                        try {
+                            $consumer->handleMessage($consumerData);
+                        } catch (\Exception $e) {
+                            Log::error($e->getMessage(), $e->getCode(), $e->getTraceAsString());
+                        }
                     } else {
                         Log::error('主题为' . $topic . '的数据消费出错,消费数据为' . $eData);
                     }
                 }
             }
-        }
-    }
-
-    /**
-     * 启动
-     */
-    public function start() {
-        $this->handleData();
-        $this->handleTimes++;
-        $this->continueTimes++;
-        RedisSingleton::getInstance()->reConnect();
-        MysqlSingleton::getInstance()->reConnect();
-        if($this->continueTimes >= 100){
-            $this->init();
+            unset($consumer);
         }
     }
 }

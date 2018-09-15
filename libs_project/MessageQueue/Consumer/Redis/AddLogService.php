@@ -16,7 +16,7 @@ use Tool\Tool;
 class AddLogService extends RedisConsumerBase implements RedisConsumerService {
     public function __construct() {
         parent::__construct();
-        $this->topic = Project::MESSAGE_QUEUE_TOPIC_REDIS_ADD_LOG;
+        $this->topic = Project::MESSAGE_QUEUE_TOPIC_ADD_LOG;
     }
 
     private function __clone() {
