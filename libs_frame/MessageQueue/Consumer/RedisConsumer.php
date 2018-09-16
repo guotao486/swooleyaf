@@ -23,6 +23,15 @@ class RedisConsumer {
      */
     private $keyManager = '';
     /**
+     * @var int
+     */
+    private $msgMaxIndex = 0;
+    /**
+     * 消费者列表
+     * @var array
+     */
+    private $consumers = [];
+    /**
      * 主题列表
      * @var array
      */
@@ -35,6 +44,7 @@ class RedisConsumer {
 
     private function __construct(){
         $this->keyManager = Project::REDIS_PREFIX_MESSAGE_QUEUE . 'manager';
+        $this->msgMaxIndex = Project::MESSAGE_QUEUE_BATCH_MSG_NUM - 1;
         $this->init();
     }
 
@@ -55,6 +65,7 @@ class RedisConsumer {
     private function init() {
         $this->continueTimes = 0;
         $this->topics = [];
+        $this->consumers = [];
         $cacheData = CacheSimpleFactory::getRedisInstance()->hGetAll($this->keyManager);
         if(isset($cacheData['unique_key']) && ($cacheData['unique_key'] == $this->keyManager)){
             unset($cacheData['unique_key']);
@@ -68,17 +79,21 @@ class RedisConsumer {
      * @return \MessageQueue\Consumer\RedisConsumerService|null
      */
     private function getConsumer(string $topic) {
+        if(isset($this->consumers[$topic])){
+            return $this->consumers[$topic];
+        }
         if(isset($this->topics[$topic])){
             $className = $this->topics[$topic];
-            return new $className();
-        } else {
-            return null;
+            $class = new $className();
+            $this->consumers[$topic] = $class;
+            return $class;
         }
+        return null;
     }
 
     public function handleData(){
         $this->continueTimes++;
-        if($this->continueTimes >= 100){
+        if($this->continueTimes >= Project::MESSAGE_QUEUE_BATCH_INIT_TIMES){
             $this->init();
         }
 
@@ -89,7 +104,7 @@ class RedisConsumer {
             }
 
             $redisKey = Project::REDIS_PREFIX_MESSAGE_QUEUE . $topic;
-            $dataList = CacheSimpleFactory::getRedisInstance()->lRange($redisKey, 0, 99);
+            $dataList = CacheSimpleFactory::getRedisInstance()->lRange($redisKey, 0, $this->msgMaxIndex);
             $dataNum = count($dataList);
             if($dataNum > 0){
                 CacheSimpleFactory::getRedisInstance()->lTrim($redisKey, $dataNum, -1);
@@ -106,7 +121,6 @@ class RedisConsumer {
                     }
                 }
             }
-            unset($consumer);
         }
     }
 }
