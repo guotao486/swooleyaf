@@ -1,13 +1,13 @@
 <?php
 /**
  * Created by PhpStorm.
- * User: jw
- * Date: 17-8-23
- * Time: 下午9:42
+ * User: 姜伟
+ * Date: 18-9-16
+ * Time: 下午2:31
  */
-namespace MessageQueue\Consumer;
+namespace SyMessageQueue;
 
-interface RedisConsumerService {
+interface ConsumerInterface {
     /**
      * 处理消息
      * @param array $data

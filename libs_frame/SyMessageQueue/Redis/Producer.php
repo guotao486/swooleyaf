@@ -2,21 +2,21 @@
 /**
  * Created by PhpStorm.
  * User: 姜伟
- * Date: 2018/9/15 0015
- * Time: 14:45
+ * Date: 18-9-16
+ * Time: 下午2:25
  */
-namespace MessageQueue\Producer;
+namespace SyMessageQueue\Redis;
 
 use Constant\ErrorCode;
 use Constant\Project;
 use DesignPatterns\Factories\CacheSimpleFactory;
 use Exception\MessageQueue\MessageQueueException;
-use MessageQueue\Consumer\RedisConsumerService;
+use SyMessageQueue\ConsumerInterface;
 use Tool\Tool;
 
-class RedisProducer {
+class Producer {
     /**
-     * @var \MessageQueue\Producer\RedisProducer
+     * @var \SyMessageQueue\Redis\Producer
      */
     private static $instance = null;
     /**
@@ -33,7 +33,7 @@ class RedisProducer {
     }
 
     /**
-     * @return \MessageQueue\Producer\RedisProducer
+     * @return \SyMessageQueue\Redis\Producer
      */
     public static function getInstance() {
         if (is_null(self::$instance)) {
@@ -45,11 +45,11 @@ class RedisProducer {
 
     /**
      * 添加消费者
-     * @param \MessageQueue\Consumer\RedisConsumerService $consumer 生产者对象
+     * @param \SyMessageQueue\ConsumerInterface $consumer 生产者对象
      * @return bool
      * @throws \Exception\MessageQueue\MessageQueueException
      */
-    public function addConsumer(RedisConsumerService $consumer) {
+    public function addConsumer(ConsumerInterface $consumer) {
         $cacheData = [
             'unique_key' => $this->keyManager,
         ];
@@ -63,10 +63,10 @@ class RedisProducer {
 
     /**
      * 删除消费者
-     * @param \MessageQueue\Consumer\RedisConsumerService $consumer
+     * @param \SyMessageQueue\ConsumerInterface $consumer
      * @return int
      */
-    public function deleteConsumer(RedisConsumerService $consumer) {
+    public function deleteConsumer(ConsumerInterface $consumer) {
         return CacheSimpleFactory::getRedisInstance()->hDel($this->keyManager, $consumer->topic);
     }
 

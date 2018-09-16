@@ -1,13 +1,13 @@
 <?php
 /**
  * Created by PhpStorm.
- * User: jw
- * Date: 17-8-23
- * Time: 下午9:44
+ * User: 姜伟
+ * Date: 18-9-16
+ * Time: 下午2:28
  */
-namespace MessageQueue\Consumer;
+namespace SyMessageQueue;
 
-abstract class RedisConsumerBase {
+abstract class ConsumerBase {
     /**
      * 主题
      * @var string

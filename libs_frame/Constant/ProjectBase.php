@@ -98,8 +98,4 @@ class ProjectBase {
     const TASK_TYPE_CLEAR_LOCAL_WXSHOP_TOKEN_CACHE = '0003'; //任务类型-清除本地微信商户号token缓存
     const TASK_TYPE_CLEAR_LOCAL_WXOPEN_AUTHORIZER_TOKEN_CACHE = '0004'; //任务类型-清除本地微信开放平台授权者token缓存
     const TASK_TYPE_TIME_WHEEL_TASK = '0005'; //任务类型-时间轮任务
-
-    //消息队列常量
-    const MESSAGE_QUEUE_BATCH_MSG_NUM = 100; //批处理-每次处理消息条数
-    const MESSAGE_QUEUE_BATCH_INIT_TIMES = 100; //批处理-重置的处理次数
 }

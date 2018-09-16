@@ -101,11 +101,6 @@ class ErrorCode {
     const MONGO_UPDATE_ERROR = 103105;
     const MONGO_SELECT_ERROR = 103106;
 
-    //KAFKA错误,取值范围:103200-103299
-    const KAFKA_PARAM_ERROR = 103200;
-    const KAFKA_PRODUCER_ERROR = 103201;
-    const KAFKA_CONSUMER_ERROR = 103202;
-
     //Solr错误,取值范围:103300-103399
     const SOLR_PARAM_ERROR = 103300;
     const SOLR_POST_ERROR = 103301;
@@ -143,6 +138,9 @@ class ErrorCode {
     //消息队列错误,取值范围:103900-103999
     const MESSAGE_QUEUE_TOPIC_ERROR = 103900;
     const MESSAGE_QUEUE_TOPIC_DATA_ERROR = 103901;
+    const MESSAGE_QUEUE_PARAM_ERROR = 103902;
+    const MESSAGE_QUEUE_KAFKA_PRODUCER_ERROR = 103903;
+    const MESSAGE_QUEUE_KAFKA_CONSUMER_ERROR = 103904;
 
     //etcd配置错误,取值范围:104000-104099
     const ETCD_PARAM_ERROR = 104000;
@@ -221,9 +219,6 @@ class ErrorCode {
         self::MONGO_DELETE_ERROR => 'Mongo删除数据出错',
         self::MONGO_UPDATE_ERROR => 'Mongo修改数据出错',
         self::MONGO_SELECT_ERROR => 'Mongo查询数据出错',
-        self::KAFKA_PARAM_ERROR => 'KAFKA参数出错',
-        self::KAFKA_PRODUCER_ERROR => 'KAFKA生产者出错',
-        self::KAFKA_CONSUMER_ERROR => 'KAFKA消费者出错',
         self::SOLR_PARAM_ERROR => 'Solr参数错误',
         self::SOLR_POST_ERROR => 'Solr发送POST请求出错',
         self::SOLR_GET_ERROR => 'Solr发送GET请求出错',
@@ -250,6 +245,9 @@ class ErrorCode {
         self::CRON_WEEK_ERROR => 'cron星期格式错误',
         self::MESSAGE_QUEUE_TOPIC_ERROR => '消息队列主题错误',
         self::MESSAGE_QUEUE_TOPIC_DATA_ERROR => '消息队列主题数据错误',
+        self::MESSAGE_QUEUE_PARAM_ERROR => '消息队列参数错误',
+        self::MESSAGE_QUEUE_KAFKA_PRODUCER_ERROR => '消息队列KAFKA生产者出错',
+        self::MESSAGE_QUEUE_KAFKA_CONSUMER_ERROR => '消息队列KAFKA消费者出错',
         self::ETCD_PARAM_ERROR => 'ETCD参数错误',
         self::ETCD_SEND_REQ_ERROR => 'ETCD发送请求出错',
         self::ETCD_GET_DATA_ERROR => 'ETCD获取数据出错',

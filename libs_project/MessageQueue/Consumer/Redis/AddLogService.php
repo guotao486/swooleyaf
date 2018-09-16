@@ -9,11 +9,11 @@ namespace MessageQueue\Consumer\Redis;
 
 use Constant\Project;
 use Log\Log;
-use MessageQueue\Consumer\RedisConsumerService;
-use MessageQueue\Consumer\RedisConsumerBase;
+use SyMessageQueue\ConsumerBase;
+use SyMessageQueue\ConsumerInterface;
 use Tool\Tool;
 
-class AddLogService extends RedisConsumerBase implements RedisConsumerService {
+class AddLogService extends ConsumerBase implements ConsumerInterface {
     public function __construct() {
         parent::__construct();
         $this->topic = Project::MESSAGE_QUEUE_TOPIC_ADD_LOG;

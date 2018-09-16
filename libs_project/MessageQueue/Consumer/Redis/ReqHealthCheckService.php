@@ -10,10 +10,10 @@ namespace MessageQueue\Consumer\Redis;
 use Constant\Project;
 use Constant\Server;
 use Log\Log;
-use MessageQueue\Consumer\RedisConsumerBase;
-use MessageQueue\Consumer\RedisConsumerService;
+use SyMessageQueue\ConsumerBase;
+use SyMessageQueue\ConsumerInterface;
 
-class ReqHealthCheckService extends RedisConsumerBase implements RedisConsumerService {
+class ReqHealthCheckService extends ConsumerBase implements ConsumerInterface {
     public function __construct() {
         parent::__construct();
         $this->topic = Project::MESSAGE_QUEUE_TOPIC_REQ_HEALTH_CHECK;

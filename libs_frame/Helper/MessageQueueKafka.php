@@ -8,7 +8,7 @@
 namespace Helper;
 
 use Constant\Project;
-use DesignPatterns\Singletons\KafkaSingleton;
+use DesignPatterns\Singletons\MessageQueueSingleton;
 use DesignPatterns\Singletons\MysqlSingleton;
 use DesignPatterns\Singletons\RedisSingleton;
 use Log\Log;
@@ -32,8 +32,8 @@ class MessageQueueKafka {
 
     public function __construct(){
         $this->consumerContainer = new KafkaConsumerContainer();
-        $this->offsetExpireTime = (int)Tool::getConfig('kafka.' . SY_ENV . SY_PROJECT . '.common.offset.expire');
-        $this->messageHandleMaxNum = (int)Tool::getConfig('kafka.' . SY_ENV . SY_PROJECT . '.common.message.handle.max');
+        $this->offsetExpireTime = (int)Tool::getConfig('messagequeue.' . SY_ENV . SY_PROJECT . '.kafka.common.offset.expire');
+        $this->messageHandleMaxNum = (int)Tool::getConfig('messagequeue.' . SY_ENV . SY_PROJECT . '.kafka.common.message.handle.max');
     }
 
     private function __clone(){
@@ -68,7 +68,7 @@ class MessageQueueKafka {
                     Log::error($e->getMessage(), $e->getCode(), $e->getTraceAsString());
                 } finally {
                     unset($consumer);
-                    KafkaSingleton::getInstance()->getConsumer()->commit($message);
+                    MessageQueueSingleton::getInstance()->getKafkaConsumer()->commit($message);
                     RedisSingleton::getInstance()->getConn()->set($redisKey, '1', $this->offsetExpireTime);
                 }
 
@@ -90,7 +90,7 @@ class MessageQueueKafka {
         $totalNum = $this->messageHandleMaxNum;
 
         while ($totalNum > 0) {
-            $message = KafkaSingleton::getInstance()->getConsumer()->consume(31536000000);
+            $message = MessageQueueSingleton::getInstance()->getKafkaConsumer()->consume(31536000000);
             $totalNum--;
 
             $this->handle($message, $totalNum);
