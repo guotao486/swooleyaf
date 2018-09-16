@@ -9,10 +9,10 @@ namespace MessageQueue\Consumer\Kafka;
 
 use Constant\Project;
 use Log\Log;
-use MessageQueue\Consumer\KafkaConsumerBase;
-use MessageQueue\Consumer\KafkaConsumerService;
+use SyMessageQueue\ConsumerBase;
+use SyMessageQueue\ConsumerInterface;
 
-class Test extends KafkaConsumerBase implements KafkaConsumerService {
+class Test extends ConsumerBase implements ConsumerInterface {
     public function __construct(){
         parent::__construct();
         $this->topic = Project::KAFKA_TOPIC_TEST;

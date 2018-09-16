@@ -2,19 +2,20 @@
 /**
  * Created by PhpStorm.
  * User: 姜伟
- * Date: 2018/9/15 0015
- * Time: 15:34
+ * Date: 18-9-16
+ * Time: 下午1:46
  */
-namespace MessageQueue\Consumer;
+namespace SyMessageQueue\Redis;
 
 use Constant\Project;
 use DesignPatterns\Factories\CacheSimpleFactory;
+use DesignPatterns\Singletons\MessageQueueSingleton;
 use Log\Log;
 use Tool\Tool;
 
-class RedisConsumer {
+class Consumer {
     /**
-     * @var \MessageQueue\Consumer\RedisConsumer
+     * @var \SyMessageQueue\Redis\Consumer
      */
     private static $instance = null;
     /**
@@ -26,6 +27,10 @@ class RedisConsumer {
      * @var int
      */
     private $msgMaxIndex = 0;
+    /**
+     * @var int
+     */
+    private $resetTimes = 0;
     /**
      * 消费者列表
      * @var array
@@ -44,7 +49,9 @@ class RedisConsumer {
 
     private function __construct(){
         $this->keyManager = Project::REDIS_PREFIX_MESSAGE_QUEUE . 'manager';
-        $this->msgMaxIndex = Project::MESSAGE_QUEUE_BATCH_MSG_NUM - 1;
+        $config = MessageQueueSingleton::getInstance()->getRedisConfig();
+        $this->msgMaxIndex = $config->getConsumerBatchMsgNum() - 1;
+        $this->resetTimes = $config->getConsumerBatchResetTimes();
         $this->init();
     }
 
@@ -52,7 +59,7 @@ class RedisConsumer {
     }
 
     /**
-     * @return \MessageQueue\Consumer\RedisConsumer
+     * @return \SyMessageQueue\Redis\Consumer
      */
     public static function getInstance() {
         if (is_null(self::$instance)) {
@@ -76,7 +83,7 @@ class RedisConsumer {
     /**
      * 获取消费者
      * @param string $topic
-     * @return \MessageQueue\Consumer\RedisConsumerService|null
+     * @return \SyMessageQueue\ConsumerInterface|null
      */
     private function getConsumer(string $topic) {
         if(isset($this->consumers[$topic])){
@@ -93,7 +100,7 @@ class RedisConsumer {
 
     public function handleData(){
         $this->continueTimes++;
-        if($this->continueTimes >= Project::MESSAGE_QUEUE_BATCH_INIT_TIMES){
+        if($this->continueTimes >= $this->resetTimes){
             $this->init();
         }
 
