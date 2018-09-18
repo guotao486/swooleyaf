@@ -10,12 +10,11 @@ namespace MessageQueue\Consumer\Kafka;
 use Constant\Project;
 use Log\Log;
 use SyMessageQueue\ConsumerBase;
-use SyMessageQueue\ConsumerInterface;
 
-class Test extends ConsumerBase implements ConsumerInterface {
+class Test extends ConsumerBase {
     public function __construct(){
         parent::__construct();
-        $this->topic = Project::KAFKA_TOPIC_TEST;
+        $this->setMqTypeAndTopic(Project::MESSAGE_QUEUE_TYPE_KAFKA, Project::MESSAGE_QUEUE_TOPIC_TEST);
     }
 
     public function handleMessage(array $data){

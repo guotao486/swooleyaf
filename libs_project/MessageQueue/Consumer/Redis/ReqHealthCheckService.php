@@ -11,12 +11,11 @@ use Constant\Project;
 use Constant\Server;
 use Log\Log;
 use SyMessageQueue\ConsumerBase;
-use SyMessageQueue\ConsumerInterface;
 
-class ReqHealthCheckService extends ConsumerBase implements ConsumerInterface {
+class ReqHealthCheckService extends ConsumerBase {
     public function __construct() {
         parent::__construct();
-        $this->topic = Project::MESSAGE_QUEUE_TOPIC_REQ_HEALTH_CHECK;
+        $this->setMqTypeAndTopic(Project::MESSAGE_QUEUE_TYPE_REDIS, Project::MESSAGE_QUEUE_TOPIC_REQ_HEALTH_CHECK);
     }
 
     private function __clone() {

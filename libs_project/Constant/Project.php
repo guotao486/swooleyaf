@@ -46,7 +46,5 @@ final class Project extends ProjectBase {
     //消息队列常量
     const MESSAGE_QUEUE_TOPIC_ADD_LOG = 'a000'; //主题-添加日志
     const MESSAGE_QUEUE_TOPIC_REQ_HEALTH_CHECK = 'a001'; //主题-请求健康检查
-
-    //kafka常量
-    const KAFKA_TOPIC_TEST = SY_ENV . SY_PROJECT . '0000'; //主题-测试
+    const MESSAGE_QUEUE_TOPIC_TEST = SY_ENV . SY_PROJECT . '0000'; //主题-测试
 }
