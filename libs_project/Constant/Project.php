@@ -45,8 +45,9 @@ final class Project extends ProjectBase {
     const REDIS_PREFIX_REGION_LIST = 'sya01007_'; //前缀-地区缓存
 
     //消息队列常量
-    const MESSAGE_QUEUE_TOPIC_ADD_LOG = 'a000'; //主题-添加日志
-    const MESSAGE_QUEUE_TOPIC_REQ_HEALTH_CHECK = 'a001'; //主题-请求健康检查
+    const MESSAGE_QUEUE_TOPIC_ADD_LOG = '0000'; //主题-添加日志
+    const MESSAGE_QUEUE_TOPIC_REQ_HEALTH_CHECK = '0001'; //主题-请求健康检查
+    const MESSAGE_QUEUE_TOPIC_TEST = '0002'; //主题-测试
 
     //支付常量
     const PAY_WAY_WX = 1; //方式-微信
@@ -56,10 +57,8 @@ final class Project extends ProjectBase {
     const PAY_TYPE_WX_SHOP_NATIVE_STATIC = 'a002'; //类型-微信公众号静态扫码支付
     const PAY_TYPE_WX_MINI_JS = 'a003'; //类型-微信小程序js支付
     const PAY_TYPE_ALI_CODE = 'a100'; //类型-支付宝扫码支付
-    const PAY_TYPE_ALI_WEB = 'a101'; //类型-支付宝网页支付
 
-    //kafka常量
-    const KAFKA_TOPIC_TEST = SY_ENV . SY_PROJECT . '0000'; //主题-测试
+    const PAY_TYPE_ALI_WEB = 'a101'; //类型-支付宝网页支付
 
     //订单常量
     const ORDER_PAY_TYPE_GOODS = '1000'; //支付类型-商品

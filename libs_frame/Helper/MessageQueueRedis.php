@@ -7,8 +7,8 @@
  */
 namespace Helper;
 
+use SyMessageQueue\ConsumerBase;
 use SyMessageQueue\Redis\Producer;
-use SyMessageQueue\ConsumerInterface;
 use Tool\Tool;
 
 class MessageQueueRedis {
@@ -30,7 +30,7 @@ class MessageQueueRedis {
         switch ($action) {
             case 'add':
                 $class = new $className();
-                if($class instanceof ConsumerInterface){
+                if($class instanceof ConsumerBase){
                     Producer::getInstance()->addConsumer($class);
                 } else {
                     print_r('类名不合法' . PHP_EOL);
@@ -38,7 +38,7 @@ class MessageQueueRedis {
                 break;
             case 'delete':
                 $class = new $className();
-                if($class instanceof ConsumerInterface){
+                if($class instanceof ConsumerBase){
                     Producer::getInstance()->deleteConsumer($class);
                 } else {
                     print_r('类名不合法' . PHP_EOL);

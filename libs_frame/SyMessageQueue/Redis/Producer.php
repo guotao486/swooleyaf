@@ -11,7 +11,7 @@ use Constant\ErrorCode;
 use Constant\Project;
 use DesignPatterns\Factories\CacheSimpleFactory;
 use Exception\MessageQueue\MessageQueueException;
-use SyMessageQueue\ConsumerInterface;
+use SyMessageQueue\ConsumerBase;
 use Tool\Tool;
 
 class Producer {
@@ -45,15 +45,20 @@ class Producer {
 
     /**
      * 添加消费者
-     * @param \SyMessageQueue\ConsumerInterface $consumer 生产者对象
+     * @param \SyMessageQueue\ConsumerBase $consumer 消费者对象
      * @return bool
      * @throws \Exception\MessageQueue\MessageQueueException
      */
-    public function addConsumer(ConsumerInterface $consumer) {
+    public function addConsumer(ConsumerBase $consumer) {
+        if($consumer->getMqType() != Project::MESSAGE_QUEUE_TYPE_REDIS){
+            throw new MessageQueueException('消息队列类型必须是redis', ErrorCode::MESSAGE_QUEUE_PARAM_ERROR);
+        }
+
+        $topic = $consumer->getTopic();
         $cacheData = [
             'unique_key' => $this->keyManager,
+            $topic => '\\' .get_class($consumer),
         ];
-        $cacheData[$consumer->topic] = '\\' .get_class($consumer);
         if(!CacheSimpleFactory::getRedisInstance()->hMset($this->keyManager, $cacheData)){
             throw new MessageQueueException('添加主题失败', ErrorCode::MESSAGE_QUEUE_TOPIC_ERROR);
         }
@@ -63,11 +68,16 @@ class Producer {
 
     /**
      * 删除消费者
-     * @param \SyMessageQueue\ConsumerInterface $consumer
+     * @param \SyMessageQueue\ConsumerBase $consumer
      * @return int
+     * @throws \Exception\MessageQueue\MessageQueueException
      */
-    public function deleteConsumer(ConsumerInterface $consumer) {
-        return CacheSimpleFactory::getRedisInstance()->hDel($this->keyManager, $consumer->topic);
+    public function deleteConsumer(ConsumerBase $consumer) {
+        if($consumer->getMqType() != Project::MESSAGE_QUEUE_TYPE_REDIS){
+            throw new MessageQueueException('消息队列类型必须是redis', ErrorCode::MESSAGE_QUEUE_PARAM_ERROR);
+        }
+
+        return CacheSimpleFactory::getRedisInstance()->hDel($this->keyManager, $consumer->getTopic());
     }
 
     /**

@@ -83,7 +83,7 @@ class Consumer {
     /**
      * 获取消费者
      * @param string $topic
-     * @return \SyMessageQueue\ConsumerInterface|null
+     * @return \SyMessageQueue\ConsumerBase|null
      */
     private function getConsumer(string $topic) {
         if(isset($this->consumers[$topic])){

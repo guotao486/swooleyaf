@@ -10,13 +10,12 @@ namespace MessageQueue\Consumer\Redis;
 use Constant\Project;
 use Log\Log;
 use SyMessageQueue\ConsumerBase;
-use SyMessageQueue\ConsumerInterface;
 use Tool\Tool;
 
-class AddLogService extends ConsumerBase implements ConsumerInterface {
+class AddLogService extends ConsumerBase {
     public function __construct() {
         parent::__construct();
-        $this->topic = Project::MESSAGE_QUEUE_TOPIC_ADD_LOG;
+        $this->setMqTypeAndTopic(Project::MESSAGE_QUEUE_TYPE_REDIS, Project::MESSAGE_QUEUE_TOPIC_ADD_LOG);
     }
 
     private function __clone() {
