@@ -160,6 +160,9 @@ class ErrorCode {
     const FFMPEG_PARAM_ERROR = 104300;
     const FFMPEG_EXEC_ERROR = 104301;
 
+    //amqp错误,取值范围:104400-104499
+    const AMQP_CONNECT_ERROR = 104400;
+
     protected static $msgArr = [
         self::COMMON_SUCCESS => '成功',
         self::COMMON_PARAM_ERROR => '参数错误',
@@ -258,6 +261,7 @@ class ErrorCode {
         self::IM_SIGN_ERROR => '即时通讯签名错误',
         self::FFMPEG_PARAM_ERROR => 'ffmpeg参数错误',
         self::FFMPEG_EXEC_ERROR => 'ffmpeg处理错误',
+        self::AMQP_CONNECT_ERROR => 'amqp连接错误',
     ];
 
     /**
