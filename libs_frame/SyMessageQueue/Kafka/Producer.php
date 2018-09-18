@@ -40,13 +40,14 @@ class Producer {
 
     /**
      * 添加主题数据
-     * @param string $topicName 主题名称
+     * @param string $topic 主题名称
      * @param array $data 数据
      */
     public function addTopicData(string $topic,array $data) {
-        $topic = $this->obj->newTopic($topic);
+        $topicName = SY_ENV . SY_PROJECT . $topic;
+        $topicObj = $this->obj->newTopic($topicName);
         foreach ($data as $eData) {
-            $topic->produce(RD_KAFKA_PARTITION_UA, 0, Tool::jsonEncode($eData, JSON_UNESCAPED_UNICODE));
+            $topicObj->produce(RD_KAFKA_PARTITION_UA, 0, Tool::jsonEncode($eData, JSON_UNESCAPED_UNICODE));
             $this->obj->poll(0);
         }
 
