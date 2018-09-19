@@ -15,6 +15,7 @@ use RdKafka\Producer;
 use RdKafka\TopicConf;
 use SyMessageQueue\ConfigRedis;
 use SyMessageQueue\Rabbit\Producer as RabbitProducer;
+use SyMessageQueue\Rabbit\Consumer as RabbitConsumer;
 use Tool\Tool;
 use Traits\SingletonTrait;
 
@@ -37,7 +38,7 @@ class MessageQueueSingleton {
      */
     private $rabbitProducer = null;
     /**
-     * @var \AMQPQueue
+     * @var \SyMessageQueue\Rabbit\Consumer
      */
     private $rabbitConsumer = null;
 
@@ -151,10 +152,11 @@ class MessageQueueSingleton {
     }
 
     /**
-     * @return \AMQPQueue
+     * @return \SyMessageQueue\Rabbit\Consumer
      */
     public function getRabbitConsumer(){
         if(is_null($this->rabbitConsumer)){
+            $this->rabbitConsumer = new RabbitConsumer();
         }
 
         return $this->rabbitConsumer;

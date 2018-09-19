@@ -7,80 +7,76 @@
  */
 namespace SyMessageQueue\Rabbit;
 
-class Consumer {
-    public function __construct(){
-        $params = array(
-            'exchangeName' => 'myexchange',
-            'queueName' => 'myqueue',
-            'routeKey' => 'myroute',
-        );
+use Constant\ErrorCode;
+use Exception\Amqp\AmqpException;
+use Tool\Tool;
 
-        $connectConfig = array(
-            'host' => 'localhost',
-            'port' => 5672,
-            'login' => 'rabbitmq',
-            'password' => 'rabbitmq',
-            'vhost' => '/'
-        );
+class Consumer {
+    /**
+     * @var \AMQPConnection
+     */
+    private $conn = null;
+    /**
+     * @var \AMQPQueue
+     */
+    private $queue = null;
+
+    public function __construct(){
+        $configs = Tool::getConfig('messagequeue.' . SY_ENV . SY_PROJECT . '.rabbit');
 
         try {
-            $conn = new AMQPConnection($connectConfig);
-            $conn->connect();
-            if (!$conn->isConnected()) {
-                //die('Conexiune esuata');
-                //TODO 记录日志
-                echo 'rabbit-mq 连接错误:', json_encode($connectConfig);
-                exit();
+            $this->conn = new \AMQPConnection($configs['conn']);
+            $this->conn->pconnect();
+            if(!$this->conn->isPersistent()){
+                throw new AmqpException('amqp连接出错', ErrorCode::AMQP_CONNECT_ERROR);
             }
-            $channel = new AMQPChannel($conn);
+
+            $channel = new \AMQPChannel($this->conn);
             if (!$channel->isConnected()) {
-                // die('Connection through channel failed');
-                //TODO 记录日志
-                echo 'rabbit-mq Connection through channel failed:', json_encode($connectConfig);
-                exit();
+                throw new AmqpException('amqp channel连接出错', ErrorCode::AMQP_CONNECT_ERROR);
             }
-            $exchange = new AMQPExchange($channel);
-            $exchange->setFlags(AMQP_PASSIVE);//声明一个已存在的交换器的，如果不存在将抛出异常，这个一般用在consume端
-            $exchange->setName($params['exchangeName']?:'');
-            $exchange->setType(AMQP_EX_TYPE_DIRECT); //direct类型
-            $exchange->declareExchange();
 
-            //$channel->startTransaction();
+            $exchangeName = 'exchange' . SY_ENV . SY_PROJECT;
+            $this->exchange = new \AMQPExchange($channel);
+            $this->exchange->setFlags(AMQP_DURABLE); //持久化
+            $this->exchange->setName($exchangeName);
+            $this->exchange->setType(AMQP_EX_TYPE_TOPIC);
+            $this->exchange->declareExchange();
 
-            $queue = new AMQPQueue($channel);
-            $queue->setName($params['queueName']?:'');
-            $queue->setFlags(AMQP_DURABLE);
-            $queue->declareQueue();
-
-            //绑定
-            $queue->bind($params['exchangeName'], $params['routeKey']);
-        } catch(Exception $e) {
-            echo $e->getMessage();
-            exit();
-        }
-
-        function callback(AMQPEnvelope $message) {
-            global $queue;
-            if ($message) {
-                $body = $message->getBody();
-                echo $body . PHP_EOL;
-                $queue->ack($message->getDeliveryTag());
-            } else {
-                echo 'no message' . PHP_EOL;
-            }
-        }
-
-        //$queue->consume('callback');  第一种消费方式,但是会阻塞,程序一直会卡在此处
-
-        //第二种消费方式,非阻塞
-        $message = $queue->get();
-        if(!empty($message))
-        {
-            echo $message->getBody();
-            $queue->ack($message->getDeliveryTag());    //应答，代表该消息已经消费
+            $this->queue = new \AMQPQueue($channel);
+            $this->queue->setName('queue' . SY_ENV . SY_PROJECT);
+            $this->queue->setFlags(AMQP_DURABLE);
+            $this->queue->declareQueue();
+            $this->queue->bind($exchangeName, SY_ENV . SY_PROJECT . '.*');
+        } catch (\Exception $e) {
+            $this->destroy();
+            throw $e;
         }
     }
 
+    public function __destruct(){
+        $this->destroy();
+    }
+
     private function __clone(){
+    }
+
+    private function destroy() {
+        if(!is_null($this->queue)){
+            $this->queue = null;
+        }
+        if(!is_null($this->conn)){
+            if($this->conn->isPersistent()){
+                $this->conn->pdisconnect();
+            }
+            $this->conn = null;
+        }
+    }
+
+    /**
+     * @return \AMQPQueue
+     */
+    public function getQueue() {
+        return $this->queue;
     }
 }
