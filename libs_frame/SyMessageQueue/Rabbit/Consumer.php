@@ -37,11 +37,11 @@ class Consumer {
             }
 
             $exchangeName = 'exchange' . SY_ENV . SY_PROJECT;
-            $this->exchange = new \AMQPExchange($channel);
-            $this->exchange->setFlags(AMQP_DURABLE); //持久化
-            $this->exchange->setName($exchangeName);
-            $this->exchange->setType(AMQP_EX_TYPE_TOPIC);
-            $this->exchange->declareExchange();
+            $exchange = new \AMQPExchange($channel);
+            $exchange->setFlags(AMQP_DURABLE); //持久化
+            $exchange->setName($exchangeName);
+            $exchange->setType(AMQP_EX_TYPE_TOPIC);
+            $exchange->declareExchange();
 
             $this->queue = new \AMQPQueue($channel);
             $this->queue->setName('queue' . SY_ENV . SY_PROJECT);
