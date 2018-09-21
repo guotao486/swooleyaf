@@ -16,7 +16,6 @@ use Entities\SyBase\PayHistoryEntity;
 use Entities\SyBase\RefundBaseEntity;
 use Entities\SyBase\RefundHistoryEntity;
 use Entities\SyBase\RegionBaseEntity;
-use Entities\SyBase\RegionsEntity;
 use Entities\SyBase\RoleBaseEntity;
 use Entities\SyBase\RolePowerEntity;
 use Entities\SyBase\RoleRelationEntity;
@@ -85,13 +84,6 @@ class SyBaseMysqlFactory {
      */
     public static function RefundHistoryEntity(string $dbName=''){
         return new RefundHistoryEntity($dbName);
-    }
-    /**
-     * @param string $dbName 数据库名
-     * @return \Entities\SyBase\RegionsEntity
-     */
-    public static function RegionsEntity(string $dbName=''){
-        return new RegionsEntity($dbName);
     }
     /**
      * @param string $dbName 数据库名
