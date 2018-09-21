@@ -5,7 +5,7 @@
  * Date: 2017/9/18 0018
  * Time: 14:49
  */
-namespace Interfaces\Containers;
+namespace Interfaces;
 
 use Constant\Project;
 use Interfaces\Impl\Pay\OrderGoods;

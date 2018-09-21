@@ -5,7 +5,7 @@
  * Date: 2017/9/18 0018
  * Time: 14:42
  */
-namespace Interfaces\Base;
+namespace Interfaces;
 
 abstract class PayBase {
     public $payType = '';

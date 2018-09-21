@@ -12,7 +12,7 @@ use Constant\Project;
 use DesignPatterns\Factories\CacheSimpleFactory;
 use Exception\Common\CheckException;
 use Factories\SyBaseMysqlFactory;
-use Interfaces\Containers\PayContainer;
+use Interfaces\PayContainer;
 use Log\Log;
 use Tool\Tool;
 use Traits\SimpleDaoTrait;
@@ -30,7 +30,7 @@ class PayDao {
     ];
 
     /**
-     * @var \Interfaces\Containers\PayContainer
+     * @var \Interfaces\PayContainer
      */
     private static $payContainer = null;
 
@@ -109,10 +109,10 @@ class PayDao {
 
             throw new CheckException('支付处理失败', ErrorCode::COMMON_SERVER_ERROR);
         } finally {
-            unset($ormResult1, $payHistory);
             if(!empty($successRes)){
                 $payService->handlePaySuccessAttach($successRes);
             }
+            unset($ormResult1, $payHistory, $payService);
         }
     }
 }
