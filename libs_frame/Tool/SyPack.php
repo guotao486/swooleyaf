@@ -259,7 +259,6 @@ class SyPack {
         $this->command = $unpackRes['k3'];
         $this->extend = $unpackRes['k4'];
         $this->data = $data;
-
         return true;
     }
 }

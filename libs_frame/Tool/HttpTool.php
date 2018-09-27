@@ -56,7 +56,6 @@ final class HttpTool {
         $rspData = explode("\r\n\r\n", $rspMessage);
         if (count($rspData) != 2) {
             Log::error('response invalid');
-
             return false;
         }
 
@@ -103,7 +102,6 @@ final class HttpTool {
         $contentLength = (int)Tool::getArrayVal($resArr['headers'], 'Content-Length', 0);
         $resArr['body'] = substr($rspData[1], 0, $contentLength);
         unset($rspData);
-
         return $resArr;
     }
 
@@ -124,7 +122,6 @@ final class HttpTool {
      */
     public static function getReqHeaderStr(string $method,string $uri,array $headers,array $cookies=[]) : string {
         $reqHeaderStr = $method . " " . $uri . " HTTP/1.1\r\n\r\n";
-
         if (!empty($cookies)) {
             $cookieStr = '';
             foreach ($cookies as $cookieName => $cookieVal) {
