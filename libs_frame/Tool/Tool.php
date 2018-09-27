@@ -72,7 +72,6 @@ class Tool {
             $keyLeft = substr($key, ($index + 1));
             $newData = $array[$keyFirst];
             unset($array);
-
             return self::getArrayVal($newData, $keyLeft, $default, $isRecursion);
         } else {
             return $default;
@@ -117,7 +116,6 @@ class Tool {
             }
         }
         $xml .= '</xml>';
-
         return $xml;
     }
 
@@ -148,7 +146,6 @@ class Tool {
         $res = openssl_get_privatekey($priKey);
         openssl_sign($data, $sign, $res);
         openssl_free_key($res);
-
         return base64_encode($sign);
     }
 
@@ -164,7 +161,6 @@ class Tool {
         $res = openssl_get_publickey($pubKey);
         $result = (boolean)openssl_verify($data, base64_decode($sign), $res);
         openssl_free_key($res);
-
         return $result;
     }
 
@@ -188,7 +184,6 @@ class Tool {
             $result .= $decrypt;
         }
         openssl_free_key($res);
-
         return $result;
     }
 
@@ -226,7 +221,6 @@ class Tool {
             'iv' => $iv,
             'value' => openssl_encrypt($content, 'AES-256-CBC', $key, 0, $iv),
         ];
-
         return base64_encode(self::jsonEncode($data));
     }
 
@@ -241,7 +235,6 @@ class Tool {
         if(is_array($data) && (!empty($data))){
             return openssl_decrypt($data['value'], 'AES-256-CBC', $key, 0, $data['iv']);
         }
-
         return false;
     }
 
@@ -328,7 +321,6 @@ class Tool {
         if(is_array($arr) || is_object($arr)){
             return json_encode($arr, $options);
         }
-
         return false;
     }
 
@@ -342,7 +334,6 @@ class Tool {
         if(is_string($json)){
             return json_decode($json, $assoc);
         }
-
         return false;
     }
 
@@ -357,7 +348,6 @@ class Tool {
      */
     public static function createNonceStr(int $length,string $dataType='total') : string {
         $resStr = '';
-
         switch ($dataType) {
             case 'lower':
                 for ($i = 0; $i < $length; $i++) {
@@ -399,7 +389,6 @@ class Tool {
             if (($headers === false) || ($servers === false)) {
                 return false;
             }
-
             if (isset($headers['x-forwarded-for'])) {
                 $ips = explode(',', $headers['x-forwarded-for']);
                 return trim($ips[0]);
@@ -472,7 +461,6 @@ class Tool {
             CURLOPT_SSL_VERIFYHOST => false,
             CURLOPT_RETURNTRANSFER => true,
         ]);
-
         return $sendRes['res_no'] == 0 ? $sendRes['res_content'] : false;
     }
 
@@ -504,7 +492,6 @@ class Tool {
 
         $res = @$client->recv();
         $client->close();
-
         return $res;
     }
 
@@ -524,7 +511,6 @@ class Tool {
             $resNo = curl_errno($ch);
             $resMsg = curl_error($ch);
             curl_close($ch);
-
             return [
                 'res_no' => $resNo,
                 'res_msg' => $resMsg,

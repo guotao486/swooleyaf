@@ -30,7 +30,6 @@ class SySessionBase {
         } else {
             $token = SyRequest::getParams('session_id', '');
         }
-
         if ((strlen($token) == 16) && ctype_alnum($token)) {
             return $token;
         } else {
@@ -49,11 +48,9 @@ class SySessionBase {
         $cacheData = CacheSimpleFactory::getRedisInstance()->hGetAll($redisKey);
         if (isset($cacheData['session_id']) && ($cacheData['session_id'] == $token)) {
             BaseServer::addLocalUserInfo($token, $cacheData);
-
             return $cacheData;
         } else if(empty($cacheData)){
             BaseServer::delLocalUserInfo($token);
-
             return [];
         } else {
             return [];
@@ -108,12 +105,10 @@ class SySessionBase {
             $cacheData = CacheSimpleFactory::getRedisInstance()->hGetAll($redisKey);
             $refreshTag = true;
         }
-
         if (isset($cacheData['session_id']) && ($cacheData['session_id'] == $token)) {
             if($refreshTag){
                 BaseServer::addLocalUserInfo($token, $cacheData);
             }
-
             if (is_null($key)) {
                 return $cacheData;
             } else {
