@@ -617,6 +617,7 @@ class HttpServer extends BaseServer {
                 'msg' => 'task received',
             ]);
             self::$_rspMsg = $result->getJson();
+            unset($result);
         }
 
         if (self::$_reqTag) {

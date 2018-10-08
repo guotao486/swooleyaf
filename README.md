@@ -3,7 +3,7 @@
 请移步至项目 https://github.com/a07061625/swooleyaf_install.git
 
 ## 基础环境
-- PHP7+
+- PHP7.1.0+
 - redis3.2+
 - etcd3
 - inotify
