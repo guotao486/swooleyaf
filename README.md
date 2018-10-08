@@ -1,6 +1,6 @@
 # 环境要求
 ## 基础环境
-- PHP7+
+- PHP7.1.0+
 - redis3.2+
 - etcd3
 - inotify

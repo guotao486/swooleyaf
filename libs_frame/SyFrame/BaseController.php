@@ -39,7 +39,7 @@ abstract class BaseController extends Controller_Abstract {
      * </pre>
      * @param string $data
      */
-    public function sendRsp(string $data=null){
+    public function sendRsp(?string $data=null){
         if(is_null($data)){
             $this->getResponse()->setBody($this->SyResult->getJson());
         } else {

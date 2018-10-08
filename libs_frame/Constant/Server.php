@@ -45,7 +45,7 @@ final class Server {
     const ENV_SYSTEM_LINUX = 'Linux'; //系统环境-linux
 
     //版本常量
-    const VERSION_PHP_MIN = '7.0.0'; //最低php版本
+    const VERSION_PHP_MIN = '7.1.0'; //最低php版本
 
     //YAC常量,以0000开头的前缀为框架内部前缀,并键名总长度不超过48个字符串
     const YAC_PREFIX_FUSE = '0000'; //前缀-熔断器
