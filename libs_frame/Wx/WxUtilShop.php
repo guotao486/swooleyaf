@@ -26,13 +26,13 @@ final class WxUtilShop extends WxUtilBaseAlone {
         $needStr1 = '';
         foreach ($data as $key => $value) {
             if($key == 'sign'){
-                break;
+                continue;
             }
             if((!is_string($value)) && !is_numeric($value)){
-                break;
+                continue;
             }
             if(strlen($value) == 0){
-                break;
+                continue;
             }
             $needStr1 .= $key . '=' . $value . '&';
         }
