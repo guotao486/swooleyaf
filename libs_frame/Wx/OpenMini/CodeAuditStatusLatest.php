@@ -35,7 +35,7 @@ class CodeAuditStatusLatest extends WxBaseOpenMini {
         ];
 
         $this->curlConfigs[CURLOPT_URL] = $this->serviceUrl . WxUtilOpenBase::getAuthorizerAccessToken($this->appId);
-        $sendRes = WxUtilBase::sendPostReq($this->curlConfigs);
+        $sendRes = WxUtilBase::sendGetReq($this->curlConfigs);
         $sendData = Tool::jsonDecode($sendRes);
         if($sendData['errcode'] == 0){
             $resArr['data'] = $sendData;
