@@ -80,22 +80,21 @@ trait HttpServerTrait {
     }
 
     protected function handleHttpTask(array $data) {
-        $result = new Result();
+        $resData = [
+            'result' => 'success',
+        ];
         $taskCommand = Tool::getArrayVal($data, 'task_command', '');
         switch ($taskCommand) {
             case Project::TASK_TYPE_CLEAR_API_SIGN_CACHE:
                 $this->clearApiSign();
-                $result->setData([
-                    'result' => 'success',
-                ]);
                 break;
             default:
-                $result->setData([
-                    'result' => 'fail',
-                ]);
+                $resData['result'] = 'fail';
                 break;
         }
 
+        $result = new Result();
+        $result->setData($resData);
         return $result->getJson();
     }
 }
