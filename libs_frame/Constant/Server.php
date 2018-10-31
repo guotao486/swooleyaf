@@ -61,7 +61,7 @@ final class Server {
     const FUSE_TIME_OPEN_KEEP = 10; //开启状态保持时间,单位为秒
     const FUSE_NUM_REQUEST_ERROR = 20; //请求出错次数
     const FUSE_NUM_HALF_REQUEST_SUCCESS = 10; //半开状态请求成功次数
-    const FUSE_MSG_REQUEST_ERROR = '{"code":10001,"data":[],"msg":"服务繁忙,清稍后重试"}'; //请求出错提示消息
+    const FUSE_MSG_REQUEST_ERROR = '{"code":10001,"data":[],"msg":"服务繁忙,请稍后重试"}'; //请求出错提示消息
 
     //路由常量
     const ROUTE_TYPE_BASIC = 'basic'; //类型-基础路由
