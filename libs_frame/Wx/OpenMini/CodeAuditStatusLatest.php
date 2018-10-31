@@ -40,7 +40,7 @@ class CodeAuditStatusLatest extends WxBaseOpenMini {
         if($sendData['errcode'] == 0){
             $resArr['data'] = $sendData;
         } else {
-            $resArr['code'] = ErrorCode::WXOPEN_POST_ERROR;
+            $resArr['code'] = ErrorCode::WXOPEN_GET_ERROR;
             $resArr['message'] = $sendData['errmsg'];
         }
 

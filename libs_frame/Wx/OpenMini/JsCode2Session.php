@@ -68,7 +68,7 @@ class JsCode2Session extends WxBaseOpenMini {
         if(isset($sendData['openid'])){
             $resArr['data'] = $sendData;
         } else {
-            $resArr['code'] = ErrorCode::WXOPEN_POST_ERROR;
+            $resArr['code'] = ErrorCode::WXOPEN_GET_ERROR;
             $resArr['message'] = $sendData['errmsg'];
         }
 
