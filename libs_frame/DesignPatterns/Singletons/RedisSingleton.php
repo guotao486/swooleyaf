@@ -111,7 +111,7 @@ class RedisSingleton {
      * @throws \Exception\Redis\RedisException
      */
     public function changeDb(int $dbIndex) {
-        if (($dbIndex < 0) || ($dbIndex >= 16)) {
+        if ($dbIndex < 0) {
             throw new RedisException('数据库索引不合法', ErrorCode::REDIS_CONNECTION_ERROR);
         }
 
