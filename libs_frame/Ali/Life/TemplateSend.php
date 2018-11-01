@@ -11,7 +11,7 @@ use Ali\AliBase;
 use Constant\ErrorCode;
 use Exception\Ali\AliPayException;
 
-class MessageSend extends AliBase {
+class TemplateSend extends AliBase {
     /**
      * 用户ID
      * @var string
