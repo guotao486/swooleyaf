@@ -7,8 +7,8 @@
  */
 namespace DesignPatterns\Facades\PayApply;
 
-use Ali\AliUtilPay;
-use Ali\Pay\PayQrCode;
+use AliPay\AliPayUtilPay;
+use AliPay\Pay\PayQrCode;
 use Constant\ErrorCode;
 use DesignPatterns\Facades\PayApplyFacade;
 use Exception\Common\CheckException;
@@ -33,7 +33,7 @@ class AliCode extends PayApplyFacade {
         $pay->setAttach($data['content_result']['pay_attach']);
         $pay->setTimeoutExpress($data['a01_timeout']);
         $pay->setOutTradeNo($data['content_result']['pay_sn']);
-        $payRes = AliUtilPay::sendServiceRequest($pay);
+        $payRes = AliPayUtilPay::sendServiceRequest($pay);
         unset($pay);
         if ($payRes['code'] > 0) {
             throw new CheckException($payRes['message'], ErrorCode::COMMON_PARAM_ERROR);

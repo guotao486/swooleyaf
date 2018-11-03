@@ -7,8 +7,8 @@
  */
 namespace DesignPatterns\Facades\PayApply;
 
-use Ali\AliUtilPay;
-use Ali\Pay\PayWap;
+use AliPay\AliPayUtilPay;
+use AliPay\Pay\PayWap;
 use Constant\ErrorCode;
 use DesignPatterns\Facades\PayApplyFacade;
 use Exception\Common\CheckException;
@@ -40,7 +40,7 @@ class AliWeb extends PayApplyFacade {
         $pay->setAttach($data['content_result']['pay_attach']);
         $pay->setTimeoutExpress($data['a01_timeout']);
         $pay->setOutTradeNo($data['content_result']['pay_sn']);
-        $html = AliUtilPay::createWapPayHtml($pay);
+        $html = AliPayUtilPay::createWapPayHtml($pay);
         unset($pay);
 
         return [

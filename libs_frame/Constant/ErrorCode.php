@@ -73,10 +73,14 @@ class ErrorCode {
     const WXOPEN_POST_ERROR = 101601;
     const WXOPEN_GET_ERROR = 101602;
 
-    //支付宝支付错误,取值范围:101800-101999
+    //支付宝错误,取值范围:101800-101999
     const ALIPAY_PARAM_ERROR = 101800;
     const ALIPAY_POST_ERROR = 101801;
     const ALIPAY_GET_ERROR = 101802;
+    const ALIPAY_AUTH_PARAM_ERROR = 101850;
+    const ALIPAY_LIFE_PARAM_ERROR = 101851;
+    const ALIPAY_PAY_PARAM_ERROR = 101852;
+    const ALIPAY_SHOP_PARAM_ERROR = 101853;
 
     //短信错误,取值范围:102000-102199
     const SMS_PARAM_ERROR = 102000;
@@ -204,9 +208,13 @@ class ErrorCode {
         self::WXOPEN_PARAM_ERROR => '微信开放平台参数错误',
         self::WXOPEN_POST_ERROR => '微信开放平台发送POST请求出错',
         self::WXOPEN_GET_ERROR => '微信开放平台发送GET请求出错',
-        self::ALIPAY_PARAM_ERROR => '支付宝支付参数错误',
-        self::ALIPAY_POST_ERROR => '支付宝支付发送POST请求出错',
-        self::ALIPAY_GET_ERROR => '支付宝支付发送GET请求出错',
+        self::ALIPAY_PARAM_ERROR => '支付宝参数错误',
+        self::ALIPAY_POST_ERROR => '支付宝发送POST请求出错',
+        self::ALIPAY_GET_ERROR => '支付宝发送GET请求出错',
+        self::ALIPAY_AUTH_PARAM_ERROR => '支付宝授权参数错误',
+        self::ALIPAY_LIFE_PARAM_ERROR => '支付宝生活号参数错误',
+        self::ALIPAY_PAY_PARAM_ERROR => '支付宝支付参数错误',
+        self::ALIPAY_SHOP_PARAM_ERROR => '支付宝店铺参数错误',
         self::SMS_PARAM_ERROR => '短信参数错误',
         self::SMS_POST_ERROR => '短信发送POST请求出错',
         self::SMS_GET_ERROR => '短信发送GET请求出错',
