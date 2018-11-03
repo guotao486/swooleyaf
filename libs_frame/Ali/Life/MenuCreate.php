@@ -9,7 +9,7 @@ namespace Ali\Life;
 
 use Ali\AliBase;
 use Constant\ErrorCode;
-use Exception\Ali\AliPayException;
+use Exception\Ali\AliLifeException;
 
 class MenuCreate extends AliBase {
     /**
@@ -35,31 +35,31 @@ class MenuCreate extends AliBase {
 
     /**
      * @param string $type
-     * @throws \Exception\Ali\AliPayException
+     * @throws \Exception\Ali\AliLifeException
      */
     public function setType(string $type){
         if(in_array($type, ['icon', 'text'])){
             $this->biz_content['type'] = $type;
         } else {
-            throw new AliPayException('菜单类型不合法', ErrorCode::ALIPAY_PARAM_ERROR);
+            throw new AliLifeException('菜单类型不合法', ErrorCode::ALIPAY_PARAM_ERROR);
         }
     }
 
     /**
      * @param array $button
-     * @throws \Exception\Ali\AliPayException
+     * @throws \Exception\Ali\AliLifeException
      */
     public function addButton(array $button){
         if(!empty($button)){
             $this->biz_content['button'][] = $button;
         } else {
-            throw new AliPayException('菜单内容不合法', ErrorCode::ALIPAY_PARAM_ERROR);
+            throw new AliLifeException('菜单内容不合法', ErrorCode::ALIPAY_PARAM_ERROR);
         }
     }
 
     public function getDetail() : array {
         if(count($this->biz_content['button']) == 0){
-            throw new AliPayException('菜单列表不能为空', ErrorCode::ALIPAY_PARAM_ERROR);
+            throw new AliLifeException('菜单列表不能为空', ErrorCode::ALIPAY_PARAM_ERROR);
         }
 
         return $this->getContent();

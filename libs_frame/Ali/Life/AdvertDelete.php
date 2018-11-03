@@ -9,7 +9,7 @@ namespace Ali\Life;
 
 use Ali\AliBase;
 use Constant\ErrorCode;
-use Exception\Ali\AliPayException;
+use Exception\Ali\AliLifeException;
 
 class AdvertDelete extends AliBase {
     /**
@@ -28,19 +28,19 @@ class AdvertDelete extends AliBase {
 
     /**
      * @param string $advertId
-     * @throws \Exception\Ali\AliPayException
+     * @throws \Exception\Ali\AliLifeException
      */
     public function setAdvertId(string $advertId){
         if(ctype_alnum($advertId) && (strlen($advertId) <= 20)){
             $this->biz_content['advert_id'] = $advertId;
         } else {
-            throw new AliPayException('广告ID不合法', ErrorCode::ALIPAY_PARAM_ERROR);
+            throw new AliLifeException('广告ID不合法', ErrorCode::ALIPAY_PARAM_ERROR);
         }
     }
 
     public function getDetail() : array {
         if(!isset($this->biz_content['advert_id'])){
-            throw new AliPayException('广告ID不能为空', ErrorCode::ALIPAY_PARAM_ERROR);
+            throw new AliLifeException('广告ID不能为空', ErrorCode::ALIPAY_PARAM_ERROR);
         }
 
         return $this->getContent();

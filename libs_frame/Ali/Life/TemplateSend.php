@@ -9,7 +9,7 @@ namespace Ali\Life;
 
 use Ali\AliBase;
 use Constant\ErrorCode;
-use Exception\Ali\AliPayException;
+use Exception\Ali\AliLifeException;
 
 class TemplateSend extends AliBase {
     /**
@@ -33,34 +33,34 @@ class TemplateSend extends AliBase {
 
     /**
      * @param string $userId
-     * @throws \Exception\Ali\AliPayException
+     * @throws \Exception\Ali\AliLifeException
      */
     public function setToUserId(string $userId){
         if(ctype_digit($userId) && (strlen($userId) <= 32)){
             $this->biz_content['to_user_id'] = $userId;
         } else {
-            throw new AliPayException('用户ID不合法', ErrorCode::ALIPAY_PARAM_ERROR);
+            throw new AliLifeException('用户ID不合法', ErrorCode::ALIPAY_PARAM_ERROR);
         }
     }
 
     /**
      * @param array $template
-     * @throws \Exception\Ali\AliPayException
+     * @throws \Exception\Ali\AliLifeException
      */
     public function setTemplate(array $template){
         if(!empty($template)){
             $this->biz_content['template'] = $template;
         } else {
-            throw new AliPayException('模板信息不合法', ErrorCode::ALIPAY_PARAM_ERROR);
+            throw new AliLifeException('模板信息不合法', ErrorCode::ALIPAY_PARAM_ERROR);
         }
     }
 
     public function getDetail() : array {
         if (!isset($this->biz_content['to_user_id'])) {
-            throw new AliPayException('用户ID不能为空', ErrorCode::ALIPAY_PARAM_ERROR);
+            throw new AliLifeException('用户ID不能为空', ErrorCode::ALIPAY_PARAM_ERROR);
         }
         if (!isset($this->biz_content['template'])) {
-            throw new AliPayException('模板信息不能为空', ErrorCode::ALIPAY_PARAM_ERROR);
+            throw new AliLifeException('模板信息不能为空', ErrorCode::ALIPAY_PARAM_ERROR);
         }
 
         return $this->getContent();

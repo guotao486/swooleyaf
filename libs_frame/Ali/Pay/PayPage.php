@@ -150,10 +150,10 @@ class PayPage extends AliBase {
         $payConfig = AliConfigSingleton::getInstance()->getPayConfig($appId);
         $this->notify_url = $payConfig->getUrlNotify();
         $this->return_baseurl = $payConfig->getUrlReturn();
-        $this->product_code = 'FAST_INSTANT_TRADE_PAY';
-        $this->goods_type = '1';
-        $this->qr_pay_mode = '2';
-        $this->integration_type = 'PCWEB';
+        $this->biz_content['product_code'] = 'FAST_INSTANT_TRADE_PAY';
+        $this->biz_content['goods_type'] = '1';
+        $this->biz_content['qr_pay_mode'] = '2';
+        $this->biz_content['integration_type'] = 'PCWEB';
         $this->setMethod('alipay.trade.page.pay');
     }
 
