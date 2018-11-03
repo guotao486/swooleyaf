@@ -11,9 +11,9 @@ class WxOpenController extends CommonController {
      * 处理微信服务器消息通知
      */
     public function handleWxNotifyAction() {
-        $allParams = \Request\SyRequest::getParams();
-        $allParams['wx_xml'] = \Tool\Tool::getArrayVal($GLOBALS, 'HTTP_RAW_POST_DATA', '');
-        $handleRes = \SyModule\SyModuleService::getInstance()->sendApiReq('/Index/WxOpen/handleWxNotify', $allParams);
+        $data = \Request\SyRequest::getParams();
+        $data['wx_xml'] = \Tool\Tool::getArrayVal($GLOBALS, 'HTTP_RAW_POST_DATA', '');
+        $handleRes = \SyModule\SyModuleService::getInstance()->sendApiReq('/Index/WxOpen/handleWxNotify', $data);
         $resData = \Tool\Tool::jsonDecode($handleRes);
         if (is_array($resData) && isset($resData['code']) && ($resData['code'] == \Constant\ErrorCode::COMMON_SUCCESS)) {
             $this->sendRsp($resData['data']['result']);
@@ -26,9 +26,9 @@ class WxOpenController extends CommonController {
      * 处理授权者公众号消息
      */
     public function handleAuthorizerNotifyAction() {
-        $allParams = \Request\SyRequest::getParams();
-        $allParams['wx_xml'] = \Tool\Tool::getArrayVal($GLOBALS, 'HTTP_RAW_POST_DATA', '');
-        $handleRes = \SyModule\SyModuleService::getInstance()->sendApiReq('/Index/WxOpen/handleAuthorizerNotify', $allParams);
+        $data = \Request\SyRequest::getParams();
+        $data['wx_xml'] = \Tool\Tool::getArrayVal($GLOBALS, 'HTTP_RAW_POST_DATA', '');
+        $handleRes = \SyModule\SyModuleService::getInstance()->sendApiReq('/Index/WxOpen/handleAuthorizerNotify', $data);
         $resData = \Tool\Tool::jsonDecode($handleRes);
         if (is_array($resData) && isset($resData['code']) && ($resData['code'] == \Constant\ErrorCode::COMMON_SUCCESS)) {
             $this->sendRsp($resData['data']['result']);
