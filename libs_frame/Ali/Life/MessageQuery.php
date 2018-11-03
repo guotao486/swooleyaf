@@ -9,7 +9,7 @@ namespace Ali\Life;
 
 use Ali\AliBase;
 use Constant\ErrorCode;
-use Exception\Ali\AliPayException;
+use Exception\Ali\AliLifeException;
 
 class MessageQuery extends AliBase {
     /**
@@ -28,17 +28,17 @@ class MessageQuery extends AliBase {
 
     /**
      * @param string $messageId
-     * @throws \Exception\Ali\AliPayException
+     * @throws \Exception\Ali\AliLifeException
      */
     public function addMessageId(string $messageId){
         if(!isset($this->message_ids[$messageId])){
             if(count($this->message_ids) >= 20){
-                throw new AliPayException('消息ID列表超过限制', ErrorCode::ALIPAY_PARAM_ERROR);
+                throw new AliLifeException('消息ID列表超过限制', ErrorCode::ALIPAY_PARAM_ERROR);
             }
 
             $length = strlen($messageId);
             if(($length == 0) || ($length > 64)){
-                throw new AliPayException('消息ID不合法', ErrorCode::ALIPAY_PARAM_ERROR);
+                throw new AliLifeException('消息ID不合法', ErrorCode::ALIPAY_PARAM_ERROR);
             }
 
             $this->message_ids[$messageId] = 1;
@@ -47,7 +47,7 @@ class MessageQuery extends AliBase {
 
     public function getDetail() : array {
         if(empty($this->message_ids)){
-            throw new AliPayException('消息ID列表不能为空', ErrorCode::ALIPAY_PARAM_ERROR);
+            throw new AliLifeException('消息ID列表不能为空', ErrorCode::ALIPAY_PARAM_ERROR);
         }
         $this->biz_content['message_ids'] = array_keys($this->message_ids);
 

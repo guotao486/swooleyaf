@@ -9,7 +9,7 @@ namespace Ali\Life;
 
 use Ali\AliBase;
 use Constant\ErrorCode;
-use Exception\Ali\AliPayException;
+use Exception\Ali\AliLifeException;
 
 class TemplateGet extends AliBase {
     /**
@@ -28,19 +28,19 @@ class TemplateGet extends AliBase {
 
     /**
      * @param string $templateId
-     * @throws \Exception\Ali\AliPayException
+     * @throws \Exception\Ali\AliLifeException
      */
     public function setTemplateId(string $templateId){
         if(ctype_alnum($templateId) && (strlen($templateId) <= 20)){
             $this->biz_content['template_id'] = $templateId;
         } else {
-            throw new AliPayException('模板ID不合法', ErrorCode::ALIPAY_PARAM_ERROR);
+            throw new AliLifeException('模板ID不合法', ErrorCode::ALIPAY_PARAM_ERROR);
         }
     }
 
     public function getDetail() : array {
         if (!isset($this->biz_content['template_id'])) {
-            throw new AliPayException('模板ID不能为空', ErrorCode::ALIPAY_PARAM_ERROR);
+            throw new AliLifeException('模板ID不能为空', ErrorCode::ALIPAY_PARAM_ERROR);
         }
 
         return $this->getContent();

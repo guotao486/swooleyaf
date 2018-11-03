@@ -9,7 +9,7 @@ namespace Ali\Life;
 
 use Ali\AliBase;
 use Constant\ErrorCode;
-use Exception\Ali\AliPayException;
+use Exception\Ali\AliLifeException;
 
 class AdvertModify extends AliBase {
     /**
@@ -34,36 +34,36 @@ class AdvertModify extends AliBase {
 
     /**
      * @param string $advertId
-     * @throws \Exception\Ali\AliPayException
+     * @throws \Exception\Ali\AliLifeException
      */
     public function setAdvertId(string $advertId){
         if(ctype_alnum($advertId) && (strlen($advertId) <= 20)){
             $this->biz_content['advert_id'] = $advertId;
         } else {
-            throw new AliPayException('广告ID不合法', ErrorCode::ALIPAY_PARAM_ERROR);
+            throw new AliLifeException('广告ID不合法', ErrorCode::ALIPAY_PARAM_ERROR);
         }
     }
 
     /**
      * @param array $advertItem
-     * @throws \Exception\Ali\AliPayException
+     * @throws \Exception\Ali\AliLifeException
      */
     public function addAdvertItems(array $advertItem){
         if(count($this->biz_content['advert_items']) >= 3){
-            throw new AliPayException('广告内容列表超过限制', ErrorCode::ALIPAY_PARAM_ERROR);
+            throw new AliLifeException('广告内容列表超过限制', ErrorCode::ALIPAY_PARAM_ERROR);
         }
         if(empty($advertItem)){
-            throw new AliPayException('广告内容不合法', ErrorCode::ALIPAY_PARAM_ERROR);
+            throw new AliLifeException('广告内容不合法', ErrorCode::ALIPAY_PARAM_ERROR);
         }
         $this->biz_content['advert_items'][] = $advertItem;
     }
 
     public function getDetail() : array {
         if(!isset($this->biz_content['advert_id'])){
-            throw new AliPayException('广告ID不能为空', ErrorCode::ALIPAY_PARAM_ERROR);
+            throw new AliLifeException('广告ID不能为空', ErrorCode::ALIPAY_PARAM_ERROR);
         }
         if(count($this->biz_content['advert_items']) == 0){
-            throw new AliPayException('广告内容列表不能为空', ErrorCode::ALIPAY_PARAM_ERROR);
+            throw new AliLifeException('广告内容列表不能为空', ErrorCode::ALIPAY_PARAM_ERROR);
         }
 
         return $this->getContent();

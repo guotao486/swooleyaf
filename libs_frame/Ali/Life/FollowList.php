@@ -9,7 +9,7 @@ namespace Ali\Life;
 
 use Ali\AliBase;
 use Constant\ErrorCode;
-use Exception\Ali\AliPayException;
+use Exception\Ali\AliLifeException;
 
 class FollowList extends AliBase {
     /**
@@ -28,13 +28,13 @@ class FollowList extends AliBase {
 
     /**
      * @param string $nextUserId
-     * @throws \Exception\Ali\AliPayException
+     * @throws \Exception\Ali\AliLifeException
      */
     public function setNextUserId(string $nextUserId){
         if(ctype_alnum($nextUserId) && (strlen($nextUserId) <= 32)){
             $this->biz_content['next_user_id'] = $nextUserId;
         } else {
-            throw new AliPayException('分组用户ID不合法', ErrorCode::ALIPAY_PARAM_ERROR);
+            throw new AliLifeException('分组用户ID不合法', ErrorCode::ALIPAY_PARAM_ERROR);
         }
     }
 

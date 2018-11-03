@@ -9,7 +9,7 @@ namespace Ali\Life;
 
 use Ali\AliBase;
 use Constant\ErrorCode;
-use Exception\Ali\AliPayException;
+use Exception\Ali\AliLifeException;
 
 class PersonalMenuDelete extends AliBase {
     /**
@@ -28,19 +28,19 @@ class PersonalMenuDelete extends AliBase {
 
     /**
      * @param string $menuKey
-     * @throws \Exception\Ali\AliPayException
+     * @throws \Exception\Ali\AliLifeException
      */
     public function setMenuKey(string $menuKey){
         if(ctype_alnum($menuKey) && (strlen($menuKey) <= 32)){
             $this->biz_content['menu_key'] = $menuKey;
         } else {
-            throw new AliPayException('菜单key不合法', ErrorCode::ALIPAY_PARAM_ERROR);
+            throw new AliLifeException('菜单key不合法', ErrorCode::ALIPAY_PARAM_ERROR);
         }
     }
 
     public function getDetail() : array {
         if(!isset($this->biz_content['menu_key'])){
-            throw new AliPayException('菜单key不能为空', ErrorCode::ALIPAY_PARAM_ERROR);
+            throw new AliLifeException('菜单key不能为空', ErrorCode::ALIPAY_PARAM_ERROR);
         }
 
         return $this->getContent();

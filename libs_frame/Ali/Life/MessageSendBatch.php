@@ -9,7 +9,7 @@ namespace Ali\Life;
 
 use Ali\AliBase;
 use Constant\ErrorCode;
-use Exception\Ali\AliPayException;
+use Exception\Ali\AliLifeException;
 
 class MessageSendBatch extends AliBase {
     /**
@@ -38,50 +38,50 @@ class MessageSendBatch extends AliBase {
 
     /**
      * @param string $msgType
-     * @throws \Exception\Ali\AliPayException
+     * @throws \Exception\Ali\AliLifeException
      */
     public function setMsgType(string $msgType){
         if(in_array($msgType, ['text', 'image-text'])){
             $this->biz_content['msg_type'] = $msgType;
         } else {
-            throw new AliPayException('消息类型不合法', ErrorCode::ALIPAY_PARAM_ERROR);
+            throw new AliLifeException('消息类型不合法', ErrorCode::ALIPAY_PARAM_ERROR);
         }
     }
 
     /**
      * @param array $articles
-     * @throws \Exception\Ali\AliPayException
+     * @throws \Exception\Ali\AliLifeException
      */
     public function setArticles(array $articles){
         if(!empty($articles)){
             $this->biz_content['articles'] = $articles;
             unset($this->biz_content['text']);
         } else {
-            throw new AliPayException('图文消息内容不合法', ErrorCode::ALIPAY_PARAM_ERROR);
+            throw new AliLifeException('图文消息内容不合法', ErrorCode::ALIPAY_PARAM_ERROR);
         }
     }
 
     /**
      * @param array $text
-     * @throws \Exception\Ali\AliPayException
+     * @throws \Exception\Ali\AliLifeException
      */
     public function setText(array $text){
         if(!empty($text)){
             $this->biz_content['text'] = $text;
             unset($this->biz_content['articles']);
         } else {
-            throw new AliPayException('文本消息内容不合法', ErrorCode::ALIPAY_PARAM_ERROR);
+            throw new AliLifeException('文本消息内容不合法', ErrorCode::ALIPAY_PARAM_ERROR);
         }
     }
 
     public function getDetail() : array {
         if(!isset($this->biz_content['msg_type'])){
-            throw new AliPayException('消息类型不能为空', ErrorCode::ALIPAY_PARAM_ERROR);
+            throw new AliLifeException('消息类型不能为空', ErrorCode::ALIPAY_PARAM_ERROR);
         }
         if(($this->biz_content['msg_type'] == 'image-text') && !isset($this->biz_content['articles'])){
-            throw new AliPayException('图文消息内容不能为空', ErrorCode::ALIPAY_PARAM_ERROR);
+            throw new AliLifeException('图文消息内容不能为空', ErrorCode::ALIPAY_PARAM_ERROR);
         } else if(($this->biz_content['msg_type'] == 'text') && !isset($this->biz_content['text'])){
-            throw new AliPayException('文本消息内容不能为空', ErrorCode::ALIPAY_PARAM_ERROR);
+            throw new AliLifeException('文本消息内容不能为空', ErrorCode::ALIPAY_PARAM_ERROR);
         }
 
         return $this->getContent();

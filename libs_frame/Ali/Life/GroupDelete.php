@@ -9,7 +9,7 @@ namespace Ali\Life;
 
 use Ali\AliBase;
 use Constant\ErrorCode;
-use Exception\Ali\AliPayException;
+use Exception\Ali\AliLifeException;
 
 class GroupDelete extends AliBase {
     /**
@@ -28,19 +28,19 @@ class GroupDelete extends AliBase {
 
     /**
      * @param string $groupId
-     * @throws \Exception\Ali\AliPayException
+     * @throws \Exception\Ali\AliLifeException
      */
     public function setGroupId(string $groupId){
         if(ctype_digit($groupId) && (strlen($groupId) <= 10)){
             $this->biz_content['group_id'] = $groupId;
         } else {
-            throw new AliPayException('分组ID不合法', ErrorCode::ALIPAY_PARAM_ERROR);
+            throw new AliLifeException('分组ID不合法', ErrorCode::ALIPAY_PARAM_ERROR);
         }
     }
 
     public function getDetail() : array {
         if(!isset($this->biz_content['group_id'])){
-            throw new AliPayException('分组ID不能为空', ErrorCode::ALIPAY_PARAM_ERROR);
+            throw new AliLifeException('分组ID不能为空', ErrorCode::ALIPAY_PARAM_ERROR);
         }
 
         return $this->getContent();

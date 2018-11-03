@@ -9,7 +9,7 @@ namespace Ali\Auth;
 
 use Ali\AliBase;
 use Constant\ErrorCode;
-use Exception\Ali\AliPayException;
+use Exception\Ali\AliAuthException;
 
 class AuthTokenQuery extends AliBase {
     /**
@@ -28,19 +28,19 @@ class AuthTokenQuery extends AliBase {
 
     /**
      * @param string $appAuthToken
-     * @throws \Exception\Ali\AliPayException
+     * @throws \Exception\Ali\AliAuthException
      */
     public function setAppAuthToken(string $appAuthToken){
         if(ctype_alnum($appAuthToken) && (strlen($appAuthToken) <= 128)){
             $this->biz_content['app_auth_token'] = $appAuthToken;
         } else {
-            throw new AliPayException('应用授权令牌不合法', ErrorCode::ALIPAY_PARAM_ERROR);
+            throw new AliAuthException('应用授权令牌不合法', ErrorCode::ALIPAY_PARAM_ERROR);
         }
     }
 
     public function getDetail() : array {
         if (!isset($this->biz_content['app_auth_token'])) {
-            throw new AliPayException('应用授权令牌不能为空', ErrorCode::ALIPAY_PARAM_ERROR);
+            throw new AliAuthException('应用授权令牌不能为空', ErrorCode::ALIPAY_PARAM_ERROR);
         }
 
         return $this->getContent();

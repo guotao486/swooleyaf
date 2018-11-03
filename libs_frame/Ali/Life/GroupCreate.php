@@ -9,7 +9,7 @@ namespace Ali\Life;
 
 use Ali\AliBase;
 use Constant\ErrorCode;
-use Exception\Ali\AliPayException;
+use Exception\Ali\AliLifeException;
 
 class GroupCreate extends AliBase {
     /**
@@ -34,35 +34,35 @@ class GroupCreate extends AliBase {
 
     /**
      * @param string $name
-     * @throws \Exception\Ali\AliPayException
+     * @throws \Exception\Ali\AliLifeException
      */
     public function setName(string $name){
         $length = strlen($name);
         if(($length > 0) && ($length <= 30)){
             $this->biz_content['name'] = $name;
         } else {
-            throw new AliPayException('分组名称不合法', ErrorCode::ALIPAY_PARAM_ERROR);
+            throw new AliLifeException('分组名称不合法', ErrorCode::ALIPAY_PARAM_ERROR);
         }
     }
 
     /**
      * @param array $labelRule
-     * @throws \Exception\Ali\AliPayException
+     * @throws \Exception\Ali\AliLifeException
      */
     public function addLabelRule(array $labelRule){
         if(!empty($labelRule)){
             $this->biz_content['label_rule'][] = $labelRule;
         } else {
-            throw new AliPayException('标签规则不合法', ErrorCode::ALIPAY_PARAM_ERROR);
+            throw new AliLifeException('标签规则不合法', ErrorCode::ALIPAY_PARAM_ERROR);
         }
     }
 
     public function getDetail() : array {
         if(!isset($this->biz_content['name'])){
-            throw new AliPayException('分组名称不能为空', ErrorCode::ALIPAY_PARAM_ERROR);
+            throw new AliLifeException('分组名称不能为空', ErrorCode::ALIPAY_PARAM_ERROR);
         }
         if(count($this->biz_content['label_rule']) == 0){
-            throw new AliPayException('标签规则不能为空', ErrorCode::ALIPAY_PARAM_ERROR);
+            throw new AliLifeException('标签规则不能为空', ErrorCode::ALIPAY_PARAM_ERROR);
         }
 
         return $this->getContent();
