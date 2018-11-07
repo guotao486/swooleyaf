@@ -57,7 +57,7 @@ class Producer {
         $topic = $consumer->getTopic();
         $cacheData = [
             'unique_key' => $this->keyManager,
-            $topic => '\\' .get_class($consumer),
+            $topic => '\\' . get_class($consumer),
         ];
         if(!CacheSimpleFactory::getRedisInstance()->hMset($this->keyManager, $cacheData)){
             throw new MessageQueueException('添加主题失败', ErrorCode::MESSAGE_QUEUE_TOPIC_ERROR);
