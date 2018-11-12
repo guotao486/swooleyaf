@@ -16,21 +16,25 @@ final class Project extends ProjectBase {
     public static $totalModuleName = [
         self::MODULE_NAME_API,
         self::MODULE_NAME_ORDER,
+        self::MODULE_NAME_CONTENT,
         self::MODULE_NAME_USER,
         self::MODULE_NAME_SERVICE,
     ];
     public static $totalModuleBase = [
         self::MODULE_BASE_API,
         self::MODULE_BASE_ORDER,
+        self::MODULE_BASE_CONTENT,
         self::MODULE_BASE_USER,
         self::MODULE_BASE_SERVICE,
     ];
     const MODULE_BASE_API = 'api';
     const MODULE_BASE_ORDER = 'order';
+    const MODULE_BASE_CONTENT = 'content';
     const MODULE_BASE_USER = 'user';
     const MODULE_BASE_SERVICE = 'services';
     const MODULE_NAME_API = SY_PROJECT . self::MODULE_BASE_API;
     const MODULE_NAME_ORDER = SY_PROJECT . self::MODULE_BASE_ORDER;
+    const MODULE_NAME_CONTENT = SY_PROJECT . self::MODULE_BASE_CONTENT;
     const MODULE_NAME_USER = SY_PROJECT . self::MODULE_BASE_USER;
     const MODULE_NAME_SERVICE = SY_PROJECT . self::MODULE_BASE_SERVICE;
 

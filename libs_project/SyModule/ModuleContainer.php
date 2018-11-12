@@ -16,6 +16,7 @@ class ModuleContainer extends BaseContainer {
             Project::MODULE_NAME_API,
             Project::MODULE_NAME_USER,
             Project::MODULE_NAME_ORDER,
+            Project::MODULE_NAME_CONTENT,
             Project::MODULE_NAME_SERVICE,
         ];
 
@@ -27,6 +28,9 @@ class ModuleContainer extends BaseContainer {
         });
         $this->bind(Project::MODULE_NAME_ORDER, function () {
             return SyModuleOrder::getInstance();
+        });
+        $this->bind(Project::MODULE_NAME_CONTENT, function () {
+            return SyModuleContent::getInstance();
         });
         $this->bind(Project::MODULE_NAME_SERVICE, function () {
             return SyModuleService::getInstance();

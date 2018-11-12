@@ -15,6 +15,7 @@ class SyModuleTaskContainer extends BaseContainer {
         $this->registryMap = [
             Project::MODULE_NAME_API,
             Project::MODULE_NAME_ORDER,
+            Project::MODULE_NAME_CONTENT,
             Project::MODULE_NAME_SERVICE,
             Project::MODULE_NAME_USER,
         ];
@@ -24,6 +25,9 @@ class SyModuleTaskContainer extends BaseContainer {
         });
         $this->bind(Project::MODULE_NAME_ORDER, function() {
             return new SyModuleOrderTask();
+        });
+        $this->bind(Project::MODULE_NAME_CONTENT, function() {
+            return new SyModuleContentTask();
         });
         $this->bind(Project::MODULE_NAME_SERVICE, function() {
             return new SyModuleServiceTask();
