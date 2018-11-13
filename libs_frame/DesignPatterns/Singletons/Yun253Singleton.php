@@ -26,7 +26,7 @@ class Yun253Singleton {
         $commonConfig = new ConfigCommon();
         $commonConfig->setAppKey((string)Tool::getArrayVal($configs, 'app.key', '', true));
         $commonConfig->setAppSecret((string)Tool::getArrayVal($configs, 'app.secret', '', true));
-        $commonConfig->setAppUrlSend((string)Tool::getArrayVal($configs, 'app.url.sms.send', '', true));
+        $commonConfig->setUrlSmsSend((string)Tool::getArrayVal($configs, 'app.url.sms.send', '', true));
         $this->commonConfig = $commonConfig;
     }
 
