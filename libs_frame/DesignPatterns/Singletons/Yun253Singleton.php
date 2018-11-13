@@ -21,7 +21,7 @@ class Yun253Singleton {
     private $commonConfig = null;
 
     private function __construct(){
-        $configs = Tool::getConfig('yum253.' . SY_ENV . SY_PROJECT);
+        $configs = Tool::getConfig('yun253.' . SY_ENV . SY_PROJECT);
 
         $commonConfig = new ConfigCommon();
         $commonConfig->setAppKey((string)Tool::getArrayVal($configs, 'app.key', '', true));
