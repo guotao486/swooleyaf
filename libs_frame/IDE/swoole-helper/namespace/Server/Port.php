@@ -2,7 +2,7 @@
 namespace Swoole\Server;
 
 /**
- * @since 1.10.4
+ * @since 4.2.6
  */
 class Port
 {
@@ -30,16 +30,6 @@ class Port
      * @return mixed
      */
     public function on($event_name, $callback){}
-
-    /**
-     * @return mixed
-     */
-    public function __sleep(){}
-
-    /**
-     * @return mixed
-     */
-    public function __wakeup(){}
 
 
 }

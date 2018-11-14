@@ -2,7 +2,7 @@
 namespace Swoole;
 
 /**
- * @since 1.10.4
+ * @since 4.2.6
  */
 class Lock
 {
@@ -55,6 +55,11 @@ class Lock
      * @return mixed
      */
     public function unlock(){}
+
+    /**
+     * @return mixed
+     */
+    public function destroy(){}
 
 
 }

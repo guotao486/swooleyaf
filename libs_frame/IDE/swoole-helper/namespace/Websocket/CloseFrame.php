@@ -4,7 +4,7 @@ namespace Swoole\WebSocket;
 /**
  * @since 4.2.6
  */
-class Frame
+class CloseFrame extends \Swoole\WebSocket\Frame
 {
 
 

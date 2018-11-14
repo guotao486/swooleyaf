@@ -1,5 +1,5 @@
 <?php
-namespace Swoole\MySQL;
+namespace Swoole\Coroutine\Socket;
 
 /**
  * @since 4.2.6

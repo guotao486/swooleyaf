@@ -1,5 +1,5 @@
 <?php
-namespace Swoole;
+namespace Swoole\Coroutine;
 
 /**
  * @since 4.2.6
@@ -10,17 +10,13 @@ class Client
     const MSG_PEEK = 2;
     const MSG_DONTWAIT = 64;
     const MSG_WAITALL = 256;
-    const SHUT_RDWR = 2;
-    const SHUT_RD = 0;
-    const SHUT_WR = 1;
 
 
     /**
      * @param $type[required]
-     * @param $async[optional]
      * @return mixed
      */
-    public function __construct($type, $async=null){}
+    public function __construct($type){}
 
     /**
      * @return mixed
@@ -37,30 +33,27 @@ class Client
      * @param $host[required]
      * @param $port[optional]
      * @param $timeout[optional]
-     * @param $sock_flag[optional]
      * @return mixed
      */
-    public function connect($host, $port=null, $timeout=null, $sock_flag=null){}
+    public function connect($host, $port=null, $timeout=null){}
 
     /**
-     * @param $size[optional]
-     * @param $flag[optional]
+     * @param $timeout[optional]
      * @return mixed
      */
-    public function recv($size=null, $flag=null){}
+    public function recv($timeout=null){}
+
+    /**
+     * @param $length[optional]
+     * @return mixed
+     */
+    public function peek($length=null){}
 
     /**
      * @param $data[required]
-     * @param $flag[optional]
      * @return mixed
      */
-    public function send($data, $flag=null){}
-
-    /**
-     * @param $dst_socket[required]
-     * @return mixed
-     */
-    public function pipe($dst_socket){}
+    public function send($data){}
 
     /**
      * @param $filename[required]
@@ -71,44 +64,25 @@ class Client
     public function sendfile($filename, $offset=null, $length=null){}
 
     /**
-     * @param $ip[required]
+     * @param $address[required]
      * @param $port[required]
      * @param $data[required]
      * @return mixed
      */
-    public function sendto($ip, $port, $data){}
+    public function sendto($address, $port, $data){}
+
+    /**
+     * @param $length[required]
+     * @param $address[required]
+     * @param $port[optional]
+     * @return mixed
+     */
+    public function recvfrom($length, $address, $port=null){}
 
     /**
      * @return mixed
      */
-    public function sleep(){}
-
-    /**
-     * @return mixed
-     */
-    public function wakeup(){}
-
-    /**
-     * @return mixed
-     */
-    public function pause(){}
-
-    /**
-     * @return mixed
-     */
-    public function resume(){}
-
-    /**
-     * @param $how[required]
-     * @return mixed
-     */
-    public function shutdown($how){}
-
-    /**
-     * @param $callback[optional]
-     * @return mixed
-     */
-    public function enableSSL($callback=null){}
+    public function enableSSL(){}
 
     /**
      * @return mixed
@@ -136,17 +110,9 @@ class Client
     public function getpeername(){}
 
     /**
-     * @param $force[optional]
      * @return mixed
      */
-    public function close($force=null){}
-
-    /**
-     * @param $event_name[required]
-     * @param $callback[required]
-     * @return mixed
-     */
-    public function on($event_name, $callback){}
+    public function close(){}
 
 
 }

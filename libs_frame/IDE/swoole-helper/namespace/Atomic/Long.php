@@ -2,7 +2,7 @@
 namespace Swoole\Atomic;
 
 /**
- * @since 1.10.4
+ * @since 4.2.6
  */
 class Long
 {
@@ -43,16 +43,6 @@ class Long
      * @return mixed
      */
     public function cmpset($cmp_value, $new_value){}
-
-    /**
-     * @return mixed
-     */
-    public function __sleep(){}
-
-    /**
-     * @return mixed
-     */
-    public function __wakeup(){}
 
 
 }

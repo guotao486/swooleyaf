@@ -4,15 +4,15 @@ namespace Swoole;
 /**
  * @since 4.2.6
  */
-class Channel
+class RingQueue
 {
 
 
     /**
-     * @param $size[required]
+     * @param $len[required]
      * @return mixed
      */
-    public function __construct($size){}
+    public function __construct($len){}
 
     /**
      * @return mixed
@@ -33,12 +33,17 @@ class Channel
     /**
      * @return mixed
      */
-    public function peek(){}
+    public function count(){}
 
     /**
      * @return mixed
      */
-    public function stats(){}
+    public function isFull(){}
+
+    /**
+     * @return mixed
+     */
+    public function isEmpty(){}
 
 
 }

@@ -2,9 +2,9 @@
 namespace Swoole\Redis;
 
 /**
- * @since 1.10.4
+ * @since 4.2.6
  */
-class Server extends \swoole_server
+class Server extends \Swoole\Server
 {
     const NIL = 1;
     const ERROR = 0;
@@ -174,6 +174,13 @@ class Server extends \swoole_server
     public function taskWaitMulti($tasks, $timeout=null){}
 
     /**
+     * @param $tasks[required]
+     * @param $timeout[optional]
+     * @return mixed
+     */
+    public function taskCo($tasks, $timeout=null){}
+
+    /**
      * @param $data[required]
      * @return mixed
      */
@@ -262,11 +269,11 @@ class Server extends \swoole_server
     public function defer($callback){}
 
     /**
+     * @param $message[required]
      * @param $dst_worker_id[required]
-     * @param $data[required]
      * @return mixed
      */
-    public function sendMessage($dst_worker_id, $data){}
+    public function sendMessage($message, $dst_worker_id){}
 
     /**
      * @param $process[required]
@@ -285,16 +292,6 @@ class Server extends \swoole_server
      * @return mixed
      */
     public function bind($fd, $uid){}
-
-    /**
-     * @return mixed
-     */
-    public function __sleep(){}
-
-    /**
-     * @return mixed
-     */
-    public function __wakeup(){}
 
 
 }
