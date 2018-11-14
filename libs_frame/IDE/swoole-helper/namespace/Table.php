@@ -2,7 +2,7 @@
 namespace Swoole;
 
 /**
- * @since 1.10.4
+ * @since 4.2.6
  */
 class Table
 {
@@ -112,16 +112,6 @@ class Table
      * @return mixed
      */
     public function offsetUnset($offset){}
-
-    /**
-     * @return mixed
-     */
-    public function __sleep(){}
-
-    /**
-     * @return mixed
-     */
-    public function __wakeup(){}
 
     /**
      * @return mixed

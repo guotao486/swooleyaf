@@ -2,7 +2,7 @@
 namespace Swoole;
 
 /**
- * @since 1.10.4
+ * @since 4.2.6
  */
 class Async
 {
@@ -43,11 +43,17 @@ class Async
     public static function writeFile($filename, $content, $callback=null, $flags=null){}
 
     /**
-     * @param $domain_name[required]
-     * @param $content[required]
+     * @param $hostname[required]
+     * @param $callback[required]
      * @return mixed
      */
-    public static function dnsLookup($domain_name, $content){}
+    public static function dnsLookup($hostname, $callback){}
+
+    /**
+     * @param $domain_name[required]
+     * @return mixed
+     */
+    public static function dnsLookupCoro($domain_name){}
 
     /**
      * @param $settings[required]

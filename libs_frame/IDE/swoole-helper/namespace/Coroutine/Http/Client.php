@@ -1,5 +1,5 @@
 <?php
-namespace Swoole\Http;
+namespace Swoole\Coroutine\Http;
 
 /**
  * @since 4.2.6
@@ -53,6 +53,39 @@ class Client
 
     /**
      * @param $path[required]
+     * @return mixed
+     */
+    public function execute($path){}
+
+    /**
+     * @param $path[required]
+     * @return mixed
+     */
+    public function get($path){}
+
+    /**
+     * @param $path[required]
+     * @param $data[required]
+     * @return mixed
+     */
+    public function post($path, $data){}
+
+    /**
+     * @param $path[required]
+     * @param $file[required]
+     * @param $offset[optional]
+     * @return mixed
+     */
+    public function download($path, $file, $offset=null){}
+
+    /**
+     * @param $path[required]
+     * @return mixed
+     */
+    public function upgrade($path){}
+
+    /**
+     * @param $path[required]
      * @param $name[required]
      * @param $type[optional]
      * @param $filename[optional]
@@ -64,49 +97,12 @@ class Client
 
     /**
      * @param $path[required]
-     * @param $callback[required]
+     * @param $name[required]
+     * @param $type[optional]
+     * @param $filename[optional]
      * @return mixed
      */
-    public function execute($path, $callback){}
-
-    /**
-     * @param $data[required]
-     * @param $opcode[optional]
-     * @param $finish[optional]
-     * @return mixed
-     */
-    public function push($data, $opcode=null, $finish=null){}
-
-    /**
-     * @param $path[required]
-     * @param $callback[required]
-     * @return mixed
-     */
-    public function get($path, $callback){}
-
-    /**
-     * @param $path[required]
-     * @param $data[required]
-     * @param $callback[required]
-     * @return mixed
-     */
-    public function post($path, $data, $callback){}
-
-    /**
-     * @param $path[required]
-     * @param $callback[required]
-     * @return mixed
-     */
-    public function upgrade($path, $callback){}
-
-    /**
-     * @param $path[required]
-     * @param $file[required]
-     * @param $callback[required]
-     * @param $offset[optional]
-     * @return mixed
-     */
-    public function download($path, $file, $callback, $offset=null){}
+    public function addData($path, $name, $type=null, $filename=null){}
 
     /**
      * @return mixed
@@ -119,11 +115,29 @@ class Client
     public function close(){}
 
     /**
-     * @param $event_name[required]
-     * @param $callback[required]
+     * @param $defer[optional]
      * @return mixed
      */
-    public function on($event_name, $callback){}
+    public function setDefer($defer=null){}
+
+    /**
+     * @return mixed
+     */
+    public function getDefer(){}
+
+    /**
+     * @param $timeout[optional]
+     * @return mixed
+     */
+    public function recv($timeout=null){}
+
+    /**
+     * @param $data[required]
+     * @param $opcode[optional]
+     * @param $finish[optional]
+     * @return mixed
+     */
+    public function push($data, $opcode=null, $finish=null){}
 
 
 }

@@ -2,16 +2,16 @@
 namespace Swoole;
 
 /**
- * @since 1.10.4
+ * @since 4.2.6
  */
-class Mysql
+class MySQL
 {
     const STATE_QUERY = 0;
     const STATE_READ_START = 1;
     const STATE_READ_FIELD  = 2;
     const STATE_READ_ROW = 3;
-    const STATE_READ_END = 4;
-    const STATE_CLOSED = 5;
+    const STATE_READ_END = 5;
+    const STATE_CLOSED = 6;
 
 
     /**

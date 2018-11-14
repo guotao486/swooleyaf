@@ -1,5 +1,5 @@
 <?php
-namespace Swoole;
+namespace Swoole\MySQL;
 
 /**
  * @since 4.2.6

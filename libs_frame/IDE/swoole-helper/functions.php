@@ -130,11 +130,35 @@ function swoole_async_readfile($filename, $callback){}
 function swoole_async_writefile($filename, $content, $callback=null, $flags=null){}
 
 /**
- * @param $domain_name[required]
- * @param $content[required]
+ * @param $hostname[required]
+ * @param $callback[required]
  * @return mixed
  */
-function swoole_async_dns_lookup($domain_name, $content){}
+function swoole_async_dns_lookup($hostname, $callback){}
+
+/**
+ * @param $domain_name[required]
+ * @return mixed
+ */
+function swoole_async_dns_lookup_coro($domain_name){}
+
+/**
+ * @param $func[required]
+ * @return mixed
+ */
+function swoole_coroutine_create($func){}
+
+/**
+ * @param $command[required]
+ * @return mixed
+ */
+function swoole_coroutine_exec($command){}
+
+/**
+ * @param $func[required]
+ * @return mixed
+ */
+function go($func){}
 
 /**
  * @param $read_array[required]
@@ -172,4 +196,19 @@ function swoole_get_local_mac(){}
 function swoole_strerror($errno, $error_type=null){}
 
 function swoole_errno(){}
+
+/**
+ * @param $data[required]
+ * @param $type[optional]
+ * @return mixed
+ */
+function swoole_hashcode($data, $type=null){}
+
+/**
+ * @param $filename[required]
+ * @return mixed
+ */
+function swoole_get_mime_type($filename){}
+
+function swoole_call_user_shutdown_begin(){}
 

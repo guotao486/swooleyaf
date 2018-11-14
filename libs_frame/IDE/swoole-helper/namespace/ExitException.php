@@ -4,9 +4,19 @@ namespace Swoole;
 /**
  * @since 4.2.6
  */
-class Exception extends \Exception
+class ExitException extends \Exception
 {
 
+
+    /**
+     * @return mixed
+     */
+    public function getFlags(){}
+
+    /**
+     * @return mixed
+     */
+    public function getStatus(){}
 
     /**
      * @param $message[optional]

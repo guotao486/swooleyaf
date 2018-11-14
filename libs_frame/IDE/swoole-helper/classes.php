@@ -40,12 +40,27 @@ class swoole_client extends Swoole\Client
 
 }
 
+class swoole_coroutine extends Swoole\Coroutine
+{
+
+}
+
+class co extends Co
+{
+
+}
+
 class swoole_http_client extends Swoole\Http\Client
 {
 
 }
 
 class swoole_process extends Swoole\Process
+{
+
+}
+
+class swoole_process_pool extends Swoole\Process\Pool
 {
 
 }
@@ -105,6 +120,11 @@ class swoole_websocket_frame extends Swoole\Websocket\Frame
 
 }
 
+class swoole_websocket_close_frame extends Swoole\Websocket\Close\Frame
+{
+
+}
+
 class swoole_mysql extends Swoole\Mysql
 {
 
@@ -125,7 +145,22 @@ class swoole_channel extends Swoole\Channel
 
 }
 
-class swoole_http2_client extends Swoole\Http2\Client
+class chan extends Chan
+{
+
+}
+
+class swoole_ringqueue extends Swoole\Ringqueue
+{
+
+}
+
+class swoole_msgqueue extends Swoole\Msgqueue
+{
+
+}
+
+class swoole_http2_request extends Swoole\Http2\Request
 {
 
 }
@@ -136,6 +171,11 @@ class swoole_http2_response extends Swoole\Http2\Response
 }
 
 class swoole_serialize extends Swoole\Serialize
+{
+
+}
+
+class swoole_redis extends Swoole\Redis
 {
 
 }
