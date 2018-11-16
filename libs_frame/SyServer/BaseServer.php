@@ -92,8 +92,8 @@ abstract class BaseServer {
      */
     public function __construct(int $port) {
         $os = php_uname('s');
-        if(version_compare(PHP_VERSION, Server::VERSION_PHP_MIN, '<')){
-            exit('PHP版本必须大于' . Server::VERSION_PHP_MIN . PHP_EOL);
+        if(version_compare(PHP_VERSION, Server::VERSION_MIN_PHP, '<')){
+            exit('PHP版本必须大于等于' . Server::VERSION_MIN_PHP . PHP_EOL);
         } else if (!defined('SY_MODULE')) {
             exit('模块名称未定义' . PHP_EOL);
         } else if (($port <= 1000) || ($port > 65535)) {
@@ -119,8 +119,9 @@ abstract class BaseServer {
         ], get_loaded_extensions());
         if (!empty($missList)) {
             exit('扩展' . implode(',', $missList) . '不存在' . PHP_EOL);
+        } else if(version_compare(SWOOLE_VERSION, Server::VERSION_MIN_SWOOLE, '<')){
+            exit('swoole版本必须大于等于' . Server::VERSION_MIN_SWOOLE . PHP_EOL);
         }
-
         $this->_configs = Tool::getConfig('syserver.' . SY_ENV . SY_MODULE);
         $this->checkBaseServer();
 
