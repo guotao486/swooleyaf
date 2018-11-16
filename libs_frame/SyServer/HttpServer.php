@@ -294,17 +294,15 @@ class HttpServer extends BaseServer {
      * @param array $headers 响应头配置
      * @return int
      */
-    private function handleReqHeader(&$headers) : int {
+    private function handleReqHeader(array &$headers) : int {
         $headers['Access-Control-Allow-Origin'] = $_SERVER['ORIGIN'] ?? '*';
         $headers['Access-Control-Allow-Credentials'] = 'true';
-
         if (isset($_SERVER['ACCESS-CONTROL-REQUEST-METHOD'])) { //校验请求方式
             $methodStr = ', ' . strtoupper(trim($_SERVER['ACCESS-CONTROL-REQUEST-METHOD']));
             if (strpos(', ' . $this->_cors['allow']['methodStr'], $methodStr) === false) {
                 return self::RESPONSE_RESULT_TYPE_FORBIDDEN;
             }
         }
-
         if (isset($_SERVER['ACCESS-CONTROL-REQUEST-HEADERS'])) { //校验请求头
             $controlReqHeaders = explode(',', strtolower($_SERVER['ACCESS-CONTROL-REQUEST-HEADERS']));
             foreach ($controlReqHeaders as $eHeader) {
@@ -330,7 +328,6 @@ class HttpServer extends BaseServer {
             $headers['Access-Control-Allow-Headers'] = $this->_cors['allow']['methodStr'];
             return self::RESPONSE_RESULT_TYPE_ALLOW;
         }
-
         return self::RESPONSE_RESULT_TYPE_ACCEPT;
     }
 
