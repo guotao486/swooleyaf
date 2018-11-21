@@ -25,13 +25,11 @@ class ServiceRunner {
             exit('参数 -n 服务项目名称无效,必须与项目目录相同,否则无法加载 profile文件' . PHP_EOL);
         }
 
-        $projectProfile = SY_ROOT . '/' . $projectName . '/profile.php';
-        if(!is_file($projectProfile)){
-            exit($projectName . ' profile file not exist' . PHP_EOL);
-        } else if(!is_readable($projectProfile)){
-            exit($projectName . ' profile file can not read' . PHP_EOL);
+        $projectPath = SY_ROOT . '/' . $projectName;
+        if(!is_dir($projectPath)){
+            exit($projectName . ' dir not exist' . PHP_EOL);
         }
-        require_once $projectProfile;
+        define('APP_PATH', $projectPath);
 
         $moduleName = trim(Tool::getClientOption('-module', false, ''));
         if (strlen($moduleName) == 0) {
