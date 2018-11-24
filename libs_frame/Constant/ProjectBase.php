@@ -20,7 +20,7 @@ class ProjectBase {
     const COMMON_PAGE_DEFAULT = 1; //默认页数
     const COMMON_LIMIT_DEFAULT = 10; //默认分页限制
 
-    //REDIS常量 以sy000开头的前缀为框架内部前缀,以sy+3位数字开头的前缀为公共模块前缀
+    //REDIS常量 后五位全数字的前缀为框架内部前缀
     const REDIS_PREFIX_SESSION = 'sy' . SY_PROJECT . '00001_'; //前缀-session
     const REDIS_PREFIX_SESSION_LIST = 'sy' . SY_PROJECT . '00002_'; //前缀-session列表
     const REDIS_PREFIX_UNIQUE_ID = 'sy' . SY_PROJECT . '00003_'; //前缀-唯一ID
