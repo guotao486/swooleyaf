@@ -38,7 +38,7 @@ final class Project extends ProjectBase {
     const MODULE_NAME_USER = SY_PROJECT . self::MODULE_BASE_USER;
     const MODULE_NAME_SERVICE = SY_PROJECT . self::MODULE_BASE_SERVICE;
 
-    //REDIS常量 以sy000开头的前缀为框架内部前缀,以sy+3位数字开头的前缀为公共模块前缀
+    //REDIS常量 后五位字母+数字的前缀为项目前缀
     const REDIS_PREFIX_CODE_IMAGE = 'sy' . SY_PROJECT . 'a0000_'; //前缀-验证码图片
     const REDIS_PREFIX_IMAGE_DATA = 'sy' . SY_PROJECT . 'a0001_'; //前缀-图片缓存
     const REDIS_PREFIX_PAY_HASH = 'sy' . SY_PROJECT . 'a00002_'; //前缀-支付哈希
