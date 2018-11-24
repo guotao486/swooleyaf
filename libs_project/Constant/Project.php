@@ -39,14 +39,14 @@ final class Project extends ProjectBase {
     const MODULE_NAME_SERVICE = SY_PROJECT . self::MODULE_BASE_SERVICE;
 
     //REDIS常量 以sy000开头的前缀为框架内部前缀,以sy+3位数字开头的前缀为公共模块前缀
-    const REDIS_PREFIX_CODE_IMAGE = 'sya01000_'; //前缀-验证码图片
-    const REDIS_PREFIX_IMAGE_DATA = 'sya01001_'; //前缀-图片缓存
-    const REDIS_PREFIX_PAY_HASH = 'sya01002_'; //前缀-支付哈希
-    const REDIS_PREFIX_WX_NATIVE_PRE = 'sya01003_'; //前缀-微信扫码预支付
-    const REDIS_PREFIX_IM_ADMIN = 'sya01004_'; //前缀-im管理账号缓存
-    const REDIS_PREFIX_ROLE_POWERS = 'sya01005_'; //前缀-角色权限列表
-    const REDIS_PREFIX_ROLE_LIST = 'sya01006_'; //前缀-角色列表
-    const REDIS_PREFIX_REGION_LIST = 'sya01007_'; //前缀-地区缓存
+    const REDIS_PREFIX_CODE_IMAGE = 'sy' . SY_PROJECT . 'a0000_'; //前缀-验证码图片
+    const REDIS_PREFIX_IMAGE_DATA = 'sy' . SY_PROJECT . 'a0001_'; //前缀-图片缓存
+    const REDIS_PREFIX_PAY_HASH = 'sy' . SY_PROJECT . 'a00002_'; //前缀-支付哈希
+    const REDIS_PREFIX_WX_NATIVE_PRE = 'sy' . SY_PROJECT . 'a0003_'; //前缀-微信扫码预支付
+    const REDIS_PREFIX_IM_ADMIN = 'sy' . SY_PROJECT . 'a0004_'; //前缀-im管理账号缓存
+    const REDIS_PREFIX_ROLE_POWERS = 'sy' . SY_PROJECT . 'a0005_'; //前缀-角色权限列表
+    const REDIS_PREFIX_ROLE_LIST = 'sy' . SY_PROJECT . 'a0006_'; //前缀-角色列表
+    const REDIS_PREFIX_REGION_LIST = 'sy' . SY_PROJECT . 'a0007_'; //前缀-地区缓存
 
     //消息队列常量
     const MESSAGE_QUEUE_TOPIC_ADD_LOG = '0000'; //主题-添加日志
