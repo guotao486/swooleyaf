@@ -25,7 +25,7 @@ class ProjectBase {
     const REDIS_PREFIX_SESSION_LIST = 'sy' . SY_PROJECT . '00002_'; //前缀-session列表
     const REDIS_PREFIX_UNIQUE_ID = 'sy' . SY_PROJECT . '00003_'; //前缀-唯一ID
     const REDIS_PREFIX_MESSAGE_QUEUE = 'sy' . SY_PROJECT . '10000_'; //前缀-消息队列
-    const REDIS_PREFIX_KAFKA_MESSAGE_OFFSET = 'sy' . SY_PROJECT . '10001_'; //前缀-kafka消息位移缓存
+    const REDIS_PREFIX_MESSAGE_KAFKA_OFFSET = 'sy' . SY_PROJECT . '10001_'; //前缀-kafka消息位移缓存
     const REDIS_PREFIX_WX_ACCOUNT = 'sy' . SY_PROJECT . '10100_'; //前缀-微信公众号
     const REDIS_PREFIX_WX_COMPONENT_ACCOUNT = 'sy' . SY_PROJECT . '10101_'; //前缀-微信开放平台账号
     const REDIS_PREFIX_WX_COMPONENT_AUTHORIZER = 'sy' . SY_PROJECT . '10102_'; //前缀-微信开放平台授权公众号
