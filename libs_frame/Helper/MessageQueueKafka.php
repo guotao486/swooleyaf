@@ -54,7 +54,7 @@ class MessageQueueKafka {
                     break;
                 }
 
-                $redisKey = Project::REDIS_PREFIX_KAFKA_MESSAGE_OFFSET . $message->topic_name . '_' . $message->partition . '_' . $message->offset;
+                $redisKey = Project::REDIS_PREFIX_MESSAGE_KAFKA_OFFSET . $message->topic_name . '_' . $message->partition . '_' . $message->offset;
                 $cacheData = RedisSingleton::getInstance()->getConn()->get($redisKey);
                 if($cacheData !== false){
                     unset($consumer);
