@@ -105,7 +105,6 @@ class RpcServer extends BaseServer {
             self::checkRequestCurrentLimit();
             $result = $this->_app->bootstrap()->getDispatcher()->dispatch(new Http($data['api_uri']))->getBody();
         } catch (\Exception $e) {
-            Log::error($e->getMessage(), $e->getCode(), $e->getTraceAsString());
             if (!($e instanceof ValidatorException)) {
                 Log::error($e->getMessage(), $e->getCode(), $e->getTraceAsString());
             }

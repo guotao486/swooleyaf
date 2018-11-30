@@ -113,7 +113,7 @@ class WxConfigSingleton {
 
         $wxConfigEntity = SyTaskMysqlFactory::WxconfigBaseEntity();
         $ormResult1 = $wxConfigEntity->getContainer()->getModel()->getOrmDbTable();
-        $ormResult1->where('`app_id`=? AND `status`=?', [$appId, Project::WX_CONFIG_BASE_STATUS_ENABLE]);
+        $ormResult1->where('`app_id`=? AND `status`=?', [$appId, Project::WX_CONFIG_STATUS_ENABLE]);
         $configInfo = $wxConfigEntity->getContainer()->getModel()->findOne($ormResult1);
         if(empty($configInfo)){
             $shopConfig->setValid(false);
