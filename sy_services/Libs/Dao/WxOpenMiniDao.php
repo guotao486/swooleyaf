@@ -280,7 +280,7 @@ class WxOpenMiniDao {
 
         $wxMiniConfig = SyBaseMysqlFactory::WxconfigMiniEntity();
         $ormResult1 = $wxMiniConfig->getContainer()->getModel()->getOrmDbTable();
-        $ormResult1->where('`status`=? AND `wtype`=? AND `latest_code`<>?', [Project::WX_CONFIG_BASE_STATUS_ENABLE, Project::WXMINI_TYPE_SHOP_MINI, $data['template_id'],])
+        $ormResult1->where('`status`=? AND `wtype`=? AND `latest_code`<>?', [Project::WX_CONFIG_STATUS_ENABLE, Project::WXMINI_TYPE_SHOP_MINI, $data['template_id'],])
                    ->order('`id` ASC');
         $wxInfo = $wxMiniConfig->getContainer()->getModel()->findOne($ormResult1);
         if(!empty($wxInfo)){
@@ -298,7 +298,7 @@ class WxOpenMiniDao {
 
         $wxMiniConfig = SyBaseMysqlFactory::WxconfigMiniEntity();;
         $ormResult1 = $wxMiniConfig->getContainer()->getModel()->getOrmDbTable();
-        $ormResult1->where('`wtype`=? AND `status`=? AND `option_status`=?', [Project::WXMINI_TYPE_SHOP_MINI, Project::WX_CONFIG_BASE_STATUS_ENABLE, Project::WXMINI_OPTION_STATUS_UPLOADED,])
+        $ormResult1->where('`wtype`=? AND `status`=? AND `option_status`=?', [Project::WXMINI_TYPE_SHOP_MINI, Project::WX_CONFIG_STATUS_ENABLE, Project::WXMINI_OPTION_STATUS_UPLOADED,])
                    ->order('`id` ASC');
         $wxInfo = $wxMiniConfig->getContainer()->getModel()->findOne($ormResult1);
         if(empty($wxInfo)){
@@ -333,7 +333,7 @@ class WxOpenMiniDao {
 
         $wxMiniConfig = SyBaseMysqlFactory::WxconfigMiniEntity();
         $ormResult1 = $wxMiniConfig->getContainer()->getModel()->getOrmDbTable();
-        $ormResult1->where('`wtype`=? AND `status`=? AND `audit_status`=?', [Project::WXMINI_TYPE_SHOP_MINI, Project::WX_CONFIG_BASE_STATUS_ENABLE, Project::WXMINI_AUDIT_STATUS_HANDING,])
+        $ormResult1->where('`wtype`=? AND `status`=? AND `audit_status`=?', [Project::WXMINI_TYPE_SHOP_MINI, Project::WX_CONFIG_STATUS_ENABLE, Project::WXMINI_AUDIT_STATUS_HANDING,])
                    ->order('`id` ASC');
         $wxInfo = $wxMiniConfig->getContainer()->getModel()->findOne($ormResult1);
         unset($ormResult1, $wxMiniConfig);
@@ -352,7 +352,7 @@ class WxOpenMiniDao {
 
         $wxMiniConfig = SyBaseMysqlFactory::WxconfigMiniEntity();
         $ormResult1 = $wxMiniConfig->getContainer()->getModel()->getOrmDbTable();
-        $ormResult1->where('`wtype`=? AND `status`=? AND `option_status`=?', [Project::WXMINI_TYPE_SHOP_MINI, Project::WX_CONFIG_BASE_STATUS_ENABLE, Project::WXMINI_OPTION_STATUS_AUDIT_SUCCESS,])
+        $ormResult1->where('`wtype`=? AND `status`=? AND `option_status`=?', [Project::WXMINI_TYPE_SHOP_MINI, Project::WX_CONFIG_STATUS_ENABLE, Project::WXMINI_OPTION_STATUS_AUDIT_SUCCESS,])
                    ->order('`id` ASC');
         $wxInfo = $wxMiniConfig->getContainer()->getModel()->findOne($ormResult1);
         unset($ormResult1, $wxMiniConfig);

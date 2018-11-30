@@ -74,8 +74,8 @@ class ProjectBase {
     const WX_COMPONENT_AUTHORIZER_OPTION_TYPE_AUTHORIZED_UPDATE = 3; //授权公众号操作类型-更新授权
 
     //微信配置常量
-    const WX_CONFIG_BASE_STATUS_DISABLE = 0; //状态-无效
-    const WX_CONFIG_BASE_STATUS_ENABLE = 1; //状态-有效
+    const WX_CONFIG_STATUS_DISABLE = 0; //状态-无效
+    const WX_CONFIG_STATUS_ENABLE = 1; //状态-有效
     const WX_CONFIG_EXPIRE_TOKEN = 7000; //token超时时间,单位为秒
 
     //支付宝支付常量
