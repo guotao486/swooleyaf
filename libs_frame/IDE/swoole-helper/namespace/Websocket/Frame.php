@@ -1,8 +1,8 @@
 <?php
-namespace Swoole\WebSocket;
+namespace Swoole\Websocket;
 
 /**
- * @since 4.2.6
+ * @since 4.2.8
  */
 class Frame
 {

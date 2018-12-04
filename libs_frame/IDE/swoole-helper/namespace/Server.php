@@ -2,7 +2,7 @@
 namespace Swoole;
 
 /**
- * @since 4.2.6
+ * @since 4.2.8
  */
 class Server
 {
@@ -80,10 +80,10 @@ class Server
      *
      * @param $fd[required]
      * @param $send_data[required]
-     * @param $reactor_id[optional]
+     * @param $server_socket[optional]
      * @return bool
      */
-    public function send($fd, $send_data, $reactor_id=null){}
+    public function send($fd, $send_data, $server_socket=null){}
 
     /**
      * @param $ip[required]
