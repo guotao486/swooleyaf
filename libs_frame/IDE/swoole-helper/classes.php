@@ -120,7 +120,7 @@ class swoole_websocket_frame extends Swoole\Websocket\Frame
 
 }
 
-class swoole_websocket_close_frame extends Swoole\Websocket\Close\Frame
+class swoole_websocke_closet_frame extends Swoole\Websocke\Closet\Frame
 {
 
 }
@@ -156,16 +156,6 @@ class swoole_ringqueue extends Swoole\Ringqueue
 }
 
 class swoole_msgqueue extends Swoole\Msgqueue
-{
-
-}
-
-class swoole_http2_request extends Swoole\Http2\Request
-{
-
-}
-
-class swoole_http2_response extends Swoole\Http2\Response
 {
 
 }

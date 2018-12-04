@@ -2,9 +2,9 @@
 namespace Swoole;
 
 /**
- * @since 4.2.6
+ * @since 4.2.8
  */
-class RingQueue
+class Msgqueue
 {
 
 
@@ -21,29 +21,32 @@ class RingQueue
 
     /**
      * @param $data[required]
+     * @param $type[optional]
      * @return mixed
      */
-    public function push($data){}
+    public function push($data, $type=null){}
+
+    /**
+     * @param $type[optional]
+     * @return mixed
+     */
+    public function pop($type=null){}
+
+    /**
+     * @param $blocking[required]
+     * @return mixed
+     */
+    public function setBlocking($blocking){}
 
     /**
      * @return mixed
      */
-    public function pop(){}
+    public function stats(){}
 
     /**
      * @return mixed
      */
-    public function count(){}
-
-    /**
-     * @return mixed
-     */
-    public function isFull(){}
-
-    /**
-     * @return mixed
-     */
-    public function isEmpty(){}
+    public function destory(){}
 
 
 }

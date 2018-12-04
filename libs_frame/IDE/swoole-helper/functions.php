@@ -161,6 +161,12 @@ function swoole_coroutine_exec($command){}
 function go($func){}
 
 /**
+ * @param $callback[required]
+ * @return mixed
+ */
+function defer($callback){}
+
+/**
  * @param $read_array[required]
  * @param $write_array[required]
  * @param $error_array[required]
