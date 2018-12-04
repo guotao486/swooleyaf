@@ -44,13 +44,12 @@ class PayController extends CommonController {
         }
 
         $resXml = '<xml>';
-        if (strlen($error) > 0) {
-            $resXml .= '<return_code>FAIL</return_code><return_msg>' . $error . '</return_msg>';
-        } else {
+        if (strlen($error) == 0) {
             $resXml .= '<return_code>SUCCESS</return_code>';
+        } else {
+            $resXml .= '<return_code>FAIL</return_code><return_msg>' . $error . '</return_msg>';
         }
         $resXml .= '</xml>';
-
         $this->sendRsp($resXml);
     }
 
@@ -130,7 +129,6 @@ class PayController extends CommonController {
         $redirectUrl = \Request\SyRequest::getParams('url');
         \Response\SyResponseHttp::cookie(\Constant\Project::DATA_KEY_SESSION_TOKEN, $sessionId, $expireTime, '/', \SyServer\HttpServer::getServerConfig('cookiedomain_base', ''));
         \Response\SyResponseHttp::redirect($redirectUrl);
-
         $this->sendRsp();
     }
 
