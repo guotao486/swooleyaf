@@ -199,7 +199,7 @@ class WxOpenMiniDao {
             throw new CheckException('微信信息不存在', ErrorCode::COMMON_PARAM_ERROR);
         } else if($wxInfo['audit_id'] != $data['audit_id']){
             throw new CheckException('微信appid和审核ID不匹配', ErrorCode::COMMON_PARAM_ERROR);
-        } else if($wxInfo['audit_status'] == Project::WXMINI_AUDIT_STATUS_UNDO){
+        } else if(!in_array($wxInfo['audit_status'], [Project::WXMINI_AUDIT_STATUS_UNDO, Project::WXMINI_AUDIT_STATUS_HANDING,])){
             throw new CheckException('审核状态不支持', ErrorCode::COMMON_PARAM_ERROR);
         } else if(in_array($wxInfo['audit_status'], [Project::WXMINI_AUDIT_STATUS_SUCCESS, Project::WXMINI_AUDIT_STATUS_FAIL,])){
             return [
@@ -218,7 +218,7 @@ class WxOpenMiniDao {
         }
 
         $ormResult2 = $wxMiniConfig->getContainer()->getModel()->getOrmDbTable();
-        $ormResult2->where('`app_id`=? AND `audit_status`=?', [$data['wxmini_appid'], Project::WXMINI_AUDIT_STATUS_HANDING]);
+        $ormResult2->where('`app_id`=? AND `audit_status`=?', [$data['wxmini_appid'], $wxInfo['audit_status'],]);
         if($getRes['data']['status'] == Project::WXMINI_AUDIT_STATUS_FAIL){
             $wxMiniConfig->getContainer()->getModel()->update($ormResult2, [
                 'audit_status' => Project::WXMINI_AUDIT_STATUS_FAIL,
@@ -231,6 +231,14 @@ class WxOpenMiniDao {
                 'audit_status' => Project::WXMINI_AUDIT_STATUS_SUCCESS,
                 'audit_desc' => '',
                 'option_status' => Project::WXMINI_OPTION_STATUS_AUDIT_SUCCESS,
+                'updated' => Tool::getNowTime(),
+            ]);
+        } else if($wxInfo['audit_status'] == Project::WXMINI_AUDIT_STATUS_UNDO){
+            $wxMiniConfig->getContainer()->getModel()->update($ormResult2, [
+                'audit_id' => '',
+                'audit_status' => Project::WXMINI_AUDIT_STATUS_HANDING,
+                'audit_desc' => '',
+                'option_status' => Project::WXMINI_OPTION_STATUS_APPLY_AUDIT,
                 'updated' => Tool::getNowTime(),
             ]);
         }
