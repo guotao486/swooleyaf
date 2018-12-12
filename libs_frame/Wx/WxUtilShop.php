@@ -17,9 +17,10 @@ final class WxUtilShop extends WxUtilBaseAlone {
      * 生成签名
      * @param array $data
      * @param string $appId
+     * @param string $signType
      * @return string
      */
-    public static function createSign(array $data,string $appId) {
+    public static function createSign(array $data,string $appId,string $signType='md5') {
         //签名步骤一：按字典序排序参数
         ksort($data);
         //签名步骤二：格式化后加入KEY
@@ -36,9 +37,15 @@ final class WxUtilShop extends WxUtilBaseAlone {
             }
             $needStr1 .= $key . '=' . $value . '&';
         }
-        $needStr1 .= 'key='. WxConfigSingleton::getInstance()->getShopConfig($appId)->getPayKey();
-        //签名步骤三：MD5加密
-        $needStr2 = md5($needStr1);
+
+        $payKey = WxConfigSingleton::getInstance()->getShopConfig($appId)->getPayKey();
+        $needStr1 .= 'key='. $payKey;
+        //签名步骤三：加密
+        if($signType == 'md5'){
+            $needStr2 = md5($needStr1);
+        } else {
+            $needStr2 = hash_hmac('sha256', $needStr1, $payKey);
+        }
         //签名步骤四：所有字符转为大写
         return strtoupper($needStr2);
     }
