@@ -134,7 +134,7 @@ class DownloadFundFlow extends WxBaseShop {
             'code' => 0
         ];
 
-        $shopConfig = WxConfigSingleton::getInstance()->getShopConfig($this->reqData['wxappid']);
+        $shopConfig = WxConfigSingleton::getInstance()->getShopConfig($this->reqData['appid']);
         $tmpKey = tmpfile();
         fwrite($tmpKey, $shopConfig->getSslKey());
         $tmpKeyData = stream_get_meta_data($tmpKey);
