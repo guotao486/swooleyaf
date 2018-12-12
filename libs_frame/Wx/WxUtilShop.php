@@ -7,7 +7,9 @@
  */
 namespace Wx;
 
+use Constant\ErrorCode;
 use DesignPatterns\Singletons\WxConfigSingleton;
+use Tool\Tool;
 use Traits\SimpleTrait;
 
 final class WxUtilShop extends WxUtilBaseAlone {
@@ -63,5 +65,43 @@ final class WxUtilShop extends WxUtilBaseAlone {
         }
 
         return false;
+    }
+
+    /**
+     * 处理退款通知消息
+     * @param array $data
+     * @return array
+     */
+    public static function handleRefundNotify(array $data) : array {
+        $resArr = [
+            'code' => 0
+        ];
+
+        if($data['return_code'] == 'FAIL'){
+            $resArr['code'] = ErrorCode::WX_POST_ERROR;
+            $resArr['message'] = $data['return_msg'];
+            return $resArr;
+        }
+
+        $decryptData = base64_decode($data['req_info'], true);
+        if(is_bool($decryptData)){
+            $resArr['code'] = ErrorCode::WX_POST_ERROR;
+            $resArr['message'] = '解密数据失败';
+            return $resArr;
+        }
+
+        $password = md5(WxConfigSingleton::getInstance()->getShopConfig($data['appid'])->getPayKey());
+        $decryptMsg = openssl_decrypt($decryptData, 'aes-256-ecb', $password, OPENSSL_RAW_DATA);
+        $refundData = Tool::xmlToArray($decryptMsg);
+        if(isset($refundData['refund_id'])){
+            $resArr['data'] = $refundData;
+            $resArr['data']['appid'] = $data['appid'];
+            $resArr['data']['mch_id'] = $data['mch_id'];
+        } else {
+            $resArr['code'] = ErrorCode::WX_POST_ERROR;
+            $resArr['message'] = '解密数据出错';
+        }
+
+        return $resArr;
     }
 }
