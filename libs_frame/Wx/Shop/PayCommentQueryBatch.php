@@ -56,6 +56,11 @@ class PayCommentQueryBatch extends WxBaseShop {
      * @var int
      */
     private $limit = 0;
+    /**
+     * 输出文件全名
+     * @var string
+     */
+    private $output_file = '';
 
     public function __construct(string $appId){
         parent::__construct();
@@ -114,12 +119,24 @@ class PayCommentQueryBatch extends WxBaseShop {
         }
     }
 
+    /**
+     * @param string $outputFile
+     */
+    public function setOutputFile(string $outputFile){
+        if(strlen($outputFile) > 0){
+            $this->output_file = $outputFile;
+        }
+    }
+
     public function getDetail() : array {
         if(!isset($this->reqData['begin_time'])){
             throw new WxException('开始时间不能为空', ErrorCode::WX_PARAM_ERROR);
         }
         if(!isset($this->reqData['end_time'])){
             throw new WxException('结束时间不能为空', ErrorCode::WX_PARAM_ERROR);
+        }
+        if(strlen($this->output_file) == 0){
+            throw new WxException('输出文件不能为空', ErrorCode::WX_PARAM_ERROR);
         }
         $this->reqData['sign'] = WxUtilShop::createSign($this->reqData, $this->reqData['appid'], 'sha256');
 
@@ -143,15 +160,16 @@ class PayCommentQueryBatch extends WxBaseShop {
         $sendRes = WxUtilBase::sendPostReq($this->curlConfigs);
         fclose($tmpKey);
         fclose($tmpCert);
-        $sendData = Tool::xmlToArray($sendRes);
-        if ($sendData['return_code'] == 'FAIL') {
+        if (substr($sendRes, 0, 5) == '<xml>') {
+            $sendData = Tool::xmlToArray($sendRes);
             $resArr['code'] = ErrorCode::WX_POST_ERROR;
-            $resArr['message'] = $sendData['return_msg'];
-        } else if ($sendData['result_code'] == 'FAIL') {
-            $resArr['code'] = ErrorCode::WX_POST_ERROR;
-            $resArr['message'] = $sendData['err_code_des'];
+            $resArr['message'] = $sendData['return_code'] == 'FAIL' ? $sendData['return_msg'] : $sendData['err_code_des'];
         } else {
-            $resArr['data'] = $sendData;
+            file_put_contents($this->output_file, $sendRes);
+
+            $resArr['data'] = [
+                'return_code' => 'SUCCESS',
+            ];
         }
 
         return $resArr;
