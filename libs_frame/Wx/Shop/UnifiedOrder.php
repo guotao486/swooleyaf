@@ -18,15 +18,17 @@ use Wx\WxUtilShop;
 class UnifiedOrder extends WxBaseShop {
     const TRADE_TYPE_JSAPI = 'JSAPI'; //支付方式-jsapi
     const TRADE_TYPE_NATIVE = 'NATIVE'; //支付方式-扫码
+    const TRADE_TYPE_APP = 'APP'; //支付方式-app
     const TRADE_TYPE_MWEB = 'MWEB'; //支付方式-h5
     const SCENE_TYPE_IOS = 'IOS'; //场景类型-ios
     const SCENE_TYPE_ANDROID = 'Android'; //场景类型-android
     const SCENE_TYPE_WAP = 'Wap'; //场景类型-wap
 
-    private static $totalTradeTypes = [
-        self::TRADE_TYPE_JSAPI,
-        self::TRADE_TYPE_NATIVE,
-        self::TRADE_TYPE_MWEB,
+    private static $totalTradeType = [
+        self::TRADE_TYPE_JSAPI => 1,
+        self::TRADE_TYPE_NATIVE => 1,
+        self::TRADE_TYPE_APP => 1,
+        self::TRADE_TYPE_MWEB => 1,
     ];
 
     /**
@@ -156,7 +158,8 @@ class UnifiedOrder extends WxBaseShop {
 
     public function __construct(string $appId,string $tradeType){
         parent::__construct();
-        if(!in_array($tradeType, self::$totalTradeTypes)){
+
+        if (!isset(self::$totalTradeType[$tradeType])) {
             throw new WxException('交易类型不合法', ErrorCode::WX_PARAM_ERROR);
         }
 
