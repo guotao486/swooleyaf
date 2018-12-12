@@ -108,12 +108,17 @@ final class WxUtilShop extends WxUtilBaseAlone {
     }
 
     /**
-     * 获取企业银行付款公钥
+     * 企业银行付款rsa加密
      * @param string $appId
-     * @return string
+     * @param array $data
+     * @return array
      * @throws \Exception\Wx\WxException
      */
-    public static function getCompanyBankPayPublicKey(string $appId) : string {
+    public static function encryptRsaCompanyBank(string $appId,array $data) : array {
+        if(empty($data)){
+            throw new WxException('加密数据不能为空', ErrorCode::WX_POST_ERROR);
+        }
+
         $shopConfig = WxConfigSingleton::getInstance()->getShopConfig($appId);
         $fileName = Tool::getConfig('project.' . SY_ENV . SY_PROJECT . '.dir.store.resources') . '/certs/wxcompanybank_' . $shopConfig->getPayMchId() . '.pem';
         if(!file_exists($fileName)){
@@ -136,19 +141,17 @@ final class WxUtilShop extends WxUtilBaseAlone {
             }
         }
 
-        return openssl_pkey_get_public(file_get_contents($fileName));
-    }
+        $publicKey = openssl_pkey_get_public(file_get_contents($fileName));
+        $encryptData = [];
+        foreach ($data as $key => $val) {
+            if(is_string($val) && (strlen($val) > 0)){
+                $encryptStr = '';
+                openssl_public_encrypt($val, $encryptStr, $publicKey, OPENSSL_PKCS1_OAEP_PADDING);
+                $encryptData[$key] = $encryptStr;
+            }
+        }
+        openssl_free_key($publicKey);
 
-    /**
-     * 企业银行付款rsa加密
-     * @param string $publicKey
-     * @param string $data
-     * @return string
-     */
-    public static function encryptRsaCompanyBank(string $publicKey,string $data) : string {
-        $encryptData = '';
-        openssl_public_encrypt($data, $encryptData, $publicKey, OPENSSL_PKCS1_OAEP_PADDING);
-
-        return base64_encode($encryptData);
+        return $encryptData;
     }
 }
