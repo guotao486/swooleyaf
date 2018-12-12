@@ -64,16 +64,15 @@ class DownloadFundFlow extends WxBaseShop {
      * 资金账户类型列表
      * @var array
      */
-    private $totalAccountType = [];
+    private static $totalAccountType = [
+        self::ACCOUNT_TYPE_BASIC => 1,
+        self::ACCOUNT_TYPE_OPERATION => 1,
+        self::ACCOUNT_TYPE_FEES => 1,
+    ];
 
     public function __construct(string $appId){
         parent::__construct();
         $this->serviceUrl = 'https://api.mch.weixin.qq.com/pay/downloadfundflow';
-        $this->totalAccountType = [
-            self::ACCOUNT_TYPE_BASIC => 1,
-            self::ACCOUNT_TYPE_OPERATION => 1,
-            self::ACCOUNT_TYPE_FEES => 1,
-        ];
         $shopConfig = WxConfigSingleton::getInstance()->getShopConfig($appId);
         $this->reqData['appid'] = $shopConfig->getAppId();
         $this->reqData['mch_id'] = $shopConfig->getPayMchId();
@@ -102,7 +101,7 @@ class DownloadFundFlow extends WxBaseShop {
      * @throws \Exception\Wx\WxException
      */
     public function setAccountType(string $accountType){
-        if (isset($this->totalAccountType[$accountType])) {
+        if (isset(self::$totalAccountType[$accountType])) {
             $this->reqData['account_type'] = $accountType;
         } else {
             throw new WxException('资金账户类型不合法', ErrorCode::WX_PARAM_ERROR);
