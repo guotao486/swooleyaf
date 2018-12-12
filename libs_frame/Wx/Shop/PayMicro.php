@@ -82,10 +82,35 @@ class PayMicro extends WxBaseShop {
      */
     private $goods_tag = '';
     /**
+     * 指定支付方式
+     * @var string
+     */
+    private $limit_pay = '';
+    /**
+     * 交易起始时间
+     * @var string
+     */
+    private $time_start = '';
+    /**
+     * 交易结束时间
+     * @var string
+     */
+    private $time_expire = '';
+    /**
+     * 电子发票入口开放标识
+     * @var string
+     */
+    private $receipt = '';
+    /**
      * 授权码
      * @var string
      */
     private $auth_code = '';
+    /**
+     * 场景信息
+     * @var string
+     */
+    private $scene_info = '';
 
     public function __construct(string $appId){
         parent::__construct();
@@ -187,6 +212,74 @@ class PayMicro extends WxBaseShop {
     public function setGoodsTag(string $goodsTag) {
         if(strlen($goodsTag) > 0){
             $this->reqData['goods_tag'] = $goodsTag;
+        }
+    }
+
+    /**
+     * @param string $limitPay
+     * @throws \Exception\Wx\WxException
+     */
+    public function setLimitPay(string $limitPay){
+        if($limitPay === ''){
+            unset($this->reqData['limit_pay']);
+        } else if($limitPay == 'no_credit'){
+            $this->reqData['limit_pay'] = $limitPay;
+        } else {
+            throw new WxException('指定支付方式不合法', ErrorCode::WX_PARAM_ERROR);
+        }
+    }
+
+    /**
+     * @param int $timeStart
+     * @param int $timeExpire
+     * @throws \Exception\Wx\WxException
+     */
+    public function setTime(int $timeStart, int $timeExpire){
+        $nowTime = Tool::getNowTime();
+        if($timeStart < 0){
+            throw new WxException('交易起始时间不合法', ErrorCode::WX_PARAM_ERROR);
+        } else if($timeExpire < 0){
+            throw new WxException('交易结束时间不合法', ErrorCode::WX_PARAM_ERROR);
+        } else if(($timeExpire > 0) && ($timeExpire <= $nowTime)){
+            throw new WxException('交易结束时间不能小于当前时间', ErrorCode::WX_PARAM_ERROR);
+        } else if(($timeStart > 0) && ($timeExpire > 0) && ($timeStart >= $timeExpire)){
+            throw new WxException('交易起始时间必须小于交易结束时间', ErrorCode::WX_PARAM_ERROR);
+        }
+
+        unset($this->reqData['time_start']);
+        unset($this->reqData['time_expire']);
+        if($timeStart > 0){
+            $this->reqData['time_start'] = date('YmdHis', $timeStart);
+        }
+        if($timeExpire > 0){
+            $this->reqData['time_expire'] = date('YmdHis', $timeExpire);
+        }
+    }
+
+    /**
+     * @param string $receipt
+     * @throws \Exception\Wx\WxException
+     */
+    public function setReceipt(string $receipt){
+        if($receipt === ''){
+            unset($this->reqData['receipt']);
+        } else if($receipt == 'Y'){
+            $this->reqData['receipt'] = $receipt;
+        } else {
+            throw new WxException('电子发票入口开放标识不合法', ErrorCode::WX_PARAM_ERROR);
+        }
+    }
+
+    /**
+     * @param array $sceneInfo
+     */
+    public function setSceneInfo(array $sceneInfo){
+        if(empty($sceneInfo)){
+            unset($this->reqData['scene_info']);
+        } else {
+            $this->reqData['scene_info'] = Tool::jsonEncode([
+                'store_info' => $sceneInfo
+            ], JSON_UNESCAPED_UNICODE);
         }
     }
 
