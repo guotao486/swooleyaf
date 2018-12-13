@@ -2,31 +2,37 @@
 /**
  * Created by PhpStorm.
  * User: 姜伟
- * Date: 18-9-12
- * Time: 上午12:22
+ * Date: 2018/12/13 0013
+ * Time: 15:12
  */
-namespace Wx\Shop;
+namespace Wx\Shop\User;
 
 use Constant\ErrorCode;
 use Exception\Wx\WxException;
 use Tool\Tool;
 use Wx\WxBaseShop;
 use Wx\WxUtilBase;
-use Wx\WxUtilBaseAlone;
+use Wx\WxUtilShop;
 
-class UserInfo extends WxBaseShop {
+class TagListByUser extends WxBaseShop {
+    /**
+     * 公众号ID
+     * @var string
+     */
+    private $appid = '';
     /**
      * 用户openid
      * @var string
      */
     private $openid = '';
 
-    public function __construct(){
+    public function __construct(string $appId){
         parent::__construct();
-        $this->serviceUrl = 'https://api.weixin.qq.com/cgi-bin/user/info?lang=zh_CN&access_token=';
+        $this->serviceUrl = 'https://api.weixin.qq.com/cgi-bin/tags/getidlist?access_token=';
+        $this->appid = $appId;
     }
 
-    public function __clone(){
+    private function __clone(){
     }
 
     /**
@@ -41,26 +47,24 @@ class UserInfo extends WxBaseShop {
         }
     }
 
-    public function getDetail(string $appId='') : array {
-        if(strlen($appId) == 0){
-            throw new WxException('应用ID不能为空', ErrorCode::WX_PARAM_ERROR);
-        }
+    public function getDetail() : array {
         if(!isset($this->reqData['openid'])){
             throw new WxException('用户openid不能为空', ErrorCode::WX_PARAM_ERROR);
         }
 
         $resArr = [
-            'code' => 0
+            'code' => 0,
         ];
 
-        $this->curlConfigs[CURLOPT_URL] = $this->serviceUrl . WxUtilBaseAlone::getAccessToken($appId) . '&openid=' . $this->reqData['openid'];
-        $sendRes = WxUtilBase::sendGetReq($this->curlConfigs);
+        $this->curlConfigs[CURLOPT_URL] = $this->serviceUrl . WxUtilShop::getAccessToken($this->appid);
+        $this->curlConfigs[CURLOPT_POSTFIELDS] = Tool::jsonEncode($this->reqData, JSON_UNESCAPED_UNICODE);
+        $sendRes = WxUtilBase::sendPostReq($this->curlConfigs);
         $sendData = Tool::jsonDecode($sendRes);
-        if (isset($sendData['openid'])) {
-            $resArr['data'] = $sendData;
-        } else {
-            $resArr['code'] = ErrorCode::WX_GET_ERROR;
+        if(isset($sendData['errcode'])){
+            $resArr['code'] = ErrorCode::WX_POST_ERROR;
             $resArr['message'] = $sendData['errmsg'];
+        } else {
+            $resArr['data'] = $sendData;
         }
 
         return $resArr;
