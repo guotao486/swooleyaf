@@ -5,7 +5,7 @@
  * Date: 2018/12/14 0014
  * Time: 16:01
  */
-namespace Wx\Shop\Merchant\Goods;
+namespace Wx\Shop\Merchant\Group;
 
 use Constant\ErrorCode;
 use Exception\Wx\WxException;
@@ -14,21 +14,21 @@ use Wx\WxBaseShop;
 use Wx\WxUtilBase;
 use Wx\WxUtilShop;
 
-class CategoryProperties extends WxBaseShop {
+class GroupDel extends WxBaseShop {
     /**
      * 公众号ID
      * @var string
      */
     private $appid = '';
     /**
-     * 分类ID
+     * 分组ID
      * @var int
      */
-    private $cate_id = 0;
+    private $group_id = 0;
 
     public function __construct(string $appId){
         parent::__construct();
-        $this->serviceUrl = 'https://api.weixin.qq.com/merchant/category/getproperty?access_token=';
+        $this->serviceUrl = 'https://api.weixin.qq.com/merchant/group/del?access_token=';
         $this->appid = $appId;
     }
 
@@ -36,20 +36,20 @@ class CategoryProperties extends WxBaseShop {
     }
 
     /**
-     * @param int $cateId
+     * @param int $groupId
      * @throws \Exception\Wx\WxException
      */
-    public function setCateId(int $cateId){
-        if($cateId > 0){
-            $this->reqData['cate_id'] = $cateId;
+    public function setGroupId(int $groupId){
+        if($groupId > 0){
+            $this->reqData['group_id'] = $groupId;
         } else {
-            throw new WxException('分类ID不合法', ErrorCode::WX_PARAM_ERROR);
+            throw new WxException('分组ID不合法', ErrorCode::WX_PARAM_ERROR);
         }
     }
 
     public function getDetail() : array {
-        if(!isset($this->reqData['cate_id'])){
-            throw new WxException('分类ID不能为空', ErrorCode::WX_PARAM_ERROR);
+        if(!isset($this->reqData['group_id'])){
+            throw new WxException('分组ID不能为空', ErrorCode::WX_PARAM_ERROR);
         }
 
         $resArr = [
