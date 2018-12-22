@@ -5,7 +5,7 @@
  * Date: 18-9-12
  * Time: 上午12:07
  */
-namespace Wx\Shop;
+namespace Wx\Shop\Message;
 
 use Constant\ErrorCode;
 use Exception\Wx\WxException;
@@ -14,7 +14,12 @@ use Wx\WxBaseShop;
 use Wx\WxUtilBase;
 use Wx\WxUtilBaseAlone;
 
-class TemplateMsg extends WxBaseShop {
+class TemplateMsgSend extends WxBaseShop {
+    /**
+     * 公众号ID
+     * @var string
+     */
+    private $appid = '';
     /**
      * 用户openid
      * @var string
@@ -31,14 +36,20 @@ class TemplateMsg extends WxBaseShop {
      */
     private $redirect_url = '';
     /**
+     * 小程序跳转数据
+     * @var array
+     */
+    private $miniprogram = [];
+    /**
      * 模版数据
      * @var array
      */
     private $template_data = [];
 
-    public function __construct(){
+    public function __construct(string $appId){
         parent::__construct();
         $this->serviceUrl = 'https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=';
+        $this->appid = $appId;
         $this->reqData['url'] = '';
         $this->reqData['data'] = [];
     }
@@ -75,11 +86,22 @@ class TemplateMsg extends WxBaseShop {
      * @throws \Exception\Wx\WxException
      */
     public function setRedirectUrl(string $redirectUrl) {
-        if (preg_match('/^(http|https|ftp)\:\/\/\S+$/', $redirectUrl) > 0) {
+        if (preg_match('/^(http|https)\:\/\/\S+$/', $redirectUrl) > 0) {
             $this->reqData['url'] = $redirectUrl;
         } else {
             throw new WxException('重定向链接不合法', ErrorCode::WX_PARAM_ERROR);
         }
+    }
+
+    /**
+     * @param array $miniProgram
+     * @throws \Exception\Wx\WxException
+     */
+    public function setMiniProgram(array $miniProgram){
+        if(empty($miniProgram)){
+            throw new WxException('小程序跳转数据不合法', ErrorCode::WX_PARAM_ERROR);
+        }
+        $this->reqData['miniprogram'] = $miniProgram;
     }
 
     /**
@@ -102,10 +124,7 @@ class TemplateMsg extends WxBaseShop {
         $this->reqData['data'] = $templateData;
     }
 
-    public function getDetail(string $appId='') : array {
-        if(strlen($appId) == 0){
-            throw new WxException('应用ID不能为空', ErrorCode::WX_PARAM_ERROR);
-        }
+    public function getDetail() : array {
         if (!isset($this->reqData['touser'])) {
             throw new WxException('用户openid不能为空', ErrorCode::WX_PARAM_ERROR);
         }
@@ -117,7 +136,7 @@ class TemplateMsg extends WxBaseShop {
             'code' => 0
         ];
 
-        $this->curlConfigs[CURLOPT_URL] = $this->serviceUrl . WxUtilBaseAlone::getAccessToken($appId);
+        $this->curlConfigs[CURLOPT_URL] = $this->serviceUrl . WxUtilBaseAlone::getAccessToken($this->appid);
         $this->curlConfigs[CURLOPT_POSTFIELDS] = Tool::jsonEncode($this->reqData, JSON_UNESCAPED_UNICODE);
         $sendRes = WxUtilBase::sendPostReq($this->curlConfigs);
         $sendData = Tool::jsonDecode($sendRes);
