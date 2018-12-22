@@ -5,7 +5,7 @@
  * Date: 2018/12/13 0013
  * Time: 9:37
  */
-namespace Wx\Shop\Material;
+namespace Wx\Shop\Media;
 
 use Constant\ErrorCode;
 use Exception\Wx\WxException;
@@ -14,7 +14,7 @@ use Wx\WxBaseShop;
 use Wx\WxUtilBase;
 use Wx\WxUtilShop;
 
-class MaterialTemporaryGet extends WxBaseShop {
+class MediaGet extends WxBaseShop {
     /**
      * 公众号ID
      * @var string
