@@ -14,7 +14,7 @@ use Wx\WxBaseShop;
 use Wx\WxUtilBase;
 use Wx\WxUtilShop;
 
-class ArticleUpdate extends WxBaseShop {
+class NewsUpdate extends WxBaseShop {
     /**
      * 公众号ID
      * @var string
