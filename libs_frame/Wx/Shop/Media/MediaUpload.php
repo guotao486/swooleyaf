@@ -5,7 +5,7 @@
  * Date: 2018/12/13 0013
  * Time: 9:37
  */
-namespace Wx\Shop\Material;
+namespace Wx\Shop\Media;
 
 use Constant\ErrorCode;
 use Exception\Wx\WxException;
@@ -14,7 +14,7 @@ use Wx\WxBaseShop;
 use Wx\WxUtilBase;
 use Wx\WxUtilShop;
 
-class ArticleImageUpload extends WxBaseShop {
+class MediaUpload extends WxBaseShop {
     /**
      * 公众号ID
      * @var string
@@ -26,9 +26,13 @@ class ArticleImageUpload extends WxBaseShop {
      */
     private $file_path = '';
 
-    public function __construct(string $appId){
+    public function __construct(string $appId,string $type){
         parent::__construct();
-        $this->serviceUrl = 'https://api.weixin.qq.com/cgi-bin/media/uploadimg?access_token=';
+        if(!isset(self::$totalMaterialType[$type])){
+            throw new WxException('类型不支持', ErrorCode::WX_PARAM_ERROR);
+        }
+
+        $this->serviceUrl = 'https://api.weixin.qq.com/cgi-bin/media/upload?type=' . $type . '&access_token=';
         $this->appid = $appId;
     }
 
@@ -60,7 +64,7 @@ class ArticleImageUpload extends WxBaseShop {
         $this->curlConfigs[CURLOPT_POSTFIELDS] = $this->reqData;
         $sendRes = WxUtilBase::sendPostReq($this->curlConfigs);
         $sendData = Tool::jsonDecode($sendRes);
-        if(isset($sendData['url'])){
+        if(isset($sendData['media_id'])){
             $resArr['data'] = $sendData;
         } else {
             $resArr['code'] = ErrorCode::WX_POST_ERROR;
