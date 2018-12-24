@@ -5,7 +5,7 @@
  * Date: 2018/9/12 0012
  * Time: 15:59
  */
-namespace Wx\Shop;
+namespace Wx\Shop\Menu;
 
 use Constant\ErrorCode;
 use Exception\Wx\WxException;
@@ -16,6 +16,11 @@ use Wx\WxUtilBaseAlone;
 
 class MenuCreate extends WxBaseShop {
     /**
+     * 公众号ID
+     * @var string
+     */
+    private $appid = '';
+    /**
      * 菜单列表
      * @var array
      */
@@ -24,14 +29,14 @@ class MenuCreate extends WxBaseShop {
     public function __construct(string $appId){
         parent::__construct();
         $this->serviceUrl = 'https://api.weixin.qq.com/cgi-bin/menu/create?access_token=';
-        $this->reqData['appid'] = $appId;
+        $this->appid = $appId;
     }
 
     public function __clone(){
     }
 
     /**
-     * @param \Wx\Shop\Menu $menu
+     * @param \Wx\Shop\Menu\Menu $menu
      * @throws \Exception\Wx\WxException
      */
     public function addMenu(Menu $menu){
@@ -51,15 +56,13 @@ class MenuCreate extends WxBaseShop {
             'code' => 0
         ];
 
-        $this->reqData['menu_list'] = [
-            'button' => [],
-        ];
+        $this->reqData['button'] = [];
         foreach ($this->menuList as $eMenu) {
-            $this->reqData['menu_list']['button'][] = $eMenu->getDetail();
+            $this->reqData['button'][] = $eMenu->getDetail();
         }
 
-        $this->curlConfigs[CURLOPT_URL] = $this->serviceUrl . WxUtilBaseAlone::getAccessToken($this->reqData['appid']);
-        $this->curlConfigs[CURLOPT_POSTFIELDS] = Tool::jsonEncode($this->reqData['menu_list'], JSON_UNESCAPED_UNICODE);
+        $this->curlConfigs[CURLOPT_URL] = $this->serviceUrl . WxUtilBaseAlone::getAccessToken($this->appid);
+        $this->curlConfigs[CURLOPT_POSTFIELDS] = Tool::jsonEncode($this->reqData, JSON_UNESCAPED_UNICODE);
         $sendRes = WxUtilBase::sendPostReq($this->curlConfigs);
         $sendData = Tool::jsonDecode($sendRes);
         if ($sendData['errcode'] == 0) {
