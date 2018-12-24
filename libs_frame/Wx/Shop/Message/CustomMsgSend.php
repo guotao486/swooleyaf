@@ -5,7 +5,7 @@
  * Date: 18-9-12
  * Time: 下午11:14
  */
-namespace Wx\Shop;
+namespace Wx\Shop\Message;
 
 use Constant\ErrorCode;
 use Exception\Wx\WxException;
@@ -15,7 +15,7 @@ use Wx\WxUtilBase;
 use Wx\WxUtilBaseAlone;
 use Wx\WxUtilOpenBase;
 
-class CustomMsg extends WxBaseShop {
+class CustomMsgSend extends WxBaseShop {
     /**
      * 应用ID
      * @var string
