@@ -12,7 +12,7 @@ use DesignPatterns\Facades\PayApplyFacade;
 use DesignPatterns\Factories\CacheSimpleFactory;
 use Tool\Tool;
 use Traits\SimpleFacadeTrait;
-use Wx\Shop\PayNativePre;
+use Wx\Shop\Pay\PayNativePre;
 
 class WxShopNativeStatic extends PayApplyFacade {
     use SimpleFacadeTrait;

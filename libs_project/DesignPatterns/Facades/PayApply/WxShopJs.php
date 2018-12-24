@@ -14,7 +14,7 @@ use Exception\Common\CheckException;
 use Tool\SyUser;
 use Tool\Tool;
 use Traits\SimpleFacadeTrait;
-use Wx\Shop\UnifiedOrder;
+use Wx\Shop\Pay\UnifiedOrder;
 use Wx\WxUtilBase;
 
 class WxShopJs extends PayApplyFacade {

@@ -5,7 +5,7 @@
  * Date: 2018/12/12 0012
  * Time: 15:44
  */
-namespace Wx\Shop;
+namespace Wx\Shop\Pay;
 
 use Constant\ErrorCode;
 use DesignPatterns\Singletons\WxConfigSingleton;
@@ -15,27 +15,12 @@ use Wx\WxBaseShop;
 use Wx\WxUtilBase;
 use Wx\WxUtilShop;
 
-class CouponSend extends WxBaseShop {
+class CouponQueryStock extends WxBaseShop {
     /**
      * 代金券批次id
      * @var string
      */
     private $coupon_stock_id = '';
-    /**
-     * openid记录数
-     * @var int
-     */
-    private $openid_count = 0;
-    /**
-     * 商户单据号
-     * @var string
-     */
-    private $partner_trade_no = '';
-    /**
-     * 用户openid
-     * @var string
-     */
-    private $openid = '';
     /**
      * 公众号ID
      * @var string
@@ -74,13 +59,12 @@ class CouponSend extends WxBaseShop {
 
     public function __construct(string $appId){
         parent::__construct();
-        $this->serviceUrl = 'https://api.mch.weixin.qq.com/mmpaymkttransfers/send_coupon';
+        $this->serviceUrl = 'https://api.mch.weixin.qq.com/mmpaymkttransfers/query_coupon_stock';
         $shopConfig = WxConfigSingleton::getInstance()->getShopConfig($appId);
         $this->reqData['appid'] = $shopConfig->getAppId();
         $this->reqData['mch_id'] = $shopConfig->getPayMchId();
         $this->reqData['op_user_id'] = $shopConfig->getPayMchId();
         $this->reqData['nonce_str'] = Tool::createNonceStr(32, 'numlower');
-        $this->reqData['openid_count'] = 1;
         $this->reqData['version'] = '1.0';
         $this->reqData['type'] = 'XML';
     }
@@ -97,30 +81,6 @@ class CouponSend extends WxBaseShop {
             $this->reqData['coupon_stock_id'] = $couponStockId;
         } else {
             throw new WxException('代金券批次id不合法', ErrorCode::WX_PARAM_ERROR);
-        }
-    }
-
-    /**
-     * @param string $partnerTradeNo
-     * @throws \Exception\Wx\WxException
-     */
-    public function setPartnerTradeNo(string $partnerTradeNo){
-        if(ctype_digit($partnerTradeNo)){
-            $this->reqData['partner_trade_no'] = $this->reqData['mch_id'] . date('Ymd') . $partnerTradeNo;
-        } else {
-            throw new WxException('商户单据号不合法', ErrorCode::WX_PARAM_ERROR);
-        }
-    }
-
-    /**
-     * @param string $openid
-     * @throws \Exception\Wx\WxException
-     */
-    public function setOpenid(string $openid){
-        if (preg_match('/^[0-9a-zA-Z\-\_]{28}$/', $openid) > 0) {
-            $this->reqData['openid'] = $openid;
-        } else {
-            throw new WxException('用户openid不合法', ErrorCode::WX_PARAM_ERROR);
         }
     }
 
@@ -145,47 +105,19 @@ class CouponSend extends WxBaseShop {
         }
     }
 
-    /**
-     * @param string $version
-     */
-    public function setVersion(string $version){
-        if(strlen($version) > 0){
-            $this->reqData['version'] = $version;
-        }
-    }
-
     public function getDetail() : array {
         if(!isset($this->reqData['coupon_stock_id'])){
             throw new WxException('代金券批次id不能为空', ErrorCode::WX_PARAM_ERROR);
         }
-        if(!isset($this->reqData['partner_trade_no'])){
-            throw new WxException('商户单据号不能为空', ErrorCode::WX_PARAM_ERROR);
-        }
-        if(!isset($this->reqData['openid'])){
-            throw new WxException('用户openid不能为空', ErrorCode::WX_PARAM_ERROR);
-        }
         $this->reqData['sign'] = WxUtilShop::createSign($this->reqData, $this->reqData['appid']);
 
         $resArr = [
-            'code' => 0
+            'code' => 0,
         ];
 
-        $shopConfig = WxConfigSingleton::getInstance()->getShopConfig($this->reqData['appid']);
-        $tmpKey = tmpfile();
-        fwrite($tmpKey, $shopConfig->getSslKey());
-        $tmpKeyData = stream_get_meta_data($tmpKey);
-        $tmpCert = tmpfile();
-        fwrite($tmpCert, $shopConfig->getSslCert());
-        $tmpCertData = stream_get_meta_data($tmpCert);
         $this->curlConfigs[CURLOPT_URL] = $this->serviceUrl;
         $this->curlConfigs[CURLOPT_POSTFIELDS] = Tool::arrayToXml($this->reqData);
-        $this->curlConfigs[CURLOPT_SSLCERTTYPE] = 'PEM';
-        $this->curlConfigs[CURLOPT_SSLCERT] = $tmpCertData['uri'];
-        $this->curlConfigs[CURLOPT_SSLKEYTYPE] = 'PEM';
-        $this->curlConfigs[CURLOPT_SSLKEY] = $tmpKeyData['uri'];
         $sendRes = WxUtilBase::sendPostReq($this->curlConfigs);
-        fclose($tmpKey);
-        fclose($tmpCert);
         $sendData = Tool::xmlToArray($sendRes);
         if ($sendData['return_code'] == 'FAIL') {
             $resArr['code'] = ErrorCode::WX_POST_ERROR;

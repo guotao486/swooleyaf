@@ -5,12 +5,14 @@
  * Date: 2018/9/12 0012
  * Time: 8:55
  */
-namespace Wx\Shop;
+namespace Wx\Shop\Pay;
 
 use Constant\ErrorCode;
 use DesignPatterns\Singletons\WxConfigSingleton;
 use Exception\Wx\WxException;
 use Tool\Tool;
+use Wx\Shop\Pay\JsConfig;
+use Wx\Shop\Pay\JsPayConfig;
 use Wx\WxBaseShop;
 use Wx\WxUtilBase;
 use Wx\WxUtilShop;

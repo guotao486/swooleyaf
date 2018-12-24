@@ -12,7 +12,7 @@ use DesignPatterns\Singletons\WxConfigSingleton;
 use Exception\Wx\WxException;
 use Tool\Tool;
 use Traits\SimpleTrait;
-use Wx\Shop\PayCompanyBankPublicKey;
+use Wx\Shop\Pay\PayCompanyBankPublicKey;
 
 final class WxUtilShop extends WxUtilBaseAlone {
     use SimpleTrait;

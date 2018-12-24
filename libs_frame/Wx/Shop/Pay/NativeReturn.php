@@ -5,7 +5,7 @@
  * Date: 2018/9/12 0012
  * Time: 16:31
  */
-namespace Wx\Shop;
+namespace Wx\Shop\Pay;
 
 use Constant\ErrorCode;
 use DesignPatterns\Singletons\WxConfigSingleton;
