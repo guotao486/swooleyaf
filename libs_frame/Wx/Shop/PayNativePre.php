@@ -11,6 +11,7 @@ use Constant\ErrorCode;
 use DesignPatterns\Singletons\WxConfigSingleton;
 use Exception\Wx\WxException;
 use Tool\Tool;
+use Wx\Shop\Tools\ShortUrl;
 use Wx\WxBaseShop;
 use Wx\WxUtilShop;
 

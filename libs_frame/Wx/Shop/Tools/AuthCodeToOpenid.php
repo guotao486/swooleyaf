@@ -5,7 +5,7 @@
  * Date: 2018/12/12 0012
  * Time: 9:43
  */
-namespace Wx\Shop;
+namespace Wx\Shop\Tools;
 
 use Constant\ErrorCode;
 use DesignPatterns\Singletons\WxConfigSingleton;

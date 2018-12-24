@@ -5,7 +5,7 @@
  * Date: 18-9-12
  * Time: 上午1:44
  */
-namespace Wx\Shop;
+namespace Wx\Shop\Tools;
 
 use Constant\ErrorCode;
 use Tool\Tool;
