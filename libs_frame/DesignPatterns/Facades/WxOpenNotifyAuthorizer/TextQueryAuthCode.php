@@ -11,7 +11,7 @@ use DesignPatterns\Facades\WxOpenNotifyAuthorizerFacade;
 use DesignPatterns\Singletons\WxConfigSingleton;
 use Traits\SimpleFacadeTrait;
 use Wx\OpenCommon\AuthorizerInfo;
-use Wx\Shop\CustomMsg;
+use Wx\Shop\Message\CustomMsgSend;
 
 class TextQueryAuthCode extends WxOpenNotifyAuthorizerFacade {
     use SimpleFacadeTrait;
@@ -26,7 +26,7 @@ class TextQueryAuthCode extends WxOpenNotifyAuthorizerFacade {
         $authInfo = $authorizerInfo->getDetail();
         unset($authorizerInfo);
         //调用发送客服消息api回复文本消息
-        $customMsg = new CustomMsg('');
+        $customMsg = new CustomMsgSend('');
         $customMsg->setAccessToken($authInfo['data']['authorization_info']['authorizer_access_token']);
         $customMsg->setMsgData([
             'touser' => $data['FromUserName'],
