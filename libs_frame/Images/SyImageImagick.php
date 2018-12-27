@@ -149,7 +149,7 @@ class SyImageImagick extends SyImageBase {
         return $this;
     }
 
-    public function addWaterImage(string $filePath, int $startX, int $startY, int $alpha){
+    public function addWaterImage(string $filePath,int $startX,int $startY,int $alpha){
         $imageInfo = $this->checkImage($filePath, 1);
         $trueAlpha = $this->checkImageAlpha($alpha);
         $opacity = (float)(1 - $trueAlpha / 100);
@@ -182,7 +182,7 @@ class SyImageImagick extends SyImageBase {
         return $this;
     }
 
-    public function cropImage(int $startX, int $startY, int $width, int $height){
+    public function cropImage(int $startX,int $startY,int $width,int $height){
         $checkRes = $this->checkCropData($startX, $startY, $width, $height);
         $this->image->cropImage($width, $height, $startX, $startY);
         $this->width = $checkRes['crop_width'];
