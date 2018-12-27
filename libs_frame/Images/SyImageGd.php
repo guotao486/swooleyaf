@@ -108,7 +108,7 @@ class SyImageGd extends SyImageBase {
         return $this;
     }
 
-    public function addWaterImage(string $filePath, int $startX, int $startY, int $alpha){
+    public function addWaterImage(string $filePath,int $startX,int $startY,int $alpha){
         $imageInfo = $this->checkImage($filePath, 1);
         $trueAlpha = $this->checkImageAlpha($alpha);
         $water = imagecreatefromstring(file_get_contents($filePath));
@@ -118,7 +118,7 @@ class SyImageGd extends SyImageBase {
         return $this;
     }
 
-    public function cropImage(int $startX, int $startY, int $width, int $height){
+    public function cropImage(int $startX,int $startY,int $width,int $height){
         $checkRes = $this->checkCropData($startX, $startY, $width, $height);
         $newImage = imagecreatetruecolor($checkRes['crop_width'], $checkRes['crop_height']);
         imagecopyresampled($newImage, $this->image, 0, 0, $startX, $startY, $checkRes['crop_width'], $checkRes['crop_height'], $width, $height);
