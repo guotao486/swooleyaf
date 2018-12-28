@@ -101,7 +101,7 @@ class JsConfig extends WxBaseShop {
             $ticket = WxUtilOpenBase::getAuthorizerJsTicket($this->reqData['appId']);
         }
 
-        $needStr = 'jsapi_ticket=' . $ticket . '&noncestr=' . $this->reqData['nonceStr'] . '&timestamp=' . $this->reqData['nonceStr'] . '&url=' . $this->url;
+        $needStr = 'jsapi_ticket=' . $ticket . '&noncestr=' . $this->reqData['nonceStr'] . '&timestamp=' . $this->reqData['timestamp'] . '&url=' . $this->url;
         $this->reqData['signature'] = sha1($needStr);
         return $this->reqData;
     }
