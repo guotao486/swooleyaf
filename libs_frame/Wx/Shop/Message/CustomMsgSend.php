@@ -100,7 +100,7 @@ class CustomMsgSend extends WxBaseShop {
             $this->curlConfigs[CURLOPT_URL] = $this->serviceUrl . WxUtilOpenBase::getAuthorizerAccessToken($this->appId);
         }
         $this->curlConfigs[CURLOPT_POSTFIELDS] = Tool::jsonEncode($this->msgData, JSON_UNESCAPED_UNICODE);
-        $this->curlConfigs[CURLOPT_HEADER] = [
+        $this->curlConfigs[CURLOPT_HTTPHEADER] = [
             'Expect:',
         ];
         $sendRes = WxUtilBase::sendPostReq($this->curlConfigs);
