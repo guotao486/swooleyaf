@@ -43,7 +43,7 @@ class Bootstrap extends \Yaf\Bootstrap_Abstract {
 
 //            $smartyConfig = \SyFrame\BaseBootstarp::getAppConfigs('smarty');
 //            if(empty($smartyConfig)){
-//                throw new \Exception\Swoole\ServerException('smarty配置不存在', \Constant\ErrorCode::SMARTY_PARAM_ERROR);
+//                throw new \Exception\Swoole\AliOpenCore\Exception\ServerException('smarty配置不存在', \Constant\ErrorCode::SMARTY_PARAM_ERROR);
 //            }
 //
 //            $smartyView = new \DesignPatterns\Adapters\SmartyAdapter(null, $smartyConfig);
