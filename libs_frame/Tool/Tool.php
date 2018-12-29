@@ -12,6 +12,8 @@ use Constant\Project;
 use Constant\Server;
 use DesignPatterns\Factories\CacheSimpleFactory;
 use Exception\Common\CheckException;
+use PHPZxing\PHPZxingDecoder;
+use PHPZxing\ZxingImage;
 use Traits\SimpleTrait;
 use Yaf\Registry;
 
@@ -527,5 +529,47 @@ class Tool {
      */
     public static function getNowTime(){
         return $_SERVER[Server::SERVER_DATA_KEY_TIMESTAMP] ?? time();
+    }
+
+    /**
+     * 读取二维码图片
+     * @param string $qrPath
+     * @param string $javaPath
+     * @return array
+     */
+    public static function readQrCode(string $qrPath,string $javaPath=''){
+        $resArr = [
+            'code' => 0,
+        ];
+
+        $decoder = new PHPZxingDecoder([
+            'try_harder' => true,
+        ]);
+        if(strlen($javaPath) > 0){
+            $decoder->setJavaPath($javaPath);
+        }
+
+        /**
+         * 返回的对象类型
+         * 识别成功时返回ZxingImage对象,包括
+         *   getImageValue 二维码的内容
+         *   getFormat 编码图像的格式
+         *   getType 获取解码图像的类型，例如：URL，TEXT等
+         *   getImagePath 获取图像的路径
+         * 图片中没有识别的二维码时返回ZxingBarNotFound对象 包括
+         *   getImageErrorCode 获取未找到图像的错误代码
+         *   getErrorMessage 错误信息
+         *   getImagePath 获取图像的路径
+         */
+        $decodedData = $decoder->decode($qrPath);
+        if($decodedData instanceof ZxingImage){
+            $resArr['data'] = $decodedData->getImageValue();
+        } else {
+            $resArr['code'] = ErrorCode::COMMON_PARAM_ERROR;
+            $resArr['msg'] = $decodedData->getErrorMessage();
+        }
+        unset($decodedData, $decoder);
+
+        return $resArr;
     }
 }
