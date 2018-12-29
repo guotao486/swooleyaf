@@ -6,11 +6,11 @@ use AliOpenCore\Auth\EcsRamRoleService;
 use AliOpenCore\Auth\RamRoleArnService;
 use AliOpenCore\Exception\ClientException;
 use AliOpenCore\Exception\ServerException;
-use EndpointProvider;
+use AliOpenCore\Regions\EndpointProvider;
 use AliOpenCore\Http\HttpHelper;
 use AliOpenCore\Http\HttpResponse;
 use AliOpenCore\Profile\IClientProfile;
-use LocationService;
+use AliOpenCore\Regions\LocationService;
 use SimpleXMLElement;
 
 class DefaultAcsClient implements IAcsClient {
@@ -23,7 +23,7 @@ class DefaultAcsClient implements IAcsClient {
      */
     public $__urlTestFlag__;
     /**
-     * @var LocationService
+     * @var \AliOpenCore\Regions\LocationService
      */
     private $locationService;
     /**

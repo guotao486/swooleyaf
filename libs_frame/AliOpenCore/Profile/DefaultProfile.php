@@ -9,10 +9,10 @@ use AliOpenCore\Auth\EcsRamRoleCredential;
 use AliOpenCore\Auth\ISigner;
 use AliOpenCore\Auth\RamRoleArnCredential;
 use AliOpenCore\Auth\ShaHmac1Signer;
-use Endpoint;
-use EndpointProvider;
-use LocationService;
-use ProductDomain;
+use AliOpenCore\Regions\Endpoint;
+use AliOpenCore\Regions\EndpointProvider;
+use AliOpenCore\Regions\LocationService;
+use AliOpenCore\Regions\ProductDomain;
 
 class DefaultProfile implements IClientProfile {
     /**

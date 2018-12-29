@@ -17,6 +17,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
+use AliOpenCore\Regions\Endpoint;
+use AliOpenCore\Regions\EndpointProvider;
+use AliOpenCore\Regions\ProductDomain;
+
 $endpoint_filename = __DIR__ . DIRECTORY_SEPARATOR . 'endpoints.xml';
 $xml               = simplexml_load_string(file_get_contents($endpoint_filename));
 $json              = json_encode($xml);
@@ -24,7 +29,7 @@ $json_array        = json_decode($json, true);
 
 $endpoints = array();
 
-foreach ($json_array['Endpoint'] as $json_endpoint) {
+foreach ($json_array['AliOpenCore\Regions\Endpoint'] as $json_endpoint) {
     # pre-process RegionId & Product
     if (!array_key_exists('RegionId', $json_endpoint['RegionIds'])) {
         $region_ids = array();
