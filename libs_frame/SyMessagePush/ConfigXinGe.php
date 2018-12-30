@@ -8,7 +8,7 @@
 namespace SyMessagePush;
 
 use Constant\ErrorCode;
-use Exception\MessagePush\TencentPushException;
+use Exception\MessagePush\XinGePushException;
 
 class ConfigXinGe {
     const PLATFORM_TYPE_IOS = 'ios';
@@ -45,13 +45,13 @@ class ConfigXinGe {
 
     /**
      * @param string $appId
-     * @throws \Exception\MessagePush\TencentPushException
+     * @throws \Exception\MessagePush\XinGePushException
      */
     public function setAppId(string $appId){
         if(ctype_alnum($appId)){
             $this->appId = $appId;
         } else {
-            throw new TencentPushException('应用ID不合法', ErrorCode::MESSAGE_PUSH_PARAM_ERROR);
+            throw new XinGePushException('应用ID不合法', ErrorCode::MESSAGE_PUSH_PARAM_ERROR);
         }
     }
 
@@ -64,13 +64,13 @@ class ConfigXinGe {
 
     /**
      * @param string $appSecret
-     * @throws \Exception\MessagePush\TencentPushException
+     * @throws \Exception\MessagePush\XinGePushException
      */
     public function setAppSecret(string $appSecret){
         if(ctype_alnum($appSecret)){
             $this->appSecret = $appSecret;
         } else {
-            throw new TencentPushException('应用密钥不合法', ErrorCode::MESSAGE_PUSH_PARAM_ERROR);
+            throw new XinGePushException('应用密钥不合法', ErrorCode::MESSAGE_PUSH_PARAM_ERROR);
         }
     }
 
@@ -83,13 +83,13 @@ class ConfigXinGe {
 
     /**
      * @param string $platform
-     * @throws \Exception\MessagePush\TencentPushException
+     * @throws \Exception\MessagePush\XinGePushException
      */
     public function setPlatform(string $platform){
         if(in_array($platform, [self::PLATFORM_TYPE_IOS, self::PLATFORM_TYPE_ANDROID])){
             $this->platform = $platform;
         } else {
-            throw new TencentPushException('平台类型不合法', ErrorCode::MESSAGE_PUSH_PARAM_ERROR);
+            throw new XinGePushException('平台类型不合法', ErrorCode::MESSAGE_PUSH_PARAM_ERROR);
         }
     }
 }
