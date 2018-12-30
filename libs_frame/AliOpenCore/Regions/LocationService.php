@@ -1,13 +1,11 @@
 <?php
 namespace AliOpenCore\Regions;
 
-use AliOpenCore\Exception\ClientException;
 use AliOpenCore\Http\HttpHelper;
-use AliOpenCore\Profile\IClientProfile;
 
 class LocationService {
     /**
-     * @var IClientProfile
+     * @var \AliOpenCore\Profile\IClientProfile
      */
     private $clientProfile;
     /**
@@ -37,7 +35,7 @@ class LocationService {
      * @param $endPointType
      * @param $product
      * @return mixed|null
-     * @throws ClientException
+     * @throws \AliOpenCore\Exception\ClientException
      */
     public function findProductDomain($regionId, $serviceCode, $endPointType, $product){
         $key = $regionId . '#' . $product;
@@ -98,7 +96,7 @@ class LocationService {
      * @param $serviceCode
      * @param $endPointType
      * @return string|null
-     * @throws ClientException
+     * @throws \AliOpenCore\Exception\ClientException
      */
     private function findProductDomainFromLocationService($regionId, $serviceCode, $endPointType){
         $request = new DescribeEndpointRequest($regionId, $serviceCode, $endPointType);

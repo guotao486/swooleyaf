@@ -8,10 +8,7 @@ use AliOpenCore\Exception\ClientException;
 use AliOpenCore\Exception\ServerException;
 use AliOpenCore\Regions\EndpointProvider;
 use AliOpenCore\Http\HttpHelper;
-use AliOpenCore\Http\HttpResponse;
-use AliOpenCore\Profile\IClientProfile;
 use AliOpenCore\Regions\LocationService;
-use SimpleXMLElement;
 
 class DefaultAcsClient implements IAcsClient {
     /**
@@ -27,11 +24,11 @@ class DefaultAcsClient implements IAcsClient {
      */
     private $locationService;
     /**
-     * @var RamRoleArnService
+     * @var \AliOpenCore\Auth\RamRoleArnService
      */
     private $ramRoleArnService;
     /**
-     * @var EcsRamRoleService
+     * @var \AliOpenCore\Auth\EcsRamRoleService
      */
     private $ecsRamRoleService;
 
@@ -57,9 +54,9 @@ class DefaultAcsClient implements IAcsClient {
      * @param null $credential
      * @param bool $autoRetry
      * @param int $maxRetryNumber
-     * @return mixed|SimpleXMLElement
-     * @throws ClientException
-     * @throws ServerException
+     * @return mixed|\SimpleXMLElement
+     * @throws \AliOpenCore\Exception\ClientException
+     * @throws \AliOpenCore\Exception\ServerException
      */
     public function getAcsResponse($request,
         $iSigner = null,
@@ -81,8 +78,8 @@ class DefaultAcsClient implements IAcsClient {
      * @param null $credential
      * @param bool $autoRetry
      * @param int $maxRetryNumber
-     * @return HttpResponse
-     * @throws ClientException
+     * @return \AliOpenCore\Http\HttpResponse
+     * @throws \AliOpenCore\Exception\ClientException
      */
     private function doActionImpl($request, $iSigner = null, $credential = null, $autoRetry = true, $maxRetryNumber = 3){
         if (null == $this->iClientProfile
@@ -151,13 +148,13 @@ class DefaultAcsClient implements IAcsClient {
     }
 
     /**
-     * @param AcsRequest $request
+     * @param \AliOpenCore\AcsRequest $request
      * @param null $iSigner
      * @param null $credential
      * @param bool $autoRetry
      * @param int $maxRetryNumber
-     * @return HttpResponse|mixed
-     * @throws ClientException
+     * @return \AliOpenCore\Http\HttpResponse|mixed
+     * @throws \AliOpenCore\Exception\ClientException
      */
     public function doAction($request, $iSigner = null, $credential = null, $autoRetry = true, $maxRetryNumber = 3){
         trigger_error('doAction() is deprecated. Please use getAcsResponse() instead.', E_USER_NOTICE);
@@ -186,7 +183,7 @@ class DefaultAcsClient implements IAcsClient {
     /**
      * @param object $respObject
      * @param int $httpStatus
-     * @throws ServerException
+     * @throws \AliOpenCore\Exception\ServerException
      */
     private function buildApiException($respObject, $httpStatus){
         // Compatible with different results
@@ -208,7 +205,7 @@ class DefaultAcsClient implements IAcsClient {
     /**
      * @param $body
      * @param $format
-     * @return mixed|SimpleXMLElement
+     * @return mixed|\SimpleXMLElement
      */
     private function parseAcsResponse($body, $format){
         if ('JSON' === $format) {

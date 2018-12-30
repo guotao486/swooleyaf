@@ -1,13 +1,11 @@
 <?php
 namespace AliOpenCore\Auth;
 
-use AliOpenCore\Exception\ClientException;
 use AliOpenCore\Http\HttpHelper;
-use AliOpenCore\Profile\IClientProfile;
 
 class EcsRamRoleService {
     /**
-     * @var IClientProfile
+     * @var \AliOpenCore\Profile\IClientProfile
      */
     private $clientProfile;
     /**
@@ -28,7 +26,7 @@ class EcsRamRoleService {
     }
 
     /**
-     * @return Credential|string|null
+     * @return \AliOpenCore\Auth\Credential|string|null
      * @throws \AliOpenCore\Exception\ClientException
      */
     public function getSessionCredential(){
@@ -53,7 +51,7 @@ class EcsRamRoleService {
     }
 
     /**
-     * @return Credential|null
+     * @return \AliOpenCore\Auth\Credential|null
      * @throws \AliOpenCore\Exception\ClientException
      */
     private function assumeRole(){

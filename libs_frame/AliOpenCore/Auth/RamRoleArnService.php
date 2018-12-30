@@ -3,11 +3,10 @@ namespace AliOpenCore\Auth;
 
 use AliOpenCore\Exception\ClientException;
 use AliOpenCore\Http\HttpHelper;
-use AliOpenCore\Profile\IClientProfile;
 
 class RamRoleArnService {
     /**
-     * @var IClientProfile
+     * @var \AliOpenCore\Profile\IClientProfile
      */
     private $clientProfile;
     /**
@@ -32,7 +31,7 @@ class RamRoleArnService {
     }
 
     /**
-     * @return Credential|string|null
+     * @return \AliOpenCore\Auth\Credential|string|null
      * @throws ClientException
      */
     public function getSessionCredential(){
@@ -57,7 +56,7 @@ class RamRoleArnService {
     }
 
     /**
-     * @return Credential|null
+     * @return \AliOpenCore\Auth\Credential|null
      * @throws ClientException
      */
     private function assumeRole(){

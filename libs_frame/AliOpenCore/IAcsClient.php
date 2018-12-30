@@ -3,7 +3,7 @@ namespace AliOpenCore;
 
 interface IAcsClient {
     /**
-     * @param AcsRequest $request
+     * @param \AliOpenCore\AcsRequest $request
      * @return mixed
      */
     public function doAction($request);

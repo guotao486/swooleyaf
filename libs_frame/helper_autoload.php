@@ -150,11 +150,14 @@ final class SyFrameLoader {
             define('LOCATION_SERVICE_DESCRIBE_ENDPOINT_ACTION', 'DescribeEndpoints');
             define('LOCATION_SERVICE_REGION', 'cn-hangzhou');
             define('CACHE_EXPIRE_TIME', 3600);
+            define('ENABLE_HTTP_PROXY', false);
+            define('HTTP_PROXY_IP', '127.0.0.1');
+            define('HTTP_PROXY_PORT', '8888');
 
             $this->aliOpenCoreStatus = false;
         }
 
-        return SY_FRAME_LIBS_ROOT . 'AliOpenCore/' . str_replace('_', '/', $className) . '.php';
+        return SY_FRAME_LIBS_ROOT . $className . '.php';
     }
 
     /**

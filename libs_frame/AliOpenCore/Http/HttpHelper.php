@@ -15,14 +15,14 @@ class HttpHelper {
     public static $readTimeout = 80;//80 second
 
     /**
-     * @param        $url
+     * @param string $url
      * @param string $httpMethod
      * @param null $postFields
      * @param null $headers
-     * @return HttpResponse
-     * @throws ClientException
+     * @return \AliOpenCore\Http\HttpResponse
+     * @throws \AliOpenCore\Exception\ClientException
      */
-    public static function curl($url, $httpMethod = 'GET', $postFields = null, $headers = null){
+    public static function curl($url,$httpMethod = 'GET',$postFields = null,$headers = null){
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $httpMethod);
         if (ENABLE_HTTP_PROXY) {
@@ -63,13 +63,13 @@ class HttpHelper {
     }
 
     /**
-     * @param $postFildes
+     * @param array $postFields
      * @return bool|string
      */
-    public static function getPostHttpBody($postFildes){
+    public static function getPostHttpBody($postFields){
         $content = '';
-        foreach ($postFildes as $apiParamKey => $apiParamValue) {
-            $content .= "$apiParamKey=" . urlencode($apiParamValue) . '&';
+        foreach ($postFields as $apiParamKey => $apiParamValue) {
+            $content .= $apiParamKey . '=' . urlencode($apiParamValue) . '&';
         }
 
         return substr($content, 0, - 1);

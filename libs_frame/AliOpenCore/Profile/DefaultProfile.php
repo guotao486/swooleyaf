@@ -1,7 +1,6 @@
 <?php
 namespace AliOpenCore\Profile;
 
-use AliOpenCore\Auth\AbstractCredential;
 use AliOpenCore\Auth\BearerTokenCredential;
 use AliOpenCore\Auth\BearTokenSigner;
 use AliOpenCore\Auth\Credential;
@@ -16,7 +15,7 @@ use AliOpenCore\Regions\ProductDomain;
 
 class DefaultProfile implements IClientProfile {
     /**
-     * @var IClientProfile
+     * @var \AliOpenCore\Profile\IClientProfile
      */
     private static $profile;
     /**
@@ -24,7 +23,7 @@ class DefaultProfile implements IClientProfile {
      */
     private static $endpoints;
     /**
-     * @var AbstractCredential
+     * @var \AliOpenCore\Auth\AbstractCredential
      */
     private static $credential;
     /**
@@ -44,7 +43,7 @@ class DefaultProfile implements IClientProfile {
      */
     private static $isigner;
     /**
-     * @var AbstractCredential
+     * @var \AliOpenCore\Auth\AbstractCredential
      */
     private static $iCredential;
 
@@ -67,7 +66,7 @@ class DefaultProfile implements IClientProfile {
      * @param      $accessKeyId
      * @param      $accessSecret
      * @param null $securityToken
-     * @return DefaultProfile|IClientProfile
+     * @return \AliOpenCore\Profile\DefaultProfile|IClientProfile
      */
     public static function getProfile($regionId, $accessKeyId, $accessSecret, $securityToken = null){
         $credential = new Credential($accessKeyId, $accessSecret, $securityToken);
@@ -82,7 +81,7 @@ class DefaultProfile implements IClientProfile {
      * @param $accessSecret
      * @param $roleArn
      * @param $roleSessionName
-     * @return DefaultProfile|IClientProfile
+     * @return \AliOpenCore\Profile\DefaultProfile|IClientProfile
      */
     public static function getRamRoleArnProfile($regionId, $accessKeyId, $accessSecret, $roleArn, $roleSessionName){
         $credential = new RamRoleArnCredential($accessKeyId, $accessSecret, $roleArn, $roleSessionName);
@@ -94,7 +93,7 @@ class DefaultProfile implements IClientProfile {
     /**
      * @param $regionId
      * @param $roleName
-     * @return DefaultProfile|IClientProfile
+     * @return \AliOpenCore\Profile\DefaultProfile|IClientProfile
      */
     public static function getEcsRamRoleProfile($regionId, $roleName){
         $credential = new EcsRamRoleCredential($roleName);
@@ -106,7 +105,7 @@ class DefaultProfile implements IClientProfile {
     /**
      * @param $regionId
      * @param $bearerToken
-     * @return DefaultProfile|IClientProfile
+     * @return \AliOpenCore\Profile\DefaultProfile|IClientProfile
      */
     public static function getBearerTokenProfile($regionId, $bearerToken){
         $credential = new BearerTokenCredential($bearerToken);
@@ -116,7 +115,7 @@ class DefaultProfile implements IClientProfile {
     }
 
     /**
-     * @return ISigner|ShaHmac1Signer|null
+     * @return \AliOpenCore\Auth\ISigner|\AliOpenCore\Auth\ShaHmac1Signer|null
      */
     public function getSigner(){
         if (null == self::$isigner) {
@@ -141,7 +140,7 @@ class DefaultProfile implements IClientProfile {
     }
 
     /**
-     * @return AbstractCredential
+     * @return \AliOpenCore\Auth\AbstractCredential
      */
     public function getCredential(){
         if (null == self::$credential && null != self::$iCredential) {
@@ -225,7 +224,7 @@ class DefaultProfile implements IClientProfile {
      * @param string $regionId
      * @param string $product
      * @param string $domain
-     * @param Endpoint $endpoint
+     * @param \AliOpenCore\Regions\Endpoint $endpoint
      */
     private static function updateEndpoint($regionId, $product, $domain, $endpoint){
         $regionIds = $endpoint->getRegionIds();
