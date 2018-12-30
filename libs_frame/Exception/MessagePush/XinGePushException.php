@@ -9,9 +9,9 @@ namespace Exception\MessagePush;
 
 use Exception\BaseException;
 
-class TencentPushException extends BaseException {
+class XinGePushException extends BaseException {
     public function __construct($message, $code) {
         parent::__construct($message, $code);
-        $this->tipName = '腾讯消息推送异常';
+        $this->tipName = '信鸽消息推送异常';
     }
 }
