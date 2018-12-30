@@ -1,5 +1,4 @@
 <?php
-
 namespace AliOpenCore;
 
 use AliOpenCore\Auth\EcsRamRoleService;
