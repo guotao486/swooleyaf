@@ -34,6 +34,11 @@ final class SyFrameLoader {
      * @var bool
      */
     private $excelStatus = true;
+    /**
+     * aliOpenCore未初始化标识 true：未初始化 false：已初始化
+     * @var bool
+     */
+    private $aliOpenCoreStatus = true;
 
     private function __construct() {
         $this->preHandleMap = [
@@ -44,6 +49,7 @@ final class SyFrameLoader {
             'Smarty' => 'preHandleSmarty',
             'SmartyBC' => 'preHandleSmarty',
             'PHPExcel' => 'preHandlePhpExcel',
+            'AliOpenCore' => 'preHandleAliOpenCore',
         ];
 
         $this->smartyRootClasses = [
@@ -123,6 +129,32 @@ final class SyFrameLoader {
         }
 
         return SY_FRAME_LIBS_ROOT . 'Excel/' . str_replace('_', '/', $className) . '.php';
+    }
+
+    private function preHandleAliOpenCore(string $className) : string {
+        if($this->aliOpenCoreStatus){
+            define('STS_PRODUCT_NAME', 'Sts');
+            define('STS_DOMAIN', 'sts.aliyuncs.com');
+            define('STS_VERSION', '2015-04-01');
+            define('STS_ACTION', 'AssumeRole');
+            define('STS_REGION', 'cn-hangzhou');
+            define('ROLE_ARN_EXPIRE_TIME', 3600);
+            define('ECS_ROLE_EXPIRE_TIME', 3600);
+            define('AUTH_TYPE_RAM_AK', 'RAM_AK');
+            define('AUTH_TYPE_RAM_ROLE_ARN', 'RAM_ROLE_ARN');
+            define('AUTH_TYPE_ECS_RAM_ROLE', 'ECS_RAM_ROLE');
+            define('AUTH_TYPE_BEARER_TOKEN', 'BEARER_TOKEN');
+            define('LOCATION_SERVICE_PRODUCT_NAME', 'Location');
+            define('LOCATION_SERVICE_DOMAIN', 'location.aliyuncs.com');
+            define('LOCATION_SERVICE_VERSION', '2015-06-12');
+            define('LOCATION_SERVICE_DESCRIBE_ENDPOINT_ACTION', 'DescribeEndpoints');
+            define('LOCATION_SERVICE_REGION', 'cn-hangzhou');
+            define('CACHE_EXPIRE_TIME', 3600);
+
+            $this->aliOpenCoreStatus = false;
+        }
+
+        return SY_FRAME_LIBS_ROOT . $className . '.php';
     }
 
     /**

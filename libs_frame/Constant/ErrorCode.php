@@ -167,6 +167,11 @@ class ErrorCode {
     //amqp错误,取值范围:104400-104499
     const AMQP_CONNECT_ERROR = 104400;
 
+    //消息推送错误,取值范围:104500-104599
+    const MESSAGE_PUSH_PARAM_ERROR = 104500;
+    const MESSAGE_PUSH_POST_ERROR = 104501;
+    const MESSAGE_PUSH_GET_ERROR = 104502;
+
     protected static $msgArr = [
         self::COMMON_SUCCESS => '成功',
         self::COMMON_PARAM_ERROR => '参数错误',
@@ -270,6 +275,9 @@ class ErrorCode {
         self::FFMPEG_PARAM_ERROR => 'ffmpeg参数错误',
         self::FFMPEG_EXEC_ERROR => 'ffmpeg处理错误',
         self::AMQP_CONNECT_ERROR => 'amqp连接错误',
+        self::MESSAGE_PUSH_PARAM_ERROR => '消息推送参数错误',
+        self::MESSAGE_PUSH_POST_ERROR => '消息推送POST请求错误',
+        self::MESSAGE_PUSH_GET_ERROR => '消息推送GET请求错误',
     ];
 
     /**
