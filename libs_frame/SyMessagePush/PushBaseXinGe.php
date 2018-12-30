@@ -7,7 +7,7 @@
  */
 namespace SyMessagePush;
 
-abstract class PushBaseTencent extends PushBase {
+abstract class PushBaseXinGe extends PushBase {
     public function __construct(){
         parent::__construct();
     }

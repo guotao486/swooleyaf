@@ -5,11 +5,11 @@
  * Date: 2018/12/30 0030
  * Time: 11:39
  */
-namespace SyMessagePush\Tencent;
+namespace SyMessagePush\XinGe;
 
-use SyMessagePush\PushBaseTencent;
+use SyMessagePush\PushBaseXinGe;
 
-class XGPush extends PushBaseTencent {
+class DeviceTag extends PushBaseXinGe {
     public function __construct(){
         parent::__construct();
     }
