@@ -10,7 +10,7 @@ namespace SyMessagePush;
 use Constant\ErrorCode;
 use Exception\MessagePush\TencentPushException;
 
-class ConfigTencent {
+class ConfigXinGe {
     const PLATFORM_TYPE_IOS = 'ios';
     const PLATFORM_TYPE_ANDROID = 'android';
 

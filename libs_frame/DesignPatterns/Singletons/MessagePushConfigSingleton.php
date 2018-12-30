@@ -10,7 +10,7 @@ namespace DesignPatterns\Singletons;
 use Constant\ErrorCode;
 use Exception\MessagePush\AliPushException;
 use SyMessagePush\ConfigAli;
-use SyMessagePush\ConfigTencent;
+use SyMessagePush\ConfigXinGe;
 use Tool\Tool;
 use Traits\SingletonTrait;
 
@@ -23,15 +23,15 @@ class MessagePushConfigSingleton {
      */
     private $aliConfig = null;
     /**
-     * 腾讯安卓配置
-     * @var \SyMessagePush\ConfigTencent
+     * 信鸽安卓配置
+     * @var \SyMessagePush\ConfigXinGe
      */
-    private $tencentAndroidConfig = null;
+    private $xinGeAndroidConfig = null;
     /**
-     * 腾讯苹果配置
-     * @var \SyMessagePush\ConfigTencent
+     * 信鸽苹果配置
+     * @var \SyMessagePush\ConfigXinGe
      */
-    private $tencentIosConfig = null;
+    private $xinGeIosConfig = null;
 
     private function __construct(){
         $configs = Tool::getConfig('messagepush.' . SY_ENV . SY_PROJECT);
@@ -67,19 +67,19 @@ class MessagePushConfigSingleton {
             }
         }
 
-        //设置腾讯安卓配置
-        $tencentAndroidConfig = new ConfigTencent();
-        $tencentAndroidConfig->setPlatform(ConfigTencent::PLATFORM_TYPE_ANDROID);
-        $tencentAndroidConfig->setAppId((string)Tool::getArrayVal($configs, 'tencent.android.app.id', '', true));
-        $tencentAndroidConfig->setAppSecret((string)Tool::getArrayVal($configs, 'tencent.android.app.secret', '', true));
-        $this->tencentAndroidConfig = $tencentAndroidConfig;
+        //设置信鸽安卓配置
+        $xinGeAndroidConfig = new ConfigXinGe();
+        $xinGeAndroidConfig->setPlatform(ConfigXinGe::PLATFORM_TYPE_ANDROID);
+        $xinGeAndroidConfig->setAppId((string)Tool::getArrayVal($configs, 'xinge.android.app.id', '', true));
+        $xinGeAndroidConfig->setAppSecret((string)Tool::getArrayVal($configs, 'xinge.android.app.secret', '', true));
+        $this->xinGeAndroidConfig = $xinGeAndroidConfig;
 
-        //设置腾讯苹果配置
-        $tencentIosConfig = new ConfigTencent();
-        $tencentIosConfig->setPlatform(ConfigTencent::PLATFORM_TYPE_IOS);
-        $tencentIosConfig->setAppId((string)Tool::getArrayVal($configs, 'tencent.ios.app.id', '', true));
-        $tencentIosConfig->setAppSecret((string)Tool::getArrayVal($configs, 'tencent.ios.app.secret', '', true));
-        $this->tencentIosConfig = $tencentIosConfig;
+        //设置信鸽苹果配置
+        $xinGeIosConfig = new ConfigXinGe();
+        $xinGeIosConfig->setPlatform(ConfigXinGe::PLATFORM_TYPE_IOS);
+        $xinGeIosConfig->setAppId((string)Tool::getArrayVal($configs, 'xinge.ios.app.id', '', true));
+        $xinGeIosConfig->setAppSecret((string)Tool::getArrayVal($configs, 'xinge.ios.app.secret', '', true));
+        $this->xinGeIosConfig = $xinGeIosConfig;
     }
 
     /**
@@ -101,16 +101,16 @@ class MessagePushConfigSingleton {
     }
 
     /**
-     * @return \SyMessagePush\ConfigTencent
+     * @return \SyMessagePush\ConfigXinGe
      */
-    public function getTencentAndroidConfig() {
-        return $this->tencentAndroidConfig;
+    public function getXinGeAndroidConfig() {
+        return $this->xinGeAndroidConfig;
     }
 
     /**
-     * @return \SyMessagePush\ConfigTencent
+     * @return \SyMessagePush\ConfigXinGe
      */
-    public function getTencentIosConfig() {
-        return $this->tencentIosConfig;
+    public function getXinGeIosConfig() {
+        return $this->xinGeIosConfig;
     }
 }
