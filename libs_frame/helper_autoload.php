@@ -87,13 +87,12 @@ final class SyFrameLoader {
 
     private function preHandleSwift(string $className) : string {
         if($this->swiftMailerStatus){ //加载swift mailer依赖文件
+            $this->swiftMailerStatus = false;
             require_once SY_FRAME_LIBS_ROOT . 'Mailer/Swift/depends/cache_deps.php';
             require_once SY_FRAME_LIBS_ROOT . 'Mailer/Swift/depends/mime_deps.php';
             require_once SY_FRAME_LIBS_ROOT . 'Mailer/Swift/depends/message_deps.php';
             require_once SY_FRAME_LIBS_ROOT . 'Mailer/Swift/depends/transport_deps.php';
             require_once SY_FRAME_LIBS_ROOT . 'Mailer/Swift/depends/preferences.php';
-
-            $this->swiftMailerStatus = false;
         }
 
         return SY_FRAME_LIBS_ROOT . 'Mailer/' . str_replace('_', '/', $className) . '.php';
@@ -150,8 +149,9 @@ final class SyFrameLoader {
             define('LOCATION_SERVICE_DESCRIBE_ENDPOINT_ACTION', 'DescribeEndpoints');
             define('LOCATION_SERVICE_REGION', 'cn-hangzhou');
             define('CACHE_EXPIRE_TIME', 3600);
-
             $this->aliOpenCoreStatus = false;
+
+            require_once SY_FRAME_LIBS_ROOT . 'AliOpenCore/Regions/init_endpoint.php';
         }
 
         return SY_FRAME_LIBS_ROOT . $className . '.php';
