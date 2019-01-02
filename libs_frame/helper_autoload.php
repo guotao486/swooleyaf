@@ -1,6 +1,4 @@
 <?php
-require_once __DIR__ . '/helper_defines.php';
-
 final class SyFrameLoader {
     /**
      * @var \SyFrameLoader
@@ -250,3 +248,5 @@ function syProjectAutoload(string $className) {
 
 spl_autoload_register('syFrameAutoload');
 spl_autoload_register('syProjectAutoload');
+
+require_once __DIR__ . '/helper_defines.php';

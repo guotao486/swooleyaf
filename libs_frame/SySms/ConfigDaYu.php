@@ -5,10 +5,10 @@
  * Date: 2018/9/7 0007
  * Time: 9:43
  */
-namespace TaoBao;
+namespace SySms;
 
 use Constant\ErrorCode;
-use Exception\TaoBao\AliDaYu\SmsException;
+use Exception\Sms\DaYuException;
 use Tool\Tool;
 
 class ConfigDaYu {
@@ -42,13 +42,13 @@ class ConfigDaYu {
 
     /**
      * @param string $appKey
-     * @throws \Exception\TaoBao\AliDaYu\SmsException
+     * @throws \Exception\Sms\DaYuException
      */
     public function setAppKey(string $appKey) {
         if (ctype_alnum($appKey)) {
             $this->appKey = $appKey;
         } else {
-            throw new SmsException('app key不合法', ErrorCode::SMS_PARAM_ERROR);
+            throw new DaYuException('app key不合法', ErrorCode::SMS_PARAM_ERROR);
         }
     }
 
@@ -61,13 +61,13 @@ class ConfigDaYu {
 
     /**
      * @param string $appSecret
-     * @throws \Exception\TaoBao\AliDaYu\SmsException
+     * @throws \Exception\Sms\DaYuException
      */
     public function setAppSecret(string $appSecret) {
         if (ctype_alnum($appSecret)) {
             $this->appSecret = $appSecret;
         } else {
-            throw new SmsException('app secret不合法', ErrorCode::SMS_PARAM_ERROR);
+            throw new DaYuException('app secret不合法', ErrorCode::SMS_PARAM_ERROR);
         }
     }
 

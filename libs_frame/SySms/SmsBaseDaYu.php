@@ -5,9 +5,9 @@
  * Date: 2018/9/7 0007
  * Time: 9:42
  */
-namespace TaoBao;
+namespace SySms;
 
-abstract class TaoBaoBase {
+abstract class SmsBaseDaYu extends SmsBase {
     /**
      * API接口名称
      * @var string
@@ -48,11 +48,6 @@ abstract class TaoBaoBase {
      * @var string
      */
     protected $appSecret = '';
-    /**
-     * 请求数据
-     * @var array
-     */
-    protected $reqData = [];
 
     public function __construct(){
         $this->signMethod = 'md5';
@@ -79,17 +74,15 @@ abstract class TaoBaoBase {
         return $this->responseTag;
     }
 
-    protected function getContent() {
+    protected function getContent() : array {
         $this->reqData['v'] = $this->version;
         $this->reqData['app_key'] = $this->appKey;
         $this->reqData['sign_method'] = $this->signMethod;
         $this->reqData['format'] = $this->format;
         $this->reqData['method'] = $this->method;
         $this->reqData['timestamp'] = $this->timestamp;
-        TaoBaoUtilBase::createSign($this->reqData, $this->appSecret);
+        SmsUtilDaYu::createSign($this->reqData, $this->appSecret);
 
         return $this->reqData;
     }
-
-    abstract public function getDetail() : array;
 }

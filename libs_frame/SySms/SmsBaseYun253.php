@@ -5,11 +5,11 @@
  * Date: 2018/9/8 0008
  * Time: 15:04
  */
-namespace Yun253;
+namespace SySms;
 
-use DesignPatterns\Singletons\Yun253Singleton;
+use DesignPatterns\Singletons\SmsConfigSingleton;
 
-abstract class YunBase {
+abstract class SmsBaseYun253 extends SmsBase {
     /**
      * API账号
      * @var string
@@ -25,11 +25,6 @@ abstract class YunBase {
      * @var string
      */
     protected $serviceUrl = '';
-    /**
-     * 请求数据
-     * @var array
-     */
-    protected $reqData = [];
 
     public function __construct(){
     }
@@ -44,9 +39,9 @@ abstract class YunBase {
         return $this->serviceUrl;
     }
 
-    protected function getContent() {
-        $this->reqData['account'] = Yun253Singleton::getInstance()->getCommonConfig()->getAppKey();
-        $this->reqData['password'] = Yun253Singleton::getInstance()->getCommonConfig()->getAppSecret();
+    protected function getContent() : array {
+        $this->reqData['account'] = SmsConfigSingleton::getInstance()->getYun253Config()->getAppKey();
+        $this->reqData['password'] = SmsConfigSingleton::getInstance()->getYun253Config()->getAppSecret();
         return $this->reqData;
     }
 

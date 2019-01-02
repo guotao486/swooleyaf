@@ -7,8 +7,6 @@
  */
 namespace DesignPatterns\Singletons;
 
-use Constant\ErrorCode;
-use Exception\MessagePush\AliPushException;
 use SyMessagePush\ConfigAli;
 use SyMessagePush\ConfigXinGe;
 use Tool\Tool;
@@ -42,30 +40,6 @@ class MessagePushConfigSingleton {
         $aliConfig->setAccessSecret((string)Tool::getArrayVal($configs, 'ali.access.secret', '', true));
         $aliConfig->setRegionId((string)Tool::getArrayVal($configs, 'ali.region.id', '', true));
         $this->aliConfig = $aliConfig;
-        if(!defined('ENABLE_HTTP_PROXY')){
-            $proxyStatus = (int)Tool::getArrayVal($configs, 'ali.proxy.status', 0, true);
-            if ($proxyStatus > 0) {
-                define('ENABLE_HTTP_PROXY', true);
-            } else {
-                define('ENABLE_HTTP_PROXY', false);
-            }
-        }
-        if(!defined('HTTP_PROXY_IP')){
-            $proxyIp = (string)Tool::getArrayVal($configs, 'ali.proxy.ip', '127.0.0.1', true);
-            if(preg_match('/^(\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])){4}$/', '.' . $proxyIp) > 0){
-                define('HTTP_PROXY_IP', $proxyIp);
-            } else {
-                throw new AliPushException('代理IP不合法', ErrorCode::MESSAGE_PUSH_PARAM_ERROR);
-            }
-        }
-        if(!defined('HTTP_PROXY_PORT')){
-            $proxyPort = (int)Tool::getArrayVal($configs, 'ali.proxy.port', 0, true);
-            if(($proxyPort > 1000) && ($proxyPort <= 65535)){
-                define('HTTP_PROXY_PORT', $proxyPort);
-            } else {
-                throw new AliPushException('代理端口不合法', ErrorCode::MESSAGE_PUSH_PARAM_ERROR);
-            }
-        }
 
         //设置信鸽安卓配置
         $xinGeAndroidConfig = new ConfigXinGe();
