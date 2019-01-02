@@ -10,6 +10,7 @@ namespace SyMessagePush\XinGe;
 use Constant\ErrorCode;
 use Exception\MessagePush\XinGePushException;
 use SyMessagePush\PushBaseXinGe;
+use Tool\Tool;
 
 class PushApp extends PushBaseXinGe {
     const PLATFORM_TYPE_ALL = 'all';
@@ -118,6 +119,7 @@ class PushApp extends PushBaseXinGe {
         parent::__construct($platform);
         $this->apiPath = 'push';
         $this->apiMethod = 'app';
+        $this->reqData['environment'] = 'product';
     }
 
     private function __clone(){
@@ -140,7 +142,6 @@ class PushApp extends PushBaseXinGe {
      * @throws \Exception\MessagePush\XinGePushException
      */
     public function setPlatform(string $platform){
-        $this->platform = $platform;
         if(in_array($platform, [self::PLATFORM_TYPE_ALL, self::PLATFORM_TYPE_IOS, self::PLATFORM_TYPE_ANDROID])){
             $this->reqData['platform'] = $platform;
         } else {
@@ -172,6 +173,190 @@ class PushApp extends PushBaseXinGe {
         }
     }
 
+    /**
+     * @param int $expireTime
+     * @throws \Exception\MessagePush\XinGePushException
+     */
+    public function setExpireTime(int $expireTime){
+        if(($expireTime >= 0) && ($expireTime <= 259200)){
+            $this->reqData['expire_time'] = $expireTime;
+        } else {
+            throw new XinGePushException('消息离线存储时间不合法', ErrorCode::MESSAGE_PUSH_PARAM_ERROR);
+        }
+    }
+
+    /**
+     * @param int $sendTime
+     * @throws \Exception\MessagePush\XinGePushException
+     */
+    public function setSendTime(int $sendTime){
+        if($sendTime < 0){
+            throw new XinGePushException('发送时间不合法', ErrorCode::MESSAGE_PUSH_PARAM_ERROR);
+        }
+
+        $nowSendTime = $sendTime > 0 ? $sendTime : Tool::getNowTime();
+        $this->reqData['send_time'] = date('Y-m-d H:i:s', $nowSendTime);
+    }
+
+    /**
+     * @param bool $multi_pkg
+     */
+    public function setMultiPkg(bool $multiPkg){
+        $this->reqData['multi_pkg'] = $multiPkg;
+    }
+
+    /**
+     * @param int $loopTimes
+     * @throws \Exception\MessagePush\XinGePushException
+     */
+    public function setLoopTimes(int $loopTimes){
+        if(($loopTimes > 0) && ($loopTimes <= 15)){
+            $this->reqData['loop_times'] = $loopTimes;
+        } else {
+            throw new XinGePushException('循环任务重复次数不合法', ErrorCode::MESSAGE_PUSH_PARAM_ERROR);
+        }
+    }
+
+    /**
+     * @param int $loopInterval
+     * @throws \Exception\MessagePush\XinGePushException
+     */
+    public function setLoopInterval(int $loopInterval){
+        if(($loopInterval > 0) && ($loopInterval <= 14)){
+            $this->reqData['loop_interval'] = $loopInterval;
+        } else {
+            throw new XinGePushException('循环任务间隔天数不合法', ErrorCode::MESSAGE_PUSH_PARAM_ERROR);
+        }
+    }
+
+    /**
+     * @param string $environment
+     * @throws \Exception\MessagePush\XinGePushException
+     */
+    public function setEnvironment(string $environment){
+        if(in_array($environment, ['dev', 'product'])){
+            $this->reqData['environment'] = $environment;
+        } else {
+            throw new XinGePushException('推送环境不合法', ErrorCode::MESSAGE_PUSH_PARAM_ERROR);
+        }
+    }
+
+    /**
+     * @param int $badgeType
+     * @throws \Exception\MessagePush\XinGePushException
+     */
+    public function setBadgeType(int $badgeType){
+        if($badgeType >= -2){
+            $this->reqData['badge_type'] = $badgeType;
+        } else {
+            throw new XinGePushException('角标数字不合法', ErrorCode::MESSAGE_PUSH_PARAM_ERROR);
+        }
+    }
+
+    /**
+     * @param string $statTag
+     * @throws \Exception\MessagePush\XinGePushException
+     */
+    public function setStatTag(string $statTag){
+        if(strlen($statTag) > 0){
+            $this->reqData['stat_tag'] = $statTag;
+        } else {
+            throw new XinGePushException('统计标签不合法', ErrorCode::MESSAGE_PUSH_PARAM_ERROR);
+        }
+    }
+
+    /**
+     * @param int $seq
+     * @throws \Exception\MessagePush\XinGePushException
+     */
+    public function setSeq(int $seq){
+        if($seq >= 0){
+            $this->reqData['seq'] = $seq;
+        } else {
+            throw new XinGePushException('请求ID不合法', ErrorCode::MESSAGE_PUSH_PARAM_ERROR);
+        }
+    }
+
+    /**
+     * @param array $tagList
+     * @throws \Exception\MessagePush\XinGePushException
+     */
+    public function setTagList(array $tagList){
+        if(empty($tagList)){
+            throw new XinGePushException('标签列表不合法', ErrorCode::MESSAGE_PUSH_PARAM_ERROR);
+        }
+
+        $this->reqData['tag_list'] = $tagList;
+    }
+
+    /**
+     * @param array $accountList
+     * @throws \Exception\MessagePush\XinGePushException
+     */
+    public function setAccountList(array $accountList){
+        $this->account_list = [];
+        foreach ($accountList as $eAccount) {
+            if(is_string($eAccount) && (strlen($eAccount) > 0)){
+                $this->account_list[$eAccount] = 1;
+            }
+        }
+        if(count($this->account_list) > 1000){
+            throw new XinGePushException('账号列表不能超过1000个', ErrorCode::MESSAGE_PUSH_PARAM_ERROR);
+        }
+    }
+
+    /**
+     * @param int $accountPushType
+     * @throws \Exception\MessagePush\XinGePushException
+     */
+    public function setAccountPushType(int $accountPushType){
+        if(in_array($accountPushType, [0, 1])){
+            $this->reqData['account_push_type'] = $accountPushType;
+        } else {
+            throw new XinGePushException('账号推送类型不合法', ErrorCode::MESSAGE_PUSH_PARAM_ERROR);
+        }
+    }
+
+    /**
+     * @param int $accountType
+     * @throws \Exception\MessagePush\XinGePushException
+     */
+    public function setAccountType(int $accountType){
+        if($accountType >= 0){
+            $this->reqData['account_type'] = $accountType;
+        } else {
+            throw new XinGePushException('账号类型不合法', ErrorCode::MESSAGE_PUSH_PARAM_ERROR);
+        }
+    }
+
+    /**
+     * @param array $tokenList
+     * @throws \Exception\MessagePush\XinGePushException
+     */
+    public function setTokenList(array $tokenList){
+        $this->token_list = [];
+        foreach ($tokenList as $eToken) {
+            if(is_string($eToken) && (strlen($eToken) > 0)){
+                $this->token_list[$eToken] = 1;
+            }
+        }
+        if(count($this->token_list) > 1000){
+            throw new XinGePushException('设备列表不能超过1000个', ErrorCode::MESSAGE_PUSH_PARAM_ERROR);
+        }
+    }
+
+    /**
+     * @param int $pushId
+     * @throws \Exception\MessagePush\XinGePushException
+     */
+    public function setPushId(int $pushId){
+        if($pushId >= 0){
+            $this->reqData['push_id'] = $pushId;
+        } else {
+            throw new XinGePushException('推送ID不合法', ErrorCode::MESSAGE_PUSH_PARAM_ERROR);
+        }
+    }
+
     public function getDetail() : array {
         if(!isset($this->reqData['audience_type'])){
             throw new XinGePushException('推送目标不能为空', ErrorCode::MESSAGE_PUSH_PARAM_ERROR);
@@ -184,6 +369,15 @@ class PushApp extends PushBaseXinGe {
         }
         if(!isset($this->reqData['message_type'])){
             throw new XinGePushException('消息类型不能为空', ErrorCode::MESSAGE_PUSH_PARAM_ERROR);
+        }
+        if(!isset($this->reqData['push_id'])){
+            throw new XinGePushException('推送ID不能为空', ErrorCode::MESSAGE_PUSH_PARAM_ERROR);
+        }
+        if(!empty($this->account_list)){
+            $this->reqData['account_list'] = array_keys($this->account_list);
+        }
+        if(!empty($this->token_list)){
+            $this->reqData['token_list'] = array_keys($this->token_list);
         }
 
         return $this->getContent();
