@@ -20,7 +20,7 @@ class RamRoleArnService {
     /**
      * @var string
      */
-    public static $serviceDomain = STS_DOMAIN;
+    public static $serviceDomain = ALIOPEN_STS_DOMAIN;
 
     /**
      * AliOpenCore\Auth\RamRoleArnService constructor.
@@ -38,7 +38,7 @@ class RamRoleArnService {
         if ($this->lastClearTime != null && $this->sessionCredential != null) {
             $now = time();
             $elapsedTime = $now - $this->lastClearTime;
-            if ($elapsedTime <= ROLE_ARN_EXPIRE_TIME * 0.8) {
+            if ($elapsedTime <= ALIOPEN_ROLE_ARN_EXPIRE_TIME * 0.8) {
                 return $this->sessionCredential;
             }
         }

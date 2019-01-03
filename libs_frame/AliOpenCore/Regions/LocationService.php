@@ -19,7 +19,7 @@ class LocationService {
     /**
      * @var string
      */
-    public static $serviceDomain = LOCATION_SERVICE_DOMAIN;
+    public static $serviceDomain = ALIOPEN_LOCATION_SERVICE_DOMAIN;
 
     /**
      * AliOpenCore\Regions\LocationService constructor.
@@ -81,7 +81,7 @@ class LocationService {
         $now = time();
         $elapsedTime = $now - $lastClearTime;
 
-        if ($elapsedTime > CACHE_EXPIRE_TIME) {
+        if ($elapsedTime > ALIOPEN_CACHE_EXPIRE_TIME) {
             $lastClearTime = time();
             self::$lastClearTimePerProduct[$key] = $lastClearTime;
 
