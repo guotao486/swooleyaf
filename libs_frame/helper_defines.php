@@ -16,7 +16,7 @@ if(preg_match('/^(\.(\d|[1-9]\d|1\d{2}|2[0-4]\d|25[0-5])){4}$/', '.' . $proxyIp)
 } else {
     throw new \Exception\Common\CheckException('代理IP不合法', \Constant\ErrorCode::COMMON_SERVER_ERROR);
 }
-$proxyPort = (int)\Tool\Tool::getArrayVal($configs, 'aliopen.proxy.port', 0, true);
+$proxyPort = (int)\Tool\Tool::getArrayVal($configs, 'aliopen.proxy.port', 8888, true);
 if(($proxyPort > 1000) && ($proxyPort <= 65535)){
     define('ALIOPEN_HTTP_PROXY_PORT', $proxyPort);
 } else {
