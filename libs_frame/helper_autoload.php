@@ -47,7 +47,7 @@ final class SyFrameLoader {
             'Smarty' => 'preHandleSmarty',
             'SmartyBC' => 'preHandleSmarty',
             'PHPExcel' => 'preHandlePhpExcel',
-            'AliOpenCore' => 'preHandleAliOpenCore',
+            'AliOpen' => 'preHandleAliOpen',
         ];
 
         $this->smartyRootClasses = [
@@ -128,7 +128,7 @@ final class SyFrameLoader {
         return SY_FRAME_LIBS_ROOT . 'Excel/' . str_replace('_', '/', $className) . '.php';
     }
 
-    private function preHandleAliOpenCore(string $className) : string {
+    private function preHandleAliOpen(string $className) : string {
         if($this->aliOpenCoreStatus){
             define('ALIOPEN_STS_PRODUCT_NAME', 'Sts');
             define('ALIOPEN_STS_DOMAIN', 'sts.aliyuncs.com');
@@ -149,7 +149,7 @@ final class SyFrameLoader {
             define('ALIOPEN_CACHE_EXPIRE_TIME', 3600);
             $this->aliOpenCoreStatus = false;
 
-            require_once SY_FRAME_LIBS_ROOT . 'AliOpenCore/Regions/init_endpoint.php';
+            require_once SY_FRAME_LIBS_ROOT . 'AliOpen/Core/Regions/init_endpoint.php';
         }
 
         return SY_FRAME_LIBS_ROOT . $className . '.php';

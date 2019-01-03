@@ -1,7 +1,7 @@
 <?php
 namespace SyMessagePush\Ali;
 
-use AliOpenCore\RpcAcsRequest;
+use AliOpen\Core\RpcAcsRequest;
 
 class CheckDeviceRequest extends RpcAcsRequest {
     private $appKey;

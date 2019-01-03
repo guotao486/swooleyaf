@@ -1,7 +1,7 @@
 <?php
 namespace SyMessagePush\Ali;
 
-use AliOpenCore\RpcAcsRequest;
+use AliOpen\Core\RpcAcsRequest;
 
 class ListSummaryAppsRequest extends RpcAcsRequest {
     public function __construct(){

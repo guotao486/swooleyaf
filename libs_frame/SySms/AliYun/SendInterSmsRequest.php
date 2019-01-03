@@ -1,7 +1,7 @@
 <?php
 namespace SySms\AliYun;
 
-use AliOpenCore\RpcAcsRequest;
+use AliOpen\Core\RpcAcsRequest;
 
 class SendInterSmsRequest extends RpcAcsRequest {
     private $templateCode;
