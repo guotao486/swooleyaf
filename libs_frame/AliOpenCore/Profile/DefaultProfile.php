@@ -54,7 +54,7 @@ class DefaultProfile implements IClientProfile {
      * @param string $authType
      * @param null $isigner
      */
-    private function __construct($regionId, $credential, $authType = AUTH_TYPE_RAM_AK, $isigner = null){
+    private function __construct($regionId, $credential, $authType = ALIOPEN_AUTH_TYPE_RAM_AK, $isigner = null){
         self::$regionId = $regionId;
         self::$credential = $credential;
         self::$authType = $authType;
@@ -85,7 +85,7 @@ class DefaultProfile implements IClientProfile {
      */
     public static function getRamRoleArnProfile($regionId, $accessKeyId, $accessSecret, $roleArn, $roleSessionName){
         $credential = new RamRoleArnCredential($accessKeyId, $accessSecret, $roleArn, $roleSessionName);
-        self::$profile = new DefaultProfile($regionId, $credential, AUTH_TYPE_RAM_ROLE_ARN);
+        self::$profile = new DefaultProfile($regionId, $credential, ALIOPEN_AUTH_TYPE_RAM_ROLE_ARN);
 
         return self::$profile;
     }
@@ -97,7 +97,7 @@ class DefaultProfile implements IClientProfile {
      */
     public static function getEcsRamRoleProfile($regionId, $roleName){
         $credential = new EcsRamRoleCredential($roleName);
-        self::$profile = new DefaultProfile($regionId, $credential, AUTH_TYPE_ECS_RAM_ROLE);
+        self::$profile = new DefaultProfile($regionId, $credential, ALIOPEN_AUTH_TYPE_ECS_RAM_ROLE);
 
         return self::$profile;
     }
@@ -109,7 +109,7 @@ class DefaultProfile implements IClientProfile {
      */
     public static function getBearerTokenProfile($regionId, $bearerToken){
         $credential = new BearerTokenCredential($bearerToken);
-        self::$profile = new DefaultProfile($regionId, $credential, AUTH_TYPE_BEARER_TOKEN, new BearTokenSigner());
+        self::$profile = new DefaultProfile($regionId, $credential, ALIOPEN_AUTH_TYPE_BEARER_TOKEN, new BearTokenSigner());
 
         return self::$profile;
     }
@@ -154,14 +154,14 @@ class DefaultProfile implements IClientProfile {
      * @return bool
      */
     public function isRamRoleArn(){
-        return self::$authType == AUTH_TYPE_RAM_ROLE_ARN;
+        return self::$authType == ALIOPEN_AUTH_TYPE_RAM_ROLE_ARN;
     }
 
     /**
      * @return bool
      */
     public function isEcsRamRole(){
-        return self::$authType == AUTH_TYPE_ECS_RAM_ROLE;
+        return self::$authType == ALIOPEN_AUTH_TYPE_ECS_RAM_ROLE;
     }
 
     /**

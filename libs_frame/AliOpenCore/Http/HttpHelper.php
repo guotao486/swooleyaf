@@ -25,10 +25,10 @@ class HttpHelper {
     public static function curl($url,$httpMethod = 'GET',$postFields = null,$headers = null){
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $httpMethod);
-        if (ENABLE_HTTP_PROXY) {
+        if (ALIOPEN_ENABLE_HTTP_PROXY) {
             curl_setopt($ch, CURLOPT_PROXYAUTH, CURLAUTH_BASIC);
-            curl_setopt($ch, CURLOPT_PROXY, HTTP_PROXY_IP);
-            curl_setopt($ch, CURLOPT_PROXYPORT, HTTP_PROXY_PORT);
+            curl_setopt($ch, CURLOPT_PROXY, ALIOPEN_HTTP_PROXY_IP);
+            curl_setopt($ch, CURLOPT_PROXYPORT, ALIOPEN_HTTP_PROXY_PORT);
             curl_setopt($ch, CURLOPT_PROXYTYPE, CURLPROXY_HTTP);
         }
         curl_setopt($ch, CURLOPT_URL, $url);

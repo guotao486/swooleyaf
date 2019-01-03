@@ -33,7 +33,7 @@ class EcsRamRoleService {
         if ($this->lastClearTime != null && $this->sessionCredential != null) {
             $now = time();
             $elapsedTime = $now - $this->lastClearTime;
-            if ($elapsedTime <= ECS_ROLE_EXPIRE_TIME * 0.8) {
+            if ($elapsedTime <= ALIOPEN_ECS_ROLE_EXPIRE_TIME * 0.8) {
                 return $this->sessionCredential;
             }
         }

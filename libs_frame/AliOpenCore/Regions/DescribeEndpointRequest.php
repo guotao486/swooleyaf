@@ -11,12 +11,12 @@ class DescribeEndpointRequest extends RpcAcsRequest {
      * @param $endPointType
      */
     public function __construct($id, $serviceCode, $endPointType){
-        parent::__construct(LOCATION_SERVICE_PRODUCT_NAME, LOCATION_SERVICE_VERSION, LOCATION_SERVICE_DESCRIBE_ENDPOINT_ACTION);
+        parent::__construct(ALIOPEN_LOCATION_SERVICE_PRODUCT_NAME, ALIOPEN_LOCATION_SERVICE_VERSION, ALIOPEN_LOCATION_SERVICE_DESCRIBE_ENDPOINT_ACTION);
 
         $this->queryParameters['Id'] = $id;
         $this->queryParameters['ServiceCode'] = $serviceCode;
         $this->queryParameters['Type'] = $endPointType;
-        $this->setRegionId(LOCATION_SERVICE_REGION);
+        $this->setRegionId(ALIOPEN_LOCATION_SERVICE_REGION);
 
         $this->setAcceptFormat('JSON');
     }
