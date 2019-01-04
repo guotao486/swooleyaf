@@ -31,12 +31,9 @@ class ErrorCode {
     const VALIDATOR_RULE_EMPTY = 100001;
     const VALIDATOR_RULE_ERROR = 100002;
 
-    //OSS错误,取值范围:100200-100399
-    const OSS_CONNECT_ERROR = 100200;
-    const OSS_UPLOAD_FILE_ERROR = 100201;
-    const OSS_DELETE_FILE_ERROR = 100202;
-    const OSS_GET_BUCKET_FILE_ERROR = 100203;
-    const OSS_PARAM_ERROR = 100204;
+    //阿里Oss错误,取值范围:100200-100299
+    const ALIOSS_PARAM_ERROR = 100200;
+    const ALIOSS_CONNECT_ERROR = 100201;
 
     //MYSQL错误,取值范围:100400-100599
     const MYSQL_CONNECTION_ERROR = 100400;
@@ -187,11 +184,8 @@ class ErrorCode {
         self::VALIDATOR_TYPE_ERROR => '校验器不支持',
         self::VALIDATOR_RULE_EMPTY => '校验规则为空',
         self::VALIDATOR_RULE_ERROR => '校验规则格式不合法',
-        self::OSS_CONNECT_ERROR => 'OSS连接失败',
-        self::OSS_UPLOAD_FILE_ERROR => 'OSS上传文件失败',
-        self::OSS_DELETE_FILE_ERROR => 'OSS删除文件失败',
-        self::OSS_GET_BUCKET_FILE_ERROR => 'OSS获取bucket文件失败',
-        self::OSS_PARAM_ERROR => 'OSS参数出错',
+        self::ALIOSS_CONNECT_ERROR => '阿里Oss连接失败',
+        self::ALIOSS_PARAM_ERROR => '阿里Oss参数出错',
         self::MYSQL_CONNECTION_ERROR => 'MYSQL连接出错',
         self::MYSQL_INSERT_ERROR => 'MYSQL添加数据出错',
         self::MYSQL_UPDATE_ERROR => 'MYSQL修改数据出错',
