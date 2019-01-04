@@ -44,6 +44,4 @@ abstract class SmsBaseYun253 extends SmsBase {
         $this->reqData['password'] = SmsConfigSingleton::getInstance()->getYun253Config()->getAppSecret();
         return $this->reqData;
     }
-
-    abstract public function getDetail() : array;
 }
