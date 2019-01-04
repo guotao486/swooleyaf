@@ -1,46 +1,32 @@
 <?php
 namespace AliOpen\Core\Regions;
 
+use Tool\Tool;
+
 class EndpointProvider {
     /**
      * @var array
      */
-    private static $endpoints;
+    private static $endpoints = [];
 
     /**
-     * @param $regionId
-     * @param $product
+     * @param string $regionId
+     * @param string $product
      * @return null
      */
-    public static function findProductDomain($regionId, $product){
-        if (null == $regionId || null == $product || null == self::$endpoints) {
+    public static function findProductDomain(string $regionId,string $product){
+        $endpoint = Tool::getArrayVal(self::$endpoints, $regionId, null);
+        if(is_null($endpoint)){
             return null;
         }
-        foreach (self::$endpoints as $key => $endpoint) {
-            if (in_array($regionId, $endpoint->getRegionIds())) {
-                return self::findProductDomainByProduct($endpoint->getProductDomains(), $product);
-            }
-        }
 
-        return null;
-    }
-
-    /**
-     * @param $productDomains
-     * @param $product
-     * @return null
-     */
-    private static function findProductDomainByProduct($productDomains, $product){
-        if (null == $productDomains) {
+        $productDomains = $endpoint->getProductDomains();
+        $productDomain = Tool::getArrayVal($productDomains, $product, null);
+        if(is_null($productDomain)){
             return null;
         }
-        foreach ($productDomains as $key => $productDomain) {
-            if ($product == $productDomain->getProductName()) {
-                return $productDomain->getDomainName();
-            }
-        }
 
-        return null;
+        return $productDomain->getDomainName();
     }
 
     /**
@@ -51,9 +37,9 @@ class EndpointProvider {
     }
 
     /**
-     * @param $endpoints
+     * @param array $endpoints
      */
-    public static function setEndpoints($endpoints){
+    public static function setEndpoints(array $endpoints){
         self::$endpoints = $endpoints;
     }
 }

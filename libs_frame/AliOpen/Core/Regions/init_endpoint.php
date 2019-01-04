@@ -11,10 +11,10 @@ $endpoints = [];
 foreach ($endpointData['Endpoints'] as $eEndpoint) {
     $productDomains = [];
     foreach ($eEndpoint['Products'] as $eProduct) {
-        $productDomains[] = new \AliOpen\Core\Regions\ProductDomain($eProduct['ProductName'], $eProduct['DomainName']);
+        $productDomains[$eProduct['ProductName']] = new \AliOpen\Core\Regions\ProductDomain($eProduct['ProductName'], $eProduct['DomainName']);
     }
 
-    $endpoints[] = new \AliOpen\Core\Regions\Endpoint($eEndpoint['RegionId'], [
+    $endpoints[$eEndpoint['RegionId']] = new \AliOpen\Core\Regions\Endpoint($eEndpoint['RegionId'], [
         0 => $eEndpoint['RegionId'],
     ], $productDomains);
 }
