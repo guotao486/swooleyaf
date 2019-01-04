@@ -27,10 +27,10 @@ class ErrorHandler {
      */
     public static function handleError($errNo, $errStr, $errFile, $errLine) {
         switch ($errNo) {
-            case E_NOTICE :
-            case E_WARNING :
-            case E_USER_NOTICE :
-            case E_USER_ERROR :
+            case E_NOTICE:
+            case E_WARNING:
+            case E_COMPILE_WARNING:
+            case E_USER_NOTICE:
                 Registry::set(Server::REGISTRY_NAME_SERVICE_ERROR, ErrorCode::COMMON_SERVER_ERROR);
 
                 throw new ErrorException($errStr . ' at ' . $errFile . '(' . $errLine . ')', ErrorCode::COMMON_SERVER_ERROR);
@@ -60,6 +60,7 @@ class ErrorHandler {
                 case E_CORE_ERROR:
                 case E_COMPILE_ERROR:
                 case E_USER_ERROR:
+                case E_RECOVERABLE_ERROR:
                     $msg = 'sy fatal error - ' . $error['message'] . ' at ' . $error['file'] . '(' . $error['line'] . ')';
                     Log::error($msg);
                     unset($msg);
