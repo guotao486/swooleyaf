@@ -89,7 +89,7 @@ class ImageController extends CommonController {
             $maxFileSize = $uploadType == 'image' ? 5242880 : 62914560;
             $uploadPath = $uploadType . '/' . date('Ym', $nowTime) . '/';
             $successStatus = '200';
-            $signRes = \OSS\OSSTool::signFrontPolicy([
+            $signRes = AliOss\OssTool::signFrontPolicy([
                 'expiration' => gmdate("Y-m-d\TH:i:s.000\Z", $expireTime),
                 'conditions' => [
                     ['content-length-range', 1, $maxFileSize],
@@ -98,9 +98,9 @@ class ImageController extends CommonController {
                 ],
             ]);
 
-            $ossConfig = \DesignPatterns\Singletons\OSSSingleton::getInstance()->getConfig();
+            $ossConfig = \DesignPatterns\Singletons\AliOssSingleton::getInstance()->getOssConfig();
             $this->SyResult->setData([
-                'key_id' => $ossConfig->getKeyId(),
+                'key_id' => $ossConfig->getAccessKeyId(),
                 'policy' => $signRes['policy_sign'],
                 'signature' => $signRes['signature'],
                 'upload_path' => $uploadPath,
