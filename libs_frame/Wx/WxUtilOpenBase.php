@@ -9,7 +9,6 @@ namespace Wx;
 
 use Constant\ErrorCode;
 use Constant\Project;
-use Constant\Server;
 use DesignPatterns\Factories\CacheSimpleFactory;
 use DesignPatterns\Singletons\WxConfigSingleton;
 use Exception\Wx\WxOpenException;
@@ -31,21 +30,9 @@ abstract class WxUtilOpenBase extends WxUtilBase {
      * @throws \Exception\Wx\WxOpenException
      */
     public static function getComponentAccessToken(string $appId) : string {
-        $nowTime = Tool::getNowTime();
-        $localKey = Server::CACHE_LOCAL_PREFIX_WXOPEN_ACCESS_TOKEN . $appId;
-        $cacheData = BaseServer::getProjectCache($localKey, '', []);
-        if(isset($cacheData['expire_time']) && ($cacheData['expire_time'] >= $nowTime)){
-            return $cacheData['value'];
-        }
-
         $redisKey = Project::REDIS_PREFIX_WX_COMPONENT_ACCOUNT . $appId;
         $redisData = CacheSimpleFactory::getRedisInstance()->hGetAll($redisKey);
         if(isset($redisData['unique_key']) && ($redisData['unique_key'] == $redisKey)){
-            BaseServer::setProjectCache($localKey, [
-                'value' => $redisData['access_token'],
-                'expire_time' => (int)$redisData['expire_time'],
-            ]);
-
             return $redisData['access_token'];
         }
 

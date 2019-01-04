@@ -51,9 +51,6 @@ final class Server {
     //YAC常量,以0000开头的前缀为框架内部前缀,并键名总长度不超过48个字符串
     const YAC_PREFIX_FUSE = '0000'; //前缀-熔断器
 
-    //本地缓存标识
-    const CACHE_LOCAL_PREFIX_WXOPEN_ACCESS_TOKEN = 'a101_'; //前缀-微信开放平台access token
-
     //熔断器常量
     const FUSE_STATE_OPEN = 'open'; //状态-开启
     const FUSE_STATE_CLOSED = 'closed'; //状态-关闭

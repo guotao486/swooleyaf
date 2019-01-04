@@ -9,11 +9,9 @@ namespace Wx\OpenCommon;
 
 use Constant\ErrorCode;
 use Constant\Project;
-use Constant\Server;
 use DesignPatterns\Factories\CacheSimpleFactory;
 use DesignPatterns\Singletons\WxConfigSingleton;
 use Exception\Wx\WxOpenException;
-use SyServer\BaseServer;
 use Tool\Tool;
 use Wx\WxBaseOpenCommon;
 use Wx\WxUtilBase;
@@ -70,12 +68,6 @@ class ComponentAccessToken extends WxBaseOpenCommon {
             'unique_key' => $redisKey,
         ]);
         CacheSimpleFactory::getRedisInstance()->expire($redisKey, $wxExpireTime);
-
-        $localKey = Server::CACHE_LOCAL_PREFIX_WXOPEN_ACCESS_TOKEN . $this->reqData['component_appid'];
-        BaseServer::setProjectCache($localKey, [
-            'value' => $sendData['component_access_token'],
-            'expire_time' => $expireTime,
-        ]);
 
         return $sendData;
     }
