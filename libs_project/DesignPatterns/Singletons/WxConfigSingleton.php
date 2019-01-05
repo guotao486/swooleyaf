@@ -11,8 +11,8 @@ use Constant\Project;
 use Factories\SyBaseMysqlFactory;
 use Tool\Tool;
 use Traits\SingletonTrait;
-use Wx\WxConfigOpenCommon;
 use Wx\WxConfigAccount;
+use Wx\WxConfigOpenCommon;
 
 class WxConfigSingleton {
     use SingletonTrait;
