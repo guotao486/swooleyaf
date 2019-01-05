@@ -269,6 +269,14 @@ class WxConfigShop {
     }
 
     /**
+     * @param string $templateTag 模板标识
+     * @return string
+     */
+    public function getTemplateId(string $templateTag) : string {
+        return $this->templates[$templateTag] ?? '';
+    }
+
+    /**
      * @param array $templates
      */
     public function setTemplates(array $templates) {
