@@ -11,7 +11,7 @@ use Constant\ErrorCode;
 use Exception\Wx\WxException;
 use Tool\Tool;
 
-class WxConfigShop {
+class WxConfigAccount {
     /**
      * 客户端IP
      * @var string
