@@ -344,7 +344,7 @@ trait BaseServerTrait {
         }
 
         RedisSingleton::getInstance()->reConnect();
-        if(SY_RECONNECT_DB){
+        if(SY_DATABASE){
             MysqlSingleton::getInstance()->reConnect();
         }
 

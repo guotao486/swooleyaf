@@ -1,6 +1,19 @@
 <?php
+//是否开启swoole的定时任务
 if(!defined('SY_ADD_TIMER')){
     define('SY_ADD_TIMER', false);
+}
+//是否连接数据库
+if(!defined('SY_DATABASE')){
+    define('SY_DATABASE', true);
+}
+//是否本地缓存微信账号数据
+if(!defined('SY_CACHE_WXACCOUNT')){
+    define('SY_CACHE_WXACCOUNT', false);
+}
+//是否本地缓存微信开放平台账号数据
+if(!defined('SY_CACHE_WXOPEN')){
+    define('SY_CACHE_WXOPEN', false);
 }
 
 $configs = \Tool\Tool::getConfig('project.' . SY_ENV . SY_PROJECT);

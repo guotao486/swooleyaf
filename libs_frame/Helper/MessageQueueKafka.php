@@ -41,7 +41,7 @@ class MessageQueueKafka {
 
     public function refresh(){
         RedisSingleton::getInstance()->close();
-        if(SY_RECONNECT_DB){
+        if(SY_DATABASE){
             MysqlSingleton::getInstance()->reConnect();
         }
     }

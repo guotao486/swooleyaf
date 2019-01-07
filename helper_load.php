@@ -6,8 +6,8 @@ define('SY_VERSION', '4.0');
 define('SY_ROOT', __DIR__);
 define('SY_ENV', 'dev');
 define('SY_PROJECT', 'a01');
-define('SY_RECONNECT_DB', true);
-define('SY_CACHE_WXSHOP', true);
+define('SY_DATABASE', true);
+define('SY_CACHE_WXACCOUNT', true);
 define('SY_CACHE_WXOPEN', true);
 $syLogPath = ini_get('seaslog.default_basepath');
 if(substr($syLogPath, -1) == '/'){

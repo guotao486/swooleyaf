@@ -22,7 +22,7 @@ class CheckConnectPlugin extends Plugin_Abstract {
 
     public function dispatchLoopStartup(Request_Abstract $request,Response_Abstract $response) {
         RedisSingleton::getInstance()->reConnect();
-        if(SY_RECONNECT_DB){
+        if(SY_DATABASE){
             MysqlSingleton::getInstance()->reConnect();
         }
     }
