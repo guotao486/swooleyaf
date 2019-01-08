@@ -1,7 +1,7 @@
 <?php
 //是否开启swoole的定时任务
-if(!defined('SY_ADD_TIMER')){
-    define('SY_ADD_TIMER', false);
+if(!defined('SY_TIMER')){
+    define('SY_TIMER', false);
 }
 //是否连接数据库
 if(!defined('SY_DATABASE')){
