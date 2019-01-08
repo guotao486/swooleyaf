@@ -404,7 +404,7 @@ abstract class BaseServer {
                 }
             }
 
-            if(SY_ADD_TIMER && method_exists($this, 'addTimer')){
+            if(SY_TIMER && method_exists($this, 'addTimer')){
                 $this->addTimer($server);
             }
         }
