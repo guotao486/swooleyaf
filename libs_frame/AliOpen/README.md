@@ -8,3 +8,11 @@
     $request->setMethod("GET");
     $response = $client->getAcsResponse($request);
     print_r($response);
+
+# 介绍
+- Dm:邮件推送
+- Live:视频直播
+- Mts:媒体处理
+- Ons:物联网微消息队列,可用于互动直播、车联网、金融支付、智能餐饮、即时聊天、移动 Apps等多种应用场景
+- Ram:资源访问控制
+- Sts:临时访问权限管理
