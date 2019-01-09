@@ -7,6 +7,7 @@
  */
 namespace SyFrame\Plugins;
 
+use Constant\ErrorCode;
 use Constant\Server;
 use Response\Result;
 use Response\SyResponseHttp;
@@ -28,6 +29,11 @@ class FinishServicePlugin extends Plugin_Abstract {
             SyResponseHttp::header('Content-Type', 'application/json; charset=utf-8');
             $result = new Result();
             $result->setCodeMsg($errorCode, '服务出错');
+            $response->setBody($result->getJson());
+        } else if(!is_string($response->getBody())){
+            SyResponseHttp::header('Content-Type', 'application/json; charset=utf-8');
+            $result = new Result();
+            $result->setCodeMsg(ErrorCode::SWOOLE_SERVER_NO_RESPONSE_ERROR, ErrorCode::getMsg(ErrorCode::SWOOLE_SERVER_NO_RESPONSE_ERROR));
             $response->setBody($result->getJson());
         }
     }

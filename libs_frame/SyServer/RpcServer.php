@@ -101,9 +101,11 @@ class RpcServer extends BaseServer {
         self::$_reqStartTime = microtime(true);
         $healthTag = $this->sendReqHealthCheckTask($data['api_uri']);
         $this->initRequest($data['api_params']);
+
+        $httpObj = new Http($data['api_uri']);
         try {
             self::checkRequestCurrentLimit();
-            $result = $this->_app->bootstrap()->getDispatcher()->dispatch(new Http($data['api_uri']))->getBody();
+            $result = $this->_app->bootstrap()->getDispatcher()->dispatch($httpObj)->getBody();
         } catch (\Exception $e) {
             if (!($e instanceof ValidatorException)) {
                 Log::error($e->getMessage(), $e->getCode(), $e->getTraceAsString());
@@ -116,6 +118,7 @@ class RpcServer extends BaseServer {
                 $result->setCodeMsg(ErrorCode::COMMON_SERVER_ERROR, '服务出错');
             }
         } finally {
+            unset($httpObj);
             self::$_syServer->decr(self::$_serverToken, 'request_handling', 1);
             $this->clearRequest();
             $this->reportLongTimeReq($data['api_uri'], $data['api_params']);
