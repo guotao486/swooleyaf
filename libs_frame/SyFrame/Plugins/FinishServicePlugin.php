@@ -33,7 +33,7 @@ class FinishServicePlugin extends Plugin_Abstract {
         } else if(!is_string($response->getBody())){
             SyResponseHttp::header('Content-Type', 'application/json; charset=utf-8');
             $result = new Result();
-            $result->setCodeMsg(ErrorCode::SWOOLE_SERVER_NO_RESPONSE_ERROR, ErrorCode::getMsg(ErrorCode::SWOOLE_SERVER_NO_RESPONSE_ERROR));
+            $result->setCodeMsg(ErrorCode::SWOOLE_SERVER_NO_RESPONSE_ERROR, '未设置响应数据');
             $response->setBody($result->getJson());
         }
     }
