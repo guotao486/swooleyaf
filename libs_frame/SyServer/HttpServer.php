@@ -357,9 +357,10 @@ class HttpServer extends BaseServer {
                 $healthTag = $this->sendReqHealthCheckTask($uri);
                 $this->initRequest($request, $initRspHeaders);
 
+                $httpObj = new Http($uri);
                 try {
                     self::checkRequestCurrentLimit();
-                    $result = $this->_app->bootstrap()->getDispatcher()->dispatch(new Http($uri))->getBody();
+                    $result = $this->_app->bootstrap()->getDispatcher()->dispatch($httpObj)->getBody();
                 } catch (\Exception $e){
                     SyResponseHttp::header('Content-Type', 'application/json; charset=utf-8');
                     if (!($e instanceof ValidatorException)) {
@@ -375,6 +376,7 @@ class HttpServer extends BaseServer {
 
                     $result = $error->getJson();
                 } finally {
+                    unset($httpObj);
                     self::$_syServer->decr(self::$_serverToken, 'request_handling', 1);
                     $this->reportLongTimeReq($uri, array_merge($_GET, $_POST));
                     self::$_syHealths->del($healthTag);

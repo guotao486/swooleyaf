@@ -50,6 +50,7 @@ class ErrorCode {
     //SWOOLE错误,取值范围:100800-100999
     const SWOOLE_SERVER_PARAM_ERROR = 100800;
     const SWOOLE_SERVER_NOT_EXIST_ERROR = 100801;
+    const SWOOLE_SERVER_NO_RESPONSE_ERROR = 100802;
 
     //反射错误,取值范围:101000-101199
     const REFLECT_RESOURCE_NOT_EXIST = 101000;
@@ -196,6 +197,7 @@ class ErrorCode {
         self::REDIS_AUTH_ERROR => 'REDIS鉴权失败',
         self::SWOOLE_SERVER_PARAM_ERROR => 'SWOOLE服务参数错误',
         self::SWOOLE_SERVER_NOT_EXIST_ERROR => 'SWOOLE服务不存在',
+        self::SWOOLE_SERVER_NO_RESPONSE_ERROR => 'SWOOLE服务未设置响应数据',
         self::REFLECT_RESOURCE_NOT_EXIST => '反射资源不存在',
         self::REFLECT_ANNOTATION_DATA_ERROR => '注解数据不正确',
         self::MAIL_SERVER_NOT_EXIST => '邮件服务器不存在',
