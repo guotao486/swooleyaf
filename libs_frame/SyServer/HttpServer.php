@@ -357,10 +357,16 @@ class HttpServer extends BaseServer {
                 $healthTag = $this->sendReqHealthCheckTask($uri);
                 $this->initRequest($request, $initRspHeaders);
 
+                $error = null;
+                $result = '';
                 $httpObj = new Http($uri);
                 try {
                     self::checkRequestCurrentLimit();
                     $result = $this->_app->bootstrap()->getDispatcher()->dispatch($httpObj)->getBody();
+                    if(strlen($result) == 0){
+                        $error = new Result();
+                        $error->setCodeMsg(ErrorCode::SWOOLE_SERVER_NO_RESPONSE_ERROR, '未设置响应数据');
+                    }
                 } catch (\Exception $e){
                     SyResponseHttp::header('Content-Type', 'application/json; charset=utf-8');
                     if (!($e instanceof ValidatorException)) {
@@ -373,13 +379,15 @@ class HttpServer extends BaseServer {
                     } else {
                         $error->setCodeMsg(ErrorCode::COMMON_SERVER_ERROR, '服务出错');
                     }
-
-                    $result = $error->getJson();
                 } finally {
-                    unset($httpObj);
                     self::$_syServer->decr(self::$_serverToken, 'request_handling', 1);
                     $this->reportLongTimeReq($uri, array_merge($_GET, $_POST));
                     self::$_syHealths->del($healthTag);
+                    unset($httpObj);
+                    if(is_object($error)){
+                        $result = $error->getJson();
+                        unset($error);
+                    }
                 }
 
                 break;
