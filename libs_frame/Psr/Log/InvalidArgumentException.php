@@ -1,7 +1,5 @@
 <?php
-
 namespace Psr\Log;
 
-class InvalidArgumentException extends \InvalidArgumentException
-{
+class InvalidArgumentException extends \InvalidArgumentException {
 }
