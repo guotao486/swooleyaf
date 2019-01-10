@@ -102,30 +102,40 @@ class RpcServer extends BaseServer {
         $healthTag = $this->sendReqHealthCheckTask($data['api_uri']);
         $this->initRequest($data['api_params']);
 
+        $error = null;
+        $result = '';
         $httpObj = new Http($data['api_uri']);
         try {
             self::checkRequestCurrentLimit();
             $result = $this->_app->bootstrap()->getDispatcher()->dispatch($httpObj)->getBody();
+            if(strlen($result) == 0){
+                $error = new Result();
+                $error->setCodeMsg(ErrorCode::SWOOLE_SERVER_NO_RESPONSE_ERROR, '未设置响应数据');
+            }
         } catch (\Exception $e) {
             if (!($e instanceof ValidatorException)) {
                 Log::error($e->getMessage(), $e->getCode(), $e->getTraceAsString());
             }
 
-            $result = new Result();
+            $error = new Result();
             if (is_numeric($e->getCode())) {
-                $result->setCodeMsg((int)$e->getCode(), $e->getMessage());
+                $error->setCodeMsg((int)$e->getCode(), $e->getMessage());
             } else {
-                $result->setCodeMsg(ErrorCode::COMMON_SERVER_ERROR, '服务出错');
+                $error->setCodeMsg(ErrorCode::COMMON_SERVER_ERROR, '服务出错');
             }
         } finally {
-            unset($httpObj);
             self::$_syServer->decr(self::$_serverToken, 'request_handling', 1);
             $this->clearRequest();
             $this->reportLongTimeReq($data['api_uri'], $data['api_params']);
             self::$_syHealths->del($healthTag);
+            unset($httpObj);
+            if(is_object($error)){
+                $result = $error->getJson();
+                unset($error);
+            }
         }
 
-        return is_string($result) ? $result : $result->getJson();
+        return $result;
     }
 
     private function handleTaskReceive(\swoole_server $server,string $data) {
