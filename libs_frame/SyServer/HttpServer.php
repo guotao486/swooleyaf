@@ -389,8 +389,6 @@ class HttpServer extends BaseServer {
                         unset($error);
                     }
                 }
-
-                break;
         }
 
         return $result;
