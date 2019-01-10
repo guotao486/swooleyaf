@@ -150,9 +150,11 @@ class RpcServer extends BaseServer {
 
     private function handleReceive(\swoole_server $server,string $data) {
         if(!$this->_receivePack->unpackData($data)){
-            $result = new Result();
-            $result->setCodeMsg(ErrorCode::COMMON_PARAM_ERROR, '请求数据格式错误');
-            return $result->getJson();
+            $error = new Result();
+            $error->setCodeMsg(ErrorCode::COMMON_PARAM_ERROR, '请求数据格式错误');
+            $result = $error->getJson();
+            unset($error);
+            return $result;
         }
 
         $command = $this->_receivePack->getCommand();
@@ -165,13 +167,14 @@ class RpcServer extends BaseServer {
                 $result = $this->handleTaskReceive($server, $data);
                 break;
             default:
-                $result = new Result();
-                $result->setCodeMsg(ErrorCode::COMMON_PARAM_ERROR, '请求命令不支持');
-                break;
+                $error = new Result();
+                $error->setCodeMsg(ErrorCode::COMMON_PARAM_ERROR, '请求命令不支持');
+                $result = $error->getJson();
+                unset($error);
         }
         Registry::del(Server::REGISTRY_NAME_SERVICE_ERROR);
 
-        return is_string($result) ? $result : $result->getJson();
+        return $result;
     }
 
     public function onWorkerStart(\swoole_server $server, $workerId){
