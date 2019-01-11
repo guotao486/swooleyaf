@@ -1,12 +1,10 @@
 <?php
-
 namespace Psr\Log;
 
 /**
  * Describes log levels
  */
-class LogLevel
-{
+class LogLevel {
     const EMERGENCY = 'emergency';
     const ALERT = 'alert';
     const CRITICAL = 'critical';
