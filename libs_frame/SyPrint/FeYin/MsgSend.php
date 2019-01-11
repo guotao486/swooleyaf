@@ -139,9 +139,7 @@ class MsgSend extends PrintBaseFeYin {
             'code' => 0,
         ];
 
-        $this->curlConfigs[CURLOPT_URL] = $this->serviceDomain . '/msg?' . http_build_query([
-            'access_token' => PrintUtilFeYin::getAccessToken($this->reqData['appid']),
-        ]);
+        $this->curlConfigs[CURLOPT_URL] = $this->serviceDomain . '/msg?access_token=' . PrintUtilFeYin::getAccessToken($this->reqData['appid']);
         $this->curlConfigs[CURLOPT_POSTFIELDS] = Tool::jsonEncode($this->reqData, JSON_UNESCAPED_UNICODE);
         $this->curlConfigs[CURLOPT_HTTPHEADER] = [
             'Content-Type: application/json; charset=utf-8',
