@@ -170,6 +170,11 @@ class ErrorCode {
     const MESSAGE_PUSH_POST_ERROR = 104501;
     const MESSAGE_PUSH_GET_ERROR = 104502;
 
+    //打印错误,取值范围:104600-104699
+    const PRINT_PARAM_ERROR = 104600;
+    const PRINT_POST_ERROR = 104601;
+    const PRINT_GET_ERROR = 104602;
+
     protected static $msgArr = [
         self::COMMON_SUCCESS => '成功',
         self::COMMON_PARAM_ERROR => '参数错误',
@@ -274,6 +279,9 @@ class ErrorCode {
         self::MESSAGE_PUSH_PARAM_ERROR => '消息推送参数错误',
         self::MESSAGE_PUSH_POST_ERROR => '消息推送POST请求错误',
         self::MESSAGE_PUSH_GET_ERROR => '消息推送GET请求错误',
+        self::PRINT_PARAM_ERROR => '打印参数错误',
+        self::PRINT_POST_ERROR => '打印POST请求错误',
+        self::PRINT_GET_ERROR => '打印GET请求错误',
     ];
 
     /**

@@ -29,6 +29,7 @@ class ProjectBase {
     const REDIS_PREFIX_WX_ACCOUNT = 'sy' . SY_PROJECT . '10100_'; //前缀-微信公众号
     const REDIS_PREFIX_WX_COMPONENT_ACCOUNT = 'sy' . SY_PROJECT . '10101_'; //前缀-微信开放平台账号
     const REDIS_PREFIX_WX_COMPONENT_AUTHORIZER = 'sy' . SY_PROJECT . '10102_'; //前缀-微信开放平台授权公众号
+    const REDIS_PREFIX_PRINT_FEYIN_ACCOUNT = 'sy' . SY_PROJECT . '10200_'; //前缀-飞印打印账号
 
     //校验器常量
     const VALIDATOR_STRING_TYPE_REQUIRED = 'string_required'; //字符串类型-必填
