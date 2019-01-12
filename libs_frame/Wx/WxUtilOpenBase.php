@@ -342,6 +342,7 @@ abstract class WxUtilOpenBase extends WxUtilBase {
      * @param string $appToken 开放平台消息校验token
      * @param string $aesKey 第三方平台的aes key
      * @return string 加密后的可以直接回复用户的密文，包括msg_signature, timestamp, nonce, encrypt的xml格式的字符串
+     * @throws \Exception\Wx\WxOpenException
      */
     public static function encryptMsg(string $replyMsg,string $appId,string $appToken,string $aesKey) : string {
         $nonceStr = Tool::createNonceStr(16);
