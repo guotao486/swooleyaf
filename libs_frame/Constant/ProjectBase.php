@@ -69,7 +69,6 @@ class ProjectBase {
     //微信开放平台常量
     const WX_COMPONENT_AUTHORIZER_STATUS_CANCEL = 0; //授权公众号状态-取消授权
     const WX_COMPONENT_AUTHORIZER_STATUS_ALLOW = 1; //授权公众号状态-允许授权
-    const WX_COMPONENT_AUTHORIZER_EXPIRE_TOKEN = 7000; //授权公众号token超时时间,单位为秒
     const WX_COMPONENT_AUTHORIZER_OPTION_TYPE_AUTHORIZED = 1; //授权公众号操作类型-允许授权
     const WX_COMPONENT_AUTHORIZER_OPTION_TYPE_UNAUTHORIZED = 2; //授权公众号操作类型-取消授权
     const WX_COMPONENT_AUTHORIZER_OPTION_TYPE_AUTHORIZED_UPDATE = 3; //授权公众号操作类型-更新授权
@@ -77,7 +76,6 @@ class ProjectBase {
     //微信配置常量
     const WX_CONFIG_STATUS_DISABLE = 0; //状态-无效
     const WX_CONFIG_STATUS_ENABLE = 1; //状态-有效
-    const WX_CONFIG_EXPIRE_TOKEN = 7000; //token超时时间,单位为秒
 
     //支付宝支付常量
     const ALI_PAY_STATUS_DISABLE = 0; //状态-无效
