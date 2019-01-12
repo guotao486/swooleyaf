@@ -321,17 +321,19 @@ trait BaseServerTrait {
 
         self::$_syWxShopToken = new \swoole_table((int)$this->_configs['server']['cachenum']['wxshop']['token']);
         self::$_syWxShopToken->column('app_id', \swoole_table::TYPE_STRING, 18);
-        self::$_syWxShopToken->column('access_token', \swoole_table::TYPE_STRING, 200);
-        self::$_syWxShopToken->column('js_ticket', \swoole_table::TYPE_STRING, 200);
-        self::$_syWxShopToken->column('expire_time', \swoole_table::TYPE_INT, 4);
+        self::$_syWxShopToken->column('at_content', \swoole_table::TYPE_STRING, 200);
+        self::$_syWxShopToken->column('at_expire', \swoole_table::TYPE_INT, 4);
+        self::$_syWxShopToken->column('jt_content', \swoole_table::TYPE_STRING, 200);
+        self::$_syWxShopToken->column('jt_expire', \swoole_table::TYPE_INT, 4);
         self::$_syWxShopToken->column('clear_time', \swoole_table::TYPE_INT, 4);
         self::$_syWxShopToken->create();
 
         self::$_syWxOpenAuthorizerToken = new \swoole_table((int)$this->_configs['server']['cachenum']['wxopen']['authorizertoken']);
         self::$_syWxOpenAuthorizerToken->column('app_id', \swoole_table::TYPE_STRING, 18);
-        self::$_syWxOpenAuthorizerToken->column('access_token', \swoole_table::TYPE_STRING, 200);
-        self::$_syWxOpenAuthorizerToken->column('js_ticket', \swoole_table::TYPE_STRING, 200);
-        self::$_syWxOpenAuthorizerToken->column('expire_time', \swoole_table::TYPE_INT, 4);
+        self::$_syWxOpenAuthorizerToken->column('at_content', \swoole_table::TYPE_STRING, 200);
+        self::$_syWxOpenAuthorizerToken->column('at_expire', \swoole_table::TYPE_INT, 4);
+        self::$_syWxOpenAuthorizerToken->column('jt_content', \swoole_table::TYPE_STRING, 200);
+        self::$_syWxOpenAuthorizerToken->column('jt_expire', \swoole_table::TYPE_INT, 4);
         self::$_syWxOpenAuthorizerToken->column('clear_time', \swoole_table::TYPE_INT, 4);
         self::$_syWxOpenAuthorizerToken->create();
     }

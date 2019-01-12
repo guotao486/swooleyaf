@@ -19,98 +19,112 @@ abstract class WxUtilBaseAlone extends WxUtilBase {
     use SimpleTrait;
 
     /**
-     * 刷新微信公众号缓存
+     * 获取access token
      * @param string $appId
-     * @return array
+     * @return string
+     * @throws \Exception\Wx\WxException
      */
-    private static function refreshWxAccountCache(string $appId) : array {
+    public static function getAccessToken(string $appId) : string {
         $nowTime = Tool::getNowTime();
-        $clearTime = $nowTime + Project::TIME_EXPIRE_LOCAL_WXACCOUNT_TOKEN_CLEAR;
+        if(SY_CACHE_WXACCOUNT){
+            $localCacheData = BaseServer::getWxShopTokenCache($appId, '', []);
+            if (isset($localCacheData['at_expire']) && ($localCacheData['at_expire'] >= $nowTime)) {
+                return $localCacheData['at_content'];
+            }
+        }
+
         $redisKey = Project::REDIS_PREFIX_WX_ACCOUNT . $appId;
         $redisData = CacheSimpleFactory::getRedisInstance()->hGetAll($redisKey);
-        if (isset($redisData['unique_key']) && ($redisData['unique_key'] == $redisKey) && ($redisData['expire_time'] >= $nowTime)) {
+        if (isset($redisData['at_key']) && ($redisData['at_key'] == $redisKey) && ($redisData['at_expire'] >= $nowTime)) {
             if(SY_CACHE_WXACCOUNT){
-                $expireTime = (int)$redisData['expire_time'];
+                $clearTime = $nowTime + Project::TIME_EXPIRE_LOCAL_WXACCOUNT_TOKEN_CLEAR;
                 BaseServer::setWxShopTokenCache($appId, [
-                    'access_token' => $redisData['access_token'],
-                    'js_ticket' => $redisData['js_ticket'],
-                    'expire_time' => $expireTime,
+                    'at_content' => $redisData['at_content'],
+                    'at_expire' => (int)$redisData['at_expire'],
                     'clear_time' => $clearTime,
                 ]);
             }
 
-            return [
-                'js_ticket' => $redisData['js_ticket'],
-                'access_token' => $redisData['access_token'],
-            ];
+            return $redisData['at_content'];
         }
 
         $accessTokenObj = new AccessToken($appId);
         $accessTokenDetail = $accessTokenObj->getDetail();
         unset($accessTokenObj);
 
-        $jsTicketObj = new JsTicket();
-        $jsTicketObj->setAccessToken($accessTokenDetail['access_token']);
-        $jsTicketDetail = $jsTicketObj->getDetail();
-        unset($jsTicketObj);
-
-        $expireTime = $nowTime + Project::WX_CONFIG_EXPIRE_TOKEN;
+        $expireTime = (int)($nowTime + $accessTokenDetail['expires_in'] - 10);
         CacheSimpleFactory::getRedisInstance()->hMset($redisKey, [
-            'js_ticket' => $jsTicketDetail['ticket'],
-            'access_token' => $accessTokenDetail['access_token'],
-            'expire_time' => $expireTime,
-            'unique_key' => $redisKey,
+            'at_content' => $accessTokenDetail['access_token'],
+            'at_expire' => $expireTime,
+            'at_key' => $redisKey,
         ]);
-        CacheSimpleFactory::getRedisInstance()->expire($redisKey, 7100);
+        CacheSimpleFactory::getRedisInstance()->expire($redisKey, 8000);
 
         if(SY_CACHE_WXACCOUNT){
+            $clearTime = $nowTime + Project::TIME_EXPIRE_LOCAL_WXACCOUNT_TOKEN_CLEAR;
             BaseServer::setWxShopTokenCache($appId, [
-                'access_token' => $accessTokenDetail['access_token'],
-                'js_ticket' => $jsTicketDetail['ticket'],
-                'expire_time' => $expireTime,
+                'at_content' => $accessTokenDetail['access_token'],
+                'at_expire' => $expireTime,
                 'clear_time' => $clearTime,
             ]);
         }
 
-        return [
-            'js_ticket' => $jsTicketDetail['ticket'],
-            'access_token' => $accessTokenDetail['access_token'],
-        ];
+        return $accessTokenDetail['access_token'];
     }
 
     /**
-     * 获取access token
+     * 获取js ticket
      * @param string $appId
      * @return string
-     */
-    public static function getAccessToken(string $appId) : string {
-        if(SY_CACHE_WXACCOUNT){
-            $nowTime = Tool::getNowTime();
-            $localCacheData = BaseServer::getWxShopTokenCache($appId, '', []);
-            if (isset($localCacheData['expire_time']) && ($localCacheData['expire_time'] >= $nowTime)) {
-                return $localCacheData['access_token'];
-            }
-        }
-
-        $cacheData = self::refreshWxAccountCache($appId);
-        return $cacheData['access_token'];
-    }
-
-    /**
-     * 获取jsapi ticket
-     * @param string $appId
-     * @return string
+     * @throws \Exception\Wx\WxException
      */
     public static function getJsTicket(string $appId) : string {
+        $nowTime = Tool::getNowTime();
         if(SY_CACHE_WXACCOUNT){
-            $nowTime = Tool::getNowTime();
             $localCacheData = BaseServer::getWxShopTokenCache($appId, '', []);
-            if (isset($localCacheData['expire_time']) && ($localCacheData['expire_time'] >= $nowTime)) {
-                return $localCacheData['js_ticket'];
+            if (isset($localCacheData['jt_expire']) && ($localCacheData['jt_expire'] >= $nowTime)) {
+                return $localCacheData['jt_content'];
             }
         }
 
-        $cacheData = self::refreshWxAccountCache($appId);
-        return $cacheData['js_ticket'];
+        $redisKey = Project::REDIS_PREFIX_WX_ACCOUNT . $appId;
+        $redisData = CacheSimpleFactory::getRedisInstance()->hGetAll($redisKey);
+        if (isset($redisData['jt_key']) && ($redisData['jt_key'] == $redisKey) && ($redisData['jt_expire'] >= $nowTime)) {
+            if(SY_CACHE_WXACCOUNT){
+                $clearTime = $nowTime + Project::TIME_EXPIRE_LOCAL_WXACCOUNT_TOKEN_CLEAR;
+                BaseServer::setWxShopTokenCache($appId, [
+                    'jt_content' => $redisData['jt_content'],
+                    'jt_expire' => (int)$redisData['jt_expire'],
+                    'clear_time' => $clearTime,
+                ]);
+            }
+
+            return $redisData['jt_content'];
+        }
+
+        $accessToken = self::getAccessToken($appId);
+        $jsTicketObj = new JsTicket();
+        $jsTicketObj->setAccessToken($accessToken);
+        $jsTicketDetail = $jsTicketObj->getDetail();
+        unset($jsTicketObj);
+
+        $expireTime = (int)($nowTime + $jsTicketDetail['expires_in'] - 10);
+        CacheSimpleFactory::getRedisInstance()->hMset($redisKey, [
+            'jt_content' => $jsTicketDetail['ticket'],
+            'jt_expire' => $expireTime,
+            'jt_key' => $redisKey,
+        ]);
+        CacheSimpleFactory::getRedisInstance()->expire($redisKey, 8000);
+
+        if(SY_CACHE_WXACCOUNT){
+            $clearTime = $nowTime + Project::TIME_EXPIRE_LOCAL_WXACCOUNT_TOKEN_CLEAR;
+            BaseServer::setWxShopTokenCache($appId, [
+                'jt_content' => $jsTicketDetail['ticket'],
+                'jt_expire' => $expireTime,
+                'clear_time' => $clearTime,
+            ]);
+        }
+
+        return $jsTicketDetail['ticket'];
     }
 }
