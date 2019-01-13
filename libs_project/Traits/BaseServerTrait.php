@@ -299,7 +299,7 @@ trait BaseServerTrait {
         self::$_syProject->column('expire_time', \swoole_table::TYPE_INT, 4);
         self::$_syProject->create();
 
-        self::$_syUsers = new \swoole_table(self::$_syUserMaxNum);
+        self::$_syUsers = new \swoole_table((int)$this->_configs['server']['cachenum']['users']);
         self::$_syUsers->column('session_id', \swoole_table::TYPE_STRING, 16);
         self::$_syUsers->column('user_id', \swoole_table::TYPE_STRING, 32);
         self::$_syUsers->column('user_name', \swoole_table::TYPE_STRING, 64);
