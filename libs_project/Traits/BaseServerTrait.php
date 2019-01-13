@@ -36,15 +36,10 @@ trait BaseServerTrait {
      */
     protected static $_syUsers = null;
     /**
-     * 项目微信商户号token缓存列表
+     * 项目微信缓存列表
      * @var \swoole_table
      */
-    protected static $_syWxShopToken = null;
-    /**
-     * 项目微信开放平台授权公众号token缓存列表
-     * @var \swoole_table
-     */
-    protected static $_syWxOpenAuthorizerToken = null;
+    protected static $_syWx = null;
     /**
      * 最大用户数量
      * @var int
@@ -56,25 +51,15 @@ trait BaseServerTrait {
      */
     private static $_syUserNowNum = 0;
     /**
-     * 最大微信商户号token数量
+     * 最大微信账号数量
      * @var int
      */
-    private static $_syWxShopTokenMaxNum = 0;
+    private static $_syWxMaxNum = 0;
     /**
-     * 当前微信商户号token数量
+     * 当前微信账号数量
      * @var int
      */
-    private static $_syWxShopTokenNowNum = 0;
-    /**
-     * 最大微信开放平台授权公众号token数量
-     * @var int
-     */
-    private static $_syWxOpenAuthorizerTokenMaxNum = 0;
-    /**
-     * 当前微信开放平台授权公众号token数量
-     * @var int
-     */
-    private static $_syWxOpenAuthorizerTokenNowNum = 0;
+    private static $_syWxNowNum = 0;
 
     private function checkBaseServer() {
         self::$_syUserNowNum = 0;
@@ -83,6 +68,14 @@ trait BaseServerTrait {
             exit('用户信息缓存数量不能小于2');
         } else if ((self::$_syUserMaxNum & (self::$_syUserMaxNum - 1)) != 0) {
             exit('用户信息缓存数量必须是2的指数倍');
+        }
+
+        self::$_syWxNowNum = 0;
+        self::$_syWxMaxNum = (int)$this->_configs['server']['cachenum']['wx'];
+        if (self::$_syWxMaxNum < 2) {
+            exit('微信缓存数量不能小于2');
+        } else if ((self::$_syWxMaxNum & (self::$_syWxMaxNum - 1)) != 0) {
+            exit('微信缓存数量必须是2的指数倍');
         }
 
         //检测redis服务是否启动
@@ -192,21 +185,20 @@ trait BaseServerTrait {
     }
 
     /**
-     * 设置项目微信商户号token缓存
-     * @param string $appId 公众号app id
+     * 设置项目微信缓存
+     * @param string $appTag 微信账号标识
      * @param array $data 键值
      * @return bool
      */
-    public static function setWxShopTokenCache(string $appId,array $data) : bool {
+    public static function setWxCache(string $appTag,array $data) : bool {
         if(empty($data)){
             return false;
-        } else if(self::$_syWxShopToken->exist($appId)){
-            self::$_syWxShopToken->set($appId, $data);
-
+        } else if(self::$_syWx->exist($appTag)){
+            self::$_syWx->set($appTag, $data);
             return true;
-        } else if(self::$_syWxShopTokenNowNum < self::$_syWxShopTokenMaxNum){
-            self::$_syWxShopToken->set($appId, $data);
-            self::$_syWxShopTokenNowNum++;
+        } else if(self::$_syWxNowNum < self::$_syWxMaxNum){
+            self::$_syWx->set($appTag, $data);
+            self::$_syWxNowNum++;
 
             return true;
         } else {
@@ -215,14 +207,14 @@ trait BaseServerTrait {
     }
 
     /**
-     * 获取项目微信商户号token缓存
-     * @param string $appId 公众号app id
+     * 获取项目微信缓存
+     * @param string $appTag 微信账号标识
      * @param string $field 字段名
      * @param mixed $default 默认值
      * @return mixed
      */
-    public static function getWxShopTokenCache(string $appId,string $field='', $default=null){
-        $data = self::$_syWxShopToken->get($appId);
+    public static function getWxCache(string $appTag,string $field='', $default=null){
+        $data = self::$_syWx->get($appTag);
         if($data === false){
             return $default;
         } else if($field === ''){
@@ -232,73 +224,21 @@ trait BaseServerTrait {
         }
     }
 
-    protected function clearLocalWxShopTokens() {
+    /**
+     * 清理项目微信缓存
+     */
+    protected function clearWxCache() {
         $nowTime = Tool::getNowTime();
         $delKeys = [];
-        foreach (self::$_syWxShopToken as $eToken) {
+        foreach (self::$_syWx as $eToken) {
             if($eToken['clear_time'] < $nowTime){
-                $delKeys[] = $eToken['app_id'];
+                $delKeys[] = $eToken['app_tag'];
             }
         }
         foreach ($delKeys as $eKey) {
-            self::$_syWxShopToken->del($eKey);
+            self::$_syWx->del($eKey);
         }
-        self::$_syWxShopTokenNowNum = count(self::$_syWxShopToken);
-    }
-
-    /**
-     * 设置项目微信开放平台授权公众号token缓存
-     * @param string $appId 公众号app id
-     * @param array $data 键值
-     * @return bool
-     */
-    public static function setWxOpenAuthorizerTokenCache(string $appId,array $data) : bool {
-        if(empty($data)){
-            return false;
-        } else if(self::$_syWxOpenAuthorizerToken->exist($appId)){
-            self::$_syWxOpenAuthorizerToken->set($appId, $data);
-
-            return true;
-        } else if(self::$_syWxOpenAuthorizerTokenNowNum < self::$_syWxOpenAuthorizerTokenMaxNum){
-            self::$_syWxOpenAuthorizerToken->set($appId, $data);
-            self::$_syWxOpenAuthorizerTokenNowNum++;
-
-            return true;
-        } else {
-            return true;
-        }
-    }
-
-    /**
-     * 获取项目微信开放平台授权公众号token缓存
-     * @param string $appId 公众号app id
-     * @param string $field 字段名
-     * @param mixed $default 默认值
-     * @return mixed
-     */
-    public static function getWxOpenAuthorizerTokenCache(string $appId,string $field='', $default=null){
-        $data = self::$_syWxOpenAuthorizerToken->get($appId);
-        if($data === false){
-            return $default;
-        } else if($field === ''){
-            return $data;
-        } else {
-            return $data[$field] ?? $default;
-        }
-    }
-
-    protected function clearLocalWxOpenAuthorizerTokens() {
-        $nowTime = Tool::getNowTime();
-        $delKeys = [];
-        foreach (self::$_syWxOpenAuthorizerToken as $eToken) {
-            if($eToken['clear_time'] < $nowTime){
-                $delKeys[] = $eToken['app_id'];
-            }
-        }
-        foreach ($delKeys as $eKey) {
-            self::$_syWxOpenAuthorizerToken->del($eKey);
-        }
-        self::$_syWxOpenAuthorizerTokenNowNum = count(self::$_syWxOpenAuthorizerToken);
+        self::$_syWxNowNum = count(self::$_syWx);
     }
 
     protected function initTableByBaseStart() {
@@ -319,23 +259,14 @@ trait BaseServerTrait {
         self::$_syUsers->column('add_time', \swoole_table::TYPE_INT, 4);
         self::$_syUsers->create();
 
-        self::$_syWxShopToken = new \swoole_table((int)$this->_configs['server']['cachenum']['wxshop']['token']);
-        self::$_syWxShopToken->column('app_id', \swoole_table::TYPE_STRING, 18);
-        self::$_syWxShopToken->column('at_content', \swoole_table::TYPE_STRING, 200);
-        self::$_syWxShopToken->column('at_expire', \swoole_table::TYPE_INT, 4);
-        self::$_syWxShopToken->column('jt_content', \swoole_table::TYPE_STRING, 200);
-        self::$_syWxShopToken->column('jt_expire', \swoole_table::TYPE_INT, 4);
-        self::$_syWxShopToken->column('clear_time', \swoole_table::TYPE_INT, 4);
-        self::$_syWxShopToken->create();
-
-        self::$_syWxOpenAuthorizerToken = new \swoole_table((int)$this->_configs['server']['cachenum']['wxopen']['authorizertoken']);
-        self::$_syWxOpenAuthorizerToken->column('app_id', \swoole_table::TYPE_STRING, 18);
-        self::$_syWxOpenAuthorizerToken->column('at_content', \swoole_table::TYPE_STRING, 200);
-        self::$_syWxOpenAuthorizerToken->column('at_expire', \swoole_table::TYPE_INT, 4);
-        self::$_syWxOpenAuthorizerToken->column('jt_content', \swoole_table::TYPE_STRING, 200);
-        self::$_syWxOpenAuthorizerToken->column('jt_expire', \swoole_table::TYPE_INT, 4);
-        self::$_syWxOpenAuthorizerToken->column('clear_time', \swoole_table::TYPE_INT, 4);
-        self::$_syWxOpenAuthorizerToken->create();
+        self::$_syWx = new \swoole_table((int)$this->_configs['server']['cachenum']['wx']);
+        self::$_syWx->column('app_tag', \swoole_table::TYPE_STRING, 24);
+        self::$_syWx->column('at_content', \swoole_table::TYPE_STRING, 200);
+        self::$_syWx->column('at_expire', \swoole_table::TYPE_INT, 4);
+        self::$_syWx->column('jt_content', \swoole_table::TYPE_STRING, 200);
+        self::$_syWx->column('jt_expire', \swoole_table::TYPE_INT, 4);
+        self::$_syWx->column('clear_time', \swoole_table::TYPE_INT, 4);
+        self::$_syWx->create();
     }
 
     protected function handleBaseTask(\swoole_server $server,int $taskId,int $fromId,string $data) {
@@ -360,11 +291,8 @@ trait BaseServerTrait {
                 case Project::TASK_TYPE_CLEAR_LOCAL_USER_CACHE:
                     $this->clearLocalUsers();
                     break;
-                case Project::TASK_TYPE_CLEAR_LOCAL_WXSHOP_TOKEN_CACHE:
-                    $this->clearLocalWxShopTokens();
-                    break;
-                case Project::TASK_TYPE_CLEAR_LOCAL_WXOPEN_AUTHORIZER_TOKEN_CACHE:
-                    $this->clearLocalWxOpenAuthorizerTokens();
+                case Project::TASK_TYPE_CLEAR_LOCAL_WX_CACHE:
+                    $this->clearWxCache();
                     break;
                 default:
                     return [

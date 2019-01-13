@@ -8,7 +8,6 @@
 namespace SyTask;
 
 use Constant\Project;
-use Constant\Server;
 use MessageQueue\Consumer\Redis\AddJsLogService;
 use MessageQueue\Consumer\Redis\AddMysqlLogService;
 use Tool\SyPack;
@@ -48,13 +47,8 @@ class SyModuleApiTask extends SyModuleTaskBase implements SyModuleTaskInterface 
                 'projects' => $data['projects'],
             ], $this->moduleTag);
         }
-        if($data['clear_localwxshoptoken']){
-            $this->clearLocalWxshopTokenCache([
-                'projects' => $data['projects'],
-            ], $this->moduleTag);
-        }
-        if($data['clear_localwxopenauthorizertoken']){
-            $this->clearLocalWxopenAuthorizerTokenCache([
+        if($data['clear_localwx']){
+            $this->clearLocalWxCache([
                 'projects' => $data['projects'],
             ], $this->moduleTag);
         }

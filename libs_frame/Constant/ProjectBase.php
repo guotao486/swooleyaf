@@ -81,13 +81,16 @@ class ProjectBase {
     const ALI_PAY_STATUS_DISABLE = 0; //状态-无效
     const ALI_PAY_STATUS_ENABLE = 1; //状态-有效
 
+    //本地缓存常量
+    const LOCAL_CACHE_TAG_WX_ACCOUNT = '001'; //标识-微信账号
+    const LOCAL_CACHE_TAG_WXOPEN_AUTHORIZER = '002'; //标识-微信开放平台授权者
+
     //时间常量
     const TIME_EXPIRE_LOCAL_USER_CACHE = 300; //超时时间-本地用户缓存,单位为秒
     const TIME_EXPIRE_LOCAL_API_SIGN_CACHE = 300; //超时时间-本地api签名缓存,单位为秒
     const TIME_EXPIRE_LOCAL_WXACCOUNT_REFRESH = 600; //超时时间-本地微信账号更新,单位为秒
     const TIME_EXPIRE_LOCAL_WXACCOUNT_CLEAR = 3600; //超时时间-本地微信账号清理,单位为秒
-    const TIME_EXPIRE_LOCAL_WXACCOUNT_TOKEN_CLEAR = 300; //超时时间-本地微信账号token清理,单位为秒
-    const TIME_EXPIRE_LOCAL_WXOPEN_AUTHORIZER_TOKEN_CLEAR = 300; //超时时间-本地微信开放平台授权者token清理,单位为秒
+    const TIME_EXPIRE_LOCAL_WXCACHE_CLEAR = 300; //超时时间-本地微信缓存清理,单位为秒
     const TIME_EXPIRE_LOCAL_ALIPAY_REFRESH = 600; //超时时间-本地支付宝支付更新,单位为秒
     const TIME_EXPIRE_LOCAL_ALIPAY_CLEAR = 3600; //超时时间-本地支付宝支付清理,单位为秒
     const TIME_EXPIRE_SESSION = 259200; //超时时间-session,单位为秒
@@ -95,9 +98,8 @@ class ProjectBase {
     //任务常量,4位字符串,数字和字母组成,纯数字的为框架内部任务,其他为自定义任务
     const TASK_TYPE_CLEAR_API_SIGN_CACHE = '0001'; //任务类型-清理api签名缓存
     const TASK_TYPE_CLEAR_LOCAL_USER_CACHE = '0002'; //任务类型-清除本地用户信息缓存
-    const TASK_TYPE_CLEAR_LOCAL_WXSHOP_TOKEN_CACHE = '0003'; //任务类型-清除本地微信商户号token缓存
-    const TASK_TYPE_CLEAR_LOCAL_WXOPEN_AUTHORIZER_TOKEN_CACHE = '0004'; //任务类型-清除本地微信开放平台授权者token缓存
-    const TASK_TYPE_TIME_WHEEL_TASK = '0005'; //任务类型-时间轮任务
+    const TASK_TYPE_CLEAR_LOCAL_WX_CACHE = '0003'; //任务类型-清除本地微信商户号token缓存
+    const TASK_TYPE_TIME_WHEEL_TASK = '0004'; //任务类型-时间轮任务
 
     //消息队列常量
     const MESSAGE_QUEUE_TYPE_REDIS = 'redis'; //类型-redis
