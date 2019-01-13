@@ -41,6 +41,16 @@ trait BaseServerTrait {
      */
     protected static $_syWx = null;
     /**
+     * 最大项目缓存数量
+     * @var int
+     */
+    private static $_syProjectMaxNum = 0;
+    /**
+     * 当前项目缓存数量
+     * @var int
+     */
+    private static $_syProjectNowNum = 0;
+    /**
      * 最大用户数量
      * @var int
      */
@@ -62,6 +72,14 @@ trait BaseServerTrait {
     private static $_syWxNowNum = 0;
 
     private function checkBaseServer() {
+        self::$_syProjectNowNum = 0;
+        self::$_syProjectMaxNum = (int)$this->_configs['server']['cachenum']['local'];
+        if (self::$_syProjectMaxNum < 2) {
+            exit('项目缓存数量不能小于2');
+        } else if ((self::$_syProjectMaxNum & (self::$_syProjectMaxNum - 1)) != 0) {
+            exit('项目缓存数量必须是2的指数倍');
+        }
+
         self::$_syUserNowNum = 0;
         self::$_syUserMaxNum = (int)$this->_configs['server']['cachenum']['users'];
         if (self::$_syUserMaxNum < 2) {
@@ -91,10 +109,18 @@ trait BaseServerTrait {
      * @return bool
      */
     public static function setProjectCache(string $key,array $data) : bool {
-        $trueKey = trim($key);
-        if(strlen($trueKey) > 0){
-            $data['tag'] = $trueKey;
-            self::$_syProject->set($trueKey, $data);
+        if(strlen($key) == 0){
+            return false;
+        } else if (empty($data)) {
+            return false;
+        } else if(self::$_syProject->exist($key)){
+            $data['tag'] = $key;
+            self::$_syProject->set($key, $data);
+            return true;
+        } else if(self::$_syProjectNowNum < self::$_syProjectMaxNum){
+            $data['tag'] = $key;
+            self::$_syProject->set($key, $data);
+            self::$_syProjectNowNum++;
             return true;
         } else {
             return false;
@@ -125,7 +151,11 @@ trait BaseServerTrait {
      * @return mixed
      */
     public static function delProjectCache(string $key) {
-        return self::$_syProject->del($key);
+        $delRes = self::$_syProject->del($key);
+        if ($delRes) {
+            self::$_syProjectNowNum--;
+        }
+        return $delRes;
     }
 
     /**
@@ -171,7 +201,6 @@ trait BaseServerTrait {
         if($delRes){
             self::$_syUserNowNum--;
         }
-
         return $delRes;
     }
 
@@ -202,9 +231,11 @@ trait BaseServerTrait {
         if(empty($data)){
             return false;
         } else if(self::$_syWx->exist($appTag)){
+            $data['app_tag'] = $appTag;
             self::$_syWx->set($appTag, $data);
             return true;
         } else if(self::$_syWxNowNum < self::$_syWxMaxNum){
+            $data['app_tag'] = $appTag;
             self::$_syWx->set($appTag, $data);
             self::$_syWxNowNum++;
             return true;
@@ -229,6 +260,19 @@ trait BaseServerTrait {
         } else {
             return $data[$field] ?? $default;
         }
+    }
+
+    /**
+     * 删除项目微信缓存
+     * @param string $appTag
+     * @return mixed
+     */
+    public static function delWxCache(string $appTag) {
+        $delRes = self::$_syWx->del($appTag);
+        if($delRes){
+            self::$_syWxNowNum--;
+        }
+        return $delRes;
     }
 
     /**
