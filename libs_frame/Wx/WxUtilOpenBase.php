@@ -16,9 +16,9 @@ use SyServer\BaseServer;
 use Tool\ProjectTool;
 use Tool\Tool;
 use Traits\SimpleTrait;
+use Wx\Alone\JsTicket;
 use Wx\OpenCommon\AuthorizerAccessToken;
 use Wx\OpenCommon\AuthorizerInfo;
-use Wx\OpenCommon\AuthorizerJsTicket;
 
 abstract class WxUtilOpenBase extends WxUtilBase {
     use SimpleTrait;
@@ -155,10 +155,10 @@ abstract class WxUtilOpenBase extends WxUtilBase {
         }
 
         $accessToken = self::getAuthorizerAccessToken($appId);
-        $authorizerJsTicket = new AuthorizerJsTicket();
-        $authorizerJsTicket->setAccessToken($accessToken);
-        $jsTicketData = $authorizerJsTicket->getDetail();
-        unset($authorizerJsTicket);
+        $jsTicketObj = new JsTicket();
+        $jsTicketObj->setAccessToken($accessToken);
+        $jsTicketData = $jsTicketObj->getDetail();
+        unset($jsTicketObj);
 
         $expireTime = (int)($nowTime + $jsTicketData['expires_in'] - 10);
         CacheSimpleFactory::getRedisInstance()->hMset($redisKey, [
