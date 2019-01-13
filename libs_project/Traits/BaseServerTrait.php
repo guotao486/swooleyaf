@@ -276,7 +276,7 @@ trait BaseServerTrait {
     }
 
     /**
-     * 清理项目微信缓存
+     * 清理项目微信缓存 
      */
     protected function clearWxCache() {
         $nowTime = Tool::getNowTime();
