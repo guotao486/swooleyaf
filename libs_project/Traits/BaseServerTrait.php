@@ -85,6 +85,23 @@ trait BaseServerTrait {
     }
 
     /**
+     * 设置项目缓存
+     * @param string $key 键名
+     * @param array $data 键值
+     * @return bool
+     */
+    public static function setProjectCache(string $key,array $data) : bool {
+        $trueKey = trim($key);
+        if(strlen($trueKey) > 0){
+            $data['tag'] = $trueKey;
+            self::$_syProject->set($trueKey, $data);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
      * 获取项目缓存
      * @param string $key 键名
      * @param string $field 字段名
@@ -99,24 +116,6 @@ trait BaseServerTrait {
             return $data;
         } else {
             return $data[$field] ?? $default;
-        }
-    }
-
-    /**
-     * 设置项目缓存
-     * @param string $key 键名
-     * @param array $data 键值
-     * @return bool
-     */
-    public static function setProjectCache(string $key,array $data) : bool {
-        $trueKey = trim($key);
-        if(strlen($trueKey) > 0){
-            $data['tag'] = $trueKey;
-            self::$_syProject->set($trueKey, $data);
-
-            return true;
-        } else {
-            return false;
         }
     }
 
