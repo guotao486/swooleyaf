@@ -120,6 +120,15 @@ trait BaseServerTrait {
     }
 
     /**
+     * 删除项目缓存
+     * @param string $key
+     * @return mixed
+     */
+    public static function delProjectCache(string $key) {
+        return self::$_syProject->del($key);
+    }
+
+    /**
      * 添加本地用户信息
      * @param string $sessionId 会话ID
      * @param array $userData
