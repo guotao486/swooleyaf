@@ -61,12 +61,12 @@ trait BaseServerTrait {
      */
     private static $_syUserNowNum = 0;
     /**
-     * 最大微信账号数量
+     * 最大微信缓存数量
      * @var int
      */
     private static $_syWxMaxNum = 0;
     /**
-     * 当前微信账号数量
+     * 当前微信缓存数量
      * @var int
      */
     private static $_syWxNowNum = 0;
