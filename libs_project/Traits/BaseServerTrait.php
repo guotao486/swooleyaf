@@ -199,7 +199,6 @@ trait BaseServerTrait {
         } else if(self::$_syWxNowNum < self::$_syWxMaxNum){
             self::$_syWx->set($appTag, $data);
             self::$_syWxNowNum++;
-
             return true;
         } else {
             return true;
