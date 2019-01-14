@@ -8,12 +8,12 @@ if(!defined('SY_DATABASE')){
     define('SY_DATABASE', true);
 }
 //是否本地缓存微信账号数据
-if(!defined('SY_CACHE_WXACCOUNT')){
-    define('SY_CACHE_WXACCOUNT', false);
+if(!defined('SY_LC_WX_ACCOUNT')){
+    define('SY_LC_WX_ACCOUNT', false);
 }
 //是否本地缓存微信开放平台账号数据
-if(!defined('SY_CACHE_WXOPEN')){
-    define('SY_CACHE_WXOPEN', false);
+if(!defined('SY_LC_WXOPEN_AUTHORIZER')){
+    define('SY_LC_WXOPEN_AUTHORIZER', false);
 }
 
 $configs = \Tool\Tool::getConfig('project.' . SY_ENV . SY_PROJECT);

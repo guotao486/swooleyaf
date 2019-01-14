@@ -48,7 +48,7 @@ abstract class WxUtilOpenBase extends WxUtilBase {
     public static function getAuthorizerAccessToken(string $appId) : string {
         $nowTime = Tool::getNowTime();
         $localCacheTag = Project::LOCAL_CACHE_TAG_WXOPEN_AUTHORIZER . $appId;
-        if(SY_CACHE_WXOPEN){
+        if(SY_LC_WXOPEN_AUTHORIZER){
             $localCacheData = BaseServer::getWxCache($localCacheTag, '', []);
             if(isset($localCacheData['at_expire']) && ($localCacheData['at_expire'] >= $nowTime)){
                 return $localCacheData['at_content'];
@@ -83,7 +83,7 @@ abstract class WxUtilOpenBase extends WxUtilBase {
             $refreshToken = $cacheData['refresh_token'];
         } else if($redisData['at_key'] == $redisKey){
             if($redisData['at_expire'] >= $nowTime){
-                if(SY_CACHE_WXOPEN){
+                if(SY_LC_WXOPEN_AUTHORIZER){
                     $clearTime = $nowTime + Project::TIME_EXPIRE_LOCAL_WXCACHE_CLEAR;
                     BaseServer::setWxCache($localCacheTag, [
                         'at_content' => $redisData['at_content'],
@@ -111,7 +111,7 @@ abstract class WxUtilOpenBase extends WxUtilBase {
         CacheSimpleFactory::getRedisInstance()->hMset($redisKey, $cacheData);
         CacheSimpleFactory::getRedisInstance()->expire($redisKey, 86400);
 
-        if(SY_CACHE_WXOPEN){
+        if(SY_LC_WXOPEN_AUTHORIZER){
             $clearTime = $nowTime + Project::TIME_EXPIRE_LOCAL_WXCACHE_CLEAR;
             BaseServer::setWxCache($localCacheTag, [
                 'at_content' => $accessTokenData['authorizer_access_token'],
@@ -127,12 +127,13 @@ abstract class WxUtilOpenBase extends WxUtilBase {
      * 获取授权者js ticket
      * @param string $appId 授权者微信号
      * @return string
+     * @throws \Exception\Wx\WxException
      * @throws \Exception\Wx\WxOpenException
      */
     public static function getAuthorizerJsTicket(string $appId) : string {
         $nowTime = Tool::getNowTime();
         $localCacheTag = Project::LOCAL_CACHE_TAG_WXOPEN_AUTHORIZER . $appId;
-        if(SY_CACHE_WXOPEN){
+        if(SY_LC_WXOPEN_AUTHORIZER){
             $localCacheData = BaseServer::getWxCache($localCacheTag, '', []);
             if(isset($localCacheData['jt_expire']) && ($localCacheData['jt_expire'] >= $nowTime)){
                 return $localCacheData['jt_content'];
@@ -142,7 +143,7 @@ abstract class WxUtilOpenBase extends WxUtilBase {
         $redisKey = Project::REDIS_PREFIX_WX_COMPONENT_AUTHORIZER . $appId;
         $redisData = CacheSimpleFactory::getRedisInstance()->hGetAll($redisKey);
         if (isset($redisData['jt_key']) && ($redisData['jt_key'] == $redisKey) && ($redisData['jt_expire'] >= $nowTime)) {
-            if(SY_CACHE_WXOPEN){
+            if(SY_LC_WXOPEN_AUTHORIZER){
                 $clearTime = $nowTime + Project::TIME_EXPIRE_LOCAL_WXCACHE_CLEAR;
                 BaseServer::setWxCache($localCacheTag, [
                     'jt_content' => $redisData['jt_content'],
@@ -168,7 +169,7 @@ abstract class WxUtilOpenBase extends WxUtilBase {
         ]);
         CacheSimpleFactory::getRedisInstance()->expire($redisKey, 86400);
 
-        if(SY_CACHE_WXOPEN){
+        if(SY_LC_WXOPEN_AUTHORIZER){
             $clearTime = $nowTime + Project::TIME_EXPIRE_LOCAL_WXCACHE_CLEAR;
             BaseServer::setWxCache($localCacheTag, [
                 'jt_content' => $jsTicketData['ticket'],
